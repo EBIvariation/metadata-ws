@@ -17,28 +17,24 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
-import javax.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
 
+@Entity
 public class Taxonomy {
 
+    @NotNull
+    @JsonProperty
     @Id
-    private Long id;
+    private long id;
 
     @NotNull
-    @Size(max = 255)
-    @Column(nullable = false)
-    private String taxonomy;
-
-    @ManyToOne
-    private Taxonomy parent;
-
-    @OneToMany
-    private List<Taxonomy> child;
+    @JsonProperty
+    @Size(max = 255, min = 1)
+    private String name;
 
 }

@@ -17,19 +17,25 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
+@Entity
 public class Assembly {
 
     @Id
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
     @NotNull
-    @Size(max = 255)
+    @JsonProperty
     @Column(nullable = false)
-    private String taxonomy;
+    private String name;
 
 }

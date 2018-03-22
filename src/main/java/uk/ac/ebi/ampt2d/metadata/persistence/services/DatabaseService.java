@@ -15,14 +15,20 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.persistence.entities;
+package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
-public enum Technology {
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 
-    GWAS,
-    EXOME_SEQUENCING,
-    GENOTYPING,
-    ARRAY,
-    CURATION
+@Service
+public class DatabaseService implements IDatabaseService {
+
+    @Autowired
+    private TaxonomyRepository taxonomyRepository;
+
+    public DatabaseService() {
+
+    }
 
 }

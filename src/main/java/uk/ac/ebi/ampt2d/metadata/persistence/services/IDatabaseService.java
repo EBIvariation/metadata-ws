@@ -15,18 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.persistence.entities;
+package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import java.util.List;
-
-public class Samples {
-
-    @Id
-    private String id;
-
-    @ManyToMany
-    private List<StudyMetadata> studies;
-
+public interface IDatabaseService {
 }

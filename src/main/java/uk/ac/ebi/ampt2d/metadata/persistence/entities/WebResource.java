@@ -17,58 +17,46 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.hibernate.validator.constraints.URL;
+
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.validation.constraints.Size;
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
-public class StudyMetadata {
+@Entity
+public class WebResource {
 
     public enum Type {
 
-        CASE_CONTROL,
+        STUDY_WEB,
 
-        CONTROL_SET,
+        CENTER_WEB,
 
-        CASE_SET,
+        CONSORTIUM_WEB,
 
-        COLLECTION,
-
-        TUMOR,
-
-        MATCHED_NORMAL
+        PUBLICATION,
 
     }
 
     @Id
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
+    @NotNull
+    @JsonProperty
     @Column(nullable = false)
-    @Size(max = 255)
-    private String name;
-
-    @Lob
-    private byte[] description;
-
-    private Center center;
-
-    private Taxonomy taxonomy;
-
-    private Assembly assembly;
-
-    private List<Samples> samples;
-
-    private Technology technology;
-
     private Type type;
 
-    private Platform platform;
-
-    private List<WebResources> resources;
-
-    @ManyToMany
-    private List<FileMetadata> studies;
+    @NotNull
+    @URL
+    @JsonProperty
+    @Lob
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String resourceUrl;
 
 }

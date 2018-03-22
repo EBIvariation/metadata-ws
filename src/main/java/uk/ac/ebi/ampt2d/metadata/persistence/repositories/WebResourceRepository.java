@@ -15,21 +15,12 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.persistence.entities;
+package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 
-public class Center {
-
-    @Id
-    private Long id;
-
-    @NotNull
-    @Size(max = 255)
-    @Column(nullable = false)
-    private String name;
-
+@RepositoryRestResource
+public interface WebResourceRepository extends CrudRepository<WebResource, Long> {
 }

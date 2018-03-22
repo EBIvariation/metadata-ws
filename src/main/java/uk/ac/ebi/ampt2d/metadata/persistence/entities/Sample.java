@@ -17,11 +17,25 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
-import javax.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Platform {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
+
+@Entity
+public class Sample {
 
     @Id
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+
+    @NotNull
+    @Column(nullable = false)
+    @JsonProperty
+    private String name;
 
 }

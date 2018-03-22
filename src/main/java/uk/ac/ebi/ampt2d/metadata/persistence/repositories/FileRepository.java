@@ -18,7 +18,9 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
 import org.springframework.data.repository.CrudRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.FileMetadata;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 
-public interface FileRepository extends CrudRepository<FileMetadata, String> {
+@RepositoryRestResource
+public interface FileRepository extends CrudRepository<File, String> {
 }

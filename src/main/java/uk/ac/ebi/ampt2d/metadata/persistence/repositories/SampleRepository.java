@@ -19,8 +19,9 @@ package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 
 @RepositoryRestResource
-public interface StudyRepository extends CrudRepository<Study, Long> {
+public interface SampleRepository extends CrudRepository<Sample, Long> {
 }

@@ -15,31 +15,12 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.persistence.entities;
+package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.validation.constraints.NotNull;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 
-public class WebResources {
-
-    public enum Type {
-
-        STUDY_WEB,
-
-        CENTER_WEB,
-
-        CONSORTIUM_WEB,
-
-        PUBLICATION,
-
-    }
-
-    @Id
-    private Long id;
-
-    @NotNull
-    @Column(nullable = false)
-    private String string;
-
+@RepositoryRestResource
+public interface AssemblyRepository extends CrudRepository<Assembly, Long> {
 }
