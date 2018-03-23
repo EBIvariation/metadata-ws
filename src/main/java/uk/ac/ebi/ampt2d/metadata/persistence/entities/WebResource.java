@@ -18,6 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.Column;
@@ -43,6 +44,8 @@ public class WebResource {
 
     }
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @ApiModelProperty(value = "Web resource auto generated id", readOnly = true, allowEmptyValue = true)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;

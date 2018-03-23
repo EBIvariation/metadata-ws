@@ -17,10 +17,12 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
+import io.swagger.annotations.Api;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 
+@Api(tags = "Assembly")
 @RepositoryRestResource
 public interface AssemblyRepository extends CrudRepository<Assembly, Long> {
 }

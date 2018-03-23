@@ -18,6 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,6 +30,8 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class Assembly {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @ApiModelProperty(value = "Assembly resource auto generated id", readOnly = true, allowEmptyValue = true)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
