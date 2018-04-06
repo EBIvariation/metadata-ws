@@ -55,7 +55,7 @@ public class SwaggerConfig {
     private TypeResolver typeResolver;
 
     @Bean
-    public Docket petApi() {
+    public Docket metadataApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.any())
@@ -64,12 +64,12 @@ public class SwaggerConfig {
                 .apiInfo(getApiInfo())
                 .pathMapping("/")
                 .tags(
-                        new Tag("Assembly", "Assembly definition"),
-                        new Tag("File", "File metadata"),
-                        new Tag("Sample", "Study sample"),
-                        new Tag("Study", "Study metadata"),
-                        new Tag("Taxonomy", "Taxonomy definitions"),
-                        new Tag("Web resources", "Study resources that can be accessed through web protocols")
+                        new Tag("Assembly Entity", "Assembly definition"),
+                        new Tag("File Entity", "File metadata"),
+                        new Tag("Sample Entity", "Study sample"),
+                        new Tag("Study Entity", "Study metadata"),
+                        new Tag("Taxonomy Entity", "Taxonomy definitions"),
+                        new Tag("WebResource Entity", "Study resources that can be accessed through web protocols")
                 )
                 .directModelSubstitute(LocalDate.class, String.class)
                 .genericModelSubstitutes(ResponseEntity.class)

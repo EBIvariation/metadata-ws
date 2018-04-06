@@ -30,12 +30,14 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class Assembly {
 
+    @ApiModelProperty(position = 1, value = "Assembly resource auto generated id", readOnly = true,
+            allowEmptyValue = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @ApiModelProperty(value = "Assembly resource auto generated id", readOnly = true, allowEmptyValue = true)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @ApiModelProperty(position = 2)
     @NotNull
     @JsonProperty
     @Column(nullable = false)
