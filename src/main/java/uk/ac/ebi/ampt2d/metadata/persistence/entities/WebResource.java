@@ -44,17 +44,19 @@ public class WebResource {
 
     }
 
+    @ApiModelProperty(position = 1, value = "Web resource auto generated id", readOnly = true, required = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @ApiModelProperty(value = "Web resource auto generated id", readOnly = true, allowEmptyValue = true)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @ApiModelProperty(position = 2, required = true)
     @NotNull
     @JsonProperty
     @Column(nullable = false)
     private Type type;
 
+    @ApiModelProperty(position = 3, required = true)
     @NotNull
     @URL
     @JsonProperty

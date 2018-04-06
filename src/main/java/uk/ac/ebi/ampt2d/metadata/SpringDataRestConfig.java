@@ -28,6 +28,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 
@@ -47,8 +48,9 @@ public class SpringDataRestConfig {
             public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
                 config.exposeIdsFor(
                         Assembly.class,
-                        Sample.class,
                         File.class,
+                        Sample.class,
+                        Study.class,
                         Taxonomy.class,
                         WebResource.class
                 );

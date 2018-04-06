@@ -18,6 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -27,11 +28,13 @@ import javax.validation.constraints.Size;
 @Entity
 public class Taxonomy {
 
+    @ApiModelProperty(position = 1)
     @NotNull
     @JsonProperty
     @Id
     private long id;
 
+    @ApiModelProperty(position = 2)
     @NotNull
     @JsonProperty
     @Size(max = 255, min = 1)

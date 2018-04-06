@@ -18,6 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
@@ -68,16 +69,20 @@ public class Study {
 
     }
 
+    @ApiModelProperty(position = 1, value = "Study auto generated id", required = true, readOnly = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @ApiModelProperty(position = 2, required = true)
+    @Size(min = 1, max = 255)
     @NotNull
-    @Size(max = 255, min = 1)
     @JsonProperty
     @Column(nullable = false)
     private String name;
 
+    @ApiModelProperty(position = 3, required = true)
     @NotNull
     @NotBlank
     @JsonProperty
@@ -85,38 +90,46 @@ public class Study {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    @ApiModelProperty(position = 4, required = true)
     @NotNull
-    @Size(max = 255, min = 1)
+    @Size(min = 1, max = 255)
     @JsonProperty
     @Column(nullable = false)
     private String center;
 
-    @ManyToOne
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Taxonomy")
+    @JsonProperty
+    @ManyToOne(optional = false)
     private Taxonomy taxonomy;
 
-    @ManyToOne
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to an Assembly")
+    @JsonProperty
+    @ManyToOne(optional = false)
     private Assembly assembly;
 
-    @OneToMany
-    private List<Sample> samples;
-
+    @ApiModelProperty(position = 7, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Technology technology;
 
+    @ApiModelProperty(position = 8, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Type type;
 
+    @ApiModelProperty(position = 9, required = true)
     @NotNull
-    @Size(max = 255)
+    @Size(min = 1, max = 255)
     @JsonProperty
     @Column(nullable = false)
     private String platform;
+
+    @OneToMany
+    private List<Sample> samples;
 
     @OneToMany
     private List<WebResource> resources;

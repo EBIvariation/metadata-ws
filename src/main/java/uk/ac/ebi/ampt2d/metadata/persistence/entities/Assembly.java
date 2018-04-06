@@ -26,18 +26,19 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Assembly {
 
-    @ApiModelProperty(position = 1, value = "Assembly resource auto generated id", readOnly = true,
-            allowEmptyValue = true)
+    @ApiModelProperty(position = 1, value = "Assembly auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @ApiModelProperty(position = 2)
+    @ApiModelProperty(position = 2, required = true)
+    @Size(min = 1, max = 255)
     @NotNull
     @JsonProperty
     @Column(nullable = false)

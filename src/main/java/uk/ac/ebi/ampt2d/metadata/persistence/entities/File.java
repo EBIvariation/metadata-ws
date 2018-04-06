@@ -18,6 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,21 +42,25 @@ public class File {
         BINARY
     }
 
+    @ApiModelProperty(position = 1, required = true)
     @NotNull
+    @Size(min = 1, max = 255)
     @JsonProperty
     @Id
     private String hash;
 
+    @ApiModelProperty(position = 2, required = true)
     @NotNull
+    @Size(min = 1, max = 255)
     @JsonProperty
-    @Size(max = 255)
     @Column(nullable = false)
     private String fileName;
 
-    @NotNull
+    @ApiModelProperty(position = 3, required = true)
     @JsonProperty
     private long fileSize;
 
+    @ApiModelProperty(position = 4, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
