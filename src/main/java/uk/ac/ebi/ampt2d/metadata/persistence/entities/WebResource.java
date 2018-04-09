@@ -42,8 +42,6 @@ public class WebResource {
 
         CONSORTIUM_WEB,
 
-        PUBLICATION,
-
     }
 
     @ApiModelProperty(position = 1, value = "Web resource auto generated id", readOnly = true, required = true)

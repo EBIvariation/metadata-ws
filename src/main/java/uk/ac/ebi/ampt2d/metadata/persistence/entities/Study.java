@@ -137,4 +137,7 @@ public class Study {
     @ManyToMany
     private List<File> studies;
 
+    @ManyToMany
+    private List<Publication> publications;
+
 }

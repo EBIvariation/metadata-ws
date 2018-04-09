@@ -71,6 +71,7 @@ public class SwaggerConfig {
                 .tags(
                         new Tag("Assembly Entity", "Assembly definition"),
                         new Tag("File Entity", "File metadata"),
+                        new Tag("Publication Entity", "Publication Pubmed reference"),
                         new Tag("Sample Entity", "Study sample"),
                         new Tag("Study Entity", "Study metadata"),
                         new Tag("Taxonomy Entity", "Taxonomy definitions"),
