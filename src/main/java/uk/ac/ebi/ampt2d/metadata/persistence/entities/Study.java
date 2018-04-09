@@ -135,7 +135,7 @@ public class Study {
     private List<WebResource> resources;
 
     @ManyToMany
-    private List<File> studies;
+    private List<File> files;
 
     @ManyToMany
     private List<Publication> publications;
