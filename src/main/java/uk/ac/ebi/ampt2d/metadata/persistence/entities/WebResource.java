@@ -23,6 +23,8 @@ import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -53,6 +55,7 @@ public class WebResource {
     @ApiModelProperty(position = 2, required = true)
     @NotNull
     @JsonProperty
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Type type;
 
