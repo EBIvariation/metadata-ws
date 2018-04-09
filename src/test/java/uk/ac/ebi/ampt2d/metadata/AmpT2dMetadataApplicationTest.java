@@ -79,12 +79,12 @@ public class AmpT2dMetadataApplicationTest {
         String location = postTestAssembly();
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("human_gcr_37"));
+                .andExpect(jsonPath("$.name").value("GRCh37"));
     }
 
     private String postTestAssembly() throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/assemblies")
-                .content("{ \"name\": \"human_gcr_37\"}"))
+                .content("{ \"name\": \"GRCh37\"}"))
                 .andExpect(status().isCreated()).andReturn();
 
         return mvcResult.getResponse().getHeader("Location");
