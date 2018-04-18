@@ -17,10 +17,13 @@
  */
 package uk.ac.ebi.ampt2d.metadata;
 
+import uk.ac.ebi.ampt2d.metadata.SwaggerApiInfoProperties;
+
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -53,11 +56,15 @@ import static springfox.documentation.schema.AlternateTypeRules.newRule;
 
 @Configuration
 @EnableSwagger2
+@EnableConfigurationProperties(SwaggerApiInfoProperties.class)
 @Import({SpringDataRestConfiguration.class, BeanValidatorPluginsConfiguration.class})
 public class SwaggerConfig {
 
     @Autowired
     private TypeResolver typeResolver;
+
+    @Autowired
+    private SwaggerApiInfoProperties swaggerApiInfoProperties;
 
     @Bean
     public Docket metadataApi() {
@@ -117,13 +124,15 @@ public class SwaggerConfig {
 
     private ApiInfo getApiInfo() {
         return new ApiInfoBuilder()
-                .contact(new Contact("Europe Phenome Genome Archive - EMBL-EBI", "https://www.ebi.ac.uk/ega/", null))
-                .license("Apache 2.0")
-                .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0")
-                .termsOfServiceUrl(null)
-                .title("AMP T2D Metadata API")
-                .description("Metadata API for the project AMP-T2D")
-                .version("1.0")
+                .contact(new Contact(swaggerApiInfoProperties.getContact().getName(),
+                        swaggerApiInfoProperties.getContact().getUrl(),
+                        swaggerApiInfoProperties.getContact().getEmail()))
+                .license(swaggerApiInfoProperties.getLicense())
+                .licenseUrl(swaggerApiInfoProperties.getLicenseUrl())
+                .termsOfServiceUrl(swaggerApiInfoProperties.getTermsOfServiceUrl())
+                .title(swaggerApiInfoProperties.getTitle())
+                .description(swaggerApiInfoProperties.getDescription())
+                .version(swaggerApiInfoProperties.getVersion())
                 .build();
     }
 
