@@ -92,7 +92,7 @@ public class SwaggerApiInfoProperties {
         this.licenseUrl = licenseUrl;
     }
 
-    public class Contact {
+    protected class Contact {
 
         private String name;
 
