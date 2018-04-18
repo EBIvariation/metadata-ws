@@ -68,11 +68,11 @@ public class SwaggerApiInfoProperties {
         this.termsOfServiceUrl = termsOfServiceUrl;
     }
 
-    public uk.ac.ebi.ampt2d.metadata.SwaggerApiInfoProperties.Contact getContact() {
+    public Contact getContact() {
         return contact;
     }
 
-    public void setContact(uk.ac.ebi.ampt2d.metadata.SwaggerApiInfoProperties.Contact contact) {
+    public void setContact(Contact contact) {
         this.contact = contact;
     }
 
