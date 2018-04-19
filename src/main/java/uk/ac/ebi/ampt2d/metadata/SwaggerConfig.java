@@ -17,7 +17,7 @@
  */
 package uk.ac.ebi.ampt2d.metadata;
 
-import uk.ac.ebi.ampt2d.metadata.SwaggerApiInfoProperties;
+import uk.ac.ebi.ampt2d.metadata.properties.SwaggerApiInfoProperties;
 
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicate;

@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata;
+package uk.ac.ebi.ampt2d.metadata.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -30,7 +30,7 @@ public class SwaggerApiInfoProperties {
 
     private String termsOfServiceUrl;
 
-    private Contact contact = new Contact();
+    private SwaggerApiInfoContact contact = new SwaggerApiInfoContact();
 
     private String license;
 
@@ -68,11 +68,11 @@ public class SwaggerApiInfoProperties {
         this.termsOfServiceUrl = termsOfServiceUrl;
     }
 
-    public Contact getContact() {
+    public SwaggerApiInfoContact getContact() {
         return contact;
     }
 
-    public void setContact(Contact contact) {
+    public void setContact(SwaggerApiInfoContact contact) {
         this.contact = contact;
     }
 
@@ -90,38 +90,5 @@ public class SwaggerApiInfoProperties {
 
     public void setLicenseUrl(String licenseUrl) {
         this.licenseUrl = licenseUrl;
-    }
-
-    protected class Contact {
-
-        private String name;
-
-        private String url;
-
-        private String email;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
     }
 }
