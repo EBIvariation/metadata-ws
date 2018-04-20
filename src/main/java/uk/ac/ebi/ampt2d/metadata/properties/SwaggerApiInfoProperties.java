@@ -17,23 +17,33 @@
  */
 package uk.ac.ebi.ampt2d.metadata.properties;
 
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
+import javax.validation.Valid;
 
 @ConfigurationProperties(prefix="swagger.apiinfo")
+@Validated
 public class SwaggerApiInfoProperties {
 
+    @NotBlank(message="API title can not be blank.")
     private String title;
 
     private String description;
 
+    @NotBlank(message="API version can not be blank.")
     private String version;
 
+    @URL(message="Terms of Service URL is not valid.")
     private String termsOfServiceUrl;
 
+    @Valid
     private SwaggerApiInfoContact contact = new SwaggerApiInfoContact();
 
     private String license;
 
+    @URL(message="License URL is not valid.")
     private String licenseUrl;
 
     public String getTitle() {

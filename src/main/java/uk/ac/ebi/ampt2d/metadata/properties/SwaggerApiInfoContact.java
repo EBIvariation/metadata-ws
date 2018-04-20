@@ -18,12 +18,17 @@
 
 package uk.ac.ebi.ampt2d.metadata.properties;
 
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.URL;
+
 public class SwaggerApiInfoContact {
 
     private String name;
 
+    @URL(message="Contact URL is not valid.")
     private String url;
 
+    @Email(message="Contact email address is not valid.")
     private String email;
 
     public String getName() {
