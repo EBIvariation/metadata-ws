@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
@@ -47,6 +48,9 @@ public class MetadataApplicationTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private AnalysisRepository analysisRepository;
+
+    @Autowired
     private AssemblyRepository assemblyRepository;
 
     @Autowired
@@ -66,6 +70,7 @@ public class MetadataApplicationTest {
 
     @Before
     public void cleanDatabases() throws Exception {
+        analysisRepository.deleteAll();
         studyRepository.deleteAll();
         webResourceRepository.deleteAll();
         sampleRepository.deleteAll();
@@ -109,14 +114,36 @@ public class MetadataApplicationTest {
 
     @Test
     public void postStudy() throws Exception {
-        String assemblyUrl = postTestAssembly();
-        String taxonomyUrl = postTestTaxonomy();
+        String location = postTestStudy();
 
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("test human study"));
+    }
+
+    private String postTestStudy() throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/studies")
                 .content("{ " +
                         "\"name\": \"test human study\"," +
+                        "\"description\": \"Nothing important\"" +
+                        "}"))
+                .andExpect(status().isCreated()).andReturn();
+
+        return mvcResult.getResponse().getHeader("Location");
+    }
+
+    @Test
+    public void postAnalysis() throws Exception {
+        String assemblyUrl = postTestAssembly();
+        String taxonomyUrl = postTestTaxonomy();
+        String studyUrl = postTestStudy();
+
+        MvcResult mvcResult = mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"name\": \"test human analysis\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"center\": \"EBI\"," +
+                        "\"study\": \"" + studyUrl + "\"," +
                         "\"taxonomy\": \"" + taxonomyUrl + "\"," +
                         "\"assembly\": \"" + assemblyUrl + "\"," +
                         "\"technology\": \"GWAS\"," +
@@ -129,7 +156,7 @@ public class MetadataApplicationTest {
 
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("test human study"));
+                .andExpect(jsonPath("$.name").value("test human analysis"));
     }
 
     @Test

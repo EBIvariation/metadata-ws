@@ -37,7 +37,37 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
-public class Study {
+public class Analysis {
+
+    public enum Type {
+
+        CASE_CONTROL,
+
+        CONTROL_SET,
+
+        CASE_SET,
+
+        COLLECTION,
+
+        TUMOR,
+
+        MATCHED_NORMAL
+
+    }
+
+    public enum Technology {
+
+        GWAS,
+
+        EXOME_SEQUENCING,
+
+        GENOTYPING,
+
+        ARRAY,
+
+        CURATION
+
+    }
 
     @ApiModelProperty(position = 1, value = "Study auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -60,10 +90,53 @@ public class Study {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @OneToMany
-    private List<WebResource> resources;
+    @ApiModelProperty(position = 4, required = true)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @JsonProperty
+    @Column(nullable = false)
+    private String center;
+
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Study")
+    @JsonProperty
+    @ManyToOne(optional = false)
+    private Study study;
+
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a Taxonomy")
+    @JsonProperty
+    @ManyToOne(optional = false)
+    private Taxonomy taxonomy;
+
+    @ApiModelProperty(position = 7, dataType = "java.lang.String", notes = "Url to an Assembly")
+    @JsonProperty
+    @ManyToOne(optional = false)
+    private Assembly assembly;
+
+    @ApiModelProperty(position = 8, required = true)
+    @NotNull
+    @JsonProperty
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Technology technology;
+
+    @ApiModelProperty(position = 9, required = true)
+    @NotNull
+    @JsonProperty
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Type type;
+
+    @ApiModelProperty(position = 10, required = true)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @JsonProperty
+    @Column(nullable = false)
+    private String platform;
 
     @ManyToMany
-    private List<Publication> publications;
+    private List<Sample> samples;
+
+    @ManyToMany
+    private List<File> files;
 
 }

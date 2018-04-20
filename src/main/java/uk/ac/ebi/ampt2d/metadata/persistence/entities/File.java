@@ -67,7 +67,4 @@ public class File {
     @Column(nullable = false)
     private Type type;
 
-    @ManyToMany
-    private List<Study> studies;
-
 }

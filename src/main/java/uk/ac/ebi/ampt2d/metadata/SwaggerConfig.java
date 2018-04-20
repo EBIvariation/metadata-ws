@@ -76,10 +76,11 @@ public class SwaggerConfig {
                 .apiInfo(getApiInfo())
                 .pathMapping("/")
                 .tags(
+                        new Tag("Analysis Entity", "Analysis metadata"),
                         new Tag("Assembly Entity", "Assembly definition"),
                         new Tag("File Entity", "File metadata"),
                         new Tag("Publication Entity", "Publication Pubmed reference"),
-                        new Tag("Sample Entity", "Study sample"),
+                        new Tag("Sample Entity", "Sample metadata"),
                         new Tag("Study Entity", "Study metadata"),
                         new Tag("Taxonomy Entity", "Taxonomy definitions"),
                         new Tag("WebResource Entity", "Study resources that can be accessed through web protocols")
