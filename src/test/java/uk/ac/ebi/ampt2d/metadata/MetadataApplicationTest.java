@@ -122,10 +122,14 @@ public class MetadataApplicationTest {
     }
 
     private String postTestStudy() throws Exception {
+        String taxonomyUrl = postTestTaxonomy();
+
         MvcResult mvcResult = mockMvc.perform(post("/studies")
                 .content("{ " +
                         "\"name\": \"test human study\"," +
-                        "\"description\": \"Nothing important\"" +
+                        "\"description\": \"Nothing important\"," +
+                        "\"center\": \"EBI\"," +
+                        "\"taxonomy\": \"" + taxonomyUrl + "\"" +
                         "}"))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -135,16 +139,13 @@ public class MetadataApplicationTest {
     @Test
     public void postAnalysis() throws Exception {
         String assemblyUrl = postTestAssembly();
-        String taxonomyUrl = postTestTaxonomy();
         String studyUrl = postTestStudy();
 
         MvcResult mvcResult = mockMvc.perform(post("/analyses")
                 .content("{ " +
                         "\"name\": \"test human analysis\"," +
                         "\"description\": \"Nothing important\"," +
-                        "\"center\": \"EBI\"," +
                         "\"study\": \"" + studyUrl + "\"," +
-                        "\"taxonomy\": \"" + taxonomyUrl + "\"," +
                         "\"assembly\": \"" + assemblyUrl + "\"," +
                         "\"technology\": \"GWAS\"," +
                         "\"type\": \"CASE_CONTROL\"," +

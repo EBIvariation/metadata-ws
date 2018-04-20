@@ -60,6 +60,18 @@ public class Study {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    @ApiModelProperty(position = 4, required = true)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @JsonProperty
+    @Column(nullable = false)
+    private String center;
+
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Taxonomy")
+    @JsonProperty
+    @ManyToOne(optional = false)
+    private Taxonomy taxonomy;
+
     @OneToMany
     private List<WebResource> resources;
 

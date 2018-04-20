@@ -90,43 +90,31 @@ public class Analysis {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ApiModelProperty(position = 4, required = true)
-    @NotNull
-    @Size(min = 1, max = 255)
-    @JsonProperty
-    @Column(nullable = false)
-    private String center;
-
-    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Study")
+    @ApiModelProperty(position = 4, dataType = "java.lang.String", notes = "Url to a Study")
     @JsonProperty
     @ManyToOne(optional = false)
     private Study study;
 
-    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a Taxonomy")
-    @JsonProperty
-    @ManyToOne(optional = false)
-    private Taxonomy taxonomy;
-
-    @ApiModelProperty(position = 7, dataType = "java.lang.String", notes = "Url to an Assembly")
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to an Assembly")
     @JsonProperty
     @ManyToOne(optional = false)
     private Assembly assembly;
 
-    @ApiModelProperty(position = 8, required = true)
+    @ApiModelProperty(position = 6, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Technology technology;
 
-    @ApiModelProperty(position = 9, required = true)
+    @ApiModelProperty(position = 7, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Type type;
 
-    @ApiModelProperty(position = 10, required = true)
+    @ApiModelProperty(position = 8, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
