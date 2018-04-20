@@ -41,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class AmpT2dMetadataApplicationTest {
+public class MetadataApplicationTest {
 
     @Autowired
     private MockMvc mockMvc;

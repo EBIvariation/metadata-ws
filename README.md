@@ -1,2 +1,2 @@
-# amp-t2d-metadata
-Metadata API for project AMP T2D
+# Metadata API
+Metadata API for projects such as AMP T2D, EGA, EVA etc.

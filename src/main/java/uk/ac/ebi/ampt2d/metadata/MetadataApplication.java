@@ -21,10 +21,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AmpT2dMetadataApplication {
+public class MetadataApplication {
 
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(AmpT2dMetadataApplication.class, args);
+        SpringApplication.run(MetadataApplication.class, args);
     }
 
 }

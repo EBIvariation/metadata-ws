@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>uk.ac.ebi.ampt2d</groupId>
-    <artifactId>amp-t2d-metadata</artifactId>
+    <artifactId>metadata-ws</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>amp-t2d-metadata</name>
-    <url>http://github.com/EBIvariation/amp-t2d-metadata</url>
+    <name>metadata-ws</name>
+    <url>http://github.com/EBIvariation/metadata-ws</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
