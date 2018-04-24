@@ -89,7 +89,11 @@ public class MetadataApplicationTest {
 
     private String postTestAssembly() throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/assemblies")
-                .content("{ \"name\": \"GRCh37\"}"))
+                .content("{ " +
+                        "\"name\": \"GRCh37\"," +
+                        "\"patch\": \"p2\"," +
+                        "\"accessions\": [\"GCA_000001405.3\", \"GCF_000001405.14\"]" +
+                        "}"))
                 .andExpect(status().isCreated()).andReturn();
 
         return mvcResult.getResponse().getHeader("Location");

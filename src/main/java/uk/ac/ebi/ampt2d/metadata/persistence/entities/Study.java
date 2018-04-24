@@ -28,7 +28,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -56,7 +55,6 @@ public class Study {
     @NotNull
     @NotBlank
     @JsonProperty
-    @Lob
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
@@ -71,6 +69,9 @@ public class Study {
     @JsonProperty
     @ManyToOne(optional = false)
     private Taxonomy taxonomy;
+
+    @OneToMany(mappedBy="study")
+    private List<Analysis> analyses;
 
     @OneToMany
     private List<WebResource> resources;

@@ -18,9 +18,23 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+
+import java.util.List;
 
 @RepositoryRestResource
 public interface StudyRepository extends CrudRepository<Study, Long> {
+
+    @RestResource(path = "findByAssemblyName")
+    List<Study> findByAnalyses_Assembly_Name(@Param("name") String name );
+
+    @RestResource(path = "findByAssemblyNameAndPatch")
+    List<Study> findByAnalyses_Assembly_NameAndAnalyses_Assembly_Patch(
+            @Param("name") String name,
+            @Param("patch") String patch
+    );
+
 }
