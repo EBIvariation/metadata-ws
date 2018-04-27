@@ -42,6 +42,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -107,15 +108,16 @@ public class MetadataApplicationTest {
 
     @Test
     public void postAssembly() throws Exception {
-        String location = postTestAssembly();
+        String location = postTestAssembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("GRCh37"));
     }
 
-    private String postTestAssembly() throws Exception {
-        Assembly testAssembly = new Assembly("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+    private String postTestAssembly(String name, String patch, List<String> accessions) throws Exception {
+        Assembly testAssembly = new Assembly(name, patch, accessions);
 
         MvcResult mvcResult = mockMvc.perform(post("/assemblies")
                 .content(testAssemblyJson.write(testAssembly).getJson()))
@@ -145,19 +147,19 @@ public class MetadataApplicationTest {
 
     @Test
     public void postStudy() throws Exception {
-        String location = postTestStudy();
+        String location = postTestStudy("test human study");
 
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("test human study"));
     }
 
-    private String postTestStudy() throws Exception {
+    private String postTestStudy(String name) throws Exception {
         String taxonomyUrl = postTestTaxonomy();
 
         MvcResult mvcResult = mockMvc.perform(post("/studies")
                 .content("{ " +
-                        "\"name\": \"test human study\"," +
+                        "\"name\": \"" + name + "\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"center\": \"EBI\"," +
                         "\"taxonomy\": \"" + taxonomyUrl + "\"" +
@@ -169,8 +171,9 @@ public class MetadataApplicationTest {
 
     @Test
     public void postAnalysis() throws Exception {
-        String assemblyUrl = postTestAssembly();
-        String studyUrl = postTestStudy();
+        String assemblyUrl = postTestAssembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String studyUrl = postTestStudy("test human study");
 
         MvcResult mvcResult = mockMvc.perform(post("/analyses")
                 .content("{ " +
@@ -234,16 +237,26 @@ public class MetadataApplicationTest {
 
     @Test
     public void findAssemblyByName() throws Exception {
-        String location = postTestAssembly();
+        String grch37Url = postTestAssembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String grch38Url = postTestAssembly("GRCh38", "p2",
+                Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
 
         mockMvc.perform(get("/assemblies/search/findByName?name=GRCh37"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
-                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(location))
+                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch37Url))
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh37"));
 
         mockMvc.perform(get("/assemblies/search/findByName?name=GRCh38"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..assemblies").isArray())
+                .andExpect(jsonPath("$..assemblies.length()").value(1))
+                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch38Url))
+                .andExpect(jsonPath("$..assemblies[0].name").value("GRCh38"));
+
+        mockMvc.perform(get("/assemblies/search/findByName?name=NCBI36"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
@@ -252,17 +265,28 @@ public class MetadataApplicationTest {
 
     @Test
     public void findAssemblyByNameAndPatch() throws Exception {
-        String location = postTestAssembly();
+        String grch37Url = postTestAssembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String grch38Url = postTestAssembly("GRCh38", "p2",
+                Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
 
         mockMvc.perform(get("/assemblies/search/findByNameAndPatch?name=GRCh37&patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
-                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(location))
+                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch37Url))
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh37"))
                 .andExpect(jsonPath("$..assemblies[0].patch").value("p2"));
 
         mockMvc.perform(get("/assemblies/search/findByNameAndPatch?name=GRCh38&patch=p2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..assemblies").isArray())
+                .andExpect(jsonPath("$..assemblies.length()").value(1))
+                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch38Url))
+                .andExpect(jsonPath("$..assemblies[0].name").value("GRCh38"))
+                .andExpect(jsonPath("$..assemblies[0].patch").value("p2"));
+
+        mockMvc.perform(get("/assemblies/search/findByNameAndPatch?name=NCBI36&patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
@@ -271,27 +295,35 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
+
+        mockMvc.perform(get("/assemblies/search/findByNameAndPatch?name=GRCh38&patch=p3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..assemblies").isArray())
+                .andExpect(jsonPath("$..assemblies.length()").value(0));
     }
 
     @Test
     public void findAssemblyByAccessions() throws Exception {
-        String location = postTestAssembly();
+        String grch37Url = postTestAssembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String grch38Url = postTestAssembly("GRCh38", "p2",
+                Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
 
         mockMvc.perform(get("/assemblies/search/findByAccessions?accession=GCA_000001405.3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
-                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(location))
+                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch37Url))
                 .andExpect(jsonPath("$..assemblies[0].accessions").isArray())
                 .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItem("GCA_000001405.3")));
 
-        mockMvc.perform(get("/assemblies/search/findByAccessions?accession=GCF_000001405.14"))
+        mockMvc.perform(get("/assemblies/search/findByAccessions?accession=GCF_000001405.28"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
-                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(location))
+                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch38Url))
                 .andExpect(jsonPath("$..assemblies[0].accessions").isArray())
-                .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItem("GCF_000001405.14")));
+                .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItem("GCF_000001405.28")));
 
         mockMvc.perform(get("/assemblies/search/findByAccessions?accession=GCA_000001405.2"))
                 .andExpect(status().isOk())
@@ -301,15 +333,31 @@ public class MetadataApplicationTest {
 
     @Test
     public void findStudyByAssemblyName() throws Exception {
-        String assemblyUrl = postTestAssembly();
-        String studyUrl = postTestStudy();
+        String grch37AssemblyUrl = postTestAssembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String grch38AssemblyUrl = postTestAssembly("GRCh38", "p2",
+                Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
+        String grch37StudyUrl = postTestStudy("test human study based on GRCh37");
+        String grch38StudyUrl = postTestStudy("test human study based on GRCh38");
 
         mockMvc.perform(post("/analyses")
                 .content("{ " +
-                        "\"name\": \"test human analysis\"," +
+                        "\"name\": \"test human analysis based on GRCh37\"," +
                         "\"description\": \"Nothing important\"," +
-                        "\"study\": \"" + studyUrl + "\"," +
-                        "\"assembly\": \"" + assemblyUrl + "\"," +
+                        "\"study\": \"" + grch37StudyUrl + "\"," +
+                        "\"assembly\": \"" + grch37AssemblyUrl + "\"," +
+                        "\"technology\": \"GWAS\"," +
+                        "\"type\": \"CASE_CONTROL\"," +
+                        "\"platform\": \"string\"" +
+                        "}"))
+                .andExpect(status().isCreated()).andReturn();
+
+        mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"name\": \"test human analysis based on GRCh38\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"study\": \"" + grch38StudyUrl + "\"," +
+                        "\"assembly\": \"" + grch38AssemblyUrl + "\"," +
                         "\"technology\": \"GWAS\"," +
                         "\"type\": \"CASE_CONTROL\"," +
                         "\"platform\": \"string\"" +
@@ -320,9 +368,15 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(studyUrl));
+                .andExpect(jsonPath("$..studies[0]..study.href").value(grch37StudyUrl));
 
         mockMvc.perform(get("/studies/search/findByAssemblyName?name=GRCh38"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(grch38StudyUrl));
+
+        mockMvc.perform(get("/studies/search/findByAssemblyName?name=NCBI36"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
@@ -330,15 +384,31 @@ public class MetadataApplicationTest {
 
     @Test
     public void findStudyByAssemblyNameAndPatch() throws Exception {
-        String assemblyUrl = postTestAssembly();
-        String studyUrl = postTestStudy();
+        String grch37AssemblyUrl = postTestAssembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String grch38AssemblyUrl = postTestAssembly("GRCh38", "p2",
+                Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
+        String grch37StudyUrl = postTestStudy("test human study based on GRCh37");
+        String grch38StudyUrl = postTestStudy("test human study based on GRCh38");
 
         mockMvc.perform(post("/analyses")
                 .content("{ " +
-                        "\"name\": \"test human analysis\"," +
+                        "\"name\": \"test human analysis based on GRCh37\"," +
                         "\"description\": \"Nothing important\"," +
-                        "\"study\": \"" + studyUrl + "\"," +
-                        "\"assembly\": \"" + assemblyUrl + "\"," +
+                        "\"study\": \"" + grch37StudyUrl + "\"," +
+                        "\"assembly\": \"" + grch37AssemblyUrl + "\"," +
+                        "\"technology\": \"GWAS\"," +
+                        "\"type\": \"CASE_CONTROL\"," +
+                        "\"platform\": \"string\"" +
+                        "}"))
+                .andExpect(status().isCreated()).andReturn();
+
+        mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"name\": \"test human analysis based on GRCh38\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"study\": \"" + grch38StudyUrl + "\"," +
+                        "\"assembly\": \"" + grch38AssemblyUrl + "\"," +
                         "\"technology\": \"GWAS\"," +
                         "\"type\": \"CASE_CONTROL\"," +
                         "\"platform\": \"string\"" +
@@ -349,9 +419,15 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(studyUrl));
+                .andExpect(jsonPath("$..studies[0]..study.href").value(grch37StudyUrl));
 
         mockMvc.perform(get("/studies/search/findByAssemblyNameAndPatch?name=GRCh38&patch=p2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(grch38StudyUrl));
+
+        mockMvc.perform(get("/studies/search/findByAssemblyNameAndPatch?name=NCBI36&patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
