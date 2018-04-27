@@ -58,4 +58,12 @@ public class Assembly {
     @ElementCollection
     private List<String> accessions = new ArrayList<String>();
 
+    Assembly() {}
+
+    public Assembly(String name, String patch, List<String> accessions) {
+        this.name = name;
+        this.patch = patch;
+        this.accessions = accessions;
+    }
+
 }

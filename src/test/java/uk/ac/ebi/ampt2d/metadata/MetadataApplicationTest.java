@@ -21,11 +21,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
@@ -33,6 +40,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
+
+import java.util.Arrays;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -42,6 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@AutoConfigureJsonTesters
 @AutoConfigureMockMvc
 public class MetadataApplicationTest {
 
@@ -69,6 +79,21 @@ public class MetadataApplicationTest {
     @Autowired
     private WebResourceRepository webResourceRepository;
 
+    @Autowired
+    private JacksonTester<Assembly> testAssemblyJson;
+
+    @Autowired
+    private JacksonTester<File> testFileJson;
+
+    @Autowired
+    private JacksonTester<Sample> testSampleJson;
+
+    @Autowired
+    private JacksonTester<Taxonomy> testTaxonomyJson;
+
+    @Autowired
+    private JacksonTester<WebResource> testWebResourceJson;
+
     @Before
     public void cleanDatabases() throws Exception {
         analysisRepository.deleteAll();
@@ -89,12 +114,11 @@ public class MetadataApplicationTest {
     }
 
     private String postTestAssembly() throws Exception {
+        Assembly testAssembly = new Assembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+
         MvcResult mvcResult = mockMvc.perform(post("/assemblies")
-                .content("{ " +
-                        "\"name\": \"GRCh37\"," +
-                        "\"patch\": \"p2\"," +
-                        "\"accessions\": [\"GCA_000001405.3\", \"GCF_000001405.14\"]" +
-                        "}"))
+                .content(testAssemblyJson.write(testAssembly).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
         return mvcResult.getResponse().getHeader("Location");
@@ -105,13 +129,15 @@ public class MetadataApplicationTest {
         String location = postTestTaxonomy();
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value("9606"))
+                .andExpect(jsonPath("$.id").value(9606))
                 .andExpect(jsonPath("$.name").value("Homo sapiens"));
     }
 
     private String postTestTaxonomy() throws Exception {
+        Taxonomy testTaxonomy = new Taxonomy(9606, "Homo sapiens");
+
         MvcResult mvcResult = mockMvc.perform(post("/taxonomies")
-                .content("{ \"id\": 9606, \"name\": \"Homo sapiens\"}"))
+                .content(testTaxonomyJson.write(testTaxonomy).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
         return mvcResult.getResponse().getHeader("Location");
@@ -167,13 +193,9 @@ public class MetadataApplicationTest {
 
     @Test
     public void postFile() throws Exception {
+        File testFile = new File("asd123", "testName", 100, File.Type.TSV);
         MvcResult mvcResult = mockMvc.perform(post("/files")
-                .content("{" +
-                        "\"hash\": \"asd123\"," +
-                        "\"fileName\": \"testName\"," +
-                        "\"fileSize\": 100," +
-                        "\"type\": \"TSV\"" +
-                        "}"))
+                .content(testFileJson.write(testFile).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
         String location = mvcResult.getResponse().getHeader("Location");
@@ -184,10 +206,9 @@ public class MetadataApplicationTest {
 
     @Test
     public void postSample() throws Exception {
+        Sample testSample = new Sample("EBI_0000001");
         MvcResult mvcResult = mockMvc.perform(post("/samples")
-                .content("{" +
-                        "\"name\":\"EBI_0000001\"" +
-                        "}"))
+                .content(testSampleJson.write(testSample).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
         String location = mvcResult.getResponse().getHeader("Location");
@@ -198,11 +219,10 @@ public class MetadataApplicationTest {
 
     @Test
     public void postWebResource() throws Exception {
+        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "http:\\www.ebi.ac.uk");
+
         MvcResult mvcResult = mockMvc.perform(post("/webResources")
-                .content("{" +
-                        "\"type\":\"CENTER_WEB\"," +
-                        "\"resourceUrl\":\"http:\\\\www.ebi.ac.uk\"" +
-                        "}"))
+                .content(testWebResourceJson.write(testWebResource).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
         String location = mvcResult.getResponse().getHeader("Location");
