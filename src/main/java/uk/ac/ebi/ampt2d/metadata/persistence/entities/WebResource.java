@@ -65,4 +65,10 @@ public class WebResource {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String resourceUrl;
 
+    WebResource() {}
+
+    public WebResource(Type type, String resourceUrl) {
+        this.type = type;
+        this.resourceUrl = resourceUrl;
+    }
 }

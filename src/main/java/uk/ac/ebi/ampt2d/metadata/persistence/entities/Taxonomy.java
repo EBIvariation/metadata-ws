@@ -40,4 +40,10 @@ public class Taxonomy {
     @Size(max = 255, min = 1)
     private String name;
 
+    Taxonomy() {}
+
+    public Taxonomy(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

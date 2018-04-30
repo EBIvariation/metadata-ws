@@ -67,4 +67,13 @@ public class File {
     @Column(nullable = false)
     private Type type;
 
+    File() {}
+
+    public File(String hash, String fileName, long fileSize, Type type) {
+        this.hash = hash;
+        this.fileName = fileName;
+        this.fileSize = fileSize;
+        this.type = type;
+    }
+
 }

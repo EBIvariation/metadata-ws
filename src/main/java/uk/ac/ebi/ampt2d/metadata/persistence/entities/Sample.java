@@ -44,4 +44,10 @@ public class Sample {
     @JsonProperty
     private String name;
 
+    Sample() {}
+
+    public Sample(String name) {
+        this.name = name;
+    }
+
 }
