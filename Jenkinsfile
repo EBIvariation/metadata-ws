@@ -46,7 +46,7 @@ pipeline {
       }
       steps {
         echo 'Deploying to Staging'
-        sh "curl --upload-file staging/target/metadata-ws-*.war 'http://'${tomcatCredentials}'@'${stagingHost}':8080/manager/text/deploy?path=/ega/ampt2d/registry&update=true' | grep 'OK - Deployed application at context path '"
+        sh "curl --upload-file staging/target/metadata-ws-*.war 'http://'${tomcatCredentials}'@'${stagingHost}':8080/manager/text/deploy?path=/ega/ampt2d/metadata&update=true' | grep 'OK - Deployed application at context path '"
       }
     }
     stage('Deploy To FallBack And Production') {
@@ -57,9 +57,9 @@ pipeline {
       }
       steps {
         echo 'Deploying to Fallback'
-        sh "curl --upload-file fallback/target/metadata-ws-*.war 'http://'${tomcatCredentials}'@'${fallbackHost}':8080/manager/text/deploy?path=/ega/ampt2d/registry&update=true' | grep 'OK - Deployed application at context path '"
+        sh "curl --upload-file fallback/target/metadata-ws-*.war 'http://'${tomcatCredentials}'@'${fallbackHost}':8080/manager/text/deploy?path=/ega/ampt2d/metadata&update=true' | grep 'OK - Deployed application at context path '"
         echo 'Deploying to Production'
-        sh "curl --upload-file production/target/metadata-ws-*.war 'http://'${tomcatCredentials}'@'${productionHost}':8080/manager/text/deploy?path=/ega/ampt2d/registry&update=true' | grep 'OK - Deployed application at context path '"
+        sh "curl --upload-file production/target/metadata-ws-*.war 'http://'${tomcatCredentials}'@'${productionHost}':8080/manager/text/deploy?path=/ega/ampt2d/metadata&update=true' | grep 'OK - Deployed application at context path '"
         archiveArtifacts artifacts: 'production/target/metadata-ws-*.war' , fingerprint: true
       }
     }
