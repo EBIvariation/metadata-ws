@@ -25,10 +25,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
 
 @Entity
 public class File {
@@ -47,20 +45,27 @@ public class File {
     @Size(min = 1, max = 255)
     @JsonProperty
     @Id
-    private String hash;
+    private String accession;
 
     @ApiModelProperty(position = 2, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
     @Column(nullable = false)
-    private String fileName;
+    private String hash;
 
     @ApiModelProperty(position = 3, required = true)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @JsonProperty
+    @Column(nullable = false)
+    private String fileName;
+
+    @ApiModelProperty(position = 4, required = true)
     @JsonProperty
     private long fileSize;
 
-    @ApiModelProperty(position = 4, required = true)
+    @ApiModelProperty(position = 5, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
@@ -69,7 +74,8 @@ public class File {
 
     File() {}
 
-    public File(String hash, String fileName, long fileSize, Type type) {
+    public File(String accession, String hash, String fileName, long fileSize, Type type) {
+        this.accession = accession;
         this.hash = hash;
         this.fileName = fileName;
         this.fileSize = fileSize;

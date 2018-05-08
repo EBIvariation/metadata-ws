@@ -23,8 +23,6 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -36,11 +34,12 @@ import java.util.List;
 @Entity
 public class Study {
 
-    @ApiModelProperty(position = 1, value = "Study auto generated id", required = true, readOnly = true)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @ApiModelProperty(position = 1, required = true)
+    @Size(min = 1, max = 255)
+    @NotNull
+    @JsonProperty
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private String accession;
 
     @ApiModelProperty(position = 2, required = true)
     @Size(min = 1, max = 255)

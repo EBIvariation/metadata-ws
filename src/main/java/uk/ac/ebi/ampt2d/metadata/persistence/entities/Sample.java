@@ -22,8 +22,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -31,11 +29,12 @@ import javax.validation.constraints.Size;
 @Entity
 public class Sample {
 
-    @ApiModelProperty(position = 1, value = "Sample auto generated id", required = true, readOnly = true)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @ApiModelProperty(position = 1, required = true)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @JsonProperty
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private String accession;
 
     @ApiModelProperty(position = 2, required = true)
     @Size(min = 1, max = 255)
@@ -46,7 +45,8 @@ public class Sample {
 
     Sample() {}
 
-    public Sample(String name) {
+    public Sample(String accession, String name) {
+        this.accession = accession;
         this.name = name;
     }
 

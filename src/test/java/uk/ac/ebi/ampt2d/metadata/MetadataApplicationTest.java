@@ -424,48 +424,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh37&analyses.assembly.patch=p3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.type=CASE_CONTROL"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(2))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudyOneUrl))
-                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudyTwoUrl));
-
-        mockMvc.perform(get("/studies?analyses.type=TUMOR"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudyOneUrl));
-
-        mockMvc.perform(get("/studies?analyses.type=COLLECTION"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.type=CASE_CONTROL"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(2))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudyOneUrl))
-                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudyTwoUrl));
-
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.type=TUMOR"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudyOneUrl));
-
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.type=COLLECTION"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.assembly.name=NCBI36&analyses.type=CASE_CONTROL"))
+        mockMvc.perform(get("/studies/search/findByAssemblyNameAndPatch?name=GRCh37&patch=p3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));

@@ -22,5 +22,5 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 
 @RepositoryRestResource
-public interface SampleRepository extends CrudRepository<Sample, Long> {
+public interface SampleRepository extends CrudRepository<Sample, String> {
 }
