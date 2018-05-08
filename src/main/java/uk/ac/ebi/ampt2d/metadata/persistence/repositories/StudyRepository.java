@@ -21,9 +21,11 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
 import java.util.List;
+import java.util.Set;
 
 @RepositoryRestResource
 public interface StudyRepository extends CrudRepository<Study, Long> {
@@ -36,5 +38,8 @@ public interface StudyRepository extends CrudRepository<Study, Long> {
             @Param("name") String name,
             @Param("patch") String patch
     );
+
+    @RestResource(path = "findByType")
+    Set<Study> findByAnalyses_Type(@Param("type") Analysis.Type type);
 
 }

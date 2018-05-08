@@ -437,4 +437,79 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
     }
+
+    @Test
+    public void findStudyByType() throws Exception {
+        String testAssemblyUrl = postTestAssembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String testOneStudyUrl = postTestStudy("test one human study");
+        String testTwoStudyUrl = postTestStudy("test two human study");
+
+        mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"name\": \"test study one case control one human analysis\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"study\": \"" + testOneStudyUrl + "\"," +
+                        "\"assembly\": \"" + testAssemblyUrl + "\"," +
+                        "\"technology\": \"GWAS\"," +
+                        "\"type\": \"CASE_CONTROL\"," +
+                        "\"platform\": \"string\"" +
+                        "}"))
+                .andExpect(status().isCreated()).andReturn();
+
+        mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"name\": \"test study one case control two human analysis\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"study\": \"" + testOneStudyUrl + "\"," +
+                        "\"assembly\": \"" + testAssemblyUrl + "\"," +
+                        "\"technology\": \"GWAS\"," +
+                        "\"type\": \"CASE_CONTROL\"," +
+                        "\"platform\": \"string\"" +
+                        "}"))
+                .andExpect(status().isCreated()).andReturn();
+
+        mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"name\": \"test study one tumor human analysis\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"study\": \"" + testOneStudyUrl + "\"," +
+                        "\"assembly\": \"" + testAssemblyUrl + "\"," +
+                        "\"technology\": \"GWAS\"," +
+                        "\"type\": \"TUMOR\"," +
+                        "\"platform\": \"string\"" +
+                        "}"))
+                .andExpect(status().isCreated()).andReturn();
+
+        mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"name\": \"test study two case control human analysis\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"study\": \"" + testTwoStudyUrl + "\"," +
+                        "\"assembly\": \"" + testAssemblyUrl + "\"," +
+                        "\"technology\": \"GWAS\"," +
+                        "\"type\": \"CASE_CONTROL\"," +
+                        "\"platform\": \"string\"" +
+                        "}"))
+                .andExpect(status().isCreated()).andReturn();
+
+        mockMvc.perform(get("/studies/search/findByType?type=CASE_CONTROL"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testOneStudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testTwoStudyUrl));
+
+        mockMvc.perform(get("/studies/search/findByType?type=TUMOR"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testOneStudyUrl));
+
+        mockMvc.perform(get("/studies/search/findByType?type=COLLECTION"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+    }
+
 }
