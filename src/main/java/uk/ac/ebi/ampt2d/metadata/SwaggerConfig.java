@@ -17,8 +17,6 @@
  */
 package uk.ac.ebi.ampt2d.metadata;
 
-import uk.ac.ebi.ampt2d.metadata.properties.SwaggerApiInfoProperties;
-
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -42,11 +40,14 @@ import springfox.documentation.service.ResponseMessage;
 import springfox.documentation.service.Tag;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.data.rest.configuration.SpringDataRestConfiguration;
+import springfox.documentation.spring.web.paths.RelativePathProvider;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger.web.UiConfiguration;
 import springfox.documentation.swagger.web.UiConfigurationBuilder;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import uk.ac.ebi.ampt2d.metadata.properties.SwaggerApiInfoProperties;
 
+import javax.servlet.ServletContext;
 import java.lang.reflect.WildcardType;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -66,9 +67,18 @@ public class SwaggerConfig {
     @Autowired
     private SwaggerApiInfoProperties swaggerApiInfoProperties;
 
+    @Autowired
+    private ServletContext servletContext;
+
     @Bean
     public Docket metadataApi() {
         return new Docket(DocumentationType.SWAGGER_2)
+                .pathProvider((new RelativePathProvider(servletContext) {
+                    @Override
+                    protected String applicationPath() {
+                        return "/ega/ampt2d/metadata";
+                    }
+                }))
                 .select()
                 .apis(RequestHandlerSelectors.any())
                 .paths(getScanRestServicesPathPredicate())
