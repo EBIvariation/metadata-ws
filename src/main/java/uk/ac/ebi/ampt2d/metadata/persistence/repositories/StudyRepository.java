@@ -18,6 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
@@ -32,7 +33,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import java.util.List;
 
 @RepositoryRestResource
-public interface StudyRepository extends CrudRepository<Study, AccessionVersionEntityId>,
+public interface StudyRepository extends CrudRepository<Study, AccessionVersionEntityId>, StudyRepositoryCustom,
         QueryDslPredicateExecutor<Study>, QuerydslBinderCustomizer<QStudy> {
 
     default void customize(QuerydslBindings bindings, QStudy study) {
@@ -44,4 +45,15 @@ public interface StudyRepository extends CrudRepository<Study, AccessionVersionE
     @ApiOperation(value = "Get the latest version of Study based on accession")
     @RestResource(path = "/accession")
     List<Study> findFirstById_AccessionOrderById_VersionDesc(@Param("accession") String accession);
+
+    List<Study> findByTaxonomyIdIn(List<Long> ids);
+
+    @RestResource(path = "findByStudyTaxonomyId")
+    @Query // Important! To prevent from using default implementation.
+    List<Study> findByTaxonomyId(@Param("id") long id);
+
+    @RestResource(path = "findByStudyTaxonomyName")
+    @Query // Important! To prevent from using default implementation.
+    List<Study> findByTaxonomyName(@Param("name") String name);
+
 }

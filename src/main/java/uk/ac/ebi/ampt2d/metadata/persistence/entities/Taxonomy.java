@@ -22,8 +22,10 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.List;
 
 @Entity
 public class Taxonomy {
@@ -40,10 +42,12 @@ public class Taxonomy {
     @Size(max = 255, min = 1)
     private String name;
 
-    Taxonomy() {}
+    @ManyToMany
+    @JsonProperty
+    private List<Taxonomy> ancestors;
 
-    public Taxonomy(long id, String name) {
-        this.id = id;
-        this.name = name;
+    public long getId() {
+        return id;
     }
+
 }
