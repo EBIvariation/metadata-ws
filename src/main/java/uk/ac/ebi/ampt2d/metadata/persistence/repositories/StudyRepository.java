@@ -17,29 +17,24 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.data.rest.core.annotation.RestResource;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
-import java.util.List;
-import java.util.Set;
-
 @RepositoryRestResource
-public interface StudyRepository extends CrudRepository<Study, Long> {
+public interface StudyRepository extends JpaRepository<Study, Long>,
+        QueryDslPredicateExecutor<Study>, QuerydslBinderCustomizer<QStudy> {
 
-    @RestResource(path = "findByAssemblyName")
-    List<Study> findByAnalyses_Assembly_Name(@Param("name") String name );
-
-    @RestResource(path = "findByAssemblyNameAndPatch")
-    List<Study> findByAnalyses_Assembly_NameAndAnalyses_Assembly_Patch(
-            @Param("name") String name,
-            @Param("patch") String patch
-    );
-
-    @RestResource(path = "findByType")
-    Set<Study> findByAnalyses_Type(@Param("type") Analysis.Type type);
+    default void customize(QuerydslBindings bindings, QStudy study) {
+        bindings.bind(study.analyses.any().assembly.name,
+                study.analyses.any().assembly.patch)
+                .first((path, value) -> path.equalsIgnoreCase(value));
+        bindings.bind(study.analyses.any().type)
+                .first((path, value) -> path.eq(value));
+    }
 
 }

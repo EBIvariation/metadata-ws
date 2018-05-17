@@ -17,20 +17,23 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
-
-import java.util.List;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QAssembly;
 
 @RepositoryRestResource
-public interface AssemblyRepository extends CrudRepository<Assembly, Long> {
+public interface AssemblyRepository extends JpaRepository<Assembly, Long>,
+        QueryDslPredicateExecutor<Assembly>, QuerydslBinderCustomizer<QAssembly> {
 
-    List<Assembly> findByName(@Param("name") String name);
-
-    List<Assembly> findByNameAndPatch(@Param("name") String name, @Param("patch") String patch);
-
-    List<Assembly> findByAccessions(@Param("accession") String accession);
+    default void customize(QuerydslBindings bindings, QAssembly assembly) {
+        bindings.bind(assembly.name, assembly.patch)
+                .first((path, value) -> path.equalsIgnoreCase(value));
+        bindings.bind(assembly.accessions)
+                .first((path, value) -> path.any().equalsIgnoreCase(value.iterator().next()));
+    }
 
 }
