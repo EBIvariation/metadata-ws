@@ -23,8 +23,6 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -79,4 +77,11 @@ public class Study {
     @ManyToMany
     private List<Publication> publications;
 
+    Study() {
+    }
+
+    public Study(String name, String description) {
+        this.name = name;
+        this.description = description;
+    }
 }
