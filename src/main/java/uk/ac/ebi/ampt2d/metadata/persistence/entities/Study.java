@@ -77,11 +77,4 @@ public class Study {
     @ManyToMany
     private List<Publication> publications;
 
-    Study() {
-    }
-
-    public Study(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
 }
