@@ -19,12 +19,15 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import uk.ac.ebi.ampt2d.metadata.persistence.AccessionValidation;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -48,24 +51,29 @@ public class File {
     private String accession;
 
     @ApiModelProperty(position = 2, required = true)
-    @NotNull
-    @Size(min = 1, max = 255)
     @JsonProperty
-    @Column(nullable = false)
-    private String hash;
+    @Min(1)
+    private int version;
 
     @ApiModelProperty(position = 3, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
     @Column(nullable = false)
-    private String fileName;
+    private String hash;
 
     @ApiModelProperty(position = 4, required = true)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @JsonProperty
+    @Column(nullable = false)
+    private String fileName;
+
+    @ApiModelProperty(position = 5, required = true)
     @JsonProperty
     private long fileSize;
 
-    @ApiModelProperty(position = 5, required = true)
+    @ApiModelProperty(position = 6, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
@@ -74,12 +82,18 @@ public class File {
 
     File() {}
 
-    public File(String accession, String hash, String fileName, long fileSize, Type type) {
+    public File(String accession, String hash, int version, long fileSize, Type type, String fileName) {
         this.accession = accession;
         this.hash = hash;
+        this.version = version;
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.type = type;
+    }
+
+    @AssertTrue(message = "Please provide valid accession of pattern accession.version")
+    private boolean isValidAccession() {
+        return AccessionValidation.isValidAccession(this.accession, this.version);
     }
 
 }

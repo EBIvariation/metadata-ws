@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
+import uk.ac.ebi.ampt2d.metadata.persistence.AccessionValidation;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,6 +29,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -73,44 +76,49 @@ public class Analysis {
     private String accession;
 
     @ApiModelProperty(position = 2, required = true)
+    @Min(1)
+    @JsonProperty
+    private int version;
+
+    @ApiModelProperty(position = 3, required = true)
     @Size(min = 1, max = 255)
     @NotNull
     @JsonProperty
     @Column(nullable = false)
     private String name;
 
-    @ApiModelProperty(position = 3, required = true)
+    @ApiModelProperty(position = 4, required = true)
     @NotNull
     @NotBlank
     @JsonProperty
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ApiModelProperty(position = 4, dataType = "java.lang.String", notes = "Url to a Study")
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Study")
     @JsonProperty
     @ManyToOne(optional = false)
     private Study study;
 
-    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to an Assembly")
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to an Assembly")
     @JsonProperty
     @ManyToOne(optional = false)
     private Assembly assembly;
-
-    @ApiModelProperty(position = 6, required = true)
-    @NotNull
-    @JsonProperty
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Technology technology;
 
     @ApiModelProperty(position = 7, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Type type;
+    private Technology technology;
 
     @ApiModelProperty(position = 8, required = true)
+    @NotNull
+    @JsonProperty
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Type type;
+
+    @ApiModelProperty(position = 9, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
@@ -122,5 +130,10 @@ public class Analysis {
 
     @ManyToMany
     private List<File> files;
+
+    @AssertTrue(message = "Please provide valid accession of pattern accession.version")
+    private boolean isValidAccession() {
+        return AccessionValidation.isValidAccession(this.accession, this.version);
+    }
 
 }

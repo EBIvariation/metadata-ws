@@ -19,10 +19,13 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import uk.ac.ebi.ampt2d.metadata.persistence.AccessionValidation;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -37,17 +40,29 @@ public class Sample {
     private String accession;
 
     @ApiModelProperty(position = 2, required = true)
+    @Min(1)
+    @JsonProperty
+    private int version;
+
+    @ApiModelProperty(position = 3, required = true)
     @Size(min = 1, max = 255)
     @NotNull
     @Column(nullable = false)
     @JsonProperty
     private String name;
 
-    Sample() {}
+    Sample() {
+    }
 
-    public Sample(String accession, String name) {
+    public Sample(String accession, int version, String name) {
         this.accession = accession;
+        this.version = version;
         this.name = name;
+    }
+
+    @AssertTrue(message = "Please provide valid accession of pattern accession.version")
+    private boolean isValidAccession() {
+        return AccessionValidation.isValidAccession(this.accession, this.version);
     }
 
 }

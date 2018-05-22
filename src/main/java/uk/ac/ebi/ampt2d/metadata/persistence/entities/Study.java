@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
+import uk.ac.ebi.ampt2d.metadata.persistence.AccessionValidation;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,6 +28,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.AssertTrue;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -42,32 +45,37 @@ public class Study {
     private String accession;
 
     @ApiModelProperty(position = 2, required = true)
+    @Min(1)
+    @JsonProperty
+    private int version;
+
+    @ApiModelProperty(position = 3, required = true)
     @Size(min = 1, max = 255)
     @NotNull
     @JsonProperty
     @Column(nullable = false)
     private String name;
 
-    @ApiModelProperty(position = 3, required = true)
+    @ApiModelProperty(position = 4, required = true)
     @NotNull
     @NotBlank
     @JsonProperty
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ApiModelProperty(position = 4, required = true)
+    @ApiModelProperty(position = 5, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
     @Column(nullable = false)
     private String center;
 
-    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Taxonomy")
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a Taxonomy")
     @JsonProperty
     @ManyToOne(optional = false)
     private Taxonomy taxonomy;
 
-    @OneToMany(mappedBy="study")
+    @OneToMany(mappedBy = "study")
     private List<Analysis> analyses;
 
     @OneToMany
@@ -76,4 +84,8 @@ public class Study {
     @ManyToMany
     private List<Publication> publications;
 
+    @AssertTrue(message = "Please provide valid accession of pattern accession.version")
+    private boolean isValidAccession() {
+        return AccessionValidation.isValidAccession(this.accession, this.version);
+    }
 }
