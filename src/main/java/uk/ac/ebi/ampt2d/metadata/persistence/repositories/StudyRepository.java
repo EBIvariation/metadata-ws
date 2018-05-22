@@ -17,16 +17,16 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
 @RepositoryRestResource
-public interface StudyRepository extends JpaRepository<Study, Long>,
+public interface StudyRepository extends CrudRepository<Study, Long>,
         QueryDslPredicateExecutor<Study>, QuerydslBinderCustomizer<QStudy> {
 
     default void customize(QuerydslBindings bindings, QStudy study) {

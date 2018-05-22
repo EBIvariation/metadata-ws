@@ -17,16 +17,16 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QAssembly;
 
 @RepositoryRestResource
-public interface AssemblyRepository extends JpaRepository<Assembly, Long>,
+public interface AssemblyRepository extends CrudRepository<Assembly, Long>,
         QueryDslPredicateExecutor<Assembly>, QuerydslBinderCustomizer<QAssembly> {
 
     default void customize(QuerydslBindings bindings, QAssembly assembly) {
