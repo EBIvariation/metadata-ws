@@ -18,6 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.controllers;
 
 import com.querydsl.core.types.Predicate;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -35,8 +36,9 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
 
 @RestController
-@RequestMapping("/search/assemblies")
+@RequestMapping("/assemblies/search")
 @ExposesResourceFor(Assembly.class)
+@Api(tags = "Assembly Entity")
 public class AssemblyRestController implements ResourceProcessor<RepositoryLinksResource> {
 
     @Autowired

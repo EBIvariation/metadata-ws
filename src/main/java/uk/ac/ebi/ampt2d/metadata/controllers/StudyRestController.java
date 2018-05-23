@@ -18,6 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.controllers;
 
 import com.querydsl.core.types.Predicate;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -35,8 +36,9 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 @RestController
-@RequestMapping("search/studies")
+@RequestMapping("studies/search")
 @ExposesResourceFor(Study.class)
+@Api(tags = "Study Entity")
 public class StudyRestController implements ResourceProcessor<RepositoryLinksResource> {
 
     @Autowired
