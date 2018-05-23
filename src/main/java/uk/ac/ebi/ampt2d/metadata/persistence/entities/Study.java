@@ -84,6 +84,10 @@ public class Study {
     @ManyToMany
     private List<Publication> publications;
 
+    public String getAccession() {
+        return accession;
+    }
+
     @AssertTrue(message = "Please provide valid accession of pattern accession.version")
     private boolean isValidAccession() {
         return AccessionValidation.isValidAccession(this.accession, this.version);
