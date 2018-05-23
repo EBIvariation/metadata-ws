@@ -25,7 +25,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
-import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,8 +35,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
 
 @RestController
-@RequestMapping("/assemblies/search")
-@ExposesResourceFor(Assembly.class)
 @Api(tags = "Assembly Entity")
 public class AssemblyRestController implements ResourceProcessor<RepositoryLinksResource> {
 
@@ -50,7 +47,7 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
             @ApiImplicitParam(name = "patch", value = "Assembly's patch number", dataType = "string", paramType = "query", example = "p2"),
             @ApiImplicitParam(name = "accessions", value = "Assembly's accession", dataType = "string", paramType = "query", example = "GCA_000001405.3")
     })
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, value = "/assemblies/search")
     @ResponseBody
     public Iterable<Assembly> filter(@QuerydslPredicate(root = Assembly.class) Predicate predicate) {
         return assemblyRepository.findAll(predicate);
@@ -58,7 +55,7 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
-        resource.add(ControllerLinkBuilder.linkTo(AssemblyRestController.class).withRel("search"));
+        resource.add(ControllerLinkBuilder.linkTo(AssemblyRestController.class).slash("/assemblies/search").withRel("assemblies"));
         return resource;
     }
 

@@ -25,7 +25,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
-import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,8 +35,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 @RestController
-@RequestMapping("studies/search")
-@ExposesResourceFor(Study.class)
 @Api(tags = "Study Entity")
 public class StudyRestController implements ResourceProcessor<RepositoryLinksResource> {
 
@@ -50,7 +47,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
             @ApiImplicitParam(name = "analyses.assembly.patch", value = "Assembly's patch number", dataType = "string", paramType = "query", example = "p2"),
             @ApiImplicitParam(name = "analyses.type", value = "Analysis's type", dataType = "string", paramType = "query", example = "CASE_CONTROL")
     })
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET, value = "/studies/search")
     @ResponseBody
     public Iterable<Study> filter(@QuerydslPredicate(root = Study.class) Predicate predicate) {
         return studyRepository.findAll(predicate);
@@ -58,7 +55,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
-        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).withRel("search"));
+        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/studies/search").withRel("studies"));
         return resource;
     }
 
