@@ -33,7 +33,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
-public class Study {
+public class Study implements BaseEntity<AccessionVersionEntityId> {
 
     @ApiModelProperty(position = 1, required = true)
     @Valid
@@ -78,4 +78,5 @@ public class Study {
     public AccessionVersionEntityId getId() {
         return id;
     }
+
 }

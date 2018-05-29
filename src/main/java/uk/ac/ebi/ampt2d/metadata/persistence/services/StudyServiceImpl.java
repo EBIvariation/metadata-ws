@@ -15,16 +15,20 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
+package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class StudyRepositoryImpl implements StudyRepositoryCustom {
+@Component("studyService")
+public class StudyServiceImpl implements StudyService {
 
     @Autowired
     private TaxonomyRepository taxonomyRepository;
@@ -33,19 +37,20 @@ public abstract class StudyRepositoryImpl implements StudyRepositoryCustom {
     private StudyRepository studyRepository;
 
     @Override
-    public List<Study> findByTaxonomyId(long id) {
+    public List<Study> findStudiesByTaxonomyId(long id) {
         List<Taxonomy> taxonomies = taxonomyRepository.findByIdOrAncestorsId(id, id);
 
-        List<Long> taxonomyIds = taxonomies.stream().map(Taxonomy::getId)
-               .collect(Collectors.toList());
-
-        return studyRepository.findByTaxonomyIdIn(taxonomyIds);
+        return findStudiesByTaxonomyIn(taxonomies);
     }
 
     @Override
-    public List<Study> findByTaxonomyName(String name) {
+    public List<Study> findStudiesByTaxonomyName(String name) {
         List<Taxonomy> taxonomies = taxonomyRepository.findByNameOrAncestorsName(name, name);
 
+        return findStudiesByTaxonomyIn(taxonomies);
+    }
+
+    private List<Study> findStudiesByTaxonomyIn(List<Taxonomy> taxonomies) {
         List<Long> taxonomyIds = taxonomies.stream().map(Taxonomy::getId)
                 .collect(Collectors.toList());
 

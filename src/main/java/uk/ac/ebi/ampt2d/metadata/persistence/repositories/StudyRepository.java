@@ -33,7 +33,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import java.util.List;
 
 @RepositoryRestResource
-public interface StudyRepository extends CrudRepository<Study, AccessionVersionEntityId>, StudyRepositoryCustom,
+public interface StudyRepository extends CrudRepository<Study, AccessionVersionEntityId>,
         QueryDslPredicateExecutor<Study>, QuerydslBinderCustomizer<QStudy> {
 
     default void customize(QuerydslBindings bindings, QStudy study) {
@@ -47,13 +47,5 @@ public interface StudyRepository extends CrudRepository<Study, AccessionVersionE
     List<Study> findFirstById_AccessionOrderById_VersionDesc(@Param("accession") String accession);
 
     List<Study> findByTaxonomyIdIn(List<Long> ids);
-
-    @RestResource(path = "findByStudyTaxonomyId")
-    @Query // Important! To prevent from using default implementation.
-    List<Study> findByTaxonomyId(@Param("id") long id);
-
-    @RestResource(path = "findByStudyTaxonomyName")
-    @Query // Important! To prevent from using default implementation.
-    List<Study> findByTaxonomyName(@Param("name") String name);
 
 }

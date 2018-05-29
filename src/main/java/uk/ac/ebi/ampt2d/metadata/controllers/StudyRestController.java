@@ -24,18 +24,23 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import io.swagger.annotations.ApiParam;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import uk.ac.ebi.ampt2d.metadata.assemblers.ResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,6 +52,12 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
 
     @Autowired
     private StudyRepository studyRepository;
+
+    @Autowired
+    private StudyService studyService;
+
+    @Autowired
+    private ResourceAssembler<Study> resourceAssembler;
 
     @ApiOperation(value = "Get a filtered list of studies based on filtering criteria")
     @ApiImplicitParams({
@@ -72,10 +83,37 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
                         .withRel("search")).collect(Collectors.toList()));
     }
 
+
+    @ApiOperation(value = "Get the list of studies filtered by taxonomy id")
+    @ApiParam(name = "id", value = "Taxonomy's id", type = "long", required = true, example = "9606")
+    @RequestMapping(method = RequestMethod.GET, value = "/studies/search/findByStudyTaxonomyId")
+    @ResponseBody
+    public ResponseEntity<Resources<?>> findStudiesByTaxonomyId(@Param(value = "id") long id) {
+        List<Study> studies = studyService.findStudiesByTaxonomyId(id);
+
+        Resources<?> resources = resourceAssembler.entitiesToResources(Study.class, studies);
+
+        return ResponseEntity.ok(resources);
+    }
+
+    @ApiOperation(value = "Get the list of studies filtered by taxonomy name")
+    @ApiParam(name = "name", value = "Taxonomy's name", type = "string", required = true, example = "Homo sapiens")
+    @RequestMapping(method = RequestMethod.GET, value = "/studies/search/findByStudyTaxonomyName")
+    @ResponseBody
+    public ResponseEntity<Resources<?>> findStudiesByTaxonomyName(@Param(value = "name") String name) {
+        List<Study> studies = studyService.findStudiesByTaxonomyName(name);
+
+        Resources<?> resources = resourceAssembler.entitiesToResources(Study.class, studies);
+
+        return ResponseEntity.ok(resources);
+    }
+
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search").withRel("studies"));
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/text").withRel("studies"));
+        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/studies/search/findByStudyTaxonomyId").withRel("studies"));
+        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/studies/search/findByStudyTaxonomyName").withRel("studies"));
         return resource;
     }
 

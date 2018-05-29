@@ -15,16 +15,16 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
+package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
 import java.util.List;
 
-public interface StudyRepositoryCustom {
+public interface StudyService {
 
-    List<Study> findByTaxonomyId(long id);
+    List<Study> findStudiesByTaxonomyId(long id);
 
-    List<Study> findByTaxonomyName(String name);
+    List<Study> findStudiesByTaxonomyName(String name);
 
 }

@@ -34,10 +34,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepositoryCustom;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepositoryImpl;
-
-import java.util.List;
 
 @Configuration
 public class SpringDataRestConfig {
@@ -79,21 +75,6 @@ public class SpringDataRestConfig {
                 validatingListener.addValidator("beforeSave", validator);
             }
 
-        };
-    }
-
-    @Bean
-    public StudyRepositoryCustom studyRepositoryImpl() {
-        return new StudyRepositoryImpl() {
-            @Override
-            public List<Study> findByTaxonomyId(long id) {
-                return super.findByTaxonomyId(id);
-            }
-
-            @Override
-            public List<Study> findByTaxonomyName(String name) {
-                return super.findByTaxonomyName(name);
-            }
         };
     }
 
