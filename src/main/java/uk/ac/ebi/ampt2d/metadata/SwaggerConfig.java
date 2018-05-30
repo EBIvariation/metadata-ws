@@ -34,6 +34,7 @@ import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.ResponseMessageBuilder;
 import springfox.documentation.schema.AlternateTypeRule;
+import springfox.documentation.schema.WildcardType;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.service.ResponseMessage;
@@ -48,7 +49,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import uk.ac.ebi.ampt2d.metadata.properties.SwaggerApiInfoProperties;
 
 import javax.servlet.ServletContext;
-import java.lang.reflect.WildcardType;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -147,10 +147,14 @@ public class SwaggerConfig {
                 .build();
     }
 
-    private AlternateTypeRule getSubstitutionRules() {
-        return newRule(typeResolver.resolve(DeferredResult.class,
+    private AlternateTypeRule[] getSubstitutionRules() {
+        AlternateTypeRule[] alternateTypeRules = new AlternateTypeRule[2];
+        alternateTypeRules[0] = newRule(typeResolver.resolve(DeferredResult.class,
                 typeResolver.resolve(ResponseEntity.class, WildcardType.class)),
                 typeResolver.resolve(WildcardType.class));
+        alternateTypeRules[1] = newRule(typeResolver.resolve(Iterable.class, WildcardType.class),
+                typeResolver.resolve(List.class, WildcardType.class));
+        return alternateTypeRules;
     }
 
     @Bean
