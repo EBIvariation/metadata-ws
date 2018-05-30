@@ -33,8 +33,6 @@ public interface StudyRepository extends CrudRepository<Study, Long>,
         bindings.bind(study.analyses.any().assembly.name,
                 study.analyses.any().assembly.patch)
                 .first((path, value) -> path.equalsIgnoreCase(value));
-        bindings.bind(study.analyses.any().type)
-                .first((path, value) -> path.eq(value));
     }
 
 }
