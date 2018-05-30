@@ -23,9 +23,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.querydsl.binding.QuerydslPredicate;
-import io.swagger.annotations.ApiParam;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
@@ -86,9 +83,9 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
 
     @ApiOperation(value = "Get the list of studies filtered by taxonomy id")
     @ApiParam(name = "id", value = "Taxonomy's id", type = "long", required = true, example = "9606")
-    @RequestMapping(method = RequestMethod.GET, value = "/studies/search/findByStudyTaxonomyId")
+    @RequestMapping(method = RequestMethod.GET, value = "/studies/search/findByStudyTaxonomyId", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Resources<?>> findStudiesByTaxonomyId(@Param(value = "id") long id) {
+    public ResponseEntity<Resources<?>> findStudiesByTaxonomyId(long id) {
         List<Study> studies = studyService.findStudiesByTaxonomyId(id);
 
         Resources<?> resources = resourceAssembler.entitiesToResources(Study.class, studies);
@@ -98,9 +95,9 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
 
     @ApiOperation(value = "Get the list of studies filtered by taxonomy name")
     @ApiParam(name = "name", value = "Taxonomy's name", type = "string", required = true, example = "Homo sapiens")
-    @RequestMapping(method = RequestMethod.GET, value = "/studies/search/findByStudyTaxonomyName")
+    @RequestMapping(method = RequestMethod.GET, value = "/studies/search/findByStudyTaxonomyName", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Resources<?>> findStudiesByTaxonomyName(@Param(value = "name") String name) {
+    public ResponseEntity<Resources<?>> findStudiesByTaxonomyName(String name) {
         List<Study> studies = studyService.findStudiesByTaxonomyName(name);
 
         Resources<?> resources = resourceAssembler.entitiesToResources(Study.class, studies);
