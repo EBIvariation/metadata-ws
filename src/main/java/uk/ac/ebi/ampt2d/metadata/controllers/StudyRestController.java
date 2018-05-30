@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.hateoas.ResourceProcessor;
+import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -47,10 +48,10 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
             @ApiImplicitParam(name = "analyses.assembly.patch", value = "Assembly's patch number", dataType = "string", paramType = "query", example = "p2"),
             @ApiImplicitParam(name = "analyses.type", value = "Analysis's type", dataType = "string", paramType = "query", example = "CASE_CONTROL")
     })
-    @RequestMapping(method = RequestMethod.GET, value = "/studies/search")
+    @RequestMapping(method = RequestMethod.GET, value = "/studies/search", produces = "application/json")
     @ResponseBody
-    public Iterable<Study> search(@QuerydslPredicate(root = Study.class) Predicate predicate) {
-        return studyRepository.findAll(predicate);
+    public Resources<Study> search(@QuerydslPredicate(root = Study.class) Predicate predicate) {
+        return new Resources<>(studyRepository.findAll(predicate));
     }
 
     @Override
