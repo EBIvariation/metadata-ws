@@ -41,7 +41,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @Autowired
     private StudyRepository studyRepository;
 
-    @ApiOperation(value = "Get the list of studies or by query filter")
+    @ApiOperation(value = "Get a filtered list of studies based on filtering criteria")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "analyses.assembly.name", value = "Assembly's name", dataType = "string", paramType = "query", example = "grch37"),
             @ApiImplicitParam(name = "analyses.assembly.patch", value = "Assembly's patch number", dataType = "string", paramType = "query", example = "p2"),
@@ -49,7 +49,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     })
     @RequestMapping(method = RequestMethod.GET, value = "/studies/search")
     @ResponseBody
-    public Iterable<Study> filter(@QuerydslPredicate(root = Study.class) Predicate predicate) {
+    public Iterable<Study> search(@QuerydslPredicate(root = Study.class) Predicate predicate) {
         return studyRepository.findAll(predicate);
     }
 

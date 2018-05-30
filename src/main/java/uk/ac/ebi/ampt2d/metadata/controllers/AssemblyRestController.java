@@ -41,15 +41,15 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
     @Autowired
     private AssemblyRepository assemblyRepository;
 
-    @ApiOperation(value="Get the list of assemblies or by query filter")
+    @ApiOperation(value="Get a filtered list of assemblies based on filtering criteria")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "name", value = "Assembly's name", dataType = "string", paramType = "query", example = "grch38"),
-            @ApiImplicitParam(name = "patch", value = "Assembly's patch number", dataType = "string", paramType = "query", example = "p2"),
-            @ApiImplicitParam(name = "accessions", value = "Assembly's accession", dataType = "string", paramType = "query", example = "GCA_000001405.3")
+            @ApiImplicitParam(name = "name", value = "name", dataType = "string", paramType = "query", example = "GRCh38"),
+            @ApiImplicitParam(name = "patch", value = "patch number", dataType = "string", paramType = "query", example = "p2"),
+            @ApiImplicitParam(name = "accessions", value = "accession", dataType = "string", paramType = "query", example = "GCA_000001405.3")
     })
     @RequestMapping(method = RequestMethod.GET, value = "/assemblies/search")
     @ResponseBody
-    public Iterable<Assembly> filter(@QuerydslPredicate(root = Assembly.class) Predicate predicate) {
+    public Iterable<Assembly> search(@QuerydslPredicate(root = Assembly.class) Predicate predicate) {
         return assemblyRepository.findAll(predicate);
     }
 
