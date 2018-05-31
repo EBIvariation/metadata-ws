@@ -30,8 +30,10 @@ import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
@@ -52,6 +54,16 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @ResponseBody
     public Resources<Study> search(@QuerydslPredicate(root = Study.class) Predicate predicate) {
         return new Resources<>(studyRepository.findAll(predicate));
+    }
+
+    @ApiOperation(value = "studySearch")
+    @RequestMapping(method = RequestMethod.GET, path = "/studies/search/text")
+    public Iterable<Study> getStudies(@RequestParam("searchString") String searchString) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.name.containsIgnoreCase(searchString).
+                or(study.description.containsIgnoreCase(searchString));
+        return studyRepository.findAll(predicate);
+
     }
 
     @Override

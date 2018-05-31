@@ -477,15 +477,15 @@ public class MetadataApplicationTest {
         postTestStudy("test human study based on GRCh37");
         postTestStudy("test human study based on GRCh38");
 
-        mockMvc.perform(get("/studies/search/").param("searchString","human"))
+        mockMvc.perform(get("/studies/search/text").param("searchString","human"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*").isArray())
                 .andExpect(jsonPath("$.length()").value(2));
-        mockMvc.perform(get("/studies/search/").param("searchString","important"))
+        mockMvc.perform(get("/studies/search/text").param("searchString","important"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.*").isArray())
                 .andExpect(jsonPath("$.length()").value(2));
-        mockMvc.perform(get("/studies/search/").param("searchString","GrCh39"))
+        mockMvc.perform(get("/studies/search/text").param("searchString","GrCh39"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(0));
 
