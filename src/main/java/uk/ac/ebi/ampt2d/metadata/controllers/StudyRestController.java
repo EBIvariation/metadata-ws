@@ -105,6 +105,16 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
         return ResponseEntity.ok(resources);
     }
 
+    @ApiOperation(value = "studySearch")
+    @RequestMapping(method = RequestMethod.GET, path = "/studies/search/text")
+    public Iterable<Study> getStudies(@RequestParam("searchString") String searchString) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.name.containsIgnoreCase(searchString).
+                or(study.description.containsIgnoreCase(searchString));
+        return studyRepository.findAll(predicate);
+
+    }
+
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search").withRel("studies"));
