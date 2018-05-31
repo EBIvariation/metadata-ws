@@ -106,19 +106,25 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     }
 
     @ApiOperation(value = "studySearch")
-    @RequestMapping(method = RequestMethod.GET, path = "/studies/search/text")
-    public Iterable<Study> getStudies(@RequestParam("searchString") String searchString) {
+    @ApiParam(name = "searchString", value = "search string", type = "string", required = true, example = "human")
+    @RequestMapping(method = RequestMethod.GET, path = "/studies/search/text", produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<Resources<?>> getStudies(String searchString) {
         QStudy study = QStudy.study;
         Predicate predicate = study.name.containsIgnoreCase(searchString).
                 or(study.description.containsIgnoreCase(searchString));
-        return studyRepository.findAll(predicate);
+        List<Study> studies = (List<Study>) studyService.findAll(predicate);
 
+        Resources<?> resources = resourceAssembler.entitiesToResources(Study.class, studies);
+
+        return ResponseEntity.ok(resources);
     }
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search").withRel("studies"));
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/text").withRel("studies"));
+        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/studies/search/text").withRel("studies"));
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/studies/search/findByStudyTaxonomyId").withRel("studies"));
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/studies/search/findByStudyTaxonomyName").withRel("studies"));
         return resource;

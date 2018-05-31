@@ -508,7 +508,6 @@ public class MetadataApplicationTest {
     @Test
     public void testAccesionValidation() throws Exception {
         String taxonomyUrl = postTestTaxonomy();
-
         mockMvc.perform(post("/studies")
                 .content("{ " +
                         "\"id\":{ \"accession\": \"EGAS0001\",\"version\":  0 }," +

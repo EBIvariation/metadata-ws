@@ -17,6 +17,7 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
+import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
@@ -35,6 +36,11 @@ public class StudyServiceImpl implements StudyService {
 
     @Autowired
     private StudyRepository studyRepository;
+
+    @Override
+    public Iterable<Study> findAll(Predicate predicate) {
+        return studyRepository.findAll(predicate);
+    }
 
     @Override
     public List<Study> findStudiesByTaxonomyId(long id) {
