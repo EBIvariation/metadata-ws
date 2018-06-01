@@ -37,6 +37,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
 
 @RestController
 @Api(tags = "Assembly Entity")
+@RequestMapping(path = "assemblies")
 public class AssemblyRestController implements ResourceProcessor<RepositoryLinksResource> {
 
     @Autowired
@@ -48,7 +49,7 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
             @ApiImplicitParam(name = "patch", value = "patch number", dataType = "string", paramType = "query", example = "p2"),
             @ApiImplicitParam(name = "accessions", value = "accession", dataType = "string", paramType = "query", example = "GCA_000001405.3")
     })
-    @RequestMapping(method = RequestMethod.GET, value = "/assemblies/search", produces = "application/json")
+    @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody
     public Resources<Assembly> search(@QuerydslPredicate(root = Assembly.class) Predicate predicate) {
         return new Resources<>(assemblyRepository.findAll(predicate));
@@ -56,7 +57,7 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
-        resource.add(ControllerLinkBuilder.linkTo(AssemblyRestController.class).slash("/assemblies/search").withRel("assemblies"));
+        resource.add(ControllerLinkBuilder.linkTo(AssemblyRestController.class).slash("/search").withRel("assemblies"));
         return resource;
     }
 
