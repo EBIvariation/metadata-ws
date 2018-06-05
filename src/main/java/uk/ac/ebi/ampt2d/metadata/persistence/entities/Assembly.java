@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Assembly {
+public class Assembly implements BaseEntity<Long> {
 
     @ApiModelProperty(position = 1, value = "Assembly auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -64,6 +64,10 @@ public class Assembly {
         this.name = name;
         this.patch = patch;
         this.accessions = accessions;
+    }
+
+    public Long getId() {
+        return id;
     }
 
 }
