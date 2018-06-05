@@ -163,7 +163,7 @@ public class SwaggerConfig {
                 .deepLinking(true)
                 .displayRequestDuration(true)
                 .filter(false)
-                .validatorUrl(null)
+                .validatorUrl("")
                 .build();
     }
 
