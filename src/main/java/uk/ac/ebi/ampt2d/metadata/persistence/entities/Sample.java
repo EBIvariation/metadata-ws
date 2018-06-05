@@ -33,7 +33,7 @@ public class Sample {
     @ApiModelProperty(position = 1, required = true)
     @Valid
     @EmbeddedId
-    public BaseAccessionVersionEntityId id;
+    public AccessionVersionEntityId id;
 
     @ApiModelProperty(position = 2, required = true)
     @Size(min = 1, max = 255)
@@ -45,12 +45,12 @@ public class Sample {
     Sample() {
     }
 
-    public Sample(BaseAccessionVersionEntityId id, String name) {
+    public Sample(AccessionVersionEntityId id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public BaseAccessionVersionEntityId getId() {
+    public AccessionVersionEntityId getId() {
         return id;
     }
 }

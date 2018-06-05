@@ -18,14 +18,19 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.idconverter;
 
 import org.springframework.core.convert.converter.Converter;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.BaseAccessionVersionEntityId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 
-public class CustomBackendIdConverter implements Converter<String, BaseAccessionVersionEntityId> {
+public class CustomBackendIdConverter implements Converter<String, AccessionVersionEntityId> {
 
     @Override
-    public BaseAccessionVersionEntityId convert(String id) {
-        if (id.split("\\.").length != 2)
-            throw new IllegalArgumentException("Please provide id in the pattern accession.version");
-        return new BaseAccessionVersionEntityId(id.split("\\.")[0], Integer.parseInt(id.split("\\.")[1]));
+    public AccessionVersionEntityId convert(String id) {
+        AccessionVersionEntityId accessionVersionEntityId;
+        try {
+            String[] entityId = id.split("\\.");
+            accessionVersionEntityId = new AccessionVersionEntityId(entityId[0], Integer.parseInt(entityId[1]));
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Please provide an ID in the form accession.version");
+        }
+        return accessionVersionEntityId;
     }
 }

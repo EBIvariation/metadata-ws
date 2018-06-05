@@ -26,8 +26,6 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.validation.Valid;
@@ -71,7 +69,7 @@ public class Analysis {
     @ApiModelProperty(position = 1, required = true)
     @Valid
     @EmbeddedId
-    private BaseAccessionVersionEntityId id;
+    private AccessionVersionEntityId id;
 
     @ApiModelProperty(position = 2, required = true)
     @Size(min = 1, max = 255)
@@ -124,7 +122,7 @@ public class Analysis {
     @ManyToMany
     private List<File> files;
 
-    public BaseAccessionVersionEntityId getId() {
+    public AccessionVersionEntityId getId() {
         return id;
     }
 }

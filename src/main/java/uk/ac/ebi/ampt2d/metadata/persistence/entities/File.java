@@ -45,8 +45,7 @@ public class File {
     @ApiModelProperty(position = 1, required = true)
     @Valid
     @EmbeddedId
-    public BaseAccessionVersionEntityId id;
-
+    public AccessionVersionEntityId id;
 
     @ApiModelProperty(position = 2, required = true)
     @NotNull
@@ -64,7 +63,7 @@ public class File {
 
     @ApiModelProperty(position = 4, required = true)
     @JsonProperty
-    private long fileSize;
+    private long size;
 
     @ApiModelProperty(position = 5, required = true)
     @NotNull
@@ -75,15 +74,15 @@ public class File {
 
     File() {}
 
-    public File(BaseAccessionVersionEntityId id, String hash, String name, long fileSize, Type type) {
+    public File(AccessionVersionEntityId id, String hash, String name, long size, Type type) {
         this.id = id;
         this.hash = hash;
         this.name = name;
-        this.fileSize = fileSize;
+        this.size = size;
         this.type = type;
     }
 
-    public BaseAccessionVersionEntityId getId() {
+    public AccessionVersionEntityId getId() {
         return id;
     }
 }

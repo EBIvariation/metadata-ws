@@ -70,7 +70,6 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
         return new Resources(studyIterable, ((List<Study>) studyIterable).stream().
                 map(studyObj -> ControllerLinkBuilder.linkTo(Study.class).slash("studies").slash(studyObj.getId())
                         .withRel("search")).collect(Collectors.toList()));
-
     }
 
     @Override

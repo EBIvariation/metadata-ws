@@ -29,7 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.BaseAccessionVersionEntityId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
@@ -179,7 +179,7 @@ public class MetadataApplicationTest {
 
         MvcResult mvcResult = mockMvc.perform(post("/analyses")
                 .content("{ " +
-                        "\"id\":{ \"accession\": \"EGAA0001\",\"version\": " + 1 + "}," +
+                        "\"id\":{ \"accession\": \"EGAA0001\",\"version\":  1 }," +
                         "\"name\": \"test_human_analysis\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"study\": \"" + studyUrl + "\"," +
@@ -199,7 +199,7 @@ public class MetadataApplicationTest {
 
     @Test
     public void postFile() throws Exception {
-        File testFile = new File(new BaseAccessionVersionEntityId("EGAF0001", 1), "asd123", "test_file", 100,
+        File testFile = new File(new AccessionVersionEntityId("EGAF0001", 1), "asd123", "test_file", 100,
                 File.Type.TSV);
         MvcResult mvcResult = mockMvc.perform(post("/files")
                 .content(testFileJson.write(testFile).getJson()))
@@ -214,7 +214,7 @@ public class MetadataApplicationTest {
 
     @Test
     public void postSample() throws Exception {
-        Sample testSample = new Sample(new BaseAccessionVersionEntityId("EGAN0001", 1), "testSample");
+        Sample testSample = new Sample(new AccessionVersionEntityId("EGAN0001", 1), "testSample");
         MvcResult mvcResult = mockMvc.perform(post("/samples")
                 .content(testSampleJson.write(testSample).getJson()))
                 .andExpect(status().isCreated()).andReturn();
@@ -346,7 +346,7 @@ public class MetadataApplicationTest {
 
         mockMvc.perform(post("/analyses")
                 .content("{ " +
-                        "\"id\":{ \"accession\": \"EGAA0001\",\"version\": " + 1 + "}," +
+                        "\"id\":{ \"accession\": \"EGAA0001\",\"version\":  1 }," +
                         "\"name\": \"test_human_analysis_based_on_GRCh37\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"study\": \"" + grch37StudyUrl + "\"," +
@@ -359,7 +359,7 @@ public class MetadataApplicationTest {
 
         mockMvc.perform(post("/analyses")
                 .content("{ " +
-                        "\"id\":{ \"accession\": \"EGAA0002\",\"version\": " + 1 + "}," +
+                        "\"id\":{ \"accession\": \"EGAA0002\",\"version\":  1 }," +
                         "\"name\": \"test_human_analysis_based_on_GRCh38\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"study\": \"" + grch38StudyUrl + "\"," +
@@ -474,7 +474,7 @@ public class MetadataApplicationTest {
 
         mockMvc.perform(post("/studies")
                 .content("{ " +
-                        "\"id\":{ \"accession\": \"EGAS0001\",\"version\": " + 0 + "}," +
+                        "\"id\":{ \"accession\": \"EGAS0001\",\"version\":  0 }," +
                         "\"name\": \" study1\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"center\": \"EBI\"," +
@@ -485,7 +485,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.errors[0].message").value("must be greater than or equal to 1"));
         mockMvc.perform(post("/studies")
                 .content("{ " +
-                        "\"id\":{ \"version\": " + 1 + "}," +
+                        "\"id\":{ \"version\":  1 }," +
                         "\"name\": \" study1\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"center\": \"EBI\"," +
@@ -494,8 +494,14 @@ public class MetadataApplicationTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.errors[0].property").value("id.accession"))
                 .andExpect(jsonPath("$.errors[0].message").value("may not be null"));
+        postTestStudy("EGAS0001",1,"test_study");
         mockMvc.perform(get("/studies/EGAS0001")).andExpect(status().is4xxClientError()).andExpect(jsonPath("$" +
-                ".message").value("Please provide id in the pattern accession.version"));
+                ".message").value("Please provide an ID in the form accession.version"));
+        mockMvc.perform(get("/studies/EGAS0001.S1")).andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.message").value("Please provide an ID in the form accession.version"));
+        mockMvc.perform(get("/studies/EGAS0001.1")).andExpect(status().isOk())
+                .andExpect(jsonPath ("$.id.accession").value("EGAS0001"));
+        mockMvc.perform(get("/studies/EGAS0001.2")).andExpect(status().isNotFound());
     }
 
 }

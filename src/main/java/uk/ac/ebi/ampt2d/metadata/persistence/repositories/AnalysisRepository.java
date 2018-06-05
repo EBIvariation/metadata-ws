@@ -20,8 +20,8 @@ package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.BaseAccessionVersionEntityId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 
 @RepositoryRestResource
-public interface AnalysisRepository extends CrudRepository<Analysis, BaseAccessionVersionEntityId> {
+public interface AnalysisRepository extends CrudRepository<Analysis, AccessionVersionEntityId> {
 }
