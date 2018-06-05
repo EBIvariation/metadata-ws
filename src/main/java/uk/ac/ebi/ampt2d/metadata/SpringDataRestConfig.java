@@ -26,6 +26,8 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import uk.ac.ebi.ampt2d.metadata.assemblers.ResourceAssembler;
+import uk.ac.ebi.ampt2d.metadata.assemblers.ResourceAssemblerImpl;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
@@ -34,6 +36,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
 
 @Configuration
 public class SpringDataRestConfig {
@@ -76,6 +80,21 @@ public class SpringDataRestConfig {
             }
 
         };
+    }
+
+    @Bean
+    public StudyService studyService() {
+        return new StudyServiceImpl();
+    }
+
+    @Bean
+    public ResourceAssembler<Assembly> assemblyResourceAssembler() {
+        return new ResourceAssemblerImpl<Assembly>();
+    }
+
+    @Bean
+    public ResourceAssembler<Study> studyResourceAssembler() {
+        return new ResourceAssemblerImpl<Study>();
     }
 
 }

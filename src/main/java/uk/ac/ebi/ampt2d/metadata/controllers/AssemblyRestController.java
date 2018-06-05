@@ -48,7 +48,7 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
     private AssemblyRepository assemblyRepository;
 
     @Autowired
-    private ResourceAssembler resourceAssembler;
+    private ResourceAssembler<Assembly> resourceAssembler;
 
     @ApiOperation(value="Get a filtered list of assemblies based on filtering criteria")
     @ApiImplicitParams({

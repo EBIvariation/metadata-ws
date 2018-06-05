@@ -24,7 +24,6 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.core.EmbeddedWrappers;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.BaseEntity;
 
@@ -32,7 +31,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class ResourceAssemblerImpl<ENTITY extends BaseEntity> implements ResourceAssembler<ENTITY> {
 
     @Autowired
