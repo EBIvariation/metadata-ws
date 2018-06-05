@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.ampt2d.metadata.assemblers.ResourceAssembler;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 
@@ -61,7 +60,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody
     public ResponseEntity<Resources<?>> search(@QuerydslPredicate(root = Study.class) Predicate predicate) {
-        List<Study> studies = (List<Study>) studyService.findAll(predicate);
+        List<Study> studies = studyService.findStudiesByPredicate(predicate);
 
         Resources<?> resources = resourceAssembler.entitiesToResources(Study.class, studies);
 
@@ -93,14 +92,11 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     }
 
     @ApiOperation(value = "studySearch")
-    @ApiParam(name = "searchString", value = "search string", type = "string", required = true, example = "human")
+    @ApiParam(name = "searchTerm", value = "search term", type = "string", required = true, example = "human")
     @RequestMapping(method = RequestMethod.GET, path = "search/text", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Resources<?>> getStudies(String searchString) {
-        QStudy study = QStudy.study;
-        Predicate predicate = study.name.containsIgnoreCase(searchString).
-                or(study.description.containsIgnoreCase(searchString));
-        List<Study> studies = (List<Study>) studyService.findAll(predicate);
+    public ResponseEntity<Resources<?>> getStudies(String searchTerm) {
+        List<Study> studies = studyService.findStudiesByTextSearch(searchTerm);
 
         Resources<?> resources = resourceAssembler.entitiesToResources(Study.class, studies);
 

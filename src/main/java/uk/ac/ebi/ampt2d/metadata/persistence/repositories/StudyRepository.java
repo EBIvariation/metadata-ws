@@ -46,6 +46,4 @@ public interface StudyRepository extends CrudRepository<Study, AccessionVersionE
     @RestResource(path = "/accession")
     List<Study> findFirstById_AccessionOrderById_VersionDesc(@Param("accession") String accession);
 
-    List<Study> findByTaxonomyIdIn(List<Long> ids);
-
 }

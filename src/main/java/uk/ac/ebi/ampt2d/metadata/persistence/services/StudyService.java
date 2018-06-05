@@ -24,7 +24,9 @@ import java.util.List;
 
 public interface StudyService {
 
-    Iterable<Study> findAll(Predicate predicate);
+    List<Study> findStudiesByPredicate(Predicate predicate);
+
+    List<Study> findStudiesByTextSearch(String searchTerm);
 
     List<Study> findStudiesByTaxonomyId(long id);
 

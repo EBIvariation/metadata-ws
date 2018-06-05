@@ -469,19 +469,19 @@ public class MetadataApplicationTest {
         postTestStudy("EGAS0001", 1, "test human study based on GRCh37");
         postTestStudy("EGAS0002", 1, "test human study based on GRCh38");
 
-        mockMvc.perform(get("/studies/search/text").param("searchString", "human"))
+        mockMvc.perform(get("/studies/search/text").param("searchTerm","human"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(2));
-        mockMvc.perform(get("/studies/search/text").param("searchString", "important"))
+        mockMvc.perform(get("/studies/search/text").param("searchTerm","important"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(2));
-        mockMvc.perform(get("/studies/search/text").param("searchString", "grCh37"))
+        mockMvc.perform(get("/studies/search/text").param("searchTerm", "grCh37"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0].id.accession").value("EGAS0001"));
-        mockMvc.perform(get("/studies/search/text").param("searchString", "GrCh39"))
+        mockMvc.perform(get("/studies/search/text").param("searchTerm", "GrCh39"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$..studies.length()").value(0));
     }
 
     @Test
@@ -624,104 +624,6 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
-    }
-
-    @Test
-    public void findTaxonomyById() throws Exception {
-        String homininesTaxonomyUrl = postTestTaxonomy(207598, "Homininae");
-        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens",
-                Arrays.asList(homininesTaxonomyUrl));
-        String panTaxonomyUrl = postTestTaxonomy(9596, "Pan",
-                Arrays.asList(homininesTaxonomyUrl));
-        String bonoboTaxonomyUrl = postTestTaxonomy(9597, "Pan paniscus",
-                Arrays.asList(homininesTaxonomyUrl, panTaxonomyUrl));
-        String chimpanzeeTaxonomyUrl = postTestTaxonomy(9598, "Pan troglodytes",
-                Arrays.asList(homininesTaxonomyUrl, panTaxonomyUrl));
-
-        mockMvc.perform(get("/taxonomies/search/findById?id=9596"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(1))
-                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(panTaxonomyUrl));
-
-        mockMvc.perform(get("/taxonomies/search/findByAncestorsId?id=9596"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(2))
-                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(bonoboTaxonomyUrl))
-                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(chimpanzeeTaxonomyUrl));
-
-        mockMvc.perform(get("/taxonomies/search/findByIdOrAncestorsId?id=9596&ancestorsId=9596"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(3))
-                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(panTaxonomyUrl))
-                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(bonoboTaxonomyUrl))
-                .andExpect(jsonPath("$..taxonomies[2]..taxonomy.href").value(chimpanzeeTaxonomyUrl));
-
-        mockMvc.perform(get("/taxonomies/search/findById?id=0"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(0));
-
-        mockMvc.perform(get("/taxonomies/search/findByAncestorsId?id=0"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(0));
-
-        mockMvc.perform(get("/taxonomies/search/findByIdOrAncestorsId?id=0&ancestorsId=0"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(0));
-    }
-
-    @Test
-    public void findTaxonomyByName() throws Exception {
-        String homininesTaxonomyUrl = postTestTaxonomy(207598, "Homininae");
-        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens",
-                Arrays.asList(homininesTaxonomyUrl));
-        String panTaxonomyUrl = postTestTaxonomy(9596, "Pan",
-                Arrays.asList(homininesTaxonomyUrl));
-        String bonoboTaxonomyUrl = postTestTaxonomy(9597, "Pan paniscus",
-                Arrays.asList(homininesTaxonomyUrl, panTaxonomyUrl));
-        String chimpanzeeTaxonomyUrl = postTestTaxonomy(9598, "Pan troglodytes",
-                Arrays.asList(homininesTaxonomyUrl, panTaxonomyUrl));
-
-        mockMvc.perform(get("/taxonomies/search/findByName?name=Pan"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(1))
-                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(panTaxonomyUrl));
-
-        mockMvc.perform(get("/taxonomies/search/findByAncestorsName?name=Pan"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(2))
-                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(bonoboTaxonomyUrl))
-                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(chimpanzeeTaxonomyUrl));
-
-        mockMvc.perform(get("/taxonomies/search/findByNameOrAncestorsName?name=Pan&ancestorsName=Pan"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(3))
-                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(panTaxonomyUrl))
-                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(bonoboTaxonomyUrl))
-                .andExpect(jsonPath("$..taxonomies[2]..taxonomy.href").value(chimpanzeeTaxonomyUrl));
-
-        mockMvc.perform(get("/taxonomies/search/findByName?name=None"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(0));
-
-        mockMvc.perform(get("/taxonomies/search/findByAncestorsName?name=None"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(0));
-
-        mockMvc.perform(get("/taxonomies/search/findByNameOrAncestorsName?name=None&ancestorsName=None"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(0));
     }
 
 }

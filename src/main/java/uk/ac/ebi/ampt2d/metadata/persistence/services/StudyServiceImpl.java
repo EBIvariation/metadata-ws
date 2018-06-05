@@ -19,6 +19,8 @@ package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
 import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QTaxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
@@ -36,20 +38,35 @@ public class StudyServiceImpl implements StudyService {
     private StudyRepository studyRepository;
 
     @Override
-    public Iterable<Study> findAll(Predicate predicate) {
-        return studyRepository.findAll(predicate);
+    public List<Study> findStudiesByPredicate(Predicate predicate) {
+        return (List<Study>) studyRepository.findAll(predicate);
+    }
+
+    @Override
+    public List<Study> findStudiesByTextSearch(String searchTerm) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.name.containsIgnoreCase(searchTerm).
+                or(study.description.containsIgnoreCase(searchTerm));
+
+        return findStudiesByPredicate(predicate);
     }
 
     @Override
     public List<Study> findStudiesByTaxonomyId(long id) {
-        List<Taxonomy> taxonomies = taxonomyRepository.findByIdOrAncestorsId(id, id);
+        QTaxonomy taxonomy = QTaxonomy.taxonomy;
+        Predicate predicate = taxonomy.id.eq(id).or(taxonomy.ancestors.any().id.eq(id));
+
+        List<Taxonomy> taxonomies = (List<Taxonomy>) taxonomyRepository.findAll(predicate);
 
         return findStudiesByTaxonomyIn(taxonomies);
     }
 
     @Override
     public List<Study> findStudiesByTaxonomyName(String name) {
-        List<Taxonomy> taxonomies = taxonomyRepository.findByNameOrAncestorsName(name, name);
+        QTaxonomy taxonomy = QTaxonomy.taxonomy;
+        Predicate predicate = taxonomy.name.equalsIgnoreCase(name).or(taxonomy.ancestors.any().name.equalsIgnoreCase(name));
+
+        List<Taxonomy> taxonomies = (List<Taxonomy>) taxonomyRepository.findAll(predicate);
 
         return findStudiesByTaxonomyIn(taxonomies);
     }
@@ -58,7 +75,10 @@ public class StudyServiceImpl implements StudyService {
         List<Long> taxonomyIds = taxonomies.stream().map(Taxonomy::getId)
                 .collect(Collectors.toList());
 
-        return studyRepository.findByTaxonomyIdIn(taxonomyIds);
+        QStudy study = QStudy.study;
+        Predicate predicate = study.taxonomy.id.in(taxonomyIds);
+
+        return findStudiesByPredicate(predicate);
     }
 
 }
