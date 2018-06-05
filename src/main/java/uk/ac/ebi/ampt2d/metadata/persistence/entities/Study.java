@@ -19,63 +19,49 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.Min;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
-public class Study implements BaseEntity<String> {
+public class Study {
 
-    @ApiModelProperty(position = 1, value = "Study auto generated id", required = true, readOnly = true)
-    @GenericGenerator(name = "idGenerator", strategy = "uk.ac.ebi.ampt2d.metadata.persistence.idgenerator.IdGenerator")
-    @GeneratedValue(generator = "idGenerator")
-    @Id
-    private String id;
+    @ApiModelProperty(position = 1, required = true)
+    @Valid
+    @EmbeddedId
+    public BaseAccessionVersionEntityId id;
 
     @ApiModelProperty(position = 2, required = true)
-    @Size(min = 1, max = 255)
-    @NotNull
-    @JsonProperty
-    private String accession;
-
-    @ApiModelProperty(position = 3, required = true)
-    @Min(1)
-    @JsonProperty
-    private int version;
-
-    @ApiModelProperty(position = 4, required = true)
     @Size(min = 1, max = 255)
     @NotNull
     @JsonProperty
     @Column(nullable = false)
     private String name;
 
-    @ApiModelProperty(position = 5, required = true)
+    @ApiModelProperty(position = 3, required = true)
     @NotNull
     @NotBlank
     @JsonProperty
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ApiModelProperty(position = 6, required = true)
+    @ApiModelProperty(position = 4, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
     @Column(nullable = false)
     private String center;
 
-    @ApiModelProperty(position = 7, dataType = "java.lang.String", notes = "Url to a Taxonomy")
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Taxonomy")
     @JsonProperty
     @ManyToOne(optional = false)
     private Taxonomy taxonomy;
@@ -89,17 +75,7 @@ public class Study implements BaseEntity<String> {
     @ManyToMany
     private List<Publication> publications;
 
-    @Override
-    public String getAccession() {
-        return accession;
-    }
-
-    @Override
-    public int getVersion() {
-        return version;
-    }
-
-    public String getId() {
+    public BaseAccessionVersionEntityId getId() {
         return id;
     }
 }

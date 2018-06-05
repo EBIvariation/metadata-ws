@@ -15,11 +15,18 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.persistence.entities;
+package uk.ac.ebi.ampt2d.metadata.persistence.idconverter;
 
-public interface BaseEntity<ACCESSION> {
+import org.springframework.core.convert.converter.Converter;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.BaseAccessionVersionEntityId;
 
-    ACCESSION getAccession();
+public class CustomBackendIdConverter implements Converter<String, BaseAccessionVersionEntityId> {
 
-    int getVersion();
+    @Override
+    public BaseAccessionVersionEntityId convert(String id) {
+        if (id.split("\\.").length != 2) {
+            return new BaseAccessionVersionEntityId();
+        }
+        return new BaseAccessionVersionEntityId(id.split("\\.")[0], Integer.parseInt(id.split("\\.")[1]));
+    }
 }

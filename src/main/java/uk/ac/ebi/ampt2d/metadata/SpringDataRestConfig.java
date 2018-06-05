@@ -19,6 +19,7 @@ package uk.ac.ebi.ampt2d.metadata;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
@@ -32,6 +33,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
+import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
 
 @Configuration
 public class SpringDataRestConfig {
@@ -57,6 +59,12 @@ public class SpringDataRestConfig {
                         WebResource.class
                 );
 
+            }
+
+            @Override
+            public void configureConversionService(ConfigurableConversionService conversionService) {
+                super.configureConversionService(conversionService);
+                conversionService.addConverter(new CustomBackendIdConverter());
             }
 
             @Override

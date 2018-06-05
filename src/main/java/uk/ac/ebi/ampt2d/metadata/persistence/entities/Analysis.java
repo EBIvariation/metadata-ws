@@ -19,24 +19,24 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.GenerationType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.Min;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
-public class Analysis implements BaseEntity<String> {
+public class Analysis {
 
     public enum Type {
 
@@ -68,62 +68,50 @@ public class Analysis implements BaseEntity<String> {
 
     }
 
-    @ApiModelProperty(position = 1, value = "Analysis auto generated id", required = true, readOnly = true)
-    @GenericGenerator(name = "idGenerator", strategy = "uk.ac.ebi.ampt2d.metadata.persistence.idgenerator.IdGenerator")
-    @GeneratedValue(generator = "idGenerator")
-    @Id
-    private String id;
+    @ApiModelProperty(position = 1, required = true)
+    @Valid
+    @EmbeddedId
+    private BaseAccessionVersionEntityId id;
 
     @ApiModelProperty(position = 2, required = true)
-    @Size(min = 1, max = 255)
-    @NotNull
-    @JsonProperty
-    private String accession;
-
-    @ApiModelProperty(position = 3, required = true)
-    @Min(1)
-    @JsonProperty
-    private int version;
-
-    @ApiModelProperty(position = 4, required = true)
     @Size(min = 1, max = 255)
     @NotNull
     @JsonProperty
     @Column(nullable = false)
     private String name;
 
-    @ApiModelProperty(position = 5, required = true)
+    @ApiModelProperty(position = 3, required = true)
     @NotNull
     @NotBlank
     @JsonProperty
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a Study")
+    @ApiModelProperty(position = 4, dataType = "java.lang.String", notes = "Url to a Study")
     @JsonProperty
     @ManyToOne(optional = false)
     private Study study;
 
-    @ApiModelProperty(position = 7, dataType = "java.lang.String", notes = "Url to an Assembly")
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to an Assembly")
     @JsonProperty
     @ManyToOne(optional = false)
     private Assembly assembly;
 
-    @ApiModelProperty(position = 8, required = true)
+    @ApiModelProperty(position = 6, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Technology technology;
 
-    @ApiModelProperty(position = 9, required = true)
+    @ApiModelProperty(position = 7, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Type type;
 
-    @ApiModelProperty(position = 10, required = true)
+    @ApiModelProperty(position = 8, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
@@ -136,18 +124,7 @@ public class Analysis implements BaseEntity<String> {
     @ManyToMany
     private List<File> files;
 
-    @Override
-    public String getAccession() {
-        return accession;
-    }
-
-    @Override
-    public int getVersion() {
-        return version;
-    }
-
-    public String getId() {
+    public BaseAccessionVersionEntityId getId() {
         return id;
     }
-
 }

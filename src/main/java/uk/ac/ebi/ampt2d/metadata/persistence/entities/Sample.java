@@ -19,37 +19,23 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.validation.constraints.Min;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-public class Sample implements BaseEntity<String>{
+public class Sample {
 
-    @ApiModelProperty(position = 1, value = "Sample auto generated id", required = true, readOnly = true)
-    @GenericGenerator(name = "idGenerator", strategy = "uk.ac.ebi.ampt2d.metadata.persistence.idgenerator.IdGenerator")
-    @GeneratedValue(generator = "idGenerator")
-    @Id
-    private String id;
+    @ApiModelProperty(position = 1, required = true)
+    @Valid
+    @EmbeddedId
+    public BaseAccessionVersionEntityId id;
 
     @ApiModelProperty(position = 2, required = true)
-    @NotNull
-    @Size(min = 1, max = 255)
-    @JsonProperty
-    private String accession;
-
-    @ApiModelProperty(position = 3, required = true)
-    @Min(1)
-    @JsonProperty
-    private int version;
-
-    @ApiModelProperty(position = 4, required = true)
     @Size(min = 1, max = 255)
     @NotNull
     @Column(nullable = false)
@@ -59,23 +45,12 @@ public class Sample implements BaseEntity<String>{
     Sample() {
     }
 
-    public Sample(String accession, int version, String name) {
-        this.accession = accession;
-        this.version = version;
+    public Sample(BaseAccessionVersionEntityId id, String name) {
+        this.id = id;
         this.name = name;
     }
 
-    @Override
-    public String getAccession() {
-        return accession;
-    }
-
-    @Override
-    public int getVersion() {
-        return version;
-    }
-
-    public String getId() {
+    public BaseAccessionVersionEntityId getId() {
         return id;
     }
 }

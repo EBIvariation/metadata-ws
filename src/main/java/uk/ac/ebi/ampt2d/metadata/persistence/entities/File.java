@@ -19,20 +19,19 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.annotations.GenericGenerator;
+
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.validation.constraints.Min;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-public class File implements BaseEntity<String> {
+public class File {
 
     public enum Type {
 
@@ -43,42 +42,31 @@ public class File implements BaseEntity<String> {
         BINARY
     }
 
-    @ApiModelProperty(position = 1, value = "File auto generated id", required = true, readOnly = true)
-    @GenericGenerator(name = "idGenerator", strategy = "uk.ac.ebi.ampt2d.metadata.persistence.idgenerator.IdGenerator")
-    @GeneratedValue(generator = "idGenerator")
-    @Id
-    private String id;
+    @ApiModelProperty(position = 1, required = true)
+    @Valid
+    @EmbeddedId
+    public BaseAccessionVersionEntityId id;
+
 
     @ApiModelProperty(position = 2, required = true)
-    @NotNull
-    @Size(min = 1, max = 255)
-    @JsonProperty
-    private String accession;
-
-    @ApiModelProperty(position = 3, required = true)
-    @JsonProperty
-    @Min(1)
-    private int version;
-
-    @ApiModelProperty(position = 4, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
     @Column(nullable = false)
     private String hash;
 
-    @ApiModelProperty(position = 5, required = true)
+    @ApiModelProperty(position = 3, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
     @Column(nullable = false)
-    private String fileName;
+    private String name;
 
-    @ApiModelProperty(position = 6, required = true)
+    @ApiModelProperty(position = 4, required = true)
     @JsonProperty
     private long fileSize;
 
-    @ApiModelProperty(position = 7, required = true)
+    @ApiModelProperty(position = 5, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
@@ -87,26 +75,15 @@ public class File implements BaseEntity<String> {
 
     File() {}
 
-    public File(String accession, String hash, int version, long fileSize, Type type, String fileName) {
-        this.accession = accession;
+    public File(BaseAccessionVersionEntityId id, String hash, String name, long fileSize, Type type) {
+        this.id = id;
         this.hash = hash;
-        this.version = version;
-        this.fileName = fileName;
+        this.name = name;
         this.fileSize = fileSize;
         this.type = type;
     }
 
-    public String getId() {
+    public BaseAccessionVersionEntityId getId() {
         return id;
-    }
-
-    @Override
-    public String getAccession() {
-        return accession;
-    }
-
-    @Override
-    public int getVersion() {
-        return version;
     }
 }
