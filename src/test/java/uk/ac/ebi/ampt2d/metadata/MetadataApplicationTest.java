@@ -494,6 +494,8 @@ public class MetadataApplicationTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.errors[0].property").value("id.accession"))
                 .andExpect(jsonPath("$.errors[0].message").value("may not be null"));
+        mockMvc.perform(get("/studies/EGAS0001")).andExpect(status().is4xxClientError()).andExpect(jsonPath("$" +
+                ".message").value("Please provide id in the pattern accession.version"));
     }
 
 }

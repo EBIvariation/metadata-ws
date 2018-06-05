@@ -33,7 +33,7 @@ public class BaseAccessionVersionEntityId implements Serializable {
     @Min(1)
     private int version;
 
-    public BaseAccessionVersionEntityId() {
+    BaseAccessionVersionEntityId() {
     }
 
     public BaseAccessionVersionEntityId(String accession, int version) {

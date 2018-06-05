@@ -15,17 +15,18 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.persistence.idconverter;
+package uk.ac.ebi.ampt2d.metadata.exceptionhandling;
 
-import org.springframework.core.convert.converter.Converter;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.BaseAccessionVersionEntityId;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
-public class CustomBackendIdConverter implements Converter<String, BaseAccessionVersionEntityId> {
+@ControllerAdvice
+public class ExceptionHandlers {
 
-    @Override
-    public BaseAccessionVersionEntityId convert(String id) {
-        if (id.split("\\.").length != 2)
-            throw new IllegalArgumentException("Please provide id in the pattern accession.version");
-        return new BaseAccessionVersionEntityId(id.split("\\.")[0], Integer.parseInt(id.split("\\.")[1]));
+    @ExceptionHandler(value = IllegalArgumentException.class)
+    public ResponseEntity<ErrorMessage> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return new ResponseEntity(new ErrorMessage(HttpStatus.BAD_REQUEST, ex, ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
