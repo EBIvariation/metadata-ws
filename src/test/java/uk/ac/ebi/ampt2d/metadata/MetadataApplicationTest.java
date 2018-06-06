@@ -469,6 +469,27 @@ public class MetadataApplicationTest {
     }
 
     @Test
+    public void searchStudyByAccession() throws Exception {
+        postTestStudy("EGAS0001", 1, "test human study based on GRCh37");
+        postTestStudy("EGAS0001", 2, "test human study based on GRCh38");
+        postTestStudy("EGAS0002", 3, "test human study based on GRCh38");
+
+        mockMvc.perform(get("/studies/search/accession").param("accession", "EGAS0001"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0].id.accession").value("EGAS0001"))
+                .andExpect(jsonPath("$..studies[0].id.version").value(2));
+        mockMvc.perform(get("/studies/search/accession").param("accession", "EGAS0002"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0].id.accession").value("EGAS0002"))
+                .andExpect(jsonPath("$..studies[0].id.version").value(3));
+        mockMvc.perform(get("/studies/search/accession").param("accession", "EGAS0003"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isEmpty());
+    }
+
+    @Test
     public void testAccesionValidation() throws Exception {
         String taxonomyUrl = postTestTaxonomy();
 
