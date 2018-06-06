@@ -573,9 +573,9 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(3))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(bonoboStudyUrl))
-                .andExpect(jsonPath("$..studies[1]..study.href").value(chimpanzeeStudyUrl))
-                .andExpect(jsonPath("$..studies[2]..study.href").value(humanStudyUrl));
+                .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(bonoboStudyUrl))
+                .andExpect(jsonPath("$..studies[2]..study.href").value(chimpanzeeStudyUrl));
 
         mockMvc.perform(get("/studies/search/findByStudyTaxonomyId?id=0"))
                 .andExpect(status().isOk())
@@ -616,9 +616,9 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(3))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(bonoboStudyUrl))
-                .andExpect(jsonPath("$..studies[1]..study.href").value(chimpanzeeStudyUrl))
-                .andExpect(jsonPath("$..studies[2]..study.href").value(humanStudyUrl));
+                .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(bonoboStudyUrl))
+                .andExpect(jsonPath("$..studies[2]..study.href").value(chimpanzeeStudyUrl));
 
         mockMvc.perform(get("/studies/search/findByStudyTaxonomyName?name=None"))
                 .andExpect(status().isOk())

@@ -20,19 +20,12 @@ package uk.ac.ebi.ampt2d.metadata.persistence.services;
 import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.QTaxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class StudyServiceImpl implements StudyService {
-
-    @Autowired
-    private TaxonomyRepository taxonomyRepository;
 
     @Autowired
     private StudyRepository studyRepository;
@@ -53,30 +46,17 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     public List<Study> findStudiesByTaxonomyId(long id) {
-        QTaxonomy taxonomy = QTaxonomy.taxonomy;
-        Predicate predicate = taxonomy.id.eq(id).or(taxonomy.ancestors.any().id.eq(id));
+        QStudy study = QStudy.study;
+        Predicate predicate = study.taxonomy.id.eq(id).or(study.taxonomy.ancestors.any().id.eq(id));
 
-        List<Taxonomy> taxonomies = (List<Taxonomy>) taxonomyRepository.findAll(predicate);
-
-        return findStudiesByTaxonomyIn(taxonomies);
+        return findStudiesByPredicate(predicate);
     }
 
     @Override
     public List<Study> findStudiesByTaxonomyName(String name) {
-        QTaxonomy taxonomy = QTaxonomy.taxonomy;
-        Predicate predicate = taxonomy.name.equalsIgnoreCase(name).or(taxonomy.ancestors.any().name.equalsIgnoreCase(name));
-
-        List<Taxonomy> taxonomies = (List<Taxonomy>) taxonomyRepository.findAll(predicate);
-
-        return findStudiesByTaxonomyIn(taxonomies);
-    }
-
-    private List<Study> findStudiesByTaxonomyIn(List<Taxonomy> taxonomies) {
-        List<Long> taxonomyIds = taxonomies.stream().map(Taxonomy::getId)
-                .collect(Collectors.toList());
-
         QStudy study = QStudy.study;
-        Predicate predicate = study.taxonomy.id.in(taxonomyIds);
+        Predicate predicate = study.taxonomy.name.equalsIgnoreCase(name).
+                or(study.taxonomy.ancestors.any().name.equalsIgnoreCase(name));
 
         return findStudiesByPredicate(predicate);
     }
