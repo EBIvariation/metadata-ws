@@ -556,20 +556,20 @@ public class MetadataApplicationTest {
         String bonoboStudyUrl = postTestStudy("testbonobo", 1,"test bonobo study", bonoboTaxonomyUrl);
         String chimpanzeeStudyUrl = postTestStudy("testchimpanzee", 1,"test chimpanzee study", chimpanzeeTaxonomyUrl);
 
-        mockMvc.perform(get("/studies/search/findByStudyTaxonomyId?id=9606"))
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=9606"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl));
 
-        mockMvc.perform(get("/studies/search/findByStudyTaxonomyId?id=9596"))
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=9596"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(bonoboStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(chimpanzeeStudyUrl));
 
-        mockMvc.perform(get("/studies/search/findByStudyTaxonomyId?id=207598"))
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=207598"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(3))
@@ -577,7 +577,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies[1]..study.href").value(bonoboStudyUrl))
                 .andExpect(jsonPath("$..studies[2]..study.href").value(chimpanzeeStudyUrl));
 
-        mockMvc.perform(get("/studies/search/findByStudyTaxonomyId?id=0"))
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=0"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
@@ -599,20 +599,20 @@ public class MetadataApplicationTest {
         String bonoboStudyUrl = postTestStudy("testbonobo", 1, "test bonobo study", bonoboTaxonomyUrl);
         String chimpanzeeStudyUrl = postTestStudy("testchimpanzee", 1, "test chimpanzee study", chimpanzeeTaxonomyUrl);
 
-        mockMvc.perform(get("/studies/search/findByStudyTaxonomyName?name=Homo sapiens"))
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homo sapiens"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl));
 
-        mockMvc.perform(get("/studies/search/findByStudyTaxonomyName?name=Pan"))
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Pan"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(bonoboStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(chimpanzeeStudyUrl));
 
-        mockMvc.perform(get("/studies/search/findByStudyTaxonomyName?name=Homininae"))
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homininae"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(3))
@@ -620,7 +620,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies[1]..study.href").value(bonoboStudyUrl))
                 .andExpect(jsonPath("$..studies[2]..study.href").value(chimpanzeeStudyUrl));
 
-        mockMvc.perform(get("/studies/search/findByStudyTaxonomyName?name=None"))
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=None"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));

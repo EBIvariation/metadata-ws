@@ -69,7 +69,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
 
     @ApiOperation(value = "Get the list of studies filtered by taxonomy id")
     @ApiParam(name = "id", value = "Taxonomy's id", type = "long", required = true, example = "9606")
-    @RequestMapping(method = RequestMethod.GET, path = "search/findByStudyTaxonomyId", produces = "application/json")
+    @RequestMapping(method = RequestMethod.GET, path = "search/taxonomy-id", produces = "application/json")
     @ResponseBody
     public ResponseEntity<Resources<?>> findStudiesByTaxonomyId(long id) {
         List<Study> studies = studyService.findStudiesByTaxonomyId(id);
@@ -81,7 +81,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
 
     @ApiOperation(value = "Get the list of studies filtered by taxonomy name")
     @ApiParam(name = "name", value = "Taxonomy's name", type = "string", required = true, example = "Homo sapiens")
-    @RequestMapping(method = RequestMethod.GET, path = "search/findByStudyTaxonomyName", produces = "application/json")
+    @RequestMapping(method = RequestMethod.GET, path = "search/taxonomy-name", produces = "application/json")
     @ResponseBody
     public ResponseEntity<Resources<?>> findStudiesByTaxonomyName(String name) {
         List<Study> studies = studyService.findStudiesByTaxonomyName(name);
