@@ -107,8 +107,8 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search").withRel("studies"));
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/text").withRel("studies"));
-        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/findByStudyTaxonomyId").withRel("studies"));
-        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/findByStudyTaxonomyName").withRel("studies"));
+        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/taxonomy-id").withRel("studies"));
+        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/taxonomy-name").withRel("studies"));
         return resource;
     }
 
