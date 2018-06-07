@@ -17,11 +17,20 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import org.springframework.data.rest.core.annotation.RestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+
+import java.util.List;
 
 @RepositoryRestResource
 public interface AnalysisRepository extends CrudRepository<Analysis, AccessionVersionEntityId> {
+
+    @ApiOperation(value = "Get the latest version of Analysis based on accession")
+    @RestResource(path = "/accession")
+    List<Analysis> findFirstById_AccessionOrderById_VersionDesc(@Param("accession") String accession);
 }

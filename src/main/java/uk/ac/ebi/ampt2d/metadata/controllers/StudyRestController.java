@@ -18,7 +18,6 @@
 package uk.ac.ebi.ampt2d.metadata.controllers;
 
 import com.querydsl.core.types.Predicate;
-import com.querydsl.jpa.JPAExpressions;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -59,19 +58,6 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @ResponseBody
     public Resources<Study> search(@QuerydslPredicate(root = Study.class) Predicate predicate) {
         return new Resources<>(studyRepository.findAll(predicate));
-    }
-
-    @ApiOperation(value = "Get the latest version of study based on accession")
-    @RequestMapping(method = RequestMethod.GET, path = "/search/accession", produces = "application/json")
-    @ResponseBody
-    public Resources<Study> searchByAccession(@RequestParam("accession") String accession) {
-        QStudy study = QStudy.study;
-        Predicate predicate = study.id.accession.eq(accession).and(study.id.version.eq(JPAExpressions.
-                select(study.id.version.max()).from(study).where(study.id.accession.eq(accession))));
-        Iterable<Study> studyIterable = studyRepository.findAll(predicate);
-        return new Resources(studyIterable, ((List<Study>) studyIterable).stream().
-                map(studyObj -> ControllerLinkBuilder.linkTo(Study.class).slash("studies").slash(studyObj.getId())
-                        .withRel("search")).collect(Collectors.toList()));
     }
 
     @ApiOperation(value = "studySearch")

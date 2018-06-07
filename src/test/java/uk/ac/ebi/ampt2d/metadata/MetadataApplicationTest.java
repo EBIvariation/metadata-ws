@@ -486,7 +486,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies[0].id.version").value(3));
         mockMvc.perform(get("/studies/search/accession").param("accession", "EGAS0003"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$..studies.length()").value(0));
     }
 
     @Test
