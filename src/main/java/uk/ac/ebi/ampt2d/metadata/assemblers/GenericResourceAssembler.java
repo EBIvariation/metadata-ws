@@ -17,12 +17,15 @@
  */
 package uk.ac.ebi.ampt2d.metadata.assemblers;
 
+import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.ResourceAssembler;
 import org.springframework.hateoas.Resources;
 
 import java.util.List;
 
-public interface ResourceAssembler<ENTITY> {
+public interface GenericResourceAssembler<ENTITY, RESOURCE extends Resource<ENTITY>>
+        extends ResourceAssembler<ENTITY, RESOURCE> {
 
-    Resources<?> entitiesToResources(Class<ENTITY> type, List<ENTITY> entities);
+    Resources<?> toResources(Class<ENTITY> type, List<ENTITY> entities);
 
 }

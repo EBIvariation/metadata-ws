@@ -31,7 +31,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ResourceAssemblerImpl<ENTITY extends BaseEntity> implements ResourceAssembler<ENTITY> {
+public class GenericResourceAssemblerImpl<ENTITY extends BaseEntity, RESOURCE extends Resource<ENTITY>>
+        implements GenericResourceAssembler<ENTITY, RESOURCE> {
 
     @Autowired
     private RepositoryEntityLinks repositoryEntityLinks;
@@ -41,18 +42,23 @@ public class ResourceAssemblerImpl<ENTITY extends BaseEntity> implements Resourc
 
     private static final EmbeddedWrappers WRAPPERS = new EmbeddedWrappers(false);
 
-    public Resources<?> entitiesToResources(Class<ENTITY> type, List<ENTITY> entities) {
+    @SuppressWarnings("unchecked")
+    public RESOURCE toResource(ENTITY entity) {
+        return (RESOURCE) new Resource<ENTITY>(entity, linkCollector.getLinksFor(entity,
+                Arrays.asList(repositoryEntityLinks.linkToSingleResource(entity.getClass(), entity.getId()))));
+    }
+
+    public Resources<?> toResources(Class<ENTITY> type, List<ENTITY> entities) {
         if ( !entities.iterator().hasNext() ) {
             List<Object> content = Arrays.asList(WRAPPERS.emptyCollectionOf(type));
             return new Resources<Object>(content, getDefaultSelfLink());
         }
 
-        List<Resource<ENTITY>> resourceList = entities.stream()
-                .map(entity -> new Resource<ENTITY>(entity, linkCollector.getLinksFor(entity,
-                        Arrays.asList(repositoryEntityLinks.linkToSingleResource(type, entity.getId())))))
+        List<RESOURCE> resourceList = entities.stream()
+                .map(entity -> toResource(entity))
                 .collect(Collectors.toList());
 
-        return new Resources<Resource<ENTITY>>(resourceList, getDefaultSelfLink());
+        return new Resources<RESOURCE>(resourceList, getDefaultSelfLink());
     }
 
     private Link getDefaultSelfLink() {

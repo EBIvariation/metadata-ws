@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -33,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.ac.ebi.ampt2d.metadata.assemblers.ResourceAssembler;
+import uk.ac.ebi.ampt2d.metadata.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
 
@@ -48,7 +49,7 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
     private AssemblyRepository assemblyRepository;
 
     @Autowired
-    private ResourceAssembler<Assembly> resourceAssembler;
+    private GenericResourceAssembler<Assembly, Resource<Assembly>> resourceAssembler;
 
     @ApiOperation(value="Get a filtered list of assemblies based on filtering criteria")
     @ApiImplicitParams({
@@ -61,7 +62,7 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
     public ResponseEntity<Resources<?>> search(@QuerydslPredicate(root = Assembly.class) Predicate predicate) {
         List<Assembly> assemblies = (List<Assembly>) assemblyRepository.findAll(predicate);
 
-        Resources<?> resources = resourceAssembler.entitiesToResources(Assembly.class, assemblies);
+        Resources<?> resources = resourceAssembler.toResources(Assembly.class, assemblies);
 
         return ResponseEntity.ok(resources);
     }

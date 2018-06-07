@@ -24,10 +24,11 @@ import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
+import org.springframework.hateoas.Resource;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import uk.ac.ebi.ampt2d.metadata.assemblers.ResourceAssembler;
-import uk.ac.ebi.ampt2d.metadata.assemblers.ResourceAssemblerImpl;
+import uk.ac.ebi.ampt2d.metadata.assemblers.GenericResourceAssembler;
+import uk.ac.ebi.ampt2d.metadata.assemblers.GenericResourceAssemblerImpl;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
@@ -88,13 +89,13 @@ public class SpringDataRestConfig {
     }
 
     @Bean
-    public ResourceAssembler<Assembly> assemblyResourceAssembler() {
-        return new ResourceAssemblerImpl<Assembly>();
+    public GenericResourceAssembler<Assembly, Resource<Assembly>> assemblyResourceAssembler() {
+        return new GenericResourceAssemblerImpl<Assembly, Resource<Assembly>>();
     }
 
     @Bean
-    public ResourceAssembler<Study> studyResourceAssembler() {
-        return new ResourceAssemblerImpl<Study>();
+    public GenericResourceAssembler<Study, Resource<Study>> studyResourceAssembler() {
+        return new GenericResourceAssemblerImpl<Study, Resource<Study>>();
     }
 
 }

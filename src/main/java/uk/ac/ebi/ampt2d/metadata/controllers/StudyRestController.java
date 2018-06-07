@@ -26,6 +26,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -34,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.ac.ebi.ampt2d.metadata.assemblers.ResourceAssembler;
+import uk.ac.ebi.ampt2d.metadata.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 
@@ -49,7 +50,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     private StudyService studyService;
 
     @Autowired
-    private ResourceAssembler<Study> resourceAssembler;
+    private GenericResourceAssembler<Study, Resource<Study>> resourceAssembler;
 
     @ApiOperation(value = "Get a filtered list of studies based on filtering criteria")
     @ApiImplicitParams({
@@ -62,7 +63,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     public ResponseEntity<Resources<?>> search(@QuerydslPredicate(root = Study.class) Predicate predicate) {
         List<Study> studies = studyService.findStudiesByPredicate(predicate);
 
-        Resources<?> resources = resourceAssembler.entitiesToResources(Study.class, studies);
+        Resources<?> resources = resourceAssembler.toResources(Study.class, studies);
 
         return ResponseEntity.ok(resources);
     }
@@ -74,7 +75,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     public ResponseEntity<Resources<?>> findStudiesByTaxonomyId(long id) {
         List<Study> studies = studyService.findStudiesByTaxonomyId(id);
 
-        Resources<?> resources = resourceAssembler.entitiesToResources(Study.class, studies);
+        Resources<?> resources = resourceAssembler.toResources(Study.class, studies);
 
         return ResponseEntity.ok(resources);
     }
@@ -86,7 +87,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     public ResponseEntity<Resources<?>> findStudiesByTaxonomyName(String name) {
         List<Study> studies = studyService.findStudiesByTaxonomyName(name);
 
-        Resources<?> resources = resourceAssembler.entitiesToResources(Study.class, studies);
+        Resources<?> resources = resourceAssembler.toResources(Study.class, studies);
 
         return ResponseEntity.ok(resources);
     }
@@ -98,7 +99,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     public ResponseEntity<Resources<?>> getStudies(String searchTerm) {
         List<Study> studies = studyService.findStudiesByTextSearch(searchTerm);
 
-        Resources<?> resources = resourceAssembler.entitiesToResources(Study.class, studies);
+        Resources<?> resources = resourceAssembler.toResources(Study.class, studies);
 
         return ResponseEntity.ok(resources);
     }
