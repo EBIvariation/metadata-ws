@@ -15,17 +15,20 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.assemblers;
+package uk.ac.ebi.ampt2d.metadata.rest.resources;
 
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.ResourceAssembler;
-import org.springframework.hateoas.Resources;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
-import java.util.List;
+public class StudyResource extends Resource<Study> {
 
-public interface GenericResourceAssembler<ENTITY, RESOURCE extends Resource<ENTITY>>
-        extends ResourceAssembler<ENTITY, RESOURCE> {
+    public StudyResource(Study content, Link... links) {
+        super(content, links);
+    }
 
-    Resources<?> toResources(Class<ENTITY> type, List<ENTITY> entities);
+    public StudyResource(Study content, Iterable<Link> links) {
+        super(content, links);
+    }
 
 }

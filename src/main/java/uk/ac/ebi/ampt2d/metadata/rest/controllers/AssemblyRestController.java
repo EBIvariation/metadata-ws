@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.controllers;
+package uk.ac.ebi.ampt2d.metadata.rest.controllers;
 
 import com.querydsl.core.types.Predicate;
 import io.swagger.annotations.Api;
@@ -25,7 +25,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
-import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -34,9 +33,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.ac.ebi.ampt2d.metadata.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
+import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
+import uk.ac.ebi.ampt2d.metadata.rest.resources.AssemblyResource;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
     private AssemblyRepository assemblyRepository;
 
     @Autowired
-    private GenericResourceAssembler<Assembly, Resource<Assembly>> resourceAssembler;
+    private GenericResourceAssembler<Assembly, AssemblyResource> resourceAssembler;
 
     @ApiOperation(value="Get a filtered list of assemblies based on filtering criteria")
     @ApiImplicitParams({

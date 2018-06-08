@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.assemblers;
+package uk.ac.ebi.ampt2d.metadata.rest.assemblers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.mapping.LinkCollector;
@@ -24,6 +24,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.core.EmbeddedWrappers;
+import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.BaseEntity;
 
@@ -31,8 +32,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GenericResourceAssemblerImpl<ENTITY extends BaseEntity, RESOURCE extends Resource<ENTITY>>
-        implements GenericResourceAssembler<ENTITY, RESOURCE> {
+public class GenericResourceAssembler<ENTITY extends BaseEntity, RESOURCE extends Resource<ENTITY>>
+        extends ResourceAssemblerSupport<ENTITY, RESOURCE> {
 
     @Autowired
     private RepositoryEntityLinks repositoryEntityLinks;
@@ -41,6 +42,10 @@ public class GenericResourceAssemblerImpl<ENTITY extends BaseEntity, RESOURCE ex
     private LinkCollector linkCollector;
 
     private static final EmbeddedWrappers WRAPPERS = new EmbeddedWrappers(false);
+
+    public GenericResourceAssembler(Class<?> controllerClass, Class<RESOURCE> resourceType) {
+        super(controllerClass, resourceType);
+    }
 
     @SuppressWarnings("unchecked")
     public RESOURCE toResource(ENTITY entity) {

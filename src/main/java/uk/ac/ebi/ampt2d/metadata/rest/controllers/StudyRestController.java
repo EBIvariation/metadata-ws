@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.controllers;
+package uk.ac.ebi.ampt2d.metadata.rest.controllers;
 
 import com.querydsl.core.types.Predicate;
 import io.swagger.annotations.Api;
@@ -26,7 +26,6 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
-import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -35,9 +34,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.ac.ebi.ampt2d.metadata.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
+import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
+import uk.ac.ebi.ampt2d.metadata.rest.resources.StudyResource;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     private StudyService studyService;
 
     @Autowired
-    private GenericResourceAssembler<Study, Resource<Study>> resourceAssembler;
+    private GenericResourceAssembler<Study, StudyResource> resourceAssembler;
 
     @ApiOperation(value = "Get a filtered list of studies based on filtering criteria")
     @ApiImplicitParams({

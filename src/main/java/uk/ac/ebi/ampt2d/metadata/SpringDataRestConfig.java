@@ -24,11 +24,8 @@ import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
-import org.springframework.hateoas.Resource;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import uk.ac.ebi.ampt2d.metadata.assemblers.GenericResourceAssembler;
-import uk.ac.ebi.ampt2d.metadata.assemblers.GenericResourceAssemblerImpl;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
@@ -39,6 +36,11 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
+import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
+import uk.ac.ebi.ampt2d.metadata.rest.controllers.AssemblyRestController;
+import uk.ac.ebi.ampt2d.metadata.rest.controllers.StudyRestController;
+import uk.ac.ebi.ampt2d.metadata.rest.resources.AssemblyResource;
+import uk.ac.ebi.ampt2d.metadata.rest.resources.StudyResource;
 
 @Configuration
 public class SpringDataRestConfig {
@@ -89,13 +91,13 @@ public class SpringDataRestConfig {
     }
 
     @Bean
-    public GenericResourceAssembler<Assembly, Resource<Assembly>> assemblyResourceAssembler() {
-        return new GenericResourceAssemblerImpl<Assembly, Resource<Assembly>>();
+    public GenericResourceAssembler<Assembly, AssemblyResource> assemblyResourceAssembler() {
+        return new GenericResourceAssembler<Assembly, AssemblyResource>(AssemblyRestController.class, AssemblyResource.class);
     }
 
     @Bean
-    public GenericResourceAssembler<Study, Resource<Study>> studyResourceAssembler() {
-        return new GenericResourceAssemblerImpl<Study, Resource<Study>>();
+    public GenericResourceAssembler<Study, StudyResource> studyResourceAssembler() {
+        return new GenericResourceAssembler<Study, StudyResource>(StudyRestController.class, StudyResource.class);
     }
 
 }
