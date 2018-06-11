@@ -60,10 +60,11 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     })
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Resources<?>> search(@QuerydslPredicate(root = Study.class) Predicate predicate) {
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Resources<StudyResource>> search(@QuerydslPredicate(root = Study.class) Predicate predicate) {
         List<Study> studies = studyService.findStudiesByPredicate(predicate);
 
-        Resources<?> resources = resourceAssembler.toResources(Study.class, studies);
+        Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
 
         return ResponseEntity.ok(resources);
     }
@@ -72,10 +73,11 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @ApiParam(name = "id", value = "Taxonomy's id", type = "long", required = true, example = "9606")
     @RequestMapping(method = RequestMethod.GET, path = "search/taxonomy-id", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Resources<?>> findStudiesByTaxonomyId(long id) {
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Resources<StudyResource>> findStudiesByTaxonomyId(long id) {
         List<Study> studies = studyService.findStudiesByTaxonomyId(id);
 
-        Resources<?> resources = resourceAssembler.toResources(Study.class, studies);
+        Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
 
         return ResponseEntity.ok(resources);
     }
@@ -84,10 +86,11 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @ApiParam(name = "name", value = "Taxonomy's name", type = "string", required = true, example = "Homo sapiens")
     @RequestMapping(method = RequestMethod.GET, path = "search/taxonomy-name", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Resources<?>> findStudiesByTaxonomyName(String name) {
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Resources<StudyResource>> findStudiesByTaxonomyName(String name) {
         List<Study> studies = studyService.findStudiesByTaxonomyName(name);
 
-        Resources<?> resources = resourceAssembler.toResources(Study.class, studies);
+        Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
 
         return ResponseEntity.ok(resources);
     }
@@ -96,10 +99,11 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @ApiParam(name = "searchTerm", value = "search term", type = "string", required = true, example = "human")
     @RequestMapping(method = RequestMethod.GET, path = "search/text", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Resources<?>> getStudies(String searchTerm) {
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Resources<StudyResource>> getStudies(String searchTerm) {
         List<Study> studies = studyService.findStudiesByTextSearch(searchTerm);
 
-        Resources<?> resources = resourceAssembler.toResources(Study.class, studies);
+        Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
 
         return ResponseEntity.ok(resources);
     }

@@ -59,10 +59,11 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
     })
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Resources<?>> search(@QuerydslPredicate(root = Assembly.class) Predicate predicate) {
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Resources<AssemblyResource>> search(@QuerydslPredicate(root = Assembly.class) Predicate predicate) {
         List<Assembly> assemblies = (List<Assembly>) assemblyRepository.findAll(predicate);
 
-        Resources<?> resources = resourceAssembler.toResources(Assembly.class, assemblies);
+        Resources<AssemblyResource> resources = (Resources<AssemblyResource>) resourceAssembler.toResources(Assembly.class, assemblies);
 
         return ResponseEntity.ok(resources);
     }
