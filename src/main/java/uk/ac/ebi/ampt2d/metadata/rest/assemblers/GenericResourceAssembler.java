@@ -59,9 +59,7 @@ public class GenericResourceAssembler<ENTITY extends BaseEntity, RESOURCE extend
             return new Resources<Object>(content, getDefaultSelfLink());
         }
 
-        List<RESOURCE> resourceList = entities.stream()
-                .map(entity -> toResource(entity))
-                .collect(Collectors.toList());
+        List<RESOURCE> resourceList = toResources(entities);
 
         return new Resources<RESOURCE>(resourceList, getDefaultSelfLink());
     }
