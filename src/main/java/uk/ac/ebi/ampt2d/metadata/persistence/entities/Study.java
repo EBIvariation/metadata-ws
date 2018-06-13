@@ -22,13 +22,12 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -36,11 +35,10 @@ import java.util.List;
 @Entity
 public class Study {
 
-    @ApiModelProperty(position = 1, value = "Study auto generated id", required = true, readOnly = true)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @ApiModelProperty(position = 1, required = true)
+    @Valid
+    @EmbeddedId
+    public AccessionVersionEntityId id;
 
     @ApiModelProperty(position = 2, required = true)
     @Size(min = 1, max = 255)
@@ -68,7 +66,7 @@ public class Study {
     @ManyToOne(optional = false)
     private Taxonomy taxonomy;
 
-    @OneToMany(mappedBy="study")
+    @OneToMany(mappedBy = "study")
     private List<Analysis> analyses;
 
     @OneToMany
@@ -77,4 +75,7 @@ public class Study {
     @ManyToMany
     private List<Publication> publications;
 
+    public AccessionVersionEntityId getId() {
+        return id;
+    }
 }

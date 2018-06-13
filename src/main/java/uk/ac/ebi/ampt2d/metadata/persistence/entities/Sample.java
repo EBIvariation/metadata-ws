@@ -21,21 +21,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
 public class Sample {
 
-    @ApiModelProperty(position = 1, value = "Sample auto generated id", required = true, readOnly = true)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @ApiModelProperty(position = 1, required = true)
+    @Valid
+    @EmbeddedId
+    public AccessionVersionEntityId id;
 
     @ApiModelProperty(position = 2, required = true)
     @Size(min = 1, max = 255)
@@ -44,10 +42,15 @@ public class Sample {
     @JsonProperty
     private String name;
 
-    Sample() {}
+    Sample() {
+    }
 
-    public Sample(String name) {
+    public Sample(AccessionVersionEntityId id, String name) {
+        this.id = id;
         this.name = name;
     }
 
+    public AccessionVersionEntityId getId() {
+        return id;
+    }
 }

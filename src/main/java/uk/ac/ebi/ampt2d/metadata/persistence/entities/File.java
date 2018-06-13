@@ -20,15 +20,15 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
+
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.List;
 
 @Entity
 public class File {
@@ -43,24 +43,29 @@ public class File {
     }
 
     @ApiModelProperty(position = 1, required = true)
-    @NotNull
-    @Size(min = 1, max = 255)
-    @JsonProperty
-    @Id
-    private String hash;
+    @Valid
+    @EmbeddedId
+    public AccessionVersionEntityId id;
 
     @ApiModelProperty(position = 2, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
     @Column(nullable = false)
-    private String fileName;
+    private String hash;
 
     @ApiModelProperty(position = 3, required = true)
+    @NotNull
+    @Size(min = 1, max = 255)
     @JsonProperty
-    private long fileSize;
+    @Column(nullable = false)
+    private String name;
 
     @ApiModelProperty(position = 4, required = true)
+    @JsonProperty
+    private long size;
+
+    @ApiModelProperty(position = 5, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
@@ -69,11 +74,15 @@ public class File {
 
     File() {}
 
-    public File(String hash, String fileName, long fileSize, Type type) {
+    public File(AccessionVersionEntityId id, String hash, String name, long size, Type type) {
+        this.id = id;
         this.hash = hash;
-        this.fileName = fileName;
-        this.fileSize = fileSize;
+        this.name = name;
+        this.size = size;
         this.type = type;
     }
 
+    public AccessionVersionEntityId getId() {
+        return id;
+    }
 }

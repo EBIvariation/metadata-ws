@@ -37,6 +37,9 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @Api(tags = "Study Entity")
 @RequestMapping(path = "studies")
@@ -58,20 +61,21 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     }
 
     @ApiOperation(value = "studySearch")
-    @RequestMapping(method = RequestMethod.GET, path = "search/text")
-    public Iterable<Study> getStudies(@RequestParam("searchString") String searchString) {
+    @RequestMapping(method = RequestMethod.GET, path = "/search/text")
+    public Resources<Study> getStudies(@RequestParam("searchString") String searchString) {
         QStudy study = QStudy.study;
         Predicate predicate = study.name.containsIgnoreCase(searchString).
                 or(study.description.containsIgnoreCase(searchString));
-        return studyRepository.findAll(predicate);
-
+        Iterable<Study> studyIterable = studyRepository.findAll(predicate);
+        return new Resources(studyIterable, ((List<Study>) studyIterable).stream().
+                map(studyObj -> ControllerLinkBuilder.linkTo(Study.class).slash("studies").slash(studyObj.getId())
+                        .withRel("search")).collect(Collectors.toList()));
     }
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search").withRel("studies"));
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/text").withRel("studies"));
-
         return resource;
     }
 
