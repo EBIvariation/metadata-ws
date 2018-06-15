@@ -44,4 +44,5 @@ public interface StudyRepository extends CrudRepository<Study, AccessionVersionE
     @ApiOperation(value = "Get the latest version of Study based on accession")
     @RestResource(path = "/accession")
     List<Study> findFirstById_AccessionOrderById_VersionDesc(@Param("accession") String accession);
+
 }

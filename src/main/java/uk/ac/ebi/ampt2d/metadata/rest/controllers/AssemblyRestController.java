@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.controllers;
+package uk.ac.ebi.ampt2d.metadata.rest.controllers;
 
 import com.querydsl.core.types.Predicate;
 import io.swagger.annotations.Api;
@@ -28,12 +28,17 @@ import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
+import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
+import uk.ac.ebi.ampt2d.metadata.rest.resources.AssemblyResource;
+
+import java.util.List;
 
 @RestController
 @Api(tags = "Assembly Entity")
@@ -43,6 +48,9 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
     @Autowired
     private AssemblyRepository assemblyRepository;
 
+    @Autowired
+    private GenericResourceAssembler<Assembly, AssemblyResource> resourceAssembler;
+
     @ApiOperation(value="Get a filtered list of assemblies based on filtering criteria")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "name", dataType = "string", paramType = "query", example = "GRCh38"),
@@ -51,8 +59,13 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
     })
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody
-    public Resources<Assembly> search(@QuerydslPredicate(root = Assembly.class) Predicate predicate) {
-        return new Resources<>(assemblyRepository.findAll(predicate));
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Resources<AssemblyResource>> search(@QuerydslPredicate(root = Assembly.class) Predicate predicate) {
+        List<Assembly> assemblies = (List<Assembly>) assemblyRepository.findAll(predicate);
+
+        Resources<AssemblyResource> resources = (Resources<AssemblyResource>) resourceAssembler.toResources(Assembly.class, assemblies);
+
+        return ResponseEntity.ok(resources);
     }
 
     @Override

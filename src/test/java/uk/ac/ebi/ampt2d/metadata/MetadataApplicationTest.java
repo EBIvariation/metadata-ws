@@ -32,7 +32,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
@@ -42,6 +41,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -88,10 +88,10 @@ public class MetadataApplicationTest {
     private JacksonTester<File> testFileJson;
 
     @Autowired
-    private JacksonTester<Sample> testSampleJson;
+    private JacksonTester<List> testListJson;
 
     @Autowired
-    private JacksonTester<Taxonomy> testTaxonomyJson;
+    private JacksonTester<Sample> testSampleJson;
 
     @Autowired
     private JacksonTester<WebResource> testWebResourceJson;
@@ -137,10 +137,22 @@ public class MetadataApplicationTest {
     }
 
     private String postTestTaxonomy() throws Exception {
-        Taxonomy testTaxonomy = new Taxonomy(9606, "Homo sapiens");
+        return postTestTaxonomy(9606, "Homo sapiens");
+    }
+
+    private String postTestTaxonomy(long id, String name) throws Exception {
+        return postTestTaxonomy(id, name, new ArrayList<>());
+    }
+
+    private String postTestTaxonomy(long id, String name, List<String> ancestors) throws Exception {
+        String jsonContent = "{ " +
+                "\"id\": " + Long.toString(id) + "," +
+                "\"name\": \"" + name + "\"," +
+                "\"ancestors\": " + testListJson.write(ancestors).getJson() + "" +
+                "}";
 
         MvcResult mvcResult = mockMvc.perform(post("/taxonomies")
-                .content(testTaxonomyJson.write(testTaxonomy).getJson()))
+                .content(jsonContent))
                 .andExpect(status().isCreated()).andReturn();
 
         return mvcResult.getResponse().getHeader("Location");
@@ -158,6 +170,10 @@ public class MetadataApplicationTest {
     private String postTestStudy(String accession, int version, String name) throws Exception {
         String taxonomyUrl = postTestTaxonomy();
 
+        return postTestStudy(accession, version, name, taxonomyUrl);
+    }
+
+    private String postTestStudy(String accession, int version, String name, String taxonomyUrl) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/studies")
                 .content("{ " +
                         "\"id\":{ \"accession\": \"" + accession + "\",\"version\": " + version + "}," +
@@ -248,26 +264,26 @@ public class MetadataApplicationTest {
         String grch38Url = postTestAssembly("GRCh38", "p2",
                 Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
 
-        mockMvc.perform(get("/assemblies?name=GRCh37"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh37"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
                 .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch37Url))
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh37"));
 
-        mockMvc.perform(get("/assemblies?name=GRCh38"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh38"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
                 .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch38Url))
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh38"));
 
-        mockMvc.perform(get("/assemblies?name=NCBI36"))
+        mockMvc.perform(get("/assemblies/search?name=NCBI36"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies?name=GRCh37&patch=p2"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -275,7 +291,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh37"))
                 .andExpect(jsonPath("$..assemblies[0].patch").value("p2"));
 
-        mockMvc.perform(get("/assemblies?name=GRCh38&patch=p2"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh38&patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -283,22 +299,22 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh38"))
                 .andExpect(jsonPath("$..assemblies[0].patch").value("p2"));
 
-        mockMvc.perform(get("/assemblies?name=NCBI36&patch=p2"))
+        mockMvc.perform(get("/assemblies/search?name=NCBI36&patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies?name=GRCh37&patch=p3"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies?name=GRCh38&patch=p3"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh38&patch=p3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies?accessions=GCA_000001405.3"))
+        mockMvc.perform(get("/assemblies/search?accessions=GCA_000001405.3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -306,7 +322,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..assemblies[0].accessions").isArray())
                 .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItem("GCA_000001405.3")));
 
-        mockMvc.perform(get("/assemblies?accessions=GCF_000001405.28"))
+        mockMvc.perform(get("/assemblies/search?accessions=GCF_000001405.28"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -314,12 +330,12 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..assemblies[0].accessions").isArray())
                 .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItem("GCF_000001405.28")));
 
-        mockMvc.perform(get("/assemblies?accessions=GCA_000001405.2"))
+        mockMvc.perform(get("/assemblies/search?accessions=GCA_000001405.2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies?name=GRCh37&patch=p2&accessions=GCA_000001405.3"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p2&accessions=GCA_000001405.3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -329,7 +345,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..assemblies[0].patch").value("p2"))
                 .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItem("GCA_000001405.3")));
 
-        mockMvc.perform(get("/assemblies?name=GRCh37&patch=p3&accessions=GCA_000001405.3"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p3&accessions=GCA_000001405.3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
@@ -453,19 +469,19 @@ public class MetadataApplicationTest {
         postTestStudy("EGAS0001", 1, "test human study based on GRCh37");
         postTestStudy("EGAS0002", 1, "test human study based on GRCh38");
 
-        mockMvc.perform(get("/studies/search/text").param("searchString", "human"))
+        mockMvc.perform(get("/studies/search/text").param("searchTerm","human"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(2));
-        mockMvc.perform(get("/studies/search/text").param("searchString", "important"))
+        mockMvc.perform(get("/studies/search/text").param("searchTerm","important"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(2));
-        mockMvc.perform(get("/studies/search/text").param("searchString", "grCh37"))
+        mockMvc.perform(get("/studies/search/text").param("searchTerm", "grCh37"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0].id.accession").value("EGAS0001"));
-        mockMvc.perform(get("/studies/search/text").param("searchString", "GrCh39"))
+        mockMvc.perform(get("/studies/search/text").param("searchTerm", "GrCh39"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isEmpty());
+                .andExpect(jsonPath("$..studies.length()").value(0));
     }
 
     @Test
@@ -492,7 +508,6 @@ public class MetadataApplicationTest {
     @Test
     public void testAccesionValidation() throws Exception {
         String taxonomyUrl = postTestTaxonomy();
-
         mockMvc.perform(post("/studies")
                 .content("{ " +
                         "\"id\":{ \"accession\": \"EGAS0001\",\"version\":  0 }," +
@@ -523,6 +538,92 @@ public class MetadataApplicationTest {
         mockMvc.perform(get("/studies/EGAS0001.1")).andExpect(status().isOk())
                 .andExpect(jsonPath ("$.id.accession").value("EGAS0001"));
         mockMvc.perform(get("/studies/EGAS0001.2")).andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void findStudyByTaxonomyId() throws Exception {
+        String homininesTaxonomyUrl = postTestTaxonomy(207598, "Homininae");
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens",
+                Arrays.asList(homininesTaxonomyUrl));
+        String panTaxonomyUrl = postTestTaxonomy(9596, "Pan",
+                Arrays.asList(homininesTaxonomyUrl));
+        String bonoboTaxonomyUrl = postTestTaxonomy(9597, "Pan paniscus",
+                Arrays.asList(homininesTaxonomyUrl, panTaxonomyUrl));
+        String chimpanzeeTaxonomyUrl = postTestTaxonomy(9598, "Pan troglodytes",
+                Arrays.asList(homininesTaxonomyUrl, panTaxonomyUrl));
+
+        String humanStudyUrl = postTestStudy("testhuman", 1, "test human study", humanTaxonomyUrl);
+        String bonoboStudyUrl = postTestStudy("testbonobo", 1,"test bonobo study", bonoboTaxonomyUrl);
+        String chimpanzeeStudyUrl = postTestStudy("testchimpanzee", 1,"test chimpanzee study", chimpanzeeTaxonomyUrl);
+
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=9606"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl));
+
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=9596"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(bonoboStudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(chimpanzeeStudyUrl));
+
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=207598"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(3))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(bonoboStudyUrl))
+                .andExpect(jsonPath("$..studies[2]..study.href").value(chimpanzeeStudyUrl));
+
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+    }
+
+    @Test
+    public void findStudyByTaxonomyName() throws Exception {
+        String homininesTaxonomyUrl = postTestTaxonomy(207598, "Homininae");
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens",
+                Arrays.asList(homininesTaxonomyUrl));
+        String panTaxonomyUrl = postTestTaxonomy(9596, "Pan",
+                Arrays.asList(homininesTaxonomyUrl));
+        String bonoboTaxonomyUrl = postTestTaxonomy(9597, "Pan paniscus",
+                Arrays.asList(homininesTaxonomyUrl, panTaxonomyUrl));
+        String chimpanzeeTaxonomyUrl = postTestTaxonomy(9598, "Pan troglodytes",
+                Arrays.asList(homininesTaxonomyUrl, panTaxonomyUrl));
+
+        String humanStudyUrl = postTestStudy("testhuman", 1, "test human study", humanTaxonomyUrl);
+        String bonoboStudyUrl = postTestStudy("testbonobo", 1, "test bonobo study", bonoboTaxonomyUrl);
+        String chimpanzeeStudyUrl = postTestStudy("testchimpanzee", 1, "test chimpanzee study", chimpanzeeTaxonomyUrl);
+
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homo sapiens"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl));
+
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Pan"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(bonoboStudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(chimpanzeeStudyUrl));
+
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homininae"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(3))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(bonoboStudyUrl))
+                .andExpect(jsonPath("$..studies[2]..study.href").value(chimpanzeeStudyUrl));
+
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=None"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
     }
 
 }

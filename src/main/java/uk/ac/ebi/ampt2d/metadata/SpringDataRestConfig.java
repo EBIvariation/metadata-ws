@@ -34,6 +34,13 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
+import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
+import uk.ac.ebi.ampt2d.metadata.rest.controllers.AssemblyRestController;
+import uk.ac.ebi.ampt2d.metadata.rest.controllers.StudyRestController;
+import uk.ac.ebi.ampt2d.metadata.rest.resources.AssemblyResource;
+import uk.ac.ebi.ampt2d.metadata.rest.resources.StudyResource;
 
 @Configuration
 public class SpringDataRestConfig {
@@ -76,6 +83,21 @@ public class SpringDataRestConfig {
             }
 
         };
+    }
+
+    @Bean
+    public StudyService studyService() {
+        return new StudyServiceImpl();
+    }
+
+    @Bean
+    public GenericResourceAssembler<Assembly, AssemblyResource> assemblyResourceAssembler() {
+        return new GenericResourceAssembler<Assembly, AssemblyResource>(AssemblyRestController.class, AssemblyResource.class);
+    }
+
+    @Bean
+    public GenericResourceAssembler<Study, StudyResource> studyResourceAssembler() {
+        return new GenericResourceAssembler<Study, StudyResource>(StudyRestController.class, StudyResource.class);
     }
 
 }

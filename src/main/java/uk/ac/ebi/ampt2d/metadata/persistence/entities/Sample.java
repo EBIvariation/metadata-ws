@@ -33,7 +33,7 @@ public class Sample {
     @ApiModelProperty(position = 1, required = true)
     @Valid
     @EmbeddedId
-    public AccessionVersionEntityId id;
+    private AccessionVersionEntityId id;
 
     @ApiModelProperty(position = 2, required = true)
     @Size(min = 1, max = 255)
