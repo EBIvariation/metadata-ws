@@ -39,6 +39,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.StudyResource;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -63,6 +64,37 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @SuppressWarnings("unchecked")
     public ResponseEntity<Resources<StudyResource>> search(@QuerydslPredicate(root = Study.class) Predicate predicate) {
         List<Study> studies = studyService.findStudiesByPredicate(predicate);
+
+        Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
+
+        return ResponseEntity.ok(resources);
+    }
+
+    @ApiOperation(value = "Get the latest version of a study based on accession ")
+    @ApiParam(name = "accession", value = "Study's accession", type = "string", required = true, example = "EGAS0001")
+    @RequestMapping(method = RequestMethod.GET, path = "search/accession", produces = "application/json")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Resources<StudyResource>> findStudiesByAccession(String accession) {
+        List<Study> studies = studyService.findStudiesByAccession(accession);
+
+        Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
+
+        return ResponseEntity.ok(resources);
+    }
+
+    @ApiOperation(value = "Get the list of studies filtered by release date")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "from", value = "starting date", dataType = "string", format = "date", paramType = "query", example = "2016-01-01"),
+            @ApiImplicitParam(name = "to", value = "ending date", dataType = "string", format = "date", paramType = "query", example = "2018-01-01")
+    })
+    @RequestMapping(method = RequestMethod.GET, path = "search/release-date", produces = "application/json")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Resources<StudyResource>> findStudiesByReleaseDate(String from, String to) {
+        LocalDate fromDate = from == null ? null : LocalDate.parse(from);
+        LocalDate toDate = to == null ? null : LocalDate.parse(to);
+        List<Study> studies = studyService.findStudiesByReleaseDate(fromDate, toDate);
 
         Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
 
@@ -111,6 +143,8 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search").withRel("studies"));
+        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/accession").withRel("studies"));
+        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/release-date").withRel("studies"));
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/text").withRel("studies"));
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/taxonomy-id").withRel("studies"));
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/taxonomy-name").withRel("studies"));

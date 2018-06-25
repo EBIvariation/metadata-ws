@@ -45,6 +45,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
 import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -179,10 +180,18 @@ public class MetadataApplicationTest {
     }
 
     private String postTestStudy(String accession, int version, String name, String taxonomyUrl) throws Exception {
-        return postTestStudy(accession, version, name, taxonomyUrl, false);
+        return postTestStudy(accession, version, name, taxonomyUrl, false, LocalDate.now());
     }
 
     private String postTestStudy(String accession, int version, String name, String taxonomyUrl, boolean deprecated) throws Exception {
+        return postTestStudy(accession, version, name, taxonomyUrl, deprecated, LocalDate.now());
+    }
+
+    private String postTestStudy(String accession, int version, String name, String taxonomyUrl, LocalDate releaseDate) throws Exception {
+        return postTestStudy(accession, version, name, taxonomyUrl, false, releaseDate);
+    }
+
+    private String postTestStudy(String accession, int version, String name, String taxonomyUrl, boolean deprecated, LocalDate releaseDate) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/studies")
                 .content("{ " +
                         "\"id\":{ \"accession\": \"" + accession + "\",\"version\": " + version + "}," +
@@ -190,6 +199,7 @@ public class MetadataApplicationTest {
                         "\"description\": \"Nothing important\"," +
                         "\"center\": \"EBI\"," +
                         "\"deprecated\": \"" + deprecated + "\"," +
+                        "\"releaseDate\": \"" + releaseDate + "\"," +
                         "\"taxonomy\": \"" + taxonomyUrl + "\"" +
                         "}"))
                 .andExpect(status().isCreated()).andReturn();
@@ -623,6 +633,17 @@ public class MetadataApplicationTest {
         mockMvc.perform(get("/studies/search/accession").param("accession", "EGAS0003"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(0));
+
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, LocalDate.now().minusDays(1));
+        postTestStudy("1kg", 2, "1kg phase 1", humanTaxonomyUrl, LocalDate.now());
+        postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, LocalDate.now().plusDays(1));
+
+        mockMvc.perform(get("/studies/search/accession").param("accession", "1kg"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0].id.accession").value("1kg"))
+                .andExpect(jsonPath("$..studies[0].id.version").value(2));
     }
 
     @Test
@@ -634,6 +655,7 @@ public class MetadataApplicationTest {
                         "\"name\": \" study1\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"center\": \"EBI\"," +
+                        "\"releaseDate\": \"" + LocalDate.now() + "\"," +
                         "\"taxonomy\": \"" + taxonomyUrl + "\"" +
                         "}"))
                 .andExpect(status().is4xxClientError())
@@ -645,6 +667,7 @@ public class MetadataApplicationTest {
                         "\"name\": \" study1\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"center\": \"EBI\"," +
+                        "\"releaseDate\": \"" + LocalDate.now() + "\"," +
                         "\"taxonomy\": \"" + taxonomyUrl + "\"" +
                         "}"))
                 .andExpect(status().is4xxClientError())
@@ -932,6 +955,36 @@ public class MetadataApplicationTest {
         checkLastModifiedDate(testFile, "file", startTime, endTime);
         checkLastModifiedDate(testSample, "sample", startTime, endTime);
         checkLastModifiedDate(testWebResource, "webResource", startTime, endTime);
+    }
+
+    public void findStudyByReleaseDate() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        LocalDate tomorrow = today.plusDays(1);
+
+        String releasedYesterday = postTestStudy("releasedYesterday", 1, "nothing important", humanTaxonomyUrl, yesterday);
+        String releasedToday = postTestStudy("releasedToday", 1, "nothing important", humanTaxonomyUrl, today);
+        String releasedTomorrow = postTestStudy("releasedTomorrow", 1, "nothing important", humanTaxonomyUrl, tomorrow);
+
+        mockMvc.perform(get("/studies/search/release-date?to=" + today))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(releasedYesterday))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(releasedToday));
+
+        mockMvc.perform(get("/studies/search/release-date?from=" + today))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(releasedToday));
+
+        mockMvc.perform(get("/studies/search/release-date?from=" + today + "&to=" + today))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(releasedToday));
     }
 
 }

@@ -20,11 +20,16 @@ package uk.ac.ebi.ampt2d.metadata.persistence.services;
 import com.querydsl.core.types.Predicate;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface StudyService {
 
     List<Study> findStudiesByPredicate(Predicate predicate);
+
+    List<Study> findStudiesByAccession(String accession);
+
+    List<Study> findStudiesByReleaseDate(LocalDate from, LocalDate to);
 
     List<Study> findStudiesByTextSearch(String searchTerm);
 

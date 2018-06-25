@@ -23,6 +23,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 public class StudyServiceImpl implements StudyService {
@@ -32,7 +34,35 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     public List<Study> findStudiesByPredicate(Predicate predicate) {
-        return (List<Study>) studyRepository.findAll(predicate);
+        QStudy study = QStudy.study;
+        Predicate dateRestrictedPredicate = study.releaseDate.between(null, LocalDate.now()).and(predicate);
+
+        return (List<Study>) studyRepository.findAll(dateRestrictedPredicate);
+    }
+
+    @Override
+    public List<Study> findStudiesByAccession(String accession) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.id.accession.equalsIgnoreCase(accession);
+
+        List<Study> studies = findStudiesByPredicate(predicate);
+
+        studies.sort((new Comparator<Study>() {
+            @Override
+            public int compare(Study o1, Study o2) {
+                return o1.getId().getVersion() - o2.getId().getVersion();
+            }
+        }).reversed());
+
+        return studies.subList(0, studies.size() > 0 ? 1 : 0);
+    }
+
+    @Override
+    public List<Study> findStudiesByReleaseDate(LocalDate from, LocalDate to) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.releaseDate.between(from, to);
+
+        return findStudiesByPredicate(predicate);
     }
 
     @Override

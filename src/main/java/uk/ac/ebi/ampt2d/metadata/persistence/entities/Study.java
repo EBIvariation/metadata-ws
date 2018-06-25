@@ -30,6 +30,7 @@ import javax.persistence.OneToMany;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -61,7 +62,13 @@ public class Study extends Auditable<AccessionVersionEntityId> {
     @Column(nullable = false)
     private String center;
 
-    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Taxonomy")
+    @ApiModelProperty(position = 5, required = true)
+    @NotNull
+    @JsonProperty
+    @Column(nullable = false)
+    private LocalDate releaseDate;
+
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a Taxonomy")
     @JsonProperty
     @ManyToOne(optional = false)
     private Taxonomy taxonomy;
