@@ -985,6 +985,16 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(releasedToday));
+
+        mockMvc.perform(get("/studies/search/release-date"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.exception").value("java.lang.IllegalArgumentException"))
+                .andExpect(jsonPath("$.message").value("Either from or to needs to be non-null"));
+
+        mockMvc.perform(get("/studies/search/release-date?from=" + "wrong-format-date"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.exception").value("java.lang.IllegalArgumentException"))
+                .andExpect(jsonPath("$.message").value("Please provide a date in the form yyyy-mm-dd"));
     }
 
 }

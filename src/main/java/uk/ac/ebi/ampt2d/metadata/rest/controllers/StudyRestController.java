@@ -40,6 +40,7 @@ import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.StudyResource;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
@@ -92,8 +93,19 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @ResponseBody
     @SuppressWarnings("unchecked")
     public ResponseEntity<Resources<StudyResource>> findStudiesByReleaseDate(String from, String to) {
-        LocalDate fromDate = from == null ? null : LocalDate.parse(from);
-        LocalDate toDate = to == null ? null : LocalDate.parse(to);
+        LocalDate fromDate = null, toDate = null;
+        try {
+            if ( from != null ) {
+                fromDate = LocalDate.parse(from);
+            }
+            if ( to != null ) {
+                toDate = LocalDate.parse(to);
+            }
+        }
+        catch ( DateTimeParseException e ) {
+            throw new IllegalArgumentException("Please provide a date in the form yyyy-mm-dd");
+        }
+
         List<Study> studies = studyService.findStudiesByReleaseDate(fromDate, toDate);
 
         Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
