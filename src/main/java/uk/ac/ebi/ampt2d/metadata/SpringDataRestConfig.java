@@ -37,8 +37,10 @@ import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverte
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
+import uk.ac.ebi.ampt2d.metadata.rest.controllers.AnalysisRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.AssemblyRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.StudyRestController;
+import uk.ac.ebi.ampt2d.metadata.rest.resources.AnalysisResource;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.AssemblyResource;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.StudyResource;
 
@@ -88,6 +90,11 @@ public class SpringDataRestConfig {
     @Bean
     public StudyService studyService() {
         return new StudyServiceImpl();
+    }
+
+    @Bean
+    public GenericResourceAssembler<Analysis, AnalysisResource> analysisResourceAssembler() {
+        return new GenericResourceAssembler<Analysis, AnalysisResource>(AnalysisRestController.class, AnalysisResource.class);
     }
 
     @Bean

@@ -352,6 +352,61 @@ public class MetadataApplicationTest {
     }
 
     @Test
+    public void findAnalyses() throws Exception {
+        String humanAssemblyUrl = postTestAssembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String humanStudyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
+
+        String testAnalysisOneUrl = mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"id\":{ \"accession\": \"EGAA0001\",\"version\":  1 }," +
+                        "\"name\": \"test_analysis_one\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"study\": \"" + humanStudyUrl + "\"," +
+                        "\"assembly\": \"" + humanAssemblyUrl + "\"," +
+                        "\"technology\": \"GWAS\"," +
+                        "\"type\": \"CASE_CONTROL\"," +
+                        "\"platform\": \"Illumina\"" +
+                        "}"))
+                .andExpect(status().isCreated()).andReturn()
+                .getResponse().getHeader("Location");
+
+        String testAnalysisTwoUrl = mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"id\":{ \"accession\": \"EGAA0002\",\"version\":  1 }," +
+                        "\"name\": \"test_analysis_two\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"study\": \"" + humanStudyUrl + "\"," +
+                        "\"assembly\": \"" + humanAssemblyUrl + "\"," +
+                        "\"technology\": \"ARRAY\"," +
+                        "\"type\": \"TUMOR\"," +
+                        "\"platform\": \"PacBio\"" +
+                        "}"))
+                .andExpect(status().isCreated()).andReturn()
+                .getResponse().getHeader("Location");
+
+        mockMvc.perform(get("/analyses/search?type=CASE_CONTROL"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(1))
+                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisOneUrl));
+
+        mockMvc.perform(get("/analyses/search?type=TUMOR"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(1))
+                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisTwoUrl));
+
+        mockMvc.perform(get("/analyses/search?type=COLLECTION"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(0));
+
+        mockMvc.perform(get("/analyses/search?type=unknown"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
     public void findStudies() throws Exception {
         String grch37AssemblyUrl = postTestAssembly("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
