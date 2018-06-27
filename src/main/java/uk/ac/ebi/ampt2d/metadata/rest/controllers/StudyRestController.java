@@ -26,6 +26,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
@@ -92,21 +93,11 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @RequestMapping(method = RequestMethod.GET, path = "search/release-date", produces = "application/json")
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public ResponseEntity<Resources<StudyResource>> findStudiesByReleaseDate(String from, String to) {
-        LocalDate fromDate = null, toDate = null;
-        try {
-            if ( from != null ) {
-                fromDate = LocalDate.parse(from);
-            }
-            if ( to != null ) {
-                toDate = LocalDate.parse(to);
-            }
-        }
-        catch ( DateTimeParseException e ) {
-            throw new IllegalArgumentException("Please provide a date in the form yyyy-mm-dd");
-        }
+    public ResponseEntity<Resources<StudyResource>> findStudiesByReleaseDate(
+            @RequestParam(name = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(name = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
 
-        List<Study> studies = studyService.findStudiesByReleaseDate(fromDate, toDate);
+        List<Study> studies = studyService.findStudiesByReleaseDate(from, to);
 
         Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
 

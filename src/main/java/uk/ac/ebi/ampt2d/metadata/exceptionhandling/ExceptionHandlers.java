@@ -21,6 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
+import java.time.LocalDate;
 
 @ControllerAdvice
 public class ExceptionHandlers {
@@ -28,5 +31,14 @@ public class ExceptionHandlers {
     @ExceptionHandler(value = IllegalArgumentException.class)
     public ResponseEntity<ErrorMessage> handleIllegalArgumentException(IllegalArgumentException ex) {
         return new ResponseEntity(new ErrorMessage(HttpStatus.BAD_REQUEST, ex, ex.getMessage()), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(value = MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorMessage> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        if ( ex.getRequiredType() == LocalDate.class ) {
+            return handleIllegalArgumentException(new IllegalArgumentException("Please provide a date in the form yyyy-mm-dd"));
+        }
+
+        throw ex;
     }
 }
