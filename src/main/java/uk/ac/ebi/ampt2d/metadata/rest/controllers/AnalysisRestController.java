@@ -53,7 +53,8 @@ public class AnalysisRestController implements ResourceProcessor<RepositoryLinks
 
     @ApiOperation(value="Get a filtered list of analyses based on filtering criteria")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "Analysis's type", dataType = "string", paramType = "query", example = "CASE_CONTROL"),
+            @ApiImplicitParam(name = "type", value = "Analysis's type", dataType = "string", paramType = "query", example = "CASE_CONTROL",
+                    allowableValues = "CASE_CONTROL,CONTROL_SET,CASE_SET,COLLECTION,TUMOR,MATCHED_NORMAL"),
     })
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody
