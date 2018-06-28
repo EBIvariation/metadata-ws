@@ -401,7 +401,10 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(0));
+    }
 
+    @Test
+    public void clientErrorWhenSearchAnalysesWithInvalidType() throws Exception {
         mockMvc.perform(get("/analyses/search?type=unknown"))
                 .andExpect(status().is4xxClientError());
     }
