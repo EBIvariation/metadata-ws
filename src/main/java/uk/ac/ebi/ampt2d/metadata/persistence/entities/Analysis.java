@@ -34,7 +34,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
-public class Analysis {
+public class Analysis implements BaseEntity<AccessionVersionEntityId> {
 
     public enum Type {
 
