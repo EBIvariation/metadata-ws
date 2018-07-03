@@ -98,4 +98,8 @@ public class Study extends Auditable<AccessionVersionEntityId> {
         return deprecated;
     }
 
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
 }

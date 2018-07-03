@@ -17,6 +17,7 @@
  */
 package uk.ac.ebi.ampt2d.metadata;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.support.ConfigurableConversionService;
@@ -36,6 +37,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
+import uk.ac.ebi.ampt2d.metadata.aop.StudyReleaseDateAspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
@@ -113,6 +115,12 @@ public class SpringDataRestConfig {
     @Bean
     public StudyDeprecationAspect studyDeprecationAspect() {
         return new StudyDeprecationAspect();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "endpoints.studies.date.restricted", matchIfMissing = true)
+    public StudyReleaseDateAspect studyReleaseDateAspect() {
+        return new StudyReleaseDateAspect();
     }
 
 }

@@ -221,6 +221,11 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.id.accession").value("EGAA0001"));
     }
 
+    private String postTestAnalysis(String accession, String assemblyUrl, String studyUrl) throws Exception {
+        return postTestAnalysis(accession, assemblyUrl, studyUrl, Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina");
+
+    }
+
     private String postTestAnalysis(String accession, String assemblyUrl, String studyUrl, Analysis.Technology
             technology, Analysis.Type type, String platform) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/analyses")
@@ -490,31 +495,8 @@ public class MetadataApplicationTest {
         String grch37StudyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
         String grch38StudyUrl = postTestStudy("EGAS0001", 2, "test_human_study");
 
-        mockMvc.perform(post("/analyses")
-                .content("{ " +
-                        "\"id\":{ \"accession\": \"EGAA0001\",\"version\":  1 }," +
-                        "\"name\": \"test_human_analysis_based_on_GRCh37\"," +
-                        "\"description\": \"Nothing important\"," +
-                        "\"study\": \"" + grch37StudyUrl + "\"," +
-                        "\"assembly\": \"" + grch37AssemblyUrl + "\"," +
-                        "\"technology\": \"GWAS\"," +
-                        "\"type\": \"CASE_CONTROL\"," +
-                        "\"platform\": \"string\"" +
-                        "}"))
-                .andExpect(status().isCreated()).andReturn();
-
-        mockMvc.perform(post("/analyses")
-                .content("{ " +
-                        "\"id\":{ \"accession\": \"EGAA0002\",\"version\":  1 }," +
-                        "\"name\": \"test_human_analysis_based_on_GRCh38\"," +
-                        "\"description\": \"Nothing important\"," +
-                        "\"study\": \"" + grch38StudyUrl + "\"," +
-                        "\"assembly\": \"" + grch38AssemblyUrl + "\"," +
-                        "\"technology\": \"GWAS\"," +
-                        "\"type\": \"CASE_CONTROL\"," +
-                        "\"platform\": \"string\"" +
-                        "}"))
-                .andExpect(status().isCreated()).andReturn();
+        postTestAnalysis("EGAA0001", grch37StudyUrl, grch37AssemblyUrl);
+        postTestAnalysis("EGAA0002", grch38StudyUrl, grch38AssemblyUrl);
 
         mockMvc.perform(get("/studies?analyses.assembly.name=GRCh37"))
                 .andExpect(status().isOk())
@@ -633,21 +615,10 @@ public class MetadataApplicationTest {
         mockMvc.perform(get("/studies/search/accession").param("accession", "EGAS0003"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(0));
-
-        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
-        postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, LocalDate.now().minusDays(1));
-        postTestStudy("1kg", 2, "1kg phase 1", humanTaxonomyUrl, LocalDate.now());
-        postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, LocalDate.now().plusDays(1));
-
-        mockMvc.perform(get("/studies/search/accession").param("accession", "1kg"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0].id.accession").value("1kg"))
-                .andExpect(jsonPath("$..studies[0].id.version").value(2));
     }
 
     @Test
-    public void testAccesionValidation() throws Exception {
+    public void testAccessionValidation() throws Exception {
         String taxonomyUrl = postTestTaxonomy();
         mockMvc.perform(post("/studies")
                 .content("{ " +
@@ -995,6 +966,91 @@ public class MetadataApplicationTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.exception").value("java.lang.IllegalArgumentException"))
                 .andExpect(jsonPath("$.message").value("Please provide a date in the form yyyy-mm-dd"));
+    }
+
+    @Test
+    public void findPublicStudiesOnly() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        String humanAssemblyUrl = postTestAssembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        LocalDate tomorrow = today.plusDays(1);
+
+        String yesterdayReleasedStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, yesterday);
+        String todayReleasedStudyUrl = postTestStudy("1kg", 2, "1kg phase 1", humanTaxonomyUrl, today);
+        String tomorrowReleasedStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, tomorrow);
+
+        String yesterdayReleasedAnalysisUrl = postTestAnalysis("analysisReleasedYesterday", yesterdayReleasedStudyUrl, humanAssemblyUrl);
+
+        mockMvc.perform(get("/studies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
+
+        mockMvc.perform(get(yesterdayReleasedStudyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(yesterdayReleasedStudyUrl));
+
+        mockMvc.perform(get(tomorrowReleasedStudyUrl))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(get(yesterdayReleasedStudyUrl + "/analyses"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(1))
+                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(yesterdayReleasedAnalysisUrl));
+
+        mockMvc.perform(get(todayReleasedStudyUrl + "/analyses"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(0));
+
+        mockMvc.perform(get(tomorrowReleasedStudyUrl + "/analyses"))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(get("/studies/search?taxonomy.id=9606"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
+
+        mockMvc.perform(get("/studies/search/accession?accession=1kg"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(todayReleasedStudyUrl));
+
+        mockMvc.perform(get("/studies/search/release-date?from=" + LocalDate.now()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(todayReleasedStudyUrl));
+
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=9606"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
+
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homo sapiens"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
+
+        mockMvc.perform(get("/studies/search/text?searchTerm=1kg"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
+
     }
 
 }

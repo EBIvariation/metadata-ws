@@ -34,10 +34,7 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     public List<Study> findStudiesByPredicate(Predicate predicate) {
-        QStudy study = QStudy.study;
-        Predicate dateRestrictedPredicate = study.releaseDate.between(null, LocalDate.now()).and(predicate);
-
-        return (List<Study>) studyRepository.findAll(dateRestrictedPredicate);
+        return (List<Study>) studyRepository.findAll(predicate);
     }
 
     @Override
