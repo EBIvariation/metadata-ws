@@ -401,6 +401,28 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(0));
+
+        mockMvc.perform(get("/analyses/search?platform=PacBio"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(1))
+                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisTwoUrl));
+
+        mockMvc.perform(get("/analyses/search?platform=illumina"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(1))
+                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisOneUrl));
+
+        mockMvc.perform(get("/analyses/search?platform=nextSeq"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(0));
+
+        mockMvc.perform(get("/analyses/search?platform=pacbio&type=TUMOR"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(1));
     }
 
     @Test
@@ -527,10 +549,10 @@ public class MetadataApplicationTest {
         postTestStudy("EGAS0001", 1, "test human study based on GRCh37");
         postTestStudy("EGAS0002", 1, "test human study based on GRCh38");
 
-        mockMvc.perform(get("/studies/search/text").param("searchTerm","human"))
+        mockMvc.perform(get("/studies/search/text").param("searchTerm", "human"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(2));
-        mockMvc.perform(get("/studies/search/text").param("searchTerm","important"))
+        mockMvc.perform(get("/studies/search/text").param("searchTerm", "important"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(2));
         mockMvc.perform(get("/studies/search/text").param("searchTerm", "grCh37"))
@@ -588,13 +610,13 @@ public class MetadataApplicationTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.errors[0].property").value("id.accession"))
                 .andExpect(jsonPath("$.errors[0].message").value("may not be null"));
-        postTestStudy("EGAS0001",1,"test_study");
+        postTestStudy("EGAS0001", 1, "test_study");
         mockMvc.perform(get("/studies/EGAS0001")).andExpect(status().is4xxClientError()).andExpect(jsonPath("$" +
                 ".message").value("Please provide an ID in the form accession.version"));
         mockMvc.perform(get("/studies/EGAS0001.S1")).andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.message").value("Please provide an ID in the form accession.version"));
         mockMvc.perform(get("/studies/EGAS0001.1")).andExpect(status().isOk())
-                .andExpect(jsonPath ("$.id.accession").value("EGAS0001"));
+                .andExpect(jsonPath("$.id.accession").value("EGAS0001"));
         mockMvc.perform(get("/studies/EGAS0001.2")).andExpect(status().isNotFound());
     }
 
@@ -611,8 +633,8 @@ public class MetadataApplicationTest {
                 Arrays.asList(homininesTaxonomyUrl, panTaxonomyUrl));
 
         String humanStudyUrl = postTestStudy("testhuman", 1, "test human study", humanTaxonomyUrl);
-        String bonoboStudyUrl = postTestStudy("testbonobo", 1,"test bonobo study", bonoboTaxonomyUrl);
-        String chimpanzeeStudyUrl = postTestStudy("testchimpanzee", 1,"test chimpanzee study", chimpanzeeTaxonomyUrl);
+        String bonoboStudyUrl = postTestStudy("testbonobo", 1, "test bonobo study", bonoboTaxonomyUrl);
+        String chimpanzeeStudyUrl = postTestStudy("testchimpanzee", 1, "test chimpanzee study", chimpanzeeTaxonomyUrl);
 
         mockMvc.perform(get("/studies/search/taxonomy-id?id=9606"))
                 .andExpect(status().isOk())
