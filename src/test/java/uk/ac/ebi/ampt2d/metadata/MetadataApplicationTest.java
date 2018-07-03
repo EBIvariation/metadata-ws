@@ -956,7 +956,10 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(releasedToday));
+    }
 
+    @Test
+    public void clientErrorWhenSearchStudiesByReleaseDateWithInvalidInput() throws Exception {
         mockMvc.perform(get("/studies/search/release-date"))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.exception").value("java.lang.IllegalArgumentException"))
@@ -994,9 +997,6 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..study.href").value(yesterdayReleasedStudyUrl));
 
-        mockMvc.perform(get(tomorrowReleasedStudyUrl))
-                .andExpect(status().isNotFound());
-
         mockMvc.perform(get(yesterdayReleasedStudyUrl + "/analyses"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
@@ -1007,9 +1007,6 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(0));
-
-        mockMvc.perform(get(tomorrowReleasedStudyUrl + "/analyses"))
-                .andExpect(status().isNotFound());
 
         mockMvc.perform(get("/studies/search?taxonomy.id=9606"))
                 .andExpect(status().isOk())
@@ -1051,6 +1048,18 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
 
+    }
+
+    @Test
+    public void notFoundWhenFindYetToPublishedStudies() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        String tomorrowReleasedStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, LocalDate.now().plusDays(1));
+
+        mockMvc.perform(get(tomorrowReleasedStudyUrl))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(get(tomorrowReleasedStudyUrl + "/analyses"))
+                .andExpect(status().isNotFound());
     }
 
 }
