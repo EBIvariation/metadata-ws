@@ -41,7 +41,7 @@ public class StudyDeprecationAspect {
     }
 
     @Around("execution(* uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository.findOne(..))")
-    public Object filterOnDeprecadtionAdviceFindOne(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
+    public Object filterOnDeprecationAdviceFindOne(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object study = proceedingJoinPoint.proceed();
 
         if ( study != null && ((Study) study).isDeprecated() ) {
