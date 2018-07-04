@@ -47,6 +47,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -712,10 +713,25 @@ public class MetadataApplicationTest {
     }
 
     @Test
+    public void deprecateStudy() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        String studyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, false);
+
+        mockMvc.perform(get(studyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(studyUrl));
+
+        mockMvc.perform(patch(studyUrl)
+                .content("{\"deprecated\": \"true\"}"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(studyUrl))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void findUndeprecatedStudiesOnly() throws Exception {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
-        String humanAssemblyUrl = postTestAssembly("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         String deprecatedStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, true);
         String undeprecatedStudyUrl = postTestStudy("1kg", 2, "1kg phase 1", humanTaxonomyUrl, false);
 
