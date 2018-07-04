@@ -26,6 +26,7 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapter;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import uk.ac.ebi.ampt2d.metadata.aop.StudyDeprecationAspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
@@ -105,6 +106,11 @@ public class SpringDataRestConfig {
     @Bean
     public GenericResourceAssembler<Study, StudyResource> studyResourceAssembler() {
         return new GenericResourceAssembler<Study, StudyResource>(StudyRestController.class, StudyResource.class);
+    }
+
+    @Bean
+    public StudyDeprecationAspect studyDeprecationAspect() {
+        return new StudyDeprecationAspect();
     }
 
 }
