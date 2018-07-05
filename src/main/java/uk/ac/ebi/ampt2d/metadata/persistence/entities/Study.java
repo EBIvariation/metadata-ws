@@ -62,7 +62,7 @@ public class Study extends Auditable<AccessionVersionEntityId> {
     @Column(nullable = false)
     private String center;
 
-    @ApiModelProperty(position = 5, required = true)
+    @ApiModelProperty(position = 5, required = true, example = "2018-01-01")
     @NotNull
     @JsonProperty
     @Column(nullable = false)
