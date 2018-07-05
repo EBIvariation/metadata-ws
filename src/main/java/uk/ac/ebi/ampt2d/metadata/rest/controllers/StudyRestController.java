@@ -57,9 +57,12 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
 
     @ApiOperation(value = "Get a filtered list of studies based on filtering criteria")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "analyses.assembly.name", value = "Assembly's name", dataType = "string", paramType = "query", example = "grch37"),
-            @ApiImplicitParam(name = "analyses.assembly.patch", value = "Assembly's patch number", dataType = "string", paramType = "query", example = "p2"),
-            @ApiImplicitParam(name = "analyses.type", value = "Analysis's type", dataType = "string", paramType = "query", example = "CASE_CONTROL")
+            @ApiImplicitParam(name = "analyses.assembly.name", value = "Assembly's name", dataType = "string",
+                    paramType = "query", example = "grch37"),
+            @ApiImplicitParam(name = "analyses.assembly.patch", value = "Assembly's patch number", dataType = "string",
+                    paramType = "query", example = "p2"),
+            @ApiImplicitParam(name = "analyses.type", value = "Analysis's type", dataType = "string",
+                    paramType = "query", example = "CASE_CONTROL")
     })
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody
@@ -87,8 +90,10 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
 
     @ApiOperation(value = "Get the list of studies filtered by release date")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "from", value = "starting date", dataType = "string", format = "date", paramType = "query", example = "2016-01-01"),
-            @ApiImplicitParam(name = "to", value = "ending date", dataType = "string", format = "date", paramType = "query", example = "2018-01-01")
+            @ApiImplicitParam(name = "from", value = "starting date", dataType = "string", format = "date",
+                    paramType = "query", example = "2016-01-01"),
+            @ApiImplicitParam(name = "to", value = "ending date", dataType = "string", format = "date",
+                    paramType = "query", example = "2018-01-01")
     })
     @RequestMapping(method = RequestMethod.GET, path = "search/release-date", produces = "application/json")
     @ResponseBody
