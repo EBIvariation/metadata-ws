@@ -31,7 +31,7 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class WebResource {
+public class WebResource extends Auditable {
 
     public enum Type {
 

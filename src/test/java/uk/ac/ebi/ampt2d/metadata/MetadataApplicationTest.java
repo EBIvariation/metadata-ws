@@ -17,6 +17,7 @@
  */
 package uk.ac.ebi.ampt2d.metadata;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +29,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultMatcher;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
@@ -41,6 +43,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -100,12 +103,12 @@ public class MetadataApplicationTest {
     @Before
     public void cleanDatabases() throws Exception {
         analysisRepository.deleteAll();
-        studyRepository.deleteAll();
-        webResourceRepository.deleteAll();
-        sampleRepository.deleteAll();
-        fileRepository.deleteAll();
-        taxonomyRepository.deleteAll();
         assemblyRepository.deleteAll();
+        fileRepository.deleteAll();
+        sampleRepository.deleteAll();
+        studyRepository.deleteAll();
+        taxonomyRepository.deleteAll();
+        webResourceRepository.deleteAll();
     }
 
     @Test
@@ -199,9 +202,17 @@ public class MetadataApplicationTest {
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
+        String location = postTestAnalysis("EGAA0001", assemblyUrl, studyUrl);
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id.accession").value("EGAA0001"));
+    }
+
+    private String postTestAnalysis(String accession, String assemblyUrl, String studyUrl) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/analyses")
                 .content("{ " +
-                        "\"id\":{ \"accession\": \"EGAA0001\",\"version\":  1 }," +
+                        "\"id\":{ \"accession\": \"" + accession + "\",\"version\":  1 }," +
                         "\"name\": \"test_human_analysis\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"study\": \"" + studyUrl + "\"," +
@@ -212,55 +223,67 @@ public class MetadataApplicationTest {
                         "}"))
                 .andExpect(status().isCreated()).andReturn();
 
-        String location = mvcResult.getResponse().getHeader("Location");
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id.accession").value("EGAA0001"));
+        return mvcResult.getResponse().getHeader("Location");
     }
 
     @Test
     public void postFile() throws Exception {
-        File testFile = new File(new AccessionVersionEntityId("EGAF0001", 1), "asd123", "test_file", 100,
-                File.Type.TSV);
-        MvcResult mvcResult = mockMvc.perform(post("/files")
-                .content(testFileJson.write(testFile).getJson()))
-                .andExpect(status().isCreated()).andReturn();
+        String location = postTestFile("EGAF0001", 1);
 
-        String location = mvcResult.getResponse().getHeader("Location");
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id.accession").value("EGAF0001"))
                 .andExpect(jsonPath("$.id.version").value(1));
     }
 
-    @Test
-    public void postSample() throws Exception {
-        Sample testSample = new Sample(new AccessionVersionEntityId("EGAN0001", 1), "testSample");
-        MvcResult mvcResult = mockMvc.perform(post("/samples")
-                .content(testSampleJson.write(testSample).getJson()))
+    private String postTestFile(String accession, int version) throws Exception {
+        File testFile = new File(new AccessionVersionEntityId(accession, version), "asd123", "test_file",
+                100, File.Type.TSV);
+
+        MvcResult mvcResult = mockMvc.perform(post("/files")
+                .content(testFileJson.write(testFile).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
-        String location = mvcResult.getResponse().getHeader("Location");
+        return mvcResult.getResponse().getHeader("Location");
+    }
+
+    @Test
+    public void postSample() throws Exception {
+        String location = postTestSample("EGAN0001", "testSample");
+
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id.accession").value("EGAN0001"))
                 .andExpect(jsonPath("$.name").value("testSample"));
     }
 
+    private String postTestSample(String accession, String name) throws Exception {
+        Sample testSample = new Sample(new AccessionVersionEntityId(accession, 1), name);
+        MvcResult mvcResult = mockMvc.perform(post("/samples")
+                .content(testSampleJson.write(testSample).getJson()))
+                .andExpect(status().isCreated()).andReturn();
+
+        return mvcResult.getResponse().getHeader("Location");
+    }
+
     @Test
     public void postWebResource() throws Exception {
+        String location = postTestWebResource();
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type").value("CENTER_WEB"))
+                .andExpect(jsonPath("$.resourceUrl").value("http:\\www.ebi.ac.uk"));
+    }
+
+    private String postTestWebResource() throws Exception {
         WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "http:\\www.ebi.ac.uk");
 
         MvcResult mvcResult = mockMvc.perform(post("/webResources")
                 .content(testWebResourceJson.write(testWebResource).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
-        String location = mvcResult.getResponse().getHeader("Location");
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type").value("CENTER_WEB"))
-                .andExpect(jsonPath("$.resourceUrl").value("http:\\www.ebi.ac.uk"));
+        return mvcResult.getResponse().getHeader("Location");
     }
 
     @Test
@@ -828,6 +851,75 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl));
+    }
+
+    private ResultMatcher isLastModifiedDateBetween(ZonedDateTime start, ZonedDateTime end) {
+        return new ResultMatcher() {
+            @Override
+            public void match(MvcResult mvcResult) throws Exception {
+                JSONObject jsonObject =  new JSONObject(mvcResult.getResponse().getContentAsString());
+                ZonedDateTime lastModifiedDate = ZonedDateTime.parse(jsonObject.getString("lastModifiedDate"));
+                assert lastModifiedDate.isAfter(start);
+                assert lastModifiedDate.isBefore(end);
+            }
+        };
+    }
+
+    private void checkLastModifiedDate(String url, String type, ZonedDateTime startTime, ZonedDateTime endTime)
+            throws Exception {
+        mockMvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.." + type + ".href").value(url))
+                .andExpect(jsonPath("$.lastModifiedDate").isNotEmpty())
+                .andExpect(isLastModifiedDateBetween(startTime, endTime));
+    }
+
+    private void patchResource(String url) throws Exception {
+        mockMvc.perform(patch(url)
+                .content("{\"name\": \"nothing important\"}"))
+                .andExpect(status().is2xxSuccessful());
+    }
+
+    @Test
+    public void metadataObjectsAreAuditable() throws Exception {
+        ZonedDateTime startTime = ZonedDateTime.now();
+        String testAssembly = postTestAssembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
+        String testStudy = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
+        String testAnalysis = postTestAnalysis("testhuman", testAssembly, testStudy);
+        String testFile = postTestFile("testhuman", 1);
+        String testSample = postTestSample("testhuman", "test human sample");
+        String testWebResource = postTestWebResource();
+        ZonedDateTime endTime = ZonedDateTime.now();
+
+        checkLastModifiedDate(testAssembly, "assembly", startTime, endTime);
+        checkLastModifiedDate(testTaxonomy, "taxonomy", startTime, endTime);
+        checkLastModifiedDate(testStudy, "study", startTime, endTime);
+        checkLastModifiedDate(testAnalysis, "analysis", startTime, endTime);
+        checkLastModifiedDate(testFile, "file", startTime, endTime);
+        checkLastModifiedDate(testSample, "sample", startTime, endTime);
+        checkLastModifiedDate(testWebResource, "webResource", startTime, endTime);
+
+        startTime = ZonedDateTime.now();
+        patchResource(testAssembly);
+        patchResource(testTaxonomy);
+        patchResource(testStudy);
+        patchResource(testAnalysis);
+        patchResource(testFile);
+        patchResource(testSample);
+        mockMvc.perform(patch(testWebResource)
+                .content("{\"resourceUrl\": \"http://nothing.important.com\"}"))
+                .andExpect(status().is2xxSuccessful());
+        endTime = ZonedDateTime.now();
+
+        checkLastModifiedDate(testAssembly, "assembly", startTime, endTime);
+        checkLastModifiedDate(testTaxonomy, "taxonomy", startTime, endTime);
+        checkLastModifiedDate(testStudy, "study", startTime, endTime);
+        checkLastModifiedDate(testAnalysis, "analysis", startTime, endTime);
+        checkLastModifiedDate(testFile, "file", startTime, endTime);
+        checkLastModifiedDate(testSample, "sample", startTime, endTime);
+        checkLastModifiedDate(testWebResource, "webResource", startTime, endTime);
     }
 
 }
