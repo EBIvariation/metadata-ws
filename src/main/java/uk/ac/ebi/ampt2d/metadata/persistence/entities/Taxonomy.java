@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
-public class Taxonomy extends Auditable {
+public class Taxonomy extends Auditable<Long> {
 
     @ApiModelProperty(position = 1)
     @NotNull
@@ -46,7 +46,7 @@ public class Taxonomy extends Auditable {
     @JsonProperty
     private List<Taxonomy> ancestors;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

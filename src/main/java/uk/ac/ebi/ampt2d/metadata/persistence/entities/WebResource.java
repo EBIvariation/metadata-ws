@@ -31,7 +31,7 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class WebResource extends Auditable {
+public class WebResource extends Auditable<Long> {
 
     public enum Type {
 
@@ -68,5 +68,9 @@ public class WebResource extends Auditable {
     public WebResource(Type type, String resourceUrl) {
         this.type = type;
         this.resourceUrl = resourceUrl;
+    }
+
+    public Long getId() {
+        return id;
     }
 }

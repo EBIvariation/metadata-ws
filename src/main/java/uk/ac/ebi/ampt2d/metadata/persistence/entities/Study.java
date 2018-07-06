@@ -33,7 +33,7 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
-public class Study extends Auditable implements BaseEntity<AccessionVersionEntityId> {
+public class Study extends Auditable<AccessionVersionEntityId> {
 
     @ApiModelProperty(position = 1, required = true)
     @Valid

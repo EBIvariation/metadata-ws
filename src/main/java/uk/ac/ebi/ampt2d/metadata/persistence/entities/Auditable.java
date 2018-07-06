@@ -26,7 +26,7 @@ import java.time.ZonedDateTime;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-abstract class Auditable {
+public abstract class Auditable<ID> {
 
     @LastModifiedDate
     private ZonedDateTime lastModifiedDate;
@@ -38,4 +38,6 @@ abstract class Auditable {
     public void setLastModifiedDate(ZonedDateTime lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
+
+    public abstract ID getId();
 }
