@@ -19,18 +19,25 @@ package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
 import io.swagger.annotations.ApiOperation;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QAnalysis;
 
 import java.util.List;
 
 @RepositoryRestResource
 public interface AnalysisRepository extends CrudRepository<Analysis, AccessionVersionEntityId>,
-        QueryDslPredicateExecutor<Analysis> {
+        QueryDslPredicateExecutor<Analysis>, QuerydslBinderCustomizer<QAnalysis> {
+
+    default void customize(QuerydslBindings bindings, QAnalysis qAnalysis) {
+        bindings.bind(qAnalysis.platform).first((path, value) -> path.equalsIgnoreCase(value));
+    }
 
     @ApiOperation(value = "Get the latest version of Analysis based on accession")
     @RestResource(path = "/accession")
