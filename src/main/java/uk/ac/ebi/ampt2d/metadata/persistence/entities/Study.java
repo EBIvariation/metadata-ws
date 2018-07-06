@@ -66,7 +66,7 @@ public class Study implements BaseEntity<AccessionVersionEntityId> {
     @ManyToOne(optional = false)
     private Taxonomy taxonomy;
 
-    @JsonProperty(defaultValue = "false")
+    @JsonProperty(defaultValue = "false", access = JsonProperty.Access.WRITE_ONLY)
     @Column
     private boolean deprecated;
 

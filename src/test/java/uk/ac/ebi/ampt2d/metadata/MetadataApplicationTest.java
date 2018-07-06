@@ -730,6 +730,18 @@ public class MetadataApplicationTest {
     }
 
     @Test
+    public void getStudyDoesNotIncludeDeprecatedField() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        String studyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, false);
+
+        mockMvc.perform(get(studyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(studyUrl))
+                .andExpect(jsonPath("$.description").exists())
+                .andExpect(jsonPath("$.deprecated").doesNotExist());
+    }
+
+    @Test
     public void findUndeprecatedStudiesOnly() throws Exception {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String deprecatedStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, true);
