@@ -66,6 +66,10 @@ public class Study implements BaseEntity<AccessionVersionEntityId> {
     @ManyToOne(optional = false)
     private Taxonomy taxonomy;
 
+    @JsonProperty(defaultValue = "false", access = JsonProperty.Access.WRITE_ONLY)
+    @Column
+    private boolean deprecated;
+
     @OneToMany(mappedBy = "study")
     private List<Analysis> analyses;
 
@@ -77,6 +81,10 @@ public class Study implements BaseEntity<AccessionVersionEntityId> {
 
     public AccessionVersionEntityId getId() {
         return id;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
     }
 
 }

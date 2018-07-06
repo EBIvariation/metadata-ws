@@ -47,6 +47,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -174,12 +175,17 @@ public class MetadataApplicationTest {
     }
 
     private String postTestStudy(String accession, int version, String name, String taxonomyUrl) throws Exception {
+        return postTestStudy(accession, version, name, taxonomyUrl, false);
+    }
+
+    private String postTestStudy(String accession, int version, String name, String taxonomyUrl, boolean deprecated) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/studies")
                 .content("{ " +
                         "\"id\":{ \"accession\": \"" + accession + "\",\"version\": " + version + "}," +
                         "\"name\": \"" + name + "\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"center\": \"EBI\"," +
+                        "\"deprecated\": \"" + deprecated + "\"," +
                         "\"taxonomy\": \"" + taxonomyUrl + "\"" +
                         "}"))
                 .andExpect(status().isCreated()).andReturn();
@@ -704,6 +710,99 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
+    }
+
+    @Test
+    public void deprecateStudy() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        String studyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, false);
+
+        mockMvc.perform(get(studyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(studyUrl));
+
+        mockMvc.perform(patch(studyUrl)
+                .content("{\"deprecated\": \"true\"}"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(studyUrl))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getStudyDoesNotIncludeDeprecatedField() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        String studyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, false);
+
+        mockMvc.perform(get(studyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(studyUrl))
+                .andExpect(jsonPath("$.description").exists())
+                .andExpect(jsonPath("$.deprecated").doesNotExist());
+    }
+
+    @Test
+    public void findUndeprecatedStudiesOnly() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        String deprecatedStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, true);
+        String undeprecatedStudyUrl = postTestStudy("1kg", 2, "1kg phase 1", humanTaxonomyUrl, false);
+
+        mockMvc.perform(get("/studies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(undeprecatedStudyUrl));
+
+        mockMvc.perform(get(undeprecatedStudyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(undeprecatedStudyUrl));
+
+        mockMvc.perform(get(undeprecatedStudyUrl + "/analyses"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(0));
+
+        mockMvc.perform(get("/studies/search?taxonomy.id=9606"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(undeprecatedStudyUrl));
+
+        mockMvc.perform(get("/studies/search/accession?accession=1kg"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(undeprecatedStudyUrl));
+
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=9606"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(undeprecatedStudyUrl));
+
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homo sapiens"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(undeprecatedStudyUrl));
+
+        mockMvc.perform(get("/studies/search/text?searchTerm=1kg"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(undeprecatedStudyUrl));
+    }
+
+    @Test
+    public void notFoundWhenFindDeprecatedStudies() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        String deprecatedStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, true);
+
+        mockMvc.perform(get(deprecatedStudyUrl))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(get(deprecatedStudyUrl + "/analyses"))
+                .andExpect(status().isNotFound());
     }
 
 }
