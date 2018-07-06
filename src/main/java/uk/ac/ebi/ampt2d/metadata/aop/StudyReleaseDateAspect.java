@@ -46,7 +46,7 @@ public class StudyReleaseDateAspect {
     public Object filterOnReleaseDateAdviceFindOne(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object study = proceedingJoinPoint.proceed();
 
-        if ( study !=null && ((Study) study).getReleaseDate().isAfter(LocalDate.now()) ) {
+        if ( study ==null || ((Study) study).getReleaseDate().isAfter(LocalDate.now()) ) {
             return null;
         }
 
