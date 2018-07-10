@@ -495,8 +495,8 @@ public class MetadataApplicationTest {
         String grch37StudyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
         String grch38StudyUrl = postTestStudy("EGAS0001", 2, "test_human_study");
 
-        postTestAnalysis("EGAA0001", grch37StudyUrl, grch37AssemblyUrl);
-        postTestAnalysis("EGAA0002", grch38StudyUrl, grch38AssemblyUrl);
+        postTestAnalysis("EGAA0001", grch37AssemblyUrl, grch37StudyUrl);
+        postTestAnalysis("EGAA0002", grch38AssemblyUrl, grch38StudyUrl);
 
         mockMvc.perform(get("/studies?analyses.assembly.name=GRCh37"))
                 .andExpect(status().isOk())
@@ -892,8 +892,7 @@ public class MetadataApplicationTest {
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
         String testStudy = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
-        String testAnalysis = postTestAnalysis("testhuman", testAssembly, testStudy,
-                                            Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina");
+        String testAnalysis = postTestAnalysis("testhuman", testAssembly, testStudy);
         String testFile = postTestFile("testhuman", 1);
         String testSample = postTestSample("testhuman", "test human sample");
         String testWebResource = postTestWebResource();
@@ -984,7 +983,7 @@ public class MetadataApplicationTest {
         String todayReleasedStudyUrl = postTestStudy("1kg", 2, "1kg phase 1", humanTaxonomyUrl, today);
         String tomorrowReleasedStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, tomorrow);
 
-        String yesterdayReleasedAnalysisUrl = postTestAnalysis("analysisReleasedYesterday", yesterdayReleasedStudyUrl, humanAssemblyUrl);
+        String yesterdayReleasedAnalysisUrl = postTestAnalysis("analysisReleasedYesterday", humanAssemblyUrl, yesterdayReleasedStudyUrl);
 
         mockMvc.perform(get("/studies"))
                 .andExpect(status().isOk())
