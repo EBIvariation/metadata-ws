@@ -70,6 +70,10 @@ public class Study implements BaseEntity<AccessionVersionEntityId> {
     @Column
     private boolean deprecated;
 
+    @JsonProperty(defaultValue = "false")
+    @Column
+    private boolean browsable;
+
     @OneToMany(mappedBy = "study")
     private List<Analysis> analyses;
 

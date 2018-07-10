@@ -805,4 +805,29 @@ public class MetadataApplicationTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    public void browsableIsAPropertyOfStudy() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        String humanStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl);
+
+        mockMvc.perform(get(humanStudyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.browsable").value(false));
+
+        mockMvc.perform(get("/studies/search?browsable=true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(patch(humanStudyUrl)
+                .content("{\"browsable\" : true }"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get("/studies/search?browsable=true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl));
+    }
+
 }
