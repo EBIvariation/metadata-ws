@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Assembly implements BaseEntity<Long> {
+public class Assembly  extends Auditable<Long> {
 
     @ApiModelProperty(position = 1, value = "Assembly auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

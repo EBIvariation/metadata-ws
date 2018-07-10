@@ -28,7 +28,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-public class Sample {
+public class Sample extends Auditable<AccessionVersionEntityId> {
 
     @ApiModelProperty(position = 1, required = true)
     @Valid

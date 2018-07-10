@@ -31,7 +31,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-public class File {
+public class File extends Auditable<AccessionVersionEntityId> {
 
     public enum Type {
 

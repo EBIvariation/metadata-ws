@@ -79,6 +79,11 @@
             <artifactId>querydsl-jpa</artifactId>
             <version>4.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.9.6</version>
+        </dependency>
         <!-- documentation -->
         <dependency>
             <groupId>io.springfox</groupId>

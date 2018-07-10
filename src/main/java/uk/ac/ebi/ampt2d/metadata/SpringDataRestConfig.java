@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.support.ConfigurableConversionService;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
@@ -46,6 +47,7 @@ import uk.ac.ebi.ampt2d.metadata.rest.resources.AssemblyResource;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.StudyResource;
 
 @Configuration
+@EnableJpaAuditing
 public class SpringDataRestConfig {
 
     @Bean

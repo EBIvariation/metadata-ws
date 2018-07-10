@@ -26,13 +26,12 @@ import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.core.EmbeddedWrappers;
 import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.BaseEntity;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Auditable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class GenericResourceAssembler<ENTITY extends BaseEntity, RESOURCE extends Resource<ENTITY>>
+public class GenericResourceAssembler<ENTITY extends Auditable, RESOURCE extends Resource<ENTITY>>
         extends ResourceAssemblerSupport<ENTITY, RESOURCE> {
 
     @Autowired

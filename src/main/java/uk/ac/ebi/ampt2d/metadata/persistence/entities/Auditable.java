@@ -17,37 +17,29 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.util.List;
+import javax.persistence.EntityListeners;
+import javax.persistence.MappedSuperclass;
+import java.time.ZonedDateTime;
 
-@Entity
-public class Taxonomy extends Auditable<Long> {
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+public abstract class Auditable<ID> {
 
-    @ApiModelProperty(position = 1)
-    @NotNull
-    @JsonProperty
-    @Id
-    private long id;
+    @ApiModelProperty(readOnly = true)
+    @LastModifiedDate
+    private ZonedDateTime lastModifiedDate;
 
-    @ApiModelProperty(position = 2)
-    @NotNull
-    @JsonProperty
-    @Size(max = 255, min = 1)
-    private String name;
-
-    @ManyToMany
-    @JsonProperty
-    private List<Taxonomy> ancestors;
-
-    public Long getId() {
-        return id;
+    public ZonedDateTime getLastModifiedDate() {
+        return lastModifiedDate;
     }
 
+    public void setLastModifiedDate(ZonedDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public abstract ID getId();
 }
