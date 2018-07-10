@@ -24,9 +24,22 @@ import org.aspectj.lang.annotation.Aspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
+/**
+ * An @Aspect for ensuring deprecated studies are not included in requests
+ */
 @Aspect
 public class StudyDeprecationAspect {
 
+    /**
+     * An @Around advice for StudyRepository.findAll(..) method execution
+     *
+     * It takes the first argument of the join point method and adds a new Predicate for checking a study's
+     * deprecated field. It then calls the join point method with updated arguments.
+     *
+     * @param proceedingJoinPoint
+     * @return the return object from join point method execution
+     * @throws Throwable
+     */
     @Around("execution(* uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository.findAll(..))")
     public Object filterOnDeprecationAdviceFindAll(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object[] args = proceedingJoinPoint.getArgs();
@@ -40,6 +53,16 @@ public class StudyDeprecationAspect {
         return proceedingJoinPoint.proceed(args);
     }
 
+    /**
+     * An @Around advice for StudyRepository.findOne(..) method execution
+     *
+     * It takes the return object from join point method execution and check the return object's (study's)
+     * deprecated field. Return null if the deprecated field is true.
+     *
+     * @param proceedingJoinPoint
+     * @return null or Study object
+     * @throws Throwable
+     */
     @Around("execution(* uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository.findOne(..))")
     public Object filterOnDeprecationAdviceFindOne(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object study = proceedingJoinPoint.proceed();

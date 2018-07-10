@@ -26,9 +26,22 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
 import java.time.LocalDate;
 
+/**
+ * An @Aspect for ensuring only published studies are returned through checking a study's releaseDate field
+ */
 @Aspect
 public class StudyReleaseDateAspect {
 
+    /**
+     * An @Around advice for StudyRepository.findAll(..) method execution.
+     *
+     * It takes the first argument of the join point method and adds a new Predicate for checking a study's
+     * releaseDate field. It then calls the join point method with updated arguments.
+     *
+     * @param proceedingJoinPoint
+     * @return the return object from join point method execution
+     * @throws Throwable
+     */
     @Around("execution(* uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository.findAll(..))")
     public Object filterOnReleaseDateAdviceFindAll(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object[] args = proceedingJoinPoint.getArgs();
@@ -42,6 +55,16 @@ public class StudyReleaseDateAspect {
         return proceedingJoinPoint.proceed(args);
     }
 
+    /**
+     * An @Around advice for StudyRepository.findOne(..) method execution
+     *
+     * It takes the return object from join point method execution and check the return object's (study's)
+     * releaseDate field. Return null if the releaseDate is a date in the future.
+     *
+     * @param proceedingJoinPoint
+     * @return null or Study object
+     * @throws Throwable
+     */
     @Around("execution(* uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository.findOne(..))")
     public Object filterOnReleaseDateAdviceFindOne(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object study = proceedingJoinPoint.proceed();

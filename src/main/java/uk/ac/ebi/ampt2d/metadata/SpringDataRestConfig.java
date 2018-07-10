@@ -112,11 +112,26 @@ public class SpringDataRestConfig {
         return new GenericResourceAssembler<Study, StudyResource>(StudyRestController.class, StudyResource.class);
     }
 
+    /**
+     * Inject StudyDeprecationAspect bean
+     *
+     * The StudyDeprecationAspect ensures every GET request returns only not yet deprecated studies
+     *
+     * @return StudyDeprecationAspect
+     */
     @Bean
     public StudyDeprecationAspect studyDeprecationAspect() {
         return new StudyDeprecationAspect();
     }
 
+    /**
+     * Inject StudyReleaseDateAspect bean conditionally
+     *
+     * The StudyReleaseDateAspect ensures every GET request returns only published studies
+     * Set "endpoints.studies.date.restricted" to false if you don't want this restriction
+     *
+     * @return StudyReleaseDateAspect
+     */
     @Bean
     @ConditionalOnProperty(name = "endpoints.studies.date.restricted", matchIfMissing = true)
     public StudyReleaseDateAspect studyReleaseDateAspect() {
