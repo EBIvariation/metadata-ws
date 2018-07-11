@@ -57,10 +57,7 @@ public class AnalysisRestController implements ResourceProcessor<RepositoryLinks
                     paramType = "query", example = "CASE_CONTROL",
                     allowableValues = "CASE_CONTROL,CONTROL_SET,CASE_SET,COLLECTION,TUMOR,MATCHED_NORMAL"),
             @ApiImplicitParam(name = "platform", value = "Analysis's Platform", dataType = "string",
-                    paramType = "query", example = "Illumina"),
-            @ApiImplicitParam(name = "technology", value = "Analysis's Technoloy", dataType = "string",
-                    paramType = "query", example = "GWAS",
-                    allowableValues = "GWAS,EXOME_SEQUENCING,GENOTYPING,ARRAY,CURATION")
+                    paramType = "query", example = "Illumina")
     })
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody

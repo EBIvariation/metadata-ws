@@ -452,24 +452,6 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(1));
-
-        mockMvc.perform(get("/analyses/search?technology=GWAS"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(1));
-
-        mockMvc.perform(get("/analyses/search?technology=ARRAY&type=TUMOR"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(1));
-
-        mockMvc.perform(get("/analyses/search?technology=CURATION"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(0));
-
-        mockMvc.perform(get("/analyses/search?technology=UNKNOWN"))
-                .andExpect(status().is4xxClientError());
     }
 
     @Test
