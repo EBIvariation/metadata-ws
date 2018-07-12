@@ -30,8 +30,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
@@ -202,14 +203,16 @@ public class MetadataApplicationTest {
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
-        String location = postTestAnalysis("EGAA0001", assemblyUrl, studyUrl);
+        String location = postTestAnalysis("EGAA0001", assemblyUrl, studyUrl, Analysis.Technology.GWAS,
+                Analysis.Type.CASE_CONTROL, "Illumina");
 
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id.accession").value("EGAA0001"));
     }
 
-    private String postTestAnalysis(String accession, String assemblyUrl, String studyUrl) throws Exception {
+    private String postTestAnalysis(String accession, String assemblyUrl, String studyUrl, Analysis.Technology
+            technology, Analysis.Type type, String platform) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/analyses")
                 .content("{ " +
                         "\"id\":{ \"accession\": \"" + accession + "\",\"version\":  1 }," +
@@ -217,9 +220,9 @@ public class MetadataApplicationTest {
                         "\"description\": \"Nothing important\"," +
                         "\"study\": \"" + studyUrl + "\"," +
                         "\"assembly\": \"" + assemblyUrl + "\"," +
-                        "\"technology\": \"GWAS\"," +
-                        "\"type\": \"CASE_CONTROL\"," +
-                        "\"platform\": \"string\"" +
+                        "\"technology\": \"" + technology + "\"," +
+                        "\"type\": \"" + type + "\"," +
+                        "\"platform\": \"" + platform + "\"" +
                         "}"))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -382,37 +385,9 @@ public class MetadataApplicationTest {
 
     @Test
     public void findAnalyses() throws Exception {
-        String humanAssemblyUrl = postTestAssembly("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String humanStudyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
-
-        String testAnalysisOneUrl = mockMvc.perform(post("/analyses")
-                .content("{ " +
-                        "\"id\":{ \"accession\": \"EGAA0001\",\"version\":  1 }," +
-                        "\"name\": \"test_analysis_one\"," +
-                        "\"description\": \"Nothing important\"," +
-                        "\"study\": \"" + humanStudyUrl + "\"," +
-                        "\"assembly\": \"" + humanAssemblyUrl + "\"," +
-                        "\"technology\": \"GWAS\"," +
-                        "\"type\": \"CASE_CONTROL\"," +
-                        "\"platform\": \"Illumina\"" +
-                        "}"))
-                .andExpect(status().isCreated()).andReturn()
-                .getResponse().getHeader("Location");
-
-        String testAnalysisTwoUrl = mockMvc.perform(post("/analyses")
-                .content("{ " +
-                        "\"id\":{ \"accession\": \"EGAA0002\",\"version\":  1 }," +
-                        "\"name\": \"test_analysis_two\"," +
-                        "\"description\": \"Nothing important\"," +
-                        "\"study\": \"" + humanStudyUrl + "\"," +
-                        "\"assembly\": \"" + humanAssemblyUrl + "\"," +
-                        "\"technology\": \"ARRAY\"," +
-                        "\"type\": \"TUMOR\"," +
-                        "\"platform\": \"PacBio\"" +
-                        "}"))
-                .andExpect(status().isCreated()).andReturn()
-                .getResponse().getHeader("Location");
+        List<String> testAnalysisUrls = postTestAnalyses();
+        String testAnalysisOneUrl = testAnalysisUrls.get(0);
+        String testAnalysisTwoUrl = testAnalysisUrls.get(1);
 
         mockMvc.perform(get("/analyses/search?type=CASE_CONTROL"))
                 .andExpect(status().isOk())
@@ -452,24 +427,42 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(1));
+    }
 
-        mockMvc.perform(get("/analyses/search?technology=GWAS"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(1));
+    @Test
+    public void findAnalysisByTechnology() throws Exception {
+        List<String> testAnalysisUrls = postTestAnalyses();
 
-        mockMvc.perform(get("/analyses/search?technology=ARRAY&type=TUMOR"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(1));
+        mockMvc.perform(get("/analyses/search?technology=UNKNOWN"))
+                .andExpect(status().is4xxClientError());
 
         mockMvc.perform(get("/analyses/search?technology=CURATION"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(0));
 
-        mockMvc.perform(get("/analyses/search?technology=UNKNOWN"))
-                .andExpect(status().is4xxClientError());
+        mockMvc.perform(get("/analyses/search?technology=GWAS"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(1))
+                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisUrls.get(0)));
+
+        mockMvc.perform(get("/analyses/search?technology=ARRAY&type=TUMOR"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(1))
+                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisUrls.get(1)));
+    }
+
+    private List<String> postTestAnalyses() throws Exception {
+        String humanAssemblyUrl = postTestAssembly("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String humanStudyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
+
+        return Arrays.asList(postTestAnalysis("EGAA0001", humanAssemblyUrl, humanStudyUrl,
+                            Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina"),
+                postTestAnalysis("EGAA0002", humanAssemblyUrl, humanStudyUrl,
+                                Analysis.Technology.ARRAY, Analysis.Type.TUMOR, "PacBio"));
     }
 
     @Test
@@ -875,7 +868,7 @@ public class MetadataApplicationTest {
         return new ResultMatcher() {
             @Override
             public void match(MvcResult mvcResult) throws Exception {
-                JSONObject jsonObject =  new JSONObject(mvcResult.getResponse().getContentAsString());
+                JSONObject jsonObject = new JSONObject(mvcResult.getResponse().getContentAsString());
                 ZonedDateTime lastModifiedDate = ZonedDateTime.parse(jsonObject.getString("lastModifiedDate"));
                 assert lastModifiedDate.isAfter(start);
                 assert lastModifiedDate.isBefore(end);
@@ -905,7 +898,8 @@ public class MetadataApplicationTest {
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
         String testStudy = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
-        String testAnalysis = postTestAnalysis("testhuman", testAssembly, testStudy);
+        String testAnalysis = postTestAnalysis("testhuman", testAssembly, testStudy,
+                                            Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina");
         String testFile = postTestFile("testhuman", 1);
         String testSample = postTestSample("testhuman", "test human sample");
         String testWebResource = postTestWebResource();
