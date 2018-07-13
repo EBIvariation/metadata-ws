@@ -17,8 +17,10 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
@@ -31,6 +33,23 @@ public class StudyServiceImpl implements StudyService {
 
     @Autowired
     private StudyRepository studyRepository;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Override
+    public Study findOneStudyByPredicate(Predicate predicate) {
+        return studyRepository.findOne(predicate);
+    }
+
+    @Override
+    public Study findOneStudyByAccession(AccessionVersionEntityId id) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.id.accession.equalsIgnoreCase(id.getAccession())
+                .and(study.id.version.eq(id.getVersion()));
+
+        return findOneStudyByPredicate(predicate);
+    }
 
     @Override
     public List<Study> findStudiesByPredicate(Predicate predicate) {
@@ -86,6 +105,13 @@ public class StudyServiceImpl implements StudyService {
                 or(study.taxonomy.ancestors.any().name.equalsIgnoreCase(name));
 
         return findStudiesByPredicate(predicate);
+    }
+
+    @Override
+    public Study patch(Study study, String patch) throws Exception {
+        Study study1 = objectMapper.readerForUpdating(study).readValue(patch);
+
+        return studyRepository.save(study1);
     }
 
 }

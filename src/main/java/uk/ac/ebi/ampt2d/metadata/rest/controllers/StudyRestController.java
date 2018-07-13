@@ -27,15 +27,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
@@ -148,8 +152,35 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
         return ResponseEntity.ok(resources);
     }
 
+    @ApiOperation(value = "Update an existing study")
+    @ApiParam(name = "id", value = "Study's id (accession.version)", type = "string", required = true, example = "EGAS0001.1")
+    @RequestMapping(method = RequestMethod.PATCH, path = "{id}/patch", produces = "application/json", consumes = "application/json")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Resource<Study>> patch(@PathVariable("id") AccessionVersionEntityId id,
+                                                 @RequestBody String json) {
+        Study study = studyService.findOneStudyByAccession(id);
+
+        if ( study == null ) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            Study study1 = studyService.patch(study, json);
+
+            Resource<Study> resource = resourceAssembler.toResource(study1);
+
+            return ResponseEntity.ok(resource);
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
+        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/{id}/patch").withRel("studies"));
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search").withRel("studies"));
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/accession").withRel("studies"));
         resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/release-date").withRel("studies"));

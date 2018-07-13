@@ -56,24 +56,26 @@ public class StudyReleaseDateAspect {
     }
 
     /**
-     * An @Around advice for StudyRepository.findOne(..) method execution
+     * An @Around advice for CrudRepository.findOne(..) method execution
      *
-     * It takes the return object from join point method execution and check the return object's (study's)
+     * It takes the returned object from join point method execution and check the returned object. If the returned
+     * object is not a Study object, return as it is. If the returned object is a Study object, check the study's
      * releaseDate field. Return null if the releaseDate is a date in the future.
      *
      * @param proceedingJoinPoint
-     * @return null or Study object
+     * @return null or object
      * @throws Throwable
      */
-    @Around("execution(* uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository.findOne(..))")
+    @Around("execution(* org.springframework.data.repository.CrudRepository.findOne(java.io.Serializable))")
     public Object filterOnReleaseDateAdviceFindOne(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        Object study = proceedingJoinPoint.proceed();
+        Object result = proceedingJoinPoint.proceed();
 
-        if ( study ==null || ((Study) study).getReleaseDate().isAfter(LocalDate.now()) ) {
+        if ( result == null ||
+                ( result.getClass() == Study.class && ((Study) result).getReleaseDate().isAfter(LocalDate.now()) ) ) {
             return null;
         }
 
-        return study;
+        return result;
     }
 
 }

@@ -26,6 +26,7 @@ import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -834,6 +835,35 @@ public class MetadataApplicationTest {
     }
 
     @Test
+    public void deprecatedStudyCouldBeUndeprecated() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        String humanStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, false);
+
+        mockMvc.perform(get(humanStudyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(humanStudyUrl));
+
+        mockMvc.perform(patch(humanStudyUrl + "/patch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"deprecated\" : \"" + true + "\" }"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(humanStudyUrl));
+
+        mockMvc.perform(get(humanStudyUrl))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(patch(humanStudyUrl + "/patch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"deprecated\" : \"" + false + "\" }"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(humanStudyUrl));
+
+        mockMvc.perform(get(humanStudyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(humanStudyUrl));
+    }
+
+    @Test
     public void browsableIsAPropertyOfStudy() throws Exception {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String humanStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl);
@@ -856,6 +886,17 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl));
+    }
+
+    private ResultMatcher isReleaseDateEqualTo(LocalDate localDate) {
+        return new ResultMatcher() {
+            @Override
+            public void match(MvcResult mvcResult) throws Exception {
+                JSONObject jsonObject =  new JSONObject(mvcResult.getResponse().getContentAsString());
+                LocalDate releaseDate = LocalDate.parse(jsonObject.getString("releaseDate"));
+                assert releaseDate.equals(localDate);
+            }
+        };
     }
 
     private ResultMatcher isLastModifiedDateBetween(ZonedDateTime start, ZonedDateTime end) {
@@ -1059,6 +1100,66 @@ public class MetadataApplicationTest {
 
         mockMvc.perform(get(tomorrowReleasedStudyUrl + "/analyses"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void studyReleaseDateCouldBeChanged() throws Exception {
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = today.plusDays(1);
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        String humanStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, today);
+
+
+        mockMvc.perform(get(humanStudyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.releaseDate").exists())
+                .andExpect(isReleaseDateEqualTo(today));
+
+        mockMvc.perform(patch(humanStudyUrl + "/patch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"releaseDate\" : \"" + tomorrow + "\" }"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.releaseDate").exists())
+                .andExpect(isReleaseDateEqualTo(tomorrow));
+
+        mockMvc.perform(get(humanStudyUrl))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(patch(humanStudyUrl + "/patch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"releaseDate\" : \"" + today + "\" }"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.releaseDate").exists())
+                .andExpect(isReleaseDateEqualTo(today));
+
+        mockMvc.perform(get(humanStudyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.releaseDate").exists())
+                .andExpect(isReleaseDateEqualTo(today));
+    }
+
+    @Test
+    public void notFoundWhenPatchAnUnexistingStudy() throws Exception {
+        mockMvc.perform(patch("studies/unexist.1/patch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"releaseDate\" : \"" + LocalDate.now() + "\" }"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void badRequestWhenPatchAStudyWithInvalidRequestBody() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        String humanStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl);
+
+        mockMvc.perform(patch(humanStudyUrl + "/patch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"releaseDate\" : \"" + 2001 + "\" }"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(patch(humanStudyUrl + "/patch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andExpect(status().isBadRequest());
     }
 
 }
