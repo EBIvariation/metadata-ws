@@ -73,10 +73,12 @@ public class Study extends Auditable<AccessionVersionEntityId> {
     @ManyToOne(optional = false)
     private Taxonomy taxonomy;
 
+    @ApiModelProperty(position = 7, example = "false")
     @JsonProperty(defaultValue = "false", access = JsonProperty.Access.WRITE_ONLY)
     @Column
     private boolean deprecated;
 
+    @ApiModelProperty(position = 8, example = "false")
     @JsonProperty(defaultValue = "false")
     @Column
     private boolean browsable;
