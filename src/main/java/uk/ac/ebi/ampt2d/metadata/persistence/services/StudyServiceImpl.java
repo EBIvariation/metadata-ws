@@ -57,7 +57,7 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
-    public List<Study> findStudiesByAccession(String accession) {
+    public Study findStudyByAccession(String accession) {
         QStudy study = QStudy.study;
         Predicate predicate = study.id.accession.equalsIgnoreCase(accession);
 
@@ -70,7 +70,7 @@ public class StudyServiceImpl implements StudyService {
             }
         }).reversed());
 
-        return studies.subList(0, studies.size() > 0 ? 1 : 0);
+        return studies.isEmpty() ? null : studies.get(0);
     }
 
     @Override

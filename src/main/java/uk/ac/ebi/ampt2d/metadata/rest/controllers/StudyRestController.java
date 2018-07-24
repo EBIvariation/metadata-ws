@@ -84,12 +84,16 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @RequestMapping(method = RequestMethod.GET, path = "search/accession", produces = "application/json")
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public ResponseEntity<Resources<StudyResource>> findStudiesByAccession(String accession) {
-        List<Study> studies = studyService.findStudiesByAccession(accession);
+    public ResponseEntity<Resource<Study>> findStudiesByAccession(String accession) {
+        Study study = studyService.findStudyByAccession(accession);
 
-        Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
+        if ( study == null ) {
+            return ResponseEntity.notFound().build();
+        }
 
-        return ResponseEntity.ok(resources);
+        Resource<Study> resource = resourceAssembler.toResource(study);
+
+        return ResponseEntity.ok(resource);
     }
 
     @ApiOperation(value = "Get the list of studies filtered by release date")

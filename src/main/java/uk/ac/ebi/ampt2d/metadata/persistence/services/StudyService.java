@@ -32,7 +32,7 @@ public interface StudyService {
 
     List<Study> findStudiesByPredicate(Predicate predicate);
 
-    List<Study> findStudiesByAccession(String accession);
+    Study findStudyByAccession(String accession);
 
     List<Study> findStudiesByReleaseDate(LocalDate from, LocalDate to);
 
