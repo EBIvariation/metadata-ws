@@ -19,6 +19,7 @@ package uk.ac.ebi.ampt2d.metadata.exceptionhandling;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -40,5 +41,10 @@ public class ExceptionHandlers {
         }
 
         throw ex;
+    }
+
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResponseEntity<ErrorMessage> handleAccessDeniedException(AccessDeniedException ex) {
+        return new ResponseEntity(new ErrorMessage(HttpStatus.FORBIDDEN, ex, ex.getMessage()), HttpStatus.FORBIDDEN);
     }
 }

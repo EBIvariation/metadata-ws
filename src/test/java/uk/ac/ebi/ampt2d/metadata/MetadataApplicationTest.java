@@ -27,6 +27,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -45,13 +46,14 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
-import java.time.ZonedDateTime;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -62,6 +64,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureJsonTesters
 @AutoConfigureMockMvc
+@WithMockUser
 public class MetadataApplicationTest {
 
     @Autowired
@@ -476,9 +479,9 @@ public class MetadataApplicationTest {
         String humanStudyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
         return Arrays.asList(postTestAnalysis("EGAA0001", humanAssemblyUrl, humanStudyUrl,
-                            Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina"),
+                Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina"),
                 postTestAnalysis("EGAA0002", humanAssemblyUrl, humanStudyUrl,
-                                Analysis.Technology.ARRAY, Analysis.Type.TUMOR, "PacBio"));
+                        Analysis.Technology.ARRAY, Analysis.Type.TUMOR, "PacBio"));
     }
 
     @Test
@@ -891,7 +894,7 @@ public class MetadataApplicationTest {
         return new ResultMatcher() {
             @Override
             public void match(MvcResult mvcResult) throws Exception {
-                JSONObject jsonObject =  new JSONObject(mvcResult.getResponse().getContentAsString());
+                JSONObject jsonObject = new JSONObject(mvcResult.getResponse().getContentAsString());
                 LocalDate releaseDate = LocalDate.parse(jsonObject.getString("releaseDate"));
                 assert releaseDate.equals(localDate);
             }
@@ -1019,86 +1022,76 @@ public class MetadataApplicationTest {
         LocalDate yesterday = today.minusDays(1);
         LocalDate tomorrow = today.plusDays(1);
 
+        //Studies are created by default user
         String yesterdayReleasedStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, yesterday);
         String todayReleasedStudyUrl = postTestStudy("1kg", 2, "1kg phase 1", humanTaxonomyUrl, today);
         String tomorrowReleasedStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, tomorrow);
 
         String yesterdayReleasedAnalysisUrl = postTestAnalysis("analysisReleasedYesterday", humanAssemblyUrl, yesterdayReleasedStudyUrl);
 
-        mockMvc.perform(get("/studies"))
+        //studies that haven't been released cannot be viewed by other users
+        mockMvc.perform(get("/studies").with(user("user1")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
 
-        mockMvc.perform(get(yesterdayReleasedStudyUrl))
+        mockMvc.perform(get(yesterdayReleasedStudyUrl).with(user("user1")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..study.href").value(yesterdayReleasedStudyUrl));
 
-        mockMvc.perform(get(yesterdayReleasedStudyUrl + "/analyses"))
+        mockMvc.perform(get(yesterdayReleasedStudyUrl + "/analyses").with(user("user1")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(1))
                 .andExpect(jsonPath("$..analyses[0]..analysis.href").value(yesterdayReleasedAnalysisUrl));
 
-        mockMvc.perform(get(todayReleasedStudyUrl + "/analyses"))
+        mockMvc.perform(get(todayReleasedStudyUrl + "/analyses").with(user("user1")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(0));
 
-        mockMvc.perform(get("/studies/search?taxonomy.id=9606"))
+        mockMvc.perform(get("/studies/search?taxonomy.id=9606").with(user("user1")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/accession?accession=1kg"))
+        mockMvc.perform(get("/studies/search/accession?accession=1kg").with(user("user1")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id.accession").value("1kg"))
                 .andExpect(jsonPath("$.id.version").value(2))
                 .andExpect(jsonPath("$..study.href").value(todayReleasedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/release-date?from=" + LocalDate.now()))
+        mockMvc.perform(get("/studies/search/release-date?from=" + LocalDate.now()).with(user("user1")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(todayReleasedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/taxonomy-id?id=9606"))
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=9606").with(user("user1")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homo sapiens"))
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homo sapiens").with(user("user1")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/text?searchTerm=1kg"))
+        mockMvc.perform(get("/studies/search/text?searchTerm=1kg").with(user("user1")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
 
-    }
-
-    @Test
-    public void notFoundWhenFindYetToPublishedStudies() throws Exception {
-        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
-        String tomorrowReleasedStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, LocalDate.now().plusDays(1));
-
-        mockMvc.perform(get(tomorrowReleasedStudyUrl))
-                .andExpect(status().isNotFound());
-
-        mockMvc.perform(get(tomorrowReleasedStudyUrl + "/analyses"))
-                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -1107,7 +1100,6 @@ public class MetadataApplicationTest {
         LocalDate tomorrow = today.plusDays(1);
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String humanStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, today);
-
 
         mockMvc.perform(get(humanStudyUrl))
                 .andExpect(status().isOk())
@@ -1121,7 +1113,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.releaseDate").exists())
                 .andExpect(isReleaseDateEqualTo(tomorrow));
 
-        mockMvc.perform(get(humanStudyUrl))
+        mockMvc.perform(get(humanStudyUrl).with(user("user1")))
                 .andExpect(status().isNotFound());
 
         mockMvc.perform(patch(humanStudyUrl + "/patch")
@@ -1159,6 +1151,82 @@ public class MetadataApplicationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testPrePublishAccessToStudy() throws Exception {
+        String releaseTomorrow = getFutureReleaseStudy();
+
+        //Can be viewed by created user
+        mockMvc.perform(get("/studies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(releaseTomorrow));
+
+        mockMvc.perform(get("/studies").with(user("user1")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        //Can be viewed by admin
+        mockMvc.perform(get("/studies").with(user("user2").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1));
+    }
+
+    @Test
+    public void testAddUsersToViewStudy() throws Exception {
+        String releaseTomorrow = getFutureReleaseStudy();
+
+        mockMvc.perform(get("/studies").with(user("user1")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(patch(releaseTomorrow)
+                .content("{\"viewableBy\": [\"user1\"]}"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get("/studies").with(user("user1")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1));
+    }
+
+    @Test
+    public void testAddUsersToViewStudyByNonOwner() throws Exception {
+        String releaseTomorrow = getFutureReleaseStudy();
+
+        mockMvc.perform(get("/studies").with(user("user1")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(patch(releaseTomorrow).with(user("user1"))
+                .content("{\"viewableBy\": [\"user1\"]}"))
+                .andExpect(status().is4xxClientError());
+
+        mockMvc.perform(patch(releaseTomorrow)
+                .content("{\"viewableBy\": [\"user1\"]}"))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/studies").with(user("user1")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1));
+
+        mockMvc.perform(patch(releaseTomorrow).with(user("user1"))
+                .content("{\"viewableBy\": [\"user1\"]}"))
+                .andExpect(status().isForbidden());
+    }
+
+    private String getFutureReleaseStudy() throws Exception {
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        LocalDate today = LocalDate.now();
+        LocalDate tomorrow = today.plusDays(1);
+        return postTestStudy("releaseTomorrow", 1, "nothing important", humanTaxonomyUrl, tomorrow);
     }
 
 }

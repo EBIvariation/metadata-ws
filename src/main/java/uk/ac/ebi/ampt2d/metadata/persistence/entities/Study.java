@@ -17,20 +17,27 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
+import org.springframework.security.access.AccessDeniedException;
+import uk.ac.ebi.ampt2d.metadata.authentication.LoginUser;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -83,6 +90,10 @@ public class Study extends Auditable<AccessionVersionEntityId> {
     @Column
     private boolean browsable;
 
+    @ApiModelProperty(position = 9)
+    @ElementCollection
+    private List<String> viewableBy = new ArrayList<>();
+
     @OneToMany(mappedBy = "study")
     private List<Analysis> analyses;
 
@@ -91,6 +102,26 @@ public class Study extends Auditable<AccessionVersionEntityId> {
 
     @ManyToMany
     private List<Publication> publications;
+
+    @Column
+    @JsonIgnore
+    private String createdBy;
+
+    @PrePersist
+    @PreUpdate
+    public void setCreatedBy() {
+       String userName = LoginUser.getUserName();
+        if ( this.createdBy != null &&  !this.createdBy.equals(userName) ) {
+            throw new AccessDeniedException("Only owners are authorised to Update");
+        }
+        if(this.createdBy == null){
+            this.createdBy = userName;
+        }
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
 
     public AccessionVersionEntityId getId() {
         return id;
@@ -104,4 +135,7 @@ public class Study extends Auditable<AccessionVersionEntityId> {
         return releaseDate;
     }
 
+    public List<String> getViewableBy() {
+        return viewableBy;
+    }
 }

@@ -18,11 +18,13 @@
 package uk.ac.ebi.ampt2d.metadata.aop;
 
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.authentication.LoginUser;
 
 import java.time.LocalDate;
 
@@ -47,9 +49,13 @@ public class StudyReleaseDateAspect {
         Object[] args = proceedingJoinPoint.getArgs();
         Predicate predicate = (Predicate) args[0];
 
-        QStudy study = QStudy.study;
-        Predicate dateRestrictedPredicate = study.releaseDate.between(null, LocalDate.now()).and(predicate);
+        if (LoginUser.isAdmin()) {
+            return proceedingJoinPoint.proceed(args);
+        }
 
+        QStudy study = QStudy.study;
+        Predicate dateRestrictedPredicate = (study.releaseDate.between(null, LocalDate.now())
+                .or(isUserTheOwnerOrHasPermissionToViewTheObject(study))).and(predicate);
         args[0] = dateRestrictedPredicate;
 
         return proceedingJoinPoint.proceed(args);
@@ -70,12 +76,27 @@ public class StudyReleaseDateAspect {
     public Object filterOnReleaseDateAdviceFindOne(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object result = proceedingJoinPoint.proceed();
 
-        if ( result == null ||
-                (result instanceof Study && ((Study) result).getReleaseDate().isAfter(LocalDate.now())) ) {
+        if (LoginUser.isAdmin()) {
+            return result;
+        }
+
+        if (result == null ||
+                (result instanceof Study && ((Study) result).getReleaseDate().isAfter(LocalDate.now()) &&
+                        !(isUserTheOwnerOrHasPermissionToViewTheObject((Study) result)))) {
             return null;
         }
 
         return result;
+    }
+
+    private BooleanExpression isUserTheOwnerOrHasPermissionToViewTheObject(QStudy study) {
+        String loginUserName = LoginUser.getUserName();
+        return study.createdBy.eq(loginUserName).or(study.viewableBy.contains(loginUserName));
+    }
+
+    private boolean isUserTheOwnerOrHasPermissionToViewTheObject(Study study) {
+        String loginUserName = LoginUser.getUserName();
+        return study.getCreatedBy().equals(loginUserName) || study.getViewableBy().contains(loginUserName);
     }
 
 }
