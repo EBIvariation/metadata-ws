@@ -40,6 +40,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.LinkedStudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
@@ -52,9 +53,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -75,6 +74,9 @@ public class MetadataApplicationTest {
 
     @Autowired
     private FileRepository fileRepository;
+
+    @Autowired
+    private LinkedStudyRepository linkedStudyRepository;
 
     @Autowired
     private SampleRepository sampleRepository;
@@ -109,6 +111,7 @@ public class MetadataApplicationTest {
         assemblyRepository.deleteAll();
         fileRepository.deleteAll();
         sampleRepository.deleteAll();
+        linkedStudyRepository.deleteAll();
         studyRepository.deleteAll();
         taxonomyRepository.deleteAll();
         webResourceRepository.deleteAll();
@@ -1159,6 +1162,385 @@ public class MetadataApplicationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void findLinkedStudies() throws Exception {
+        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
+        String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
+        String testStudy2 = postTestStudy("testhuman", 2, "test human study", testTaxonomy);
+        String testStudy3 = postTestStudy("testhuman", 3, "test human study", testTaxonomy);
+
+        mockMvc.perform(post(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.2\"]"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy2));
+
+        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+
+        mockMvc.perform(get(testStudy3 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+    }
+
+    @Test
+    public void notFoundWhenRequstLinkedStudiesOfAnUnexistedStudy() throws Exception {
+        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
+        String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
+        String testStudy2 = testStudy1.replace("testhuman.1", "testhuman.2");
+
+        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(post(testStudy2 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.1\"]"))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(put(testStudy2 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.1\"]"))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(patch(testStudy2 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.1\"]"))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(delete(testStudy2 + "/linkedStudies"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void clientErrorWhenPostLinkedStudyWithUnexistedStudy() throws Exception {
+        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
+        String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
+        String testStudy2 = postTestStudy("testhuman", 2, "test human study", testTaxonomy);
+
+        mockMvc.perform(post(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.3\"]"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void clientErrorWhenPostAnAlreadyExistedLinkedStudy() throws Exception {
+        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
+        String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
+        String testStudy2 = postTestStudy("testhuman", 2, "test human study", testTaxonomy);
+
+        mockMvc.perform(post(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.2\"]"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy2));
+
+        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+
+        mockMvc.perform(post(testStudy2 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.1\"]"))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void updateLinkedStudiesWithPutRequest() throws Exception {
+        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
+        String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
+        String testStudy2 = postTestStudy("testhuman", 2, "test human study", testTaxonomy);
+        String testStudy3 = postTestStudy("testhuman", 3, "test human study", testTaxonomy);
+
+        mockMvc.perform(post(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.2\"]"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy2));
+
+        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+
+        mockMvc.perform(get(testStudy3 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(put(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.3\"]"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy3));
+
+        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(get(testStudy3 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+
+        mockMvc.perform(put(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[]"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(get(testStudy3 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+    }
+
+    @Test
+    public void updateLinkedStudiesWithPatchRequest() throws Exception {
+        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
+        String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
+        String testStudy2 = postTestStudy("testhuman", 2, "test human study", testTaxonomy);
+        String testStudy3 = postTestStudy("testhuman", 3, "test human study", testTaxonomy);
+
+        mockMvc.perform(post(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.2\"]"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy2));
+
+        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+
+        mockMvc.perform(get(testStudy3 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(patch(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.3\"]"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy2))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudy3));
+
+        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+
+        mockMvc.perform(get(testStudy3 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+
+        mockMvc.perform(patch(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[]"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy2))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudy3));
+
+        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+
+        mockMvc.perform(get(testStudy3 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+    }
+
+    @Test
+    public void deleteAllLinkedStudiesOfAStudy() throws Exception {
+        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
+        String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
+        String testStudy2 = postTestStudy("testhuman", 2, "test human study", testTaxonomy);
+        String testStudy3 = postTestStudy("testhuman", 3, "test human study", testTaxonomy);
+
+        mockMvc.perform(post(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.2\", \"testhuman.3\"]"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy2))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudy3));
+
+        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+
+        mockMvc.perform(get(testStudy3 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+
+        mockMvc.perform(delete(testStudy1 + "/linkedStudies"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(get(testStudy3 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+    }
+
+    @Test
+    public void getALinkedStudyOfAnotherStudy() throws Exception {
+        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
+        String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
+        String testStudy2 = postTestStudy("testhuman", 2, "test human study", testTaxonomy);
+
+        mockMvc.perform(post(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.2\"]"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies/testhuman.2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(testStudy2));
+
+        mockMvc.perform(get(testStudy2 + "/linkedStudies/testhuman.1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(testStudy1));
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies/testhuman.1"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteALinkedStudyOfAnotherStudy() throws Exception {
+        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
+        String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
+        String testStudy2 = postTestStudy("testhuman", 2, "test human study", testTaxonomy);
+        String testStudy3 = postTestStudy("testhuman", 3, "test human study", testTaxonomy);
+
+        mockMvc.perform(post(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.2\", \"testhuman.3\"]"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies/testhuman.2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(testStudy2));
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies/testhuman.3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(testStudy3));
+
+        mockMvc.perform(delete(testStudy1 + "/linkedStudies/testhuman.2"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies/testhuman.2"))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies/testhuman.3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..study.href").value(testStudy3));
+    }
+
+    @Test
+    public void deleteAStudyThatHasLinkedStudies() throws Exception {
+        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
+        String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
+        String testStudy2 = postTestStudy("testhuman", 2, "test human study", testTaxonomy);
+
+        mockMvc.perform(post(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.2\"]"))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy2));
+
+        mockMvc.perform(delete(testStudy2))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
     }
 
 }

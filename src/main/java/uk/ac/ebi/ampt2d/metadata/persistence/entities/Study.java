@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -82,6 +83,12 @@ public class Study extends Auditable<AccessionVersionEntityId> {
     @JsonProperty(defaultValue = "false")
     @Column
     private boolean browsable;
+
+    @OneToMany(mappedBy = "study", cascade = CascadeType.ALL)
+    private List<LinkedStudy> linkedStudies;
+
+    @OneToMany(mappedBy = "linkedStudy", cascade = CascadeType.ALL)
+    private List<LinkedStudy> linkedStudiesOf;
 
     @OneToMany(mappedBy = "study")
     private List<Analysis> analyses;
