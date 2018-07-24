@@ -68,8 +68,7 @@ public class StudyDeprecationAspect {
     public Object filterOnDeprecationAdviceFindOne(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object result = proceedingJoinPoint.proceed();
 
-        if ( result == null ||
-                ( result.getClass() == Study.class && ((Study) result).isDeprecated() ) ) {
+        if ( result == null || (result instanceof Study && ((Study) result).isDeprecated()) ) {
             return null;
         }
 

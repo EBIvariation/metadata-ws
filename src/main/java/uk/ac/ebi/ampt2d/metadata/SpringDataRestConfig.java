@@ -147,7 +147,7 @@ public class SpringDataRestConfig {
      * @return StudyReleaseDateAspect
      */
     @Bean
-    @ConditionalOnProperty(name = "endpoints.studies.date.restricted", matchIfMissing = true)
+    @ConditionalOnProperty(name = "endpoints.studies.release-date.restricted", matchIfMissing = true)
     public StudyReleaseDateAspect studyReleaseDateAspect() {
         return new StudyReleaseDateAspect();
     }

@@ -152,7 +152,10 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
         return ResponseEntity.ok(resources);
     }
 
-    @ApiOperation(value = "Update an existing study, especially for those deprecated or unpublished studies.")
+    @ApiOperation(value = "Update an existing study. For a study that has release date in the future or has been " +
+            "deprecated, it is not possible to update that study object through PATCH /studies/{id} method, it will " +
+            "result in NOT FOUND. This new method (PATCH /studies/{id}/patch) allows that study object to be found and" +
+            " updated.")
     @ApiParam(name = "id", value = "Study's id (accession.version)", type = "string", required = true, example = "EGAS0001.1")
     @RequestMapping(method = RequestMethod.PATCH, path = "{id}/patch", produces = "application/json", consumes = "application/json")
     @ResponseBody

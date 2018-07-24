@@ -71,7 +71,7 @@ public class StudyReleaseDateAspect {
         Object result = proceedingJoinPoint.proceed();
 
         if ( result == null ||
-                ( result.getClass() == Study.class && ((Study) result).getReleaseDate().isAfter(LocalDate.now()) ) ) {
+                (result instanceof Study && ((Study) result).getReleaseDate().isAfter(LocalDate.now())) ) {
             return null;
         }
 
