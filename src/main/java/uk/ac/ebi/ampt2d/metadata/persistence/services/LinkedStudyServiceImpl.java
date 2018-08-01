@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 import java.util.stream.Collectors;
 
 
@@ -51,15 +52,26 @@ public class LinkedStudyServiceImpl implements LinkedStudyService {
     }
 
     private List<AccessionVersionEntityId> findLinkedStudyIds(AccessionVersionEntityId id) {
-        List<LinkedStudy> linkedStudies = findLinkedStudies(id);
-
         Set<AccessionVersionEntityId> ids = new HashSet<>();
-        for ( LinkedStudy linkedStudy2 : linkedStudies ) {
-            if ( !id.equals(linkedStudy2.getStudy().getId()) ) {
-                ids.add(linkedStudy2.getStudy().getId());
-            }
-            if ( !id.equals(linkedStudy2.getLinkedStudy().getId()) ) {
-                ids.add(linkedStudy2.getLinkedStudy().getId());
+        Set<AccessionVersionEntityId> seen = new HashSet<>();
+        Stack<AccessionVersionEntityId> stack = new Stack<>();
+
+        seen.add(id);
+        stack.push(id);
+
+        while ( !stack.empty() ) {
+            AccessionVersionEntityId top = stack.pop();
+            List<LinkedStudy> linkedStudies = findLinkedStudies(top);
+
+            for ( LinkedStudy linkedStudy : linkedStudies ) {
+                Arrays.asList(linkedStudy.getStudy().getId(), linkedStudy.getLinkedStudy().getId())
+                        .forEach(studyId->{
+                            if ( !top.equals(studyId) && !seen.contains(studyId) ) {
+                                ids.add(studyId);
+                                seen.add(studyId);
+                                stack.push(studyId);
+                            }
+                        });
             }
         }
 

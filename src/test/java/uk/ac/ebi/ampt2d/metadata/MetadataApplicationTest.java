@@ -1170,25 +1170,40 @@ public class MetadataApplicationTest {
         String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
         String testStudy2 = postTestStudy("testhuman", 2, "test human study", testTaxonomy);
         String testStudy3 = postTestStudy("testhuman", 3, "test human study", testTaxonomy);
+        String testStudy4 = postTestStudy("testhuman", 4, "test human study", testTaxonomy);
 
         mockMvc.perform(post(testStudy1 + "/linkedStudies")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("[\"testhuman.2\"]"))
                 .andExpect(status().isOk());
 
+        mockMvc.perform(patch(testStudy2 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.3\"]"))
+                .andExpect(status().isOk());
+
         mockMvc.perform(get(testStudy1 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy2));
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy2))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudy3));
 
         mockMvc.perform(get(testStudy2 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudy3));
 
         mockMvc.perform(get(testStudy3 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudy2));
+
+        mockMvc.perform(get(testStudy4 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
@@ -1379,14 +1394,16 @@ public class MetadataApplicationTest {
         mockMvc.perform(get(testStudy2 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudy3));
 
         mockMvc.perform(get(testStudy3 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudy2));
 
         mockMvc.perform(patch(testStudy1 + "/linkedStudies")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -1403,14 +1420,16 @@ public class MetadataApplicationTest {
         mockMvc.perform(get(testStudy2 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudy3));
 
         mockMvc.perform(get(testStudy3 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudy2));
     }
 
     @Test
@@ -1435,14 +1454,16 @@ public class MetadataApplicationTest {
         mockMvc.perform(get(testStudy2 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudy3));
 
         mockMvc.perform(get(testStudy3 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1));
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(testStudy1))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(testStudy2));
 
         mockMvc.perform(delete(testStudy1 + "/linkedStudies"))
                 .andExpect(status().is2xxSuccessful());
