@@ -17,12 +17,16 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
+import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 
 public class StudyServiceImpl implements StudyService {
@@ -30,9 +34,51 @@ public class StudyServiceImpl implements StudyService {
     @Autowired
     private StudyRepository studyRepository;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Override
+    public Study findOneStudyByPredicate(Predicate predicate) {
+        return studyRepository.findOne(predicate);
+    }
+
+    @Override
+    public Study findOneStudyByAccession(AccessionVersionEntityId id) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.id.accession.equalsIgnoreCase(id.getAccession())
+                .and(study.id.version.eq(id.getVersion()));
+
+        return findOneStudyByPredicate(predicate);
+    }
+
     @Override
     public List<Study> findStudiesByPredicate(Predicate predicate) {
         return (List<Study>) studyRepository.findAll(predicate);
+    }
+
+    @Override
+    public Study findStudyByAccession(String accession) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.id.accession.equalsIgnoreCase(accession);
+
+        List<Study> studies = findStudiesByPredicate(predicate);
+
+        studies.sort((new Comparator<Study>() {
+            @Override
+            public int compare(Study o1, Study o2) {
+                return o1.getId().getVersion() - o2.getId().getVersion();
+            }
+        }).reversed());
+
+        return studies.isEmpty() ? null : studies.get(0);
+    }
+
+    @Override
+    public List<Study> findStudiesByReleaseDate(LocalDate from, LocalDate to) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.releaseDate.between(from, to);
+
+        return findStudiesByPredicate(predicate);
     }
 
     @Override
@@ -59,6 +105,13 @@ public class StudyServiceImpl implements StudyService {
                 or(study.taxonomy.ancestors.any().name.equalsIgnoreCase(name));
 
         return findStudiesByPredicate(predicate);
+    }
+
+    @Override
+    public Study patch(Study study, String patch) throws Exception {
+        Study study1 = objectMapper.readerForUpdating(study).readValue(patch);
+
+        return studyRepository.save(study1);
     }
 
 }
