@@ -27,6 +27,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -44,6 +45,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
+import uk.ac.ebi.ampt2d.metadata.security.SecurityConfig;
 
 import java.time.ZonedDateTime;
 import java.time.LocalDate;
@@ -52,6 +54,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -62,6 +65,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureJsonTesters
 @AutoConfigureMockMvc
+@WithMockUser(authorities = {
+        SecurityConfig.AUTHORITY_CREATE,
+        SecurityConfig.AUTHORITY_READ,
+        SecurityConfig.AUTHORITY_UPDATE,
+        SecurityConfig.AUTHORITY_DELETE
+})
 public class MetadataApplicationTest {
 
     @Autowired
@@ -1159,6 +1168,37 @@ public class MetadataApplicationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(authorities = {
+            SecurityConfig.AUTHORITY_READ,
+            SecurityConfig.AUTHORITY_UPDATE,
+            SecurityConfig.AUTHORITY_DELETE
+    })
+    public void forbiddenWhenPostWithoutCreateAuthority() throws Exception {
+        String jsonContent = "{ " +
+                "\"id\": " + 9606 + "," +
+                "\"name\": \"" + "Homo sapiens" + "\"," +
+                "\"ancestors\": " + testListJson.write(Arrays.asList()).getJson() + "" +
+                "}";
+
+        mockMvc.perform(post("/taxonomies")
+                .content(jsonContent))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(authorities = {
+            SecurityConfig.AUTHORITY_CREATE,
+            SecurityConfig.AUTHORITY_READ,
+            SecurityConfig.AUTHORITY_UPDATE
+    })
+    public void forbiddenWhenDeleteWithoutDeleteAuthority() throws Exception {
+        String location = postTestTaxonomy();
+
+        mockMvc.perform(delete(location))
+                .andExpect(status().isForbidden());
     }
 
 }
