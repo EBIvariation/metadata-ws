@@ -26,6 +26,8 @@ import java.util.Collection;
 
 public class LoginUser {
 
+    private static final String ROLE_ADMIN = "ROLE_ADMIN";
+
     private static SecurityContext securityContext = SecurityContextHolder.getContext();
 
     public static String getUserName() {
@@ -34,7 +36,7 @@ public class LoginUser {
 
     public static boolean isAdmin() {
         Collection<GrantedAuthority> authorities = getUser().getAuthorities();
-        return authorities.stream().anyMatch(authority -> authority.getAuthority().toString().equals("ROLE_ADMIN"));
+        return authorities.stream().anyMatch(authority -> authority.getAuthority().toString().equals(ROLE_ADMIN));
     }
 
     private static User getUser() {
