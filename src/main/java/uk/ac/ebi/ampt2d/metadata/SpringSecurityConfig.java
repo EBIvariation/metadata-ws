@@ -32,16 +32,14 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http.httpBasic().and().csrf().disable()
                 .formLogin()
-                .loginProcessingUrl("/login")
                 .usernameParameter("username")
                 .passwordParameter("password")
                 .successHandler(new SimpleUrlAuthenticationSuccessHandler("/swagger-ui.html"))
                 .permitAll()
                 .and()
                 .logout()
-                .logoutUrl("/logout")
                 .deleteCookies("JSESSIONID")
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
