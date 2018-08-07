@@ -45,7 +45,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
-import uk.ac.ebi.ampt2d.metadata.security.SecurityConfig;
+import uk.ac.ebi.ampt2d.metadata.configuration.SecurityConfig;
 
 import java.time.ZonedDateTime;
 import java.time.LocalDate;
