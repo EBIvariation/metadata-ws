@@ -63,8 +63,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/**").hasAuthority(AUTHORITY_CREATE)
                 .antMatchers(HttpMethod.PUT, "/**").hasAuthority(AUTHORITY_UPDATE)
                 .antMatchers(HttpMethod.PATCH, "/**").hasAuthority(AUTHORITY_UPDATE)
-                .antMatchers(HttpMethod.DELETE, "/**").hasAuthority(AUTHORITY_DELETE)
-                .and()
-                .csrf().disable();
+                .antMatchers(HttpMethod.DELETE, "/**").hasAuthority(AUTHORITY_DELETE);
     }
 }

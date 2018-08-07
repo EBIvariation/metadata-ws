@@ -54,6 +54,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasItem;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -137,6 +138,7 @@ public class MetadataApplicationTest {
         Assembly testAssembly = new Assembly(name, patch, accessions);
 
         MvcResult mvcResult = mockMvc.perform(post("/assemblies")
+                .with(csrf())
                 .content(testAssemblyJson.write(testAssembly).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -168,6 +170,7 @@ public class MetadataApplicationTest {
                 "}";
 
         MvcResult mvcResult = mockMvc.perform(post("/taxonomies")
+                .with(csrf())
                 .content(jsonContent))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -203,6 +206,7 @@ public class MetadataApplicationTest {
 
     private String postTestStudy(String accession, int version, String name, String taxonomyUrl, boolean deprecated, LocalDate releaseDate) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/studies")
+                .with(csrf())
                 .content("{ " +
                         "\"id\":{ \"accession\": \"" + accession + "\",\"version\": " + version + "}," +
                         "\"name\": \"" + name + "\"," +
@@ -239,6 +243,7 @@ public class MetadataApplicationTest {
     private String postTestAnalysis(String accession, String assemblyUrl, String studyUrl, Analysis.Technology
             technology, Analysis.Type type, String platform) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/analyses")
+                .with(csrf())
                 .content("{ " +
                         "\"id\":{ \"accession\": \"" + accession + "\",\"version\":  1 }," +
                         "\"name\": \"test_human_analysis\"," +
@@ -269,6 +274,7 @@ public class MetadataApplicationTest {
                 100, File.Type.TSV);
 
         MvcResult mvcResult = mockMvc.perform(post("/files")
+                .with(csrf())
                 .content(testFileJson.write(testFile).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -288,6 +294,7 @@ public class MetadataApplicationTest {
     private String postTestSample(String accession, String name) throws Exception {
         Sample testSample = new Sample(new AccessionVersionEntityId(accession, 1), name);
         MvcResult mvcResult = mockMvc.perform(post("/samples")
+                .with(csrf())
                 .content(testSampleJson.write(testSample).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -308,6 +315,7 @@ public class MetadataApplicationTest {
         WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "http:\\www.ebi.ac.uk");
 
         MvcResult mvcResult = mockMvc.perform(post("/webResources")
+                .with(csrf())
                 .content(testWebResourceJson.write(testWebResource).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -630,6 +638,7 @@ public class MetadataApplicationTest {
     public void testAccessionValidation() throws Exception {
         String taxonomyUrl = postTestTaxonomy();
         mockMvc.perform(post("/studies")
+                .with(csrf())
                 .content("{ " +
                         "\"id\":{ \"accession\": \"EGAS0001\",\"version\":  0 }," +
                         "\"name\": \" study1\"," +
@@ -642,6 +651,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.errors[0].property").value("id.version"))
                 .andExpect(jsonPath("$.errors[0].message").value("must be greater than or equal to 1"));
         mockMvc.perform(post("/studies")
+                .with(csrf())
                 .content("{ " +
                         "\"id\":{ \"version\":  1 }," +
                         "\"name\": \" study1\"," +
@@ -759,6 +769,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..study.href").value(studyUrl));
 
         mockMvc.perform(patch(studyUrl)
+                .with(csrf())
                 .content("{\"deprecated\": \"true\"}"))
                 .andExpect(status().is2xxSuccessful());
 
@@ -852,6 +863,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..study.href").value(humanStudyUrl));
 
         mockMvc.perform(patch(humanStudyUrl + "/patch")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"deprecated\" : \"" + true + "\" }"))
                 .andExpect(status().isOk())
@@ -861,6 +873,7 @@ public class MetadataApplicationTest {
                 .andExpect(status().isNotFound());
 
         mockMvc.perform(patch(humanStudyUrl + "/patch")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"deprecated\" : \"" + false + "\" }"))
                 .andExpect(status().isOk())
@@ -886,6 +899,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
         mockMvc.perform(patch(humanStudyUrl)
+                .with(csrf())
                 .content("{\"browsable\" : true }"))
                 .andExpect(status().is2xxSuccessful());
 
@@ -930,6 +944,7 @@ public class MetadataApplicationTest {
 
     private void patchResource(String url) throws Exception {
         mockMvc.perform(patch(url)
+                .with(csrf())
                 .content("{\"name\": \"nothing important\"}"))
                 .andExpect(status().is2xxSuccessful());
     }
@@ -963,6 +978,7 @@ public class MetadataApplicationTest {
         patchResource(testFile);
         patchResource(testSample);
         mockMvc.perform(patch(testWebResource)
+                .with(csrf())
                 .content("{\"resourceUrl\": \"http://nothing.important.com\"}"))
                 .andExpect(status().is2xxSuccessful());
         endTime = ZonedDateTime.now();
@@ -1124,6 +1140,7 @@ public class MetadataApplicationTest {
                 .andExpect(isReleaseDateEqualTo(today));
 
         mockMvc.perform(patch(humanStudyUrl + "/patch")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"releaseDate\" : \"" + tomorrow + "\" }"))
                 .andExpect(status().isOk())
@@ -1134,6 +1151,7 @@ public class MetadataApplicationTest {
                 .andExpect(status().isNotFound());
 
         mockMvc.perform(patch(humanStudyUrl + "/patch")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"releaseDate\" : \"" + today + "\" }"))
                 .andExpect(status().isOk())
@@ -1149,6 +1167,7 @@ public class MetadataApplicationTest {
     @Test
     public void notFoundWhenPatchAnUnexistingStudy() throws Exception {
         mockMvc.perform(patch("studies/unexist.1/patch")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"releaseDate\" : \"" + LocalDate.now() + "\" }"))
                 .andExpect(status().isNotFound());
@@ -1160,11 +1179,13 @@ public class MetadataApplicationTest {
         String humanStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl);
 
         mockMvc.perform(patch(humanStudyUrl + "/patch")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"releaseDate\" : \"" + 2001 + "\" }"))
                 .andExpect(status().isBadRequest());
 
         mockMvc.perform(patch(humanStudyUrl + "/patch")
+                .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andExpect(status().isBadRequest());
@@ -1184,6 +1205,7 @@ public class MetadataApplicationTest {
                 "}";
 
         mockMvc.perform(post("/taxonomies")
+                .with(csrf())
                 .content(jsonContent))
                 .andExpect(status().isForbidden());
     }
@@ -1197,7 +1219,8 @@ public class MetadataApplicationTest {
     public void forbiddenWhenDeleteWithoutDeleteAuthority() throws Exception {
         String location = postTestTaxonomy();
 
-        mockMvc.perform(delete(location))
+        mockMvc.perform(delete(location)
+                .with(csrf()))
                 .andExpect(status().isForbidden());
     }
 
