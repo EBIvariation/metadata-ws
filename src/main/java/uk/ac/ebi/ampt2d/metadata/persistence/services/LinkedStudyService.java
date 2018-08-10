@@ -25,14 +25,41 @@ import java.util.List;
 
 public interface LinkedStudyService {
 
+    /**
+     * Find one LinkedStudy record for direct link between two studies.
+     * @param studyId
+     * @param linkedStudyId
+     * @return LinkedStudy object or null
+     */
     LinkedStudy findOne(AccessionVersionEntityId studyId, AccessionVersionEntityId linkedStudyId);
 
+    /**
+     * Find all studies that could be linked to a given study.
+     * The linkages are transitive, e.g.: if A linked to B and B linked to C then A is also linked to C.
+     * @param id
+     * @return list of studies
+     */
     List<Study> findLinkedStudiesById(AccessionVersionEntityId id);
 
+    /**
+     * Save the link between an id and all the ids from a list.
+     * @param id
+     * @param studies
+     * @return
+     */
     List<LinkedStudy> save(AccessionVersionEntityId id, List<AccessionVersionEntityId> studies);
 
+    /**
+     * Delete all the links a given study id has been directly associated with.
+     * @param id
+     */
     void delete(AccessionVersionEntityId id);
 
+    /**
+     * Delete the link between two given study ids.
+     * @param id
+     * @param linkedStudyId
+     */
     void delete(AccessionVersionEntityId id, AccessionVersionEntityId linkedStudyId);
 
 }

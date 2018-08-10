@@ -21,8 +21,6 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.LinkedStudy;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.LinkedStudyId;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.QLinkedStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.LinkedStudyRepository;
@@ -44,13 +42,12 @@ public class LinkedStudyServiceImpl implements LinkedStudyService {
     @Autowired
     private LinkedStudyRepository linkedStudyRepository;
 
-    private List<LinkedStudy> findLinkedStudies(AccessionVersionEntityId id) {
-        QLinkedStudy linkedStudy = QLinkedStudy.linkedStudy1;
-        Predicate predicate = linkedStudy.study.id.eq(id).or(linkedStudy.linkedStudy.id.eq(id));
-
-        return (List<LinkedStudy>) linkedStudyRepository.findAll(predicate);
-    }
-
+    /**
+     * Get a list of ids for all the studies that could be linked to a given study.
+     * The linkages are transitive, e.g.: if A linked to B and B linked to C then A is also linked to C.
+     * @param id
+     * @return list of study ids
+     */
     private List<AccessionVersionEntityId> findLinkedStudyIds(AccessionVersionEntityId id) {
         Set<AccessionVersionEntityId> ids = new HashSet<>();
         Set<AccessionVersionEntityId> seen = new HashSet<>();
@@ -61,7 +58,7 @@ public class LinkedStudyServiceImpl implements LinkedStudyService {
 
         while ( !stack.empty() ) {
             AccessionVersionEntityId top = stack.pop();
-            List<LinkedStudy> linkedStudies = findLinkedStudies(top);
+            List<LinkedStudy> linkedStudies = linkedStudyRepository.findByStudy_IdOrLinkedStudy_Id(top, top);
 
             for ( LinkedStudy linkedStudy : linkedStudies ) {
                 Arrays.asList(linkedStudy.getStudy().getId(), linkedStudy.getLinkedStudy().getId())
@@ -80,28 +77,12 @@ public class LinkedStudyServiceImpl implements LinkedStudyService {
 
     @Override
     public LinkedStudy findOne(AccessionVersionEntityId studyId, AccessionVersionEntityId linkedStudyId) {
-        Study study = studyRepository.findOne(studyId);
-        Study linkedStudy = studyRepository.findOne(linkedStudyId);
-
-        if ( study == null || linkedStudy == null) {
-            return null;
+        LinkedStudy linkedStudy = linkedStudyRepository.findByStudy_IdAndLinkedStudy_Id(studyId, linkedStudyId);
+        if ( linkedStudy != null ) {
+            return linkedStudy;
         }
 
-        LinkedStudyId linkedStudyId1 = new LinkedStudyId(studyId, linkedStudyId);
-        LinkedStudy linkedStudy1 = linkedStudyRepository.findOne(linkedStudyId1);
-
-        if ( linkedStudy1 != null ) {
-            return linkedStudy1;
-        }
-
-        LinkedStudyId linkedStudyId2 = new LinkedStudyId(linkedStudyId, studyId);
-        LinkedStudy linkedStudy2 = linkedStudyRepository.findOne(linkedStudyId2);
-
-        if ( linkedStudy2 != null ) {
-            return linkedStudy2;
-        }
-
-        return null;
+        return linkedStudyRepository.findByStudy_IdAndLinkedStudy_Id(linkedStudyId, studyId);
     }
 
     @Override
@@ -138,7 +119,7 @@ public class LinkedStudyServiceImpl implements LinkedStudyService {
 
     @Override
     public void delete(AccessionVersionEntityId id) {
-        List<LinkedStudy> linkedStudies = findLinkedStudies(id);
+        List<LinkedStudy> linkedStudies = linkedStudyRepository.findByStudy_IdOrLinkedStudy_Id(id, id);
 
         linkedStudyRepository.delete(linkedStudies);
     }
