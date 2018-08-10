@@ -21,6 +21,7 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.LinkedStudy;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.LinkedStudyId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.LinkedStudyRepository;
@@ -77,12 +78,12 @@ public class LinkedStudyServiceImpl implements LinkedStudyService {
 
     @Override
     public LinkedStudy findOne(AccessionVersionEntityId studyId, AccessionVersionEntityId linkedStudyId) {
-        LinkedStudy linkedStudy = linkedStudyRepository.findByStudy_IdAndLinkedStudy_Id(studyId, linkedStudyId);
+        LinkedStudy linkedStudy = linkedStudyRepository.findOne(new LinkedStudyId(studyId, linkedStudyId));
         if ( linkedStudy != null ) {
             return linkedStudy;
         }
 
-        return linkedStudyRepository.findByStudy_IdAndLinkedStudy_Id(linkedStudyId, studyId);
+        return linkedStudyRepository.findOne(new LinkedStudyId(linkedStudyId, studyId));
     }
 
     @Override
@@ -119,23 +120,12 @@ public class LinkedStudyServiceImpl implements LinkedStudyService {
 
     @Override
     public void delete(AccessionVersionEntityId id) {
-        List<LinkedStudy> linkedStudies = linkedStudyRepository.findByStudy_IdOrLinkedStudy_Id(id, id);
-
-        linkedStudyRepository.delete(linkedStudies);
+        linkedStudyRepository.deleteLinkedStudiesByStudy_IdOrLinkedStudy_Id(id, id);
     }
 
     @Override
     public void delete(AccessionVersionEntityId id, AccessionVersionEntityId linkedStudyId) {
-        LinkedStudy linkedStudy1 = findOne(id, linkedStudyId);
-
-        if ( linkedStudy1 != null ) {
-            linkedStudyRepository.delete(linkedStudy1);
-        }
-
-        LinkedStudy linkedStudy2 = findOne(linkedStudyId, id);
-
-        if ( linkedStudy2 != null ) {
-            linkedStudyRepository.delete(linkedStudy2);
-        }
+        linkedStudyRepository.deleteByStudy_IdAndLinkedStudy_Id(id, linkedStudyId);
+        linkedStudyRepository.deleteByStudy_IdAndLinkedStudy_Id(linkedStudyId, id);
     }
 }

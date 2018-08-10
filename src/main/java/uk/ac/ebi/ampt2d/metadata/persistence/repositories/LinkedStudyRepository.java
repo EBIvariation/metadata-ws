@@ -19,6 +19,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.LinkedStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.LinkedStudyId;
@@ -28,8 +29,12 @@ import java.util.List;
 @RepositoryRestResource(exported = false)
 public interface LinkedStudyRepository extends CrudRepository<LinkedStudy, LinkedStudyId> {
 
-    LinkedStudy findByStudy_IdAndLinkedStudy_Id(AccessionVersionEntityId studyId, AccessionVersionEntityId linkedStudyId);
-
     List<LinkedStudy> findByStudy_IdOrLinkedStudy_Id(AccessionVersionEntityId studyId, AccessionVersionEntityId linkedStudyId);
+
+    @Transactional
+    void deleteByStudy_IdAndLinkedStudy_Id(AccessionVersionEntityId studyId, AccessionVersionEntityId linkedStudyId);
+
+    @Transactional
+    void deleteLinkedStudiesByStudy_IdOrLinkedStudy_Id(AccessionVersionEntityId studyId, AccessionVersionEntityId linkedStudyId);
 
 }
