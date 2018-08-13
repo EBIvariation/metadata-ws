@@ -41,6 +41,16 @@ public class AccessionVersionEntityId implements Serializable {
         this.version = version;
     }
 
+    public AccessionVersionEntityId(String id) {
+        try {
+            String[] entityId = id.split("\\.");
+            this.accession = entityId[0];
+            this.version = Integer.parseInt(entityId[1]);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("Please provide an ID in the form accession.version");
+        }
+    }
+
     public String getAccession() {
         return accession;
     }

@@ -29,6 +29,7 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapt
 import org.springframework.format.FormatterRegistry;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import uk.ac.ebi.ampt2d.metadata.aop.StudyDeprecationAspect;
@@ -41,6 +42,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
 import uk.ac.ebi.ampt2d.metadata.aop.StudyReleaseDateAspect;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.LinkedStudyService;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.LinkedStudyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
@@ -63,10 +66,17 @@ public class SpringDataRestConfig {
     @Bean
     public WebMvcConfigurer webMvcConfigurer() {
         return new WebMvcConfigurerAdapter() {
+
             @Override
             public void addFormatters(FormatterRegistry registry) {
                 registry.addConverter(new CustomBackendIdConverter());
                 super.addFormatters(registry);
+            }
+
+            @Override
+            public void configurePathMatch(PathMatchConfigurer configurer) {
+                configurer.setUseRegisteredSuffixPatternMatch(true);
+                super.configurePathMatch(configurer);
             }
         };
     }
@@ -109,6 +119,11 @@ public class SpringDataRestConfig {
     @Bean
     public StudyService studyService() {
         return new StudyServiceImpl();
+    }
+
+    @Bean
+    public LinkedStudyService linkedStudyService() {
+        return new LinkedStudyServiceImpl();
     }
 
     @Bean
