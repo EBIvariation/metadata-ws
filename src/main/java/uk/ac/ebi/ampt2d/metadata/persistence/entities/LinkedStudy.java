@@ -17,30 +17,45 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.ManyToOne;
+import javax.persistence.MapsId;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "linked_study")
-@IdClass(LinkedStudyId.class)
 public class LinkedStudy {
 
-    @Id
+    @EmbeddedId
+    private LinkedStudyId linkedStudyId;
+
     @ManyToOne
+    @MapsId("study")
     private Study study;
 
-    @Id
     @ManyToOne
+    @MapsId("linkedStudy")
     private Study linkedStudy;
 
     public LinkedStudy() {
     }
 
+    public LinkedStudy(LinkedStudyId linkedStudyId) {
+        this.linkedStudyId = linkedStudyId;
+    }
+
     public LinkedStudy(Study study, Study linkedStudy) {
+        this.linkedStudyId = new LinkedStudyId(study.getId(), linkedStudy.getId());
         this.study = study;
+        this.linkedStudy = linkedStudy;
+    }
+
+    public void setStudy(Study study) {
+        this.study = study;
+    }
+
+    public void setLinkedStudy(Study linkedStudy) {
         this.linkedStudy = linkedStudy;
     }
 
