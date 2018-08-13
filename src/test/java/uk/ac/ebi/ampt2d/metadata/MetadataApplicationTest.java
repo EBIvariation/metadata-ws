@@ -1633,6 +1633,14 @@ public class MetadataApplicationTest {
         )));
     }
 
+    @Test(expected = JpaSystemException.class)
+    public void exceptionWhenSavingLinkedStudyWithSameKey() {
+        linkedStudyRepository.save(new LinkedStudy(new LinkedStudyId(
+                new AccessionVersionEntityId("testhuman", 1),
+                new AccessionVersionEntityId("testhuman", 1)
+        )));
+    }
+
     @Test
     public void testAccessionVersionEntityIdComparator() {
         AccessionVersionEntityIdComparator comparator = new AccessionVersionEntityIdComparator();
