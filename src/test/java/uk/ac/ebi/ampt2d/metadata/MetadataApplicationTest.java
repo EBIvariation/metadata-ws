@@ -27,14 +27,18 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityIdComparator;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.LinkedStudy;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.LinkedStudyId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
@@ -52,8 +56,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -1562,6 +1576,87 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
+    }
+
+    @Test
+    public void linkedStudyCompositeKeysShouldBeOrdered() throws Exception {
+        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
+        String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
+        String testStudy2 = postTestStudy("testhuman", 2, "test human study", testTaxonomy);
+        String testStudy3 = postTestStudy("testhuman", 3, "test human study", testTaxonomy);
+
+        mockMvc.perform(post(testStudy2 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.1\"]"))
+                .andExpect(status().isOk());
+
+        assertNotNull(linkedStudyRepository.findOne(
+                new LinkedStudyId(new AccessionVersionEntityId("testhuman", 1),
+                        new AccessionVersionEntityId("testhuman", 2))));
+
+        assertNull(linkedStudyRepository.findOne(
+                new LinkedStudyId(new AccessionVersionEntityId("testhuman", 2),
+                        new AccessionVersionEntityId("testhuman", 1))));
+
+        mockMvc.perform(patch(testStudy1 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.3\"]"))
+                .andExpect(status().isOk());
+
+        assertNotNull(linkedStudyRepository.findOne(
+                new LinkedStudyId(new AccessionVersionEntityId("testhuman", 1),
+                        new AccessionVersionEntityId("testhuman", 3))));
+
+        assertNull(linkedStudyRepository.findOne(
+                new LinkedStudyId(new AccessionVersionEntityId("testhuman", 3),
+                        new AccessionVersionEntityId("testhuman", 1))));
+
+        mockMvc.perform(patch(testStudy3 + "/linkedStudies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("[\"testhuman.2\"]"))
+                .andExpect(status().isOk());
+
+        assertNotNull(linkedStudyRepository.findOne(
+                new LinkedStudyId(new AccessionVersionEntityId("testhuman", 2),
+                        new AccessionVersionEntityId("testhuman", 3))));
+
+        assertNull(linkedStudyRepository.findOne(
+                new LinkedStudyId(new AccessionVersionEntityId("testhuman", 3),
+                        new AccessionVersionEntityId("testhuman", 2))));
+    }
+
+    @Test(expected = JpaSystemException.class)
+    public void exceptionWhenSavingLinkedStudyWithUnorderedKeys() {
+        linkedStudyRepository.save(new LinkedStudy(new LinkedStudyId(
+                new AccessionVersionEntityId("testhuman", 2),
+                new AccessionVersionEntityId("testhuman", 1)
+        )));
+    }
+
+    @Test
+    public void testAccessionVersionEntityIdComparator() {
+        AccessionVersionEntityIdComparator comparator = new AccessionVersionEntityIdComparator();
+
+        assertThat(comparator.compare(new AccessionVersionEntityId("testhuman", 1),
+                new AccessionVersionEntityId("testmouse",1)), lessThan(0));
+        assertThat(comparator.compare(new AccessionVersionEntityId("testmouse", 1),
+                new AccessionVersionEntityId("testhuman",1)), greaterThan(0));
+
+        assertThat(comparator.compare(new AccessionVersionEntityId("testhuman", 1),
+                new AccessionVersionEntityId("testhuman",2)), lessThan(0));
+        assertThat(comparator.compare(new AccessionVersionEntityId("testhuman", 1),
+                new AccessionVersionEntityId("testhuman",1)), equalTo(0));
+        assertThat(comparator.compare(new AccessionVersionEntityId("testhuman", 2),
+                new AccessionVersionEntityId("testhuman",1)), greaterThan(0));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void exceptionWhenUsingAccessionVersionEntityIdWithNullObject() {
+        AccessionVersionEntityIdComparator comparator = new AccessionVersionEntityIdComparator();
+
+        comparator.compare(null, new AccessionVersionEntityId("testhuman", 1));
+        comparator.compare(new AccessionVersionEntityId("testhuman", 1), null);
+        comparator.compare(null, null);
     }
 
 }

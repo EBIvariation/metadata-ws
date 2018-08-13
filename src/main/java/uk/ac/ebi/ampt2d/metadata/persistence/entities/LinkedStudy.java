@@ -17,6 +17,8 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import org.hibernate.annotations.Check;
+
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -25,6 +27,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "linked_study")
+@Check(constraints = "study_accession < linked_study_accession OR ( study_accession = linked_study_accession AND study_version < linked_study_version)")
 public class LinkedStudy {
 
     @EmbeddedId

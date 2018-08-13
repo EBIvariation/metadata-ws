@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.services;
 import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityIdComparator;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.LinkedStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.LinkedStudyId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
@@ -42,6 +43,8 @@ public class LinkedStudyServiceImpl implements LinkedStudyService {
 
     @Autowired
     private LinkedStudyRepository linkedStudyRepository;
+
+    private AccessionVersionEntityIdComparator accessionVersionEntityIdComparator = new AccessionVersionEntityIdComparator();
 
     /**
      * Get a list of ids for all the studies that could be linked to a given study.
@@ -78,9 +81,8 @@ public class LinkedStudyServiceImpl implements LinkedStudyService {
 
     @Override
     public LinkedStudy findOne(AccessionVersionEntityId studyId, AccessionVersionEntityId linkedStudyId) {
-        LinkedStudy linkedStudy = linkedStudyRepository.findOne(new LinkedStudyId(studyId, linkedStudyId));
-        if ( linkedStudy != null ) {
-            return linkedStudy;
+        if ( accessionVersionEntityIdComparator.compare(studyId, linkedStudyId) < 0 ) {
+            return linkedStudyRepository.findOne(new LinkedStudyId(studyId, linkedStudyId));
         }
 
         return linkedStudyRepository.findOne(new LinkedStudyId(linkedStudyId, studyId));
@@ -108,7 +110,10 @@ public class LinkedStudyServiceImpl implements LinkedStudyService {
             if ( !id.equals(linkedStudyId) ) {
                 Study linkedStudy = studyRepository.findOne(linkedStudyId);
                 if ( linkedStudy != null ) {
-                    return new LinkedStudy(study, linkedStudy);
+                    if ( accessionVersionEntityIdComparator.compare(id, linkedStudyId) < 0 ) {
+                        return new LinkedStudy(study, linkedStudy);
+                    }
+                    return new LinkedStudy(linkedStudy, study);
                 }
             }
 
@@ -125,7 +130,11 @@ public class LinkedStudyServiceImpl implements LinkedStudyService {
 
     @Override
     public void delete(AccessionVersionEntityId id, AccessionVersionEntityId linkedStudyId) {
-        linkedStudyRepository.deleteByStudy_IdAndLinkedStudy_Id(id, linkedStudyId);
-        linkedStudyRepository.deleteByStudy_IdAndLinkedStudy_Id(linkedStudyId, id);
+        if ( accessionVersionEntityIdComparator.compare(id, linkedStudyId) < 0 ) {
+            linkedStudyRepository.deleteByStudy_IdAndLinkedStudy_Id(id, linkedStudyId);
+        }
+        else {
+            linkedStudyRepository.deleteByStudy_IdAndLinkedStudy_Id(linkedStudyId, id);
+        }
     }
 }

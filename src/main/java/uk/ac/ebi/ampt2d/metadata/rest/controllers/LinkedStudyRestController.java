@@ -166,10 +166,9 @@ public class LinkedStudyRestController {
             return ResponseEntity.notFound().build();
         }
 
-        LinkedStudy linkedStudy1 = linkedStudyService.findOne(id, linkedStudyId);
-        LinkedStudy linkedStudy2 = linkedStudyService.findOne(linkedStudyId, id);
+        LinkedStudy linkedStudy = linkedStudyService.findOne(id, linkedStudyId);
 
-        if ( linkedStudy1 == null && linkedStudy2 == null ) {
+        if ( linkedStudy == null ) {
             return ResponseEntity.notFound().build();
         }
 
