@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata;
+package uk.ac.ebi.ampt2d.metadata.config;
 
 import com.fasterxml.classmate.TypeResolver;
 import com.google.common.base.Predicate;

@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata;
+package uk.ac.ebi.ampt2d.metadata.stateful;
 
 import org.json.JSONObject;
 import org.junit.Before;
@@ -27,6 +27,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -45,8 +46,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
-import java.time.ZonedDateTime;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,10 +60,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(properties = "oauthconfig=stateful")
 @AutoConfigureJsonTesters
 @AutoConfigureMockMvc
-public class MetadataApplicationTest {
+@WithMockUser(authorities = "WRITE")
+public class MetadataApplicationStatefulOauthTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -476,9 +478,9 @@ public class MetadataApplicationTest {
         String humanStudyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
         return Arrays.asList(postTestAnalysis("EGAA0001", humanAssemblyUrl, humanStudyUrl,
-                            Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina"),
+                Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina"),
                 postTestAnalysis("EGAA0002", humanAssemblyUrl, humanStudyUrl,
-                                Analysis.Technology.ARRAY, Analysis.Type.TUMOR, "PacBio"));
+                        Analysis.Technology.ARRAY, Analysis.Type.TUMOR, "PacBio"));
     }
 
     @Test
@@ -891,7 +893,7 @@ public class MetadataApplicationTest {
         return new ResultMatcher() {
             @Override
             public void match(MvcResult mvcResult) throws Exception {
-                JSONObject jsonObject =  new JSONObject(mvcResult.getResponse().getContentAsString());
+                JSONObject jsonObject = new JSONObject(mvcResult.getResponse().getContentAsString());
                 LocalDate releaseDate = LocalDate.parse(jsonObject.getString("releaseDate"));
                 assert releaseDate.equals(localDate);
             }
@@ -1107,7 +1109,6 @@ public class MetadataApplicationTest {
         LocalDate tomorrow = today.plusDays(1);
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String humanStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, today);
-
 
         mockMvc.perform(get(humanStudyUrl))
                 .andExpect(status().isOk())
