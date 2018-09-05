@@ -42,6 +42,8 @@ public interface StudyService {
 
     List<Study> findStudiesByTaxonomyName(String name);
 
+    List<Study> findLinkedStudies(AccessionVersionEntityId id);
+
     Study patch(Study study, String patch) throws Exception;
 
 }

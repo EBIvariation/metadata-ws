@@ -83,6 +83,10 @@ public class Study extends Auditable<AccessionVersionEntityId> {
     @Column
     private boolean browsable;
 
+    @JsonProperty
+    @OneToMany
+    private List<Study> linkedStudies;
+
     @OneToMany(mappedBy = "study")
     private List<Analysis> analyses;
 
@@ -102,6 +106,10 @@ public class Study extends Auditable<AccessionVersionEntityId> {
 
     public LocalDate getReleaseDate() {
         return releaseDate;
+    }
+
+    public List<Study> getLinkedStudies() {
+        return linkedStudies;
     }
 
 }

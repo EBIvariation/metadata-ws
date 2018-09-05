@@ -156,6 +156,18 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
         return ResponseEntity.ok(resources);
     }
 
+    @ApiOperation(value = "Get a list of studies linked to a given study")
+    @ApiParam(name = "id", value = "Study's id (accession.version)", type = "string", required = true, example = "EGAS0001.1")
+    @RequestMapping(method = RequestMethod.GET, path = "{id}/linkedStudies", produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<Resources<StudyResource>> getLinkedStudies(@PathVariable("id") AccessionVersionEntityId id) {
+        List<Study> studies = studyService.findLinkedStudies(id);
+
+        Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
+
+        return ResponseEntity.ok(resources);
+    }
+
     @ApiOperation(value = "Update an existing study. For a study that has release date in the future or has been " +
             "deprecated, it is not possible to update that study object through PATCH /studies/{id} method, it will " +
             "result in NOT FOUND. This new method (PATCH /studies/{id}/patch) allows that study object to be found and" +
