@@ -16,7 +16,8 @@ public class SecurityConfig extends ResourceServerConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST).hasAuthority("WRITE")
-                .anyRequest().authenticated();
+                .antMatchers("/").permitAll()
+                .antMatchers("/**").authenticated();
 
     }
 }
