@@ -30,10 +30,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.async.DeferredResult;
 import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.ResponseMessageBuilder;
 import springfox.documentation.schema.AlternateTypeRule;
+import springfox.documentation.schema.ModelRef;
 import springfox.documentation.schema.WildcardType;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
@@ -88,7 +90,11 @@ public class SwaggerConfig {
                 .globalResponseMessage(RequestMethod.PATCH, getResponseMessagesForPostAndPatch())
                 .directModelSubstitute(LocalDate.class, String.class)
                 .genericModelSubstitutes(ResponseEntity.class)
-                .alternateTypeRules(getSubstitutionRules());
+                .alternateTypeRules(getSubstitutionRules())
+                .globalOperationParameters(Arrays.asList(new ParameterBuilder()
+                        .name("Authorization").description("access Token")
+                        .modelRef(new ModelRef("string")).parameterType("header")
+                        .required(true).build()));
     }
 
     private List<ResponseMessage> getResponseMessagesForPostAndPatch() {
