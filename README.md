@@ -10,12 +10,19 @@ To perform any valid authenticated request please follow the below steps,
 
 #### What you need are the following:
 * Sample app setup in - https://console.developers.google.com/
-* Client ID - 548139723323-g70r2bllnlkcgcq85vo5kjshkegitomk.apps.googleusercontent.com
-* Client Secret - zBTsE__1l35F6qupvxvENfvV
+* Client ID 
+* Client Secret 
 * Scopes –  the scopes define what access you will receive.  you can have more then one just put a space between them. 
 
+eg : used for testing ,
+* Client Id     - 548139723323-g70r2bllnlkcgcq85vo5kjshkegitomk.apps.googleusercontent.com
+* Client Secret - zBTsE__1l35F6qupvxvENfvV
+* Scopes        - openid
+
 #### Requesting Authorization
-   Now replace the values needed in the following link and put it in a web browser
+   Now replace the values needed in the following link and put it in a web browser.
+   
+   
 
 ``` https://accounts.google.com/o/oauth2/auth?client_id=[Application Client Id]&redirect_uri=urn:ietf:wg:oauth:2.0:oob&scope=[Scopes]&response_type=code ```
 
