@@ -30,18 +30,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.async.DeferredResult;
 import springfox.bean.validators.configuration.BeanValidatorPluginsConfiguration;
 import springfox.documentation.builders.ApiInfoBuilder;
-import springfox.documentation.builders.ParameterBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.builders.ResponseMessageBuilder;
 import springfox.documentation.schema.AlternateTypeRule;
-import springfox.documentation.schema.ModelRef;
 import springfox.documentation.schema.WildcardType;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ApiKey;
+import springfox.documentation.service.AuthorizationScope;
 import springfox.documentation.service.Contact;
 import springfox.documentation.service.ResponseMessage;
+import springfox.documentation.service.SecurityReference;
 import springfox.documentation.service.Tag;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.data.rest.configuration.SpringDataRestConfiguration;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger.web.UiConfiguration;
@@ -67,6 +69,12 @@ public class SwaggerConfig {
     @Autowired
     private SwaggerApiInfoProperties swaggerApiInfoProperties;
 
+    private SecurityReference securityReference = SecurityReference.builder()
+            .reference("Authorization").scopes(new AuthorizationScope[0]).build();
+
+    private SecurityContext securityContext = SecurityContext.builder()
+            .securityReferences(Arrays.asList(securityReference)).build();
+
     @Bean
     public Docket metadataApi() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -90,11 +98,9 @@ public class SwaggerConfig {
                 .globalResponseMessage(RequestMethod.PATCH, getResponseMessagesForPostAndPatch())
                 .directModelSubstitute(LocalDate.class, String.class)
                 .genericModelSubstitutes(ResponseEntity.class)
-                .alternateTypeRules(getSubstitutionRules())
-                .globalOperationParameters(Arrays.asList(new ParameterBuilder()
-                        .name("Authorization").description("access Token")
-                        .modelRef(new ModelRef("string")).parameterType("header")
-                        .required(true).build()));
+                .securitySchemes(Arrays.asList(new ApiKey("Authorization", "Authorization", "header")))
+                .securityContexts(Arrays.asList(securityContext))
+                .alternateTypeRules(getSubstitutionRules());
     }
 
     private List<ResponseMessage> getResponseMessagesForPostAndPatch() {
