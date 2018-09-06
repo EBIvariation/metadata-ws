@@ -15,7 +15,7 @@ To perform any valid authenticated request please follow the below steps,
 
 #### Requesting Authorization
 ``` 
-curl --data "grant_type=password&amp;client_id=<client_id>&amp;client_secret=<client_secret>&amp;username=<username>&amp;password
+curl --data "grant_type=password&client_id=<client_id>&client_secret=<client_secret>&username=<username>&password
 =<password>" https://www.ebi.ac
 .uk/ega/ampt2d/auth/realms/Ampt2d/protocol/openid-connect/token 
 ```
