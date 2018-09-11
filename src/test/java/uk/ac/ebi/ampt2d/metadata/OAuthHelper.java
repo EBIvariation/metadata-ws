@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.stateless;
+package uk.ac.ebi.ampt2d.metadata;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -83,9 +83,6 @@ public class OAuthHelper extends AuthorizationServerConfigurerAdapter {
     @Override
     public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
-                .withClient("test")
-                .and()
-                .withClient("test1")
-                .authorities("WRITE");
+                .withClient("test");
     }
 }

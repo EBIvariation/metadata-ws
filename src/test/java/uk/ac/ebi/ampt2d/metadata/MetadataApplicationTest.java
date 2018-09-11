@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.stateful;
+package uk.ac.ebi.ampt2d.metadata;
 
 import org.json.JSONObject;
 import org.junit.Before;
@@ -27,7 +27,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -60,11 +59,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(properties = "oauthconfig=stateful")
+@SpringBootTest
 @AutoConfigureJsonTesters
 @AutoConfigureMockMvc
-@WithMockUser(authorities = "WRITE")
-public class MetadataApplicationStatefulOauthTest {
+public class MetadataApplicationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -105,6 +103,9 @@ public class MetadataApplicationStatefulOauthTest {
     @Autowired
     private JacksonTester<WebResource> testWebResourceJson;
 
+    @Autowired
+    private OAuthHelper oAuthHelper;
+
     @Before
     public void cleanDatabases() throws Exception {
         analysisRepository.deleteAll();
@@ -121,7 +122,7 @@ public class MetadataApplicationStatefulOauthTest {
         String location = postTestAssembly("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
 
-        mockMvc.perform(get(location))
+        mockMvc.perform(get(location).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("GRCh37"));
     }
@@ -129,7 +130,7 @@ public class MetadataApplicationStatefulOauthTest {
     private String postTestAssembly(String name, String patch, List<String> accessions) throws Exception {
         Assembly testAssembly = new Assembly(name, patch, accessions);
 
-        MvcResult mvcResult = mockMvc.perform(post("/assemblies")
+        MvcResult mvcResult = mockMvc.perform(post("/assemblies").with(oAuthHelper.bearerToken("test"))
                 .content(testAssemblyJson.write(testAssembly).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -139,7 +140,7 @@ public class MetadataApplicationStatefulOauthTest {
     @Test
     public void postTaxonomy() throws Exception {
         String location = postTestTaxonomy();
-        mockMvc.perform(get(location))
+        mockMvc.perform(get(location).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(9606))
                 .andExpect(jsonPath("$.name").value("Homo sapiens"));
@@ -160,7 +161,7 @@ public class MetadataApplicationStatefulOauthTest {
                 "\"ancestors\": " + testListJson.write(ancestors).getJson() + "" +
                 "}";
 
-        MvcResult mvcResult = mockMvc.perform(post("/taxonomies")
+        MvcResult mvcResult = mockMvc.perform(post("/taxonomies").with(oAuthHelper.bearerToken("test"))
                 .content(jsonContent))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -171,7 +172,7 @@ public class MetadataApplicationStatefulOauthTest {
     public void postStudy() throws Exception {
         String location = postTestStudy("EGAS0001", 1, "test_human_study");
 
-        mockMvc.perform(get(location))
+        mockMvc.perform(get(location).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id.accession").value("EGAS0001"));
     }
@@ -195,7 +196,7 @@ public class MetadataApplicationStatefulOauthTest {
     }
 
     private String postTestStudy(String accession, int version, String name, String taxonomyUrl, boolean deprecated, LocalDate releaseDate) throws Exception {
-        MvcResult mvcResult = mockMvc.perform(post("/studies")
+        MvcResult mvcResult = mockMvc.perform(post("/studies").with(oAuthHelper.bearerToken("test"))
                 .content("{ " +
                         "\"id\":{ \"accession\": \"" + accession + "\",\"version\": " + version + "}," +
                         "\"name\": \"" + name + "\"," +
@@ -219,7 +220,7 @@ public class MetadataApplicationStatefulOauthTest {
         String location = postTestAnalysis("EGAA0001", assemblyUrl, studyUrl, Analysis.Technology.GWAS,
                 Analysis.Type.CASE_CONTROL, "Illumina");
 
-        mockMvc.perform(get(location))
+        mockMvc.perform(get(location).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id.accession").value("EGAA0001"));
     }
@@ -231,7 +232,7 @@ public class MetadataApplicationStatefulOauthTest {
 
     private String postTestAnalysis(String accession, String assemblyUrl, String studyUrl, Analysis.Technology
             technology, Analysis.Type type, String platform) throws Exception {
-        MvcResult mvcResult = mockMvc.perform(post("/analyses")
+        MvcResult mvcResult = mockMvc.perform(post("/analyses").with(oAuthHelper.bearerToken("test"))
                 .content("{ " +
                         "\"id\":{ \"accession\": \"" + accession + "\",\"version\":  1 }," +
                         "\"name\": \"test_human_analysis\"," +
@@ -251,7 +252,7 @@ public class MetadataApplicationStatefulOauthTest {
     public void postFile() throws Exception {
         String location = postTestFile("EGAF0001", 1);
 
-        mockMvc.perform(get(location))
+        mockMvc.perform(get(location).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id.accession").value("EGAF0001"))
                 .andExpect(jsonPath("$.id.version").value(1));
@@ -261,7 +262,7 @@ public class MetadataApplicationStatefulOauthTest {
         File testFile = new File(new AccessionVersionEntityId(accession, version), "asd123", "test_file",
                 100, File.Type.TSV);
 
-        MvcResult mvcResult = mockMvc.perform(post("/files")
+        MvcResult mvcResult = mockMvc.perform(post("/files").with(oAuthHelper.bearerToken("test"))
                 .content(testFileJson.write(testFile).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -272,7 +273,7 @@ public class MetadataApplicationStatefulOauthTest {
     public void postSample() throws Exception {
         String location = postTestSample("EGAN0001", "testSample");
 
-        mockMvc.perform(get(location))
+        mockMvc.perform(get(location).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id.accession").value("EGAN0001"))
                 .andExpect(jsonPath("$.name").value("testSample"));
@@ -280,7 +281,7 @@ public class MetadataApplicationStatefulOauthTest {
 
     private String postTestSample(String accession, String name) throws Exception {
         Sample testSample = new Sample(new AccessionVersionEntityId(accession, 1), name);
-        MvcResult mvcResult = mockMvc.perform(post("/samples")
+        MvcResult mvcResult = mockMvc.perform(post("/samples").with(oAuthHelper.bearerToken("test"))
                 .content(testSampleJson.write(testSample).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -291,7 +292,7 @@ public class MetadataApplicationStatefulOauthTest {
     public void postWebResource() throws Exception {
         String location = postTestWebResource();
 
-        mockMvc.perform(get(location))
+        mockMvc.perform(get(location).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.type").value("CENTER_WEB"))
                 .andExpect(jsonPath("$.resourceUrl").value("http:\\www.ebi.ac.uk"));
@@ -300,7 +301,7 @@ public class MetadataApplicationStatefulOauthTest {
     private String postTestWebResource() throws Exception {
         WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "http:\\www.ebi.ac.uk");
 
-        MvcResult mvcResult = mockMvc.perform(post("/webResources")
+        MvcResult mvcResult = mockMvc.perform(post("/webResources").with(oAuthHelper.bearerToken("test"))
                 .content(testWebResourceJson.write(testWebResource).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -314,26 +315,26 @@ public class MetadataApplicationStatefulOauthTest {
         String grch38Url = postTestAssembly("GRCh38", "p2",
                 Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh37").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
                 .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch37Url))
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh37"));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh38"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh38").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
                 .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch38Url))
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh38"));
 
-        mockMvc.perform(get("/assemblies/search?name=NCBI36"))
+        mockMvc.perform(get("/assemblies/search?name=NCBI36").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p2"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p2").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -341,7 +342,7 @@ public class MetadataApplicationStatefulOauthTest {
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh37"))
                 .andExpect(jsonPath("$..assemblies[0].patch").value("p2"));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh38&patch=p2"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh38&patch=p2").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -349,22 +350,22 @@ public class MetadataApplicationStatefulOauthTest {
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh38"))
                 .andExpect(jsonPath("$..assemblies[0].patch").value("p2"));
 
-        mockMvc.perform(get("/assemblies/search?name=NCBI36&patch=p2"))
+        mockMvc.perform(get("/assemblies/search?name=NCBI36&patch=p2").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p3"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p3").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh38&patch=p3"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh38&patch=p3").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?accessions=GCA_000001405.3"))
+        mockMvc.perform(get("/assemblies/search?accessions=GCA_000001405.3").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -372,7 +373,7 @@ public class MetadataApplicationStatefulOauthTest {
                 .andExpect(jsonPath("$..assemblies[0].accessions").isArray())
                 .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItem("GCA_000001405.3")));
 
-        mockMvc.perform(get("/assemblies/search?accessions=GCF_000001405.28"))
+        mockMvc.perform(get("/assemblies/search?accessions=GCF_000001405.28").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -380,12 +381,12 @@ public class MetadataApplicationStatefulOauthTest {
                 .andExpect(jsonPath("$..assemblies[0].accessions").isArray())
                 .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItem("GCF_000001405.28")));
 
-        mockMvc.perform(get("/assemblies/search?accessions=GCA_000001405.2"))
+        mockMvc.perform(get("/assemblies/search?accessions=GCA_000001405.2").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p2&accessions=GCA_000001405.3"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p2&accessions=GCA_000001405.3").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -395,7 +396,7 @@ public class MetadataApplicationStatefulOauthTest {
                 .andExpect(jsonPath("$..assemblies[0].patch").value("p2"))
                 .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItem("GCA_000001405.3")));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p3&accessions=GCA_000001405.3"))
+        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p3&accessions=GCA_000001405.3").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
@@ -407,41 +408,41 @@ public class MetadataApplicationStatefulOauthTest {
         String testAnalysisOneUrl = testAnalysisUrls.get(0);
         String testAnalysisTwoUrl = testAnalysisUrls.get(1);
 
-        mockMvc.perform(get("/analyses/search?type=CASE_CONTROL"))
+        mockMvc.perform(get("/analyses/search?type=CASE_CONTROL").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(1))
                 .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisOneUrl));
 
-        mockMvc.perform(get("/analyses/search?type=TUMOR"))
+        mockMvc.perform(get("/analyses/search?type=TUMOR").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(1))
                 .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisTwoUrl));
 
-        mockMvc.perform(get("/analyses/search?type=COLLECTION"))
+        mockMvc.perform(get("/analyses/search?type=COLLECTION").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(0));
 
-        mockMvc.perform(get("/analyses/search?platform=PacBio"))
+        mockMvc.perform(get("/analyses/search?platform=PacBio").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(1))
                 .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisTwoUrl));
 
-        mockMvc.perform(get("/analyses/search?platform=illumina"))
+        mockMvc.perform(get("/analyses/search?platform=illumina").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(1))
                 .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisOneUrl));
 
-        mockMvc.perform(get("/analyses/search?platform=nextSeq"))
+        mockMvc.perform(get("/analyses/search?platform=nextSeq").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(0));
 
-        mockMvc.perform(get("/analyses/search?platform=pacbio&type=TUMOR"))
+        mockMvc.perform(get("/analyses/search?platform=pacbio&type=TUMOR").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(1));
@@ -451,21 +452,21 @@ public class MetadataApplicationStatefulOauthTest {
     public void findAnalysisByTechnology() throws Exception {
         List<String> testAnalysisUrls = postTestAnalyses();
 
-        mockMvc.perform(get("/analyses/search?technology=UNKNOWN"))
+        mockMvc.perform(get("/analyses/search?technology=UNKNOWN").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().is4xxClientError());
 
-        mockMvc.perform(get("/analyses/search?technology=CURATION"))
+        mockMvc.perform(get("/analyses/search?technology=CURATION").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(0));
 
-        mockMvc.perform(get("/analyses/search?technology=GWAS"))
+        mockMvc.perform(get("/analyses/search?technology=GWAS").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(1))
                 .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisUrls.get(0)));
 
-        mockMvc.perform(get("/analyses/search?technology=ARRAY&type=TUMOR"))
+        mockMvc.perform(get("/analyses/search?technology=ARRAY&type=TUMOR").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(1))
@@ -485,7 +486,7 @@ public class MetadataApplicationStatefulOauthTest {
 
     @Test
     public void clientErrorWhenSearchAnalysesWithInvalidType() throws Exception {
-        mockMvc.perform(get("/analyses/search?type=unknown"))
+        mockMvc.perform(get("/analyses/search?type=unknown").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().is4xxClientError());
     }
 
@@ -501,79 +502,79 @@ public class MetadataApplicationStatefulOauthTest {
         postTestAnalysis("EGAA0001", grch37AssemblyUrl, grch37StudyUrl);
         postTestAnalysis("EGAA0002", grch38AssemblyUrl, grch38StudyUrl);
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh37"))
+        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh37").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(grch37StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38"))
+        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(grch38StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=NCBI36"))
+        mockMvc.perform(get("/studies?analyses.assembly.name=NCBI36").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh37&analyses.assembly.patch=p2"))
+        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh37&analyses.assembly.patch=p2").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(grch37StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.assembly.patch=p2"))
+        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.assembly.patch=p2").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(grch38StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=NCBI36&analyses.assembly.patch=p2"))
+        mockMvc.perform(get("/studies?analyses.assembly.name=NCBI36&analyses.assembly.patch=p2").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh37&analyses.assembly.patch=p3"))
+        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh37&analyses.assembly.patch=p3").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.type=CASE_CONTROL"))
+        mockMvc.perform(get("/studies?analyses.type=CASE_CONTROL").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(grch37StudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(grch38StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.type=TUMOR"))
+        mockMvc.perform(get("/studies?analyses.type=TUMOR").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.type=COLLECTION"))
+        mockMvc.perform(get("/studies?analyses.type=COLLECTION").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.type=CASE_CONTROL"))
+        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.type=CASE_CONTROL").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(grch38StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.type=TUMOR"))
+        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.type=TUMOR").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.type=COLLECTION"))
+        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.type=COLLECTION").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=NCBI36&analyses.type=CASE_CONTROL"))
+        mockMvc.perform(get("/studies?analyses.assembly.name=NCBI36&analyses.type=CASE_CONTROL").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
@@ -584,17 +585,17 @@ public class MetadataApplicationStatefulOauthTest {
         postTestStudy("EGAS0001", 1, "test human study based on GRCh37");
         postTestStudy("EGAS0002", 1, "test human study based on GRCh38");
 
-        mockMvc.perform(get("/studies/search/text").param("searchTerm", "human"))
+        mockMvc.perform(get("/studies/search/text").with(oAuthHelper.bearerToken("test")).param("searchTerm", "human"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(2));
-        mockMvc.perform(get("/studies/search/text").param("searchTerm", "important"))
+        mockMvc.perform(get("/studies/search/text").with(oAuthHelper.bearerToken("test")).param("searchTerm", "important"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(2));
-        mockMvc.perform(get("/studies/search/text").param("searchTerm", "grCh37"))
+        mockMvc.perform(get("/studies/search/text").with(oAuthHelper.bearerToken("test")).param("searchTerm", "grCh37"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0].id.accession").value("EGAS0001"));
-        mockMvc.perform(get("/studies/search/text").param("searchTerm", "GrCh39"))
+        mockMvc.perform(get("/studies/search/text").with(oAuthHelper.bearerToken("test")).param("searchTerm", "GrCh39"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(0));
     }
@@ -605,24 +606,24 @@ public class MetadataApplicationStatefulOauthTest {
         String testStudy2 = postTestStudy("EGAS0001", 2, "test human study based on GRCh38");
         String testStudy3 = postTestStudy("EGAS0002", 3, "test human study based on GRCh38");
 
-        mockMvc.perform(get("/studies/search/accession").param("accession", "EGAS0001"))
+        mockMvc.perform(get("/studies/search/accession").with(oAuthHelper.bearerToken("test")).param("accession", "EGAS0001"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..study.href").value(testStudy2))
                 .andExpect(jsonPath("$.id.accession").value("EGAS0001"))
                 .andExpect(jsonPath("$.id.version").value(2));
-        mockMvc.perform(get("/studies/search/accession").param("accession", "EGAS0002"))
+        mockMvc.perform(get("/studies/search/accession").with(oAuthHelper.bearerToken("test")).param("accession", "EGAS0002"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..study.href").value(testStudy3))
                 .andExpect(jsonPath("$.id.accession").value("EGAS0002"))
                 .andExpect(jsonPath("$.id.version").value(3));
-        mockMvc.perform(get("/studies/search/accession").param("accession", "EGAS0003"))
+        mockMvc.perform(get("/studies/search/accession").with(oAuthHelper.bearerToken("test")).param("accession", "EGAS0003"))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void testAccessionValidation() throws Exception {
         String taxonomyUrl = postTestTaxonomy();
-        mockMvc.perform(post("/studies")
+        mockMvc.perform(post("/studies").with(oAuthHelper.bearerToken("test"))
                 .content("{ " +
                         "\"id\":{ \"accession\": \"EGAS0001\",\"version\":  0 }," +
                         "\"name\": \" study1\"," +
@@ -634,7 +635,7 @@ public class MetadataApplicationStatefulOauthTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.errors[0].property").value("id.version"))
                 .andExpect(jsonPath("$.errors[0].message").value("must be greater than or equal to 1"));
-        mockMvc.perform(post("/studies")
+        mockMvc.perform(post("/studies").with(oAuthHelper.bearerToken("test"))
                 .content("{ " +
                         "\"id\":{ \"version\":  1 }," +
                         "\"name\": \" study1\"," +
@@ -647,13 +648,13 @@ public class MetadataApplicationStatefulOauthTest {
                 .andExpect(jsonPath("$.errors[0].property").value("id.accession"))
                 .andExpect(jsonPath("$.errors[0].message").value("may not be null"));
         postTestStudy("EGAS0001", 1, "test_study");
-        mockMvc.perform(get("/studies/EGAS0001")).andExpect(status().is4xxClientError()).andExpect(jsonPath("$" +
+        mockMvc.perform(get("/studies/EGAS0001").with(oAuthHelper.bearerToken("test"))).andExpect(status().is4xxClientError()).andExpect(jsonPath("$" +
                 ".message").value("Please provide an ID in the form accession.version"));
-        mockMvc.perform(get("/studies/EGAS0001.S1")).andExpect(status().is4xxClientError())
+        mockMvc.perform(get("/studies/EGAS0001.S1").with(oAuthHelper.bearerToken("test"))).andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.message").value("Please provide an ID in the form accession.version"));
-        mockMvc.perform(get("/studies/EGAS0001.1")).andExpect(status().isOk())
+        mockMvc.perform(get("/studies/EGAS0001.1").with(oAuthHelper.bearerToken("test"))).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id.accession").value("EGAS0001"));
-        mockMvc.perform(get("/studies/EGAS0001.2")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/studies/EGAS0001.2").with(oAuthHelper.bearerToken("test"))).andExpect(status().isNotFound());
     }
 
     @Test
@@ -672,20 +673,20 @@ public class MetadataApplicationStatefulOauthTest {
         String bonoboStudyUrl = postTestStudy("testbonobo", 1, "test bonobo study", bonoboTaxonomyUrl);
         String chimpanzeeStudyUrl = postTestStudy("testchimpanzee", 1, "test chimpanzee study", chimpanzeeTaxonomyUrl);
 
-        mockMvc.perform(get("/studies/search/taxonomy-id?id=9606"))
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=9606").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl));
 
-        mockMvc.perform(get("/studies/search/taxonomy-id?id=9596"))
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=9596").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(bonoboStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(chimpanzeeStudyUrl));
 
-        mockMvc.perform(get("/studies/search/taxonomy-id?id=207598"))
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=207598").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(3))
@@ -693,7 +694,7 @@ public class MetadataApplicationStatefulOauthTest {
                 .andExpect(jsonPath("$..studies[1]..study.href").value(bonoboStudyUrl))
                 .andExpect(jsonPath("$..studies[2]..study.href").value(chimpanzeeStudyUrl));
 
-        mockMvc.perform(get("/studies/search/taxonomy-id?id=0"))
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=0").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
@@ -715,20 +716,20 @@ public class MetadataApplicationStatefulOauthTest {
         String bonoboStudyUrl = postTestStudy("testbonobo", 1, "test bonobo study", bonoboTaxonomyUrl);
         String chimpanzeeStudyUrl = postTestStudy("testchimpanzee", 1, "test chimpanzee study", chimpanzeeTaxonomyUrl);
 
-        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homo sapiens"))
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homo sapiens").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrl));
 
-        mockMvc.perform(get("/studies/search/taxonomy-name?name=Pan"))
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Pan").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(bonoboStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(chimpanzeeStudyUrl));
 
-        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homininae"))
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homininae").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(3))
@@ -736,7 +737,7 @@ public class MetadataApplicationStatefulOauthTest {
                 .andExpect(jsonPath("$..studies[1]..study.href").value(bonoboStudyUrl))
                 .andExpect(jsonPath("$..studies[2]..study.href").value(chimpanzeeStudyUrl));
 
-        mockMvc.perform(get("/studies/search/taxonomy-name?name=None"))
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=None").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
@@ -747,15 +748,15 @@ public class MetadataApplicationStatefulOauthTest {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String studyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, false);
 
-        mockMvc.perform(get(studyUrl))
+        mockMvc.perform(get(studyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..study.href").value(studyUrl));
 
-        mockMvc.perform(patch(studyUrl)
+        mockMvc.perform(patch(studyUrl).with(oAuthHelper.bearerToken("test"))
                 .content("{\"deprecated\": \"true\"}"))
                 .andExpect(status().is2xxSuccessful());
 
-        mockMvc.perform(get(studyUrl))
+        mockMvc.perform(get(studyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isNotFound());
     }
 
@@ -764,7 +765,7 @@ public class MetadataApplicationStatefulOauthTest {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String studyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, false);
 
-        mockMvc.perform(get(studyUrl))
+        mockMvc.perform(get(studyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..study.href").value(studyUrl))
                 .andExpect(jsonPath("$.description").exists())
@@ -777,46 +778,46 @@ public class MetadataApplicationStatefulOauthTest {
         String deprecatedStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, true);
         String undeprecatedStudyUrl = postTestStudy("1kg", 2, "1kg phase 1", humanTaxonomyUrl, false);
 
-        mockMvc.perform(get("/studies"))
+        mockMvc.perform(get("/studies").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(undeprecatedStudyUrl));
 
-        mockMvc.perform(get(undeprecatedStudyUrl))
+        mockMvc.perform(get(undeprecatedStudyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..study.href").value(undeprecatedStudyUrl));
 
-        mockMvc.perform(get(undeprecatedStudyUrl + "/analyses"))
+        mockMvc.perform(get(undeprecatedStudyUrl + "/analyses").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(0));
 
-        mockMvc.perform(get("/studies/search?taxonomy.id=9606"))
+        mockMvc.perform(get("/studies/search?taxonomy.id=9606").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(undeprecatedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/accession?accession=1kg"))
+        mockMvc.perform(get("/studies/search/accession?accession=1kg").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id.accession").value("1kg"))
                 .andExpect(jsonPath("$.id.version").value(2))
                 .andExpect(jsonPath("$..study.href").value(undeprecatedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/taxonomy-id?id=9606"))
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=9606").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(undeprecatedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homo sapiens"))
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homo sapiens").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(undeprecatedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/text?searchTerm=1kg"))
+        mockMvc.perform(get("/studies/search/text?searchTerm=1kg").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
@@ -828,10 +829,10 @@ public class MetadataApplicationStatefulOauthTest {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String deprecatedStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, true);
 
-        mockMvc.perform(get(deprecatedStudyUrl))
+        mockMvc.perform(get(deprecatedStudyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isNotFound());
 
-        mockMvc.perform(get(deprecatedStudyUrl + "/analyses"))
+        mockMvc.perform(get(deprecatedStudyUrl + "/analyses").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isNotFound());
     }
 
@@ -840,26 +841,26 @@ public class MetadataApplicationStatefulOauthTest {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String humanStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, false);
 
-        mockMvc.perform(get(humanStudyUrl))
+        mockMvc.perform(get(humanStudyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..study.href").value(humanStudyUrl));
 
-        mockMvc.perform(patch(humanStudyUrl + "/patch")
+        mockMvc.perform(patch(humanStudyUrl + "/patch").with(oAuthHelper.bearerToken("test"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"deprecated\" : \"" + true + "\" }"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..study.href").value(humanStudyUrl));
 
-        mockMvc.perform(get(humanStudyUrl))
+        mockMvc.perform(get(humanStudyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isNotFound());
 
-        mockMvc.perform(patch(humanStudyUrl + "/patch")
+        mockMvc.perform(patch(humanStudyUrl + "/patch").with(oAuthHelper.bearerToken("test"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"deprecated\" : \"" + false + "\" }"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..study.href").value(humanStudyUrl));
 
-        mockMvc.perform(get(humanStudyUrl))
+        mockMvc.perform(get(humanStudyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..study.href").value(humanStudyUrl));
     }
@@ -869,20 +870,20 @@ public class MetadataApplicationStatefulOauthTest {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String humanStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl);
 
-        mockMvc.perform(get(humanStudyUrl))
+        mockMvc.perform(get(humanStudyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.browsable").value(false));
 
-        mockMvc.perform(get("/studies/search?browsable=true"))
+        mockMvc.perform(get("/studies/search?browsable=true").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(patch(humanStudyUrl)
+        mockMvc.perform(patch(humanStudyUrl).with(oAuthHelper.bearerToken("test"))
                 .content("{\"browsable\" : true }"))
                 .andExpect(status().is2xxSuccessful());
 
-        mockMvc.perform(get("/studies/search?browsable=true"))
+        mockMvc.perform(get("/studies/search?browsable=true").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
@@ -914,7 +915,7 @@ public class MetadataApplicationStatefulOauthTest {
 
     private void checkLastModifiedDate(String url, String type, ZonedDateTime startTime, ZonedDateTime endTime)
             throws Exception {
-        mockMvc.perform(get(url))
+        mockMvc.perform(get(url).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.." + type + ".href").value(url))
                 .andExpect(jsonPath("$.lastModifiedDate").isNotEmpty())
@@ -922,7 +923,7 @@ public class MetadataApplicationStatefulOauthTest {
     }
 
     private void patchResource(String url) throws Exception {
-        mockMvc.perform(patch(url)
+        mockMvc.perform(patch(url).with(oAuthHelper.bearerToken("test"))
                 .content("{\"name\": \"nothing important\"}"))
                 .andExpect(status().is2xxSuccessful());
     }
@@ -955,7 +956,7 @@ public class MetadataApplicationStatefulOauthTest {
         patchResource(testAnalysis);
         patchResource(testFile);
         patchResource(testSample);
-        mockMvc.perform(patch(testWebResource)
+        mockMvc.perform(patch(testWebResource).with(oAuthHelper.bearerToken("test"))
                 .content("{\"resourceUrl\": \"http://nothing.important.com\"}"))
                 .andExpect(status().is2xxSuccessful());
         endTime = ZonedDateTime.now();
@@ -979,20 +980,20 @@ public class MetadataApplicationStatefulOauthTest {
         String releasedToday = postTestStudy("releasedToday", 1, "nothing important", humanTaxonomyUrl, today);
         String releasedTomorrow = postTestStudy("releasedTomorrow", 1, "nothing important", humanTaxonomyUrl, tomorrow);
 
-        mockMvc.perform(get("/studies/search/release-date?to=" + today))
+        mockMvc.perform(get("/studies/search/release-date?to=" + today).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(releasedYesterday))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(releasedToday));
 
-        mockMvc.perform(get("/studies/search/release-date?from=" + today))
+        mockMvc.perform(get("/studies/search/release-date?from=" + today).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(releasedToday));
 
-        mockMvc.perform(get("/studies/search/release-date?from=" + today + "&to=" + today))
+        mockMvc.perform(get("/studies/search/release-date?from=" + today + "&to=" + today).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
@@ -1001,12 +1002,12 @@ public class MetadataApplicationStatefulOauthTest {
 
     @Test
     public void clientErrorWhenSearchStudiesByReleaseDateWithInvalidInput() throws Exception {
-        mockMvc.perform(get("/studies/search/release-date"))
+        mockMvc.perform(get("/studies/search/release-date").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.exception").value("java.lang.IllegalArgumentException"))
                 .andExpect(jsonPath("$.message").value("Either from or to needs to be non-null"));
 
-        mockMvc.perform(get("/studies/search/release-date?from=" + "wrong-format-date"))
+        mockMvc.perform(get("/studies/search/release-date?from=" + "wrong-format-date").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.exception").value("java.lang.IllegalArgumentException"))
                 .andExpect(jsonPath("$.message").value("Please provide a date in the form yyyy-mm-dd"));
@@ -1027,62 +1028,63 @@ public class MetadataApplicationStatefulOauthTest {
 
         String yesterdayReleasedAnalysisUrl = postTestAnalysis("analysisReleasedYesterday", humanAssemblyUrl, yesterdayReleasedStudyUrl);
 
-        mockMvc.perform(get("/studies"))
+        mockMvc.perform(get("/studies").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
 
-        mockMvc.perform(get(yesterdayReleasedStudyUrl))
+        mockMvc.perform(get(yesterdayReleasedStudyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..study.href").value(yesterdayReleasedStudyUrl));
 
-        mockMvc.perform(get(yesterdayReleasedStudyUrl + "/analyses"))
+        mockMvc.perform(get(yesterdayReleasedStudyUrl + "/analyses").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(1))
                 .andExpect(jsonPath("$..analyses[0]..analysis.href").value(yesterdayReleasedAnalysisUrl));
 
-        mockMvc.perform(get(todayReleasedStudyUrl + "/analyses"))
+        mockMvc.perform(get(todayReleasedStudyUrl + "/analyses").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..analyses").isArray())
                 .andExpect(jsonPath("$..analyses.length()").value(0));
 
-        mockMvc.perform(get("/studies/search?taxonomy.id=9606"))
+        mockMvc.perform(get("/studies/search?taxonomy.id=9606").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/accession?accession=1kg"))
+        mockMvc.perform(get("/studies/search/accession?accession=1kg").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id.accession").value("1kg"))
                 .andExpect(jsonPath("$.id.version").value(2))
                 .andExpect(jsonPath("$..study.href").value(todayReleasedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/release-date?from=" + LocalDate.now()))
+        mockMvc.perform(get("/studies/search/release-date?from=" + LocalDate.now()).with(oAuthHelper.bearerToken
+                ("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(todayReleasedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/taxonomy-id?id=9606"))
+        mockMvc.perform(get("/studies/search/taxonomy-id?id=9606").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homo sapiens"))
+        mockMvc.perform(get("/studies/search/taxonomy-name?name=Homo sapiens").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(yesterdayReleasedStudyUrl))
                 .andExpect(jsonPath("$..studies[1]..study.href").value(todayReleasedStudyUrl));
 
-        mockMvc.perform(get("/studies/search/text?searchTerm=1kg"))
+        mockMvc.perform(get("/studies/search/text?searchTerm=1kg").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
@@ -1096,10 +1098,10 @@ public class MetadataApplicationStatefulOauthTest {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String tomorrowReleasedStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, LocalDate.now().plusDays(1));
 
-        mockMvc.perform(get(tomorrowReleasedStudyUrl))
+        mockMvc.perform(get(tomorrowReleasedStudyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isNotFound());
 
-        mockMvc.perform(get(tomorrowReleasedStudyUrl + "/analyses"))
+        mockMvc.perform(get(tomorrowReleasedStudyUrl + "/analyses").with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isNotFound());
     }
 
@@ -1110,29 +1112,29 @@ public class MetadataApplicationStatefulOauthTest {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String humanStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, today);
 
-        mockMvc.perform(get(humanStudyUrl))
+        mockMvc.perform(get(humanStudyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.releaseDate").exists())
                 .andExpect(isReleaseDateEqualTo(today));
 
-        mockMvc.perform(patch(humanStudyUrl + "/patch")
+        mockMvc.perform(patch(humanStudyUrl + "/patch").with(oAuthHelper.bearerToken("test"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"releaseDate\" : \"" + tomorrow + "\" }"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.releaseDate").exists())
                 .andExpect(isReleaseDateEqualTo(tomorrow));
 
-        mockMvc.perform(get(humanStudyUrl))
+        mockMvc.perform(get(humanStudyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isNotFound());
 
-        mockMvc.perform(patch(humanStudyUrl + "/patch")
+        mockMvc.perform(patch(humanStudyUrl + "/patch").with(oAuthHelper.bearerToken("test"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"releaseDate\" : \"" + today + "\" }"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.releaseDate").exists())
                 .andExpect(isReleaseDateEqualTo(today));
 
-        mockMvc.perform(get(humanStudyUrl))
+        mockMvc.perform(get(humanStudyUrl).with(oAuthHelper.bearerToken("test")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.releaseDate").exists())
                 .andExpect(isReleaseDateEqualTo(today));
@@ -1140,7 +1142,7 @@ public class MetadataApplicationStatefulOauthTest {
 
     @Test
     public void notFoundWhenPatchAnUnexistingStudy() throws Exception {
-        mockMvc.perform(patch("studies/unexist.1/patch")
+        mockMvc.perform(patch("studies/unexist.1/patch").with(oAuthHelper.bearerToken("test"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"releaseDate\" : \"" + LocalDate.now() + "\" }"))
                 .andExpect(status().isNotFound());
@@ -1151,15 +1153,26 @@ public class MetadataApplicationStatefulOauthTest {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String humanStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl);
 
-        mockMvc.perform(patch(humanStudyUrl + "/patch")
+        mockMvc.perform(patch(humanStudyUrl + "/patch").with(oAuthHelper.bearerToken("test"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{ \"releaseDate\" : \"" + 2001 + "\" }"))
                 .andExpect(status().isBadRequest());
 
-        mockMvc.perform(patch(humanStudyUrl + "/patch")
+        mockMvc.perform(patch(humanStudyUrl + "/patch").with(oAuthHelper.bearerToken("test"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void withOutOAuthToken() throws Exception {
+        // Any url other than root and swagger is Secured
+        mockMvc.perform(get("/taxonomies")).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/studies")).andExpect(status().isUnauthorized());
+
+        mockMvc.perform(get("/")).andExpect(status().isOk()); // Root is not secured
+        mockMvc.perform(get("/swagger-ui.html")).andExpect(status().isOk()); // Swagger is not secured
+
     }
 
 }
