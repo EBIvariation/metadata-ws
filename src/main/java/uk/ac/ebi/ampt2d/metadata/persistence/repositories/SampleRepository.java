@@ -18,7 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
 import io.swagger.annotations.ApiOperation;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
@@ -28,7 +28,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import java.util.List;
 
 @RepositoryRestResource
-public interface SampleRepository extends CrudRepository<Sample, AccessionVersionEntityId> {
+public interface SampleRepository extends PagingAndSortingRepository<Sample, AccessionVersionEntityId> {
 
     @ApiOperation(value = "Get the latest version of Sample based on accession")
     @RestResource(path = "/accession")

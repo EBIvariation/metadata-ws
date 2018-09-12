@@ -21,7 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
@@ -32,7 +32,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.QAnalysis;
 import java.util.List;
 
 @RepositoryRestResource
-public interface AnalysisRepository extends CrudRepository<Analysis, AccessionVersionEntityId>,
+public interface AnalysisRepository extends PagingAndSortingRepository<Analysis, AccessionVersionEntityId>,
         QueryDslPredicateExecutor<Analysis>, QuerydslBinderCustomizer<QAnalysis> {
 
     default void customize(QuerydslBindings bindings, QAnalysis qAnalysis) {
