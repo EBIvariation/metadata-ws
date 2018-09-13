@@ -1218,6 +1218,19 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
+
+        String nonexistent = testStudy1.replace("testhuman", "testmouse");
+        mockMvc.perform(patch(testStudy1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ \"linkedStudies\":" +
+                        testListJson.write(Arrays.asList(nonexistent)).getJson() +
+                        "}"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
     }
 
 }
