@@ -1161,4 +1161,28 @@ public class MetadataApplicationTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    public void searchStudyByPagingAndSorting() throws Exception {
+        String humanStudyUrlB = postTestStudy("EGAS0001", 1, "test human B");
+        String humanStudyUrlA = postTestStudy("EGAS0002", 1, "test human A");
+
+        mockMvc.perform(get("/studies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies.length()").value(2))
+                .andExpect(jsonPath("$.page.size").value(20))
+                .andExpect(jsonPath("$.page.totalElements").value(2))
+                .andExpect(jsonPath("$.page.totalPages").value(1));
+        mockMvc.perform(get("/studies?size=1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrlB));
+        mockMvc.perform(get("/studies?size=1&sort=name"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(humanStudyUrlA));
+        mockMvc.perform(get("/studies?page=1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+    }
+
 }
