@@ -1165,17 +1165,6 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void withOutOAuthToken() throws Exception {
-        // Any url other than root and swagger is Secured
-        mockMvc.perform(get("/taxonomies")).andExpect(status().isUnauthorized());
-        mockMvc.perform(get("/studies")).andExpect(status().isUnauthorized());
-
-        mockMvc.perform(get("/")).andExpect(status().isOk()); // Root is not secured
-        mockMvc.perform(get("/swagger-ui.html")).andExpect(status().isOk()); // Swagger is not secured
-
-    }
-
-    @Test
     public void searchStudyByPagingAndSorting() throws Exception {
         String humanStudyUrlB = postTestStudy("EGAS0001", 1, "test human B");
         String humanStudyUrlA = postTestStudy("EGAS0002", 1, "test human A");
@@ -1198,4 +1187,17 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(0));
     }
+
+    @Test
+    public void withOutOAuthToken() throws Exception {
+        // Any url other than root and swagger is Secured
+        mockMvc.perform(get("/taxonomies")).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/studies")).andExpect(status().isUnauthorized());
+
+        mockMvc.perform(get("/")).andExpect(status().isOk()); // Root is not secured
+        mockMvc.perform(get("/swagger-ui.html")).andExpect(status().isOk()); // Swagger is not secured
+
+    }
+
+
 }
