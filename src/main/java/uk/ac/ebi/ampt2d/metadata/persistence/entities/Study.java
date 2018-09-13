@@ -83,6 +83,7 @@ public class Study extends Auditable<AccessionVersionEntityId> {
     @Column
     private boolean browsable;
 
+    @ApiModelProperty(position = 9)
     @JsonProperty
     @OneToMany
     private List<Study> linkedStudies;
