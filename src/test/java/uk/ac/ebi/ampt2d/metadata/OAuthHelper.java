@@ -57,7 +57,7 @@ public class OAuthHelper extends AuthorizationServerConfigurerAdapter {
         };
     }
 
-    OAuth2AccessToken createAccessToken(final String clientId) {
+    private OAuth2AccessToken createAccessToken(final String clientId) {
         ClientDetails client = clientDetailsService.loadClientByClientId(clientId);
         Collection<GrantedAuthority> authorities = client.getAuthorities();
         Set<String> resourceIds = client.getResourceIds();

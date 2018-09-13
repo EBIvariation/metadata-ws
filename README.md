@@ -32,7 +32,8 @@ eg : used for testing ,
 ```
 curl \
 –request POST \
-–data “code=[Authentcation code from authorization link]&client_id=[Application Client Id]&client_secret=[Application Client Secret]&redirect_uri=urn:ietf:wg:oauth:2.0:oob&grant_type=authorization_code” \
+–data “code=[Authentication code from authorization link]&client_id=[Application Client 
+Id]&client_secret=[Application Client Secret]&redirect_uri=urn:ietf:wg:oauth:2.0:oob&grant_type=authorization_code” \
 https://accounts.google.com/o/oauth2/token  
 ```
 
@@ -60,7 +61,7 @@ curl \
 https://accounts.google.com/o/oauth2/token
 ```
 
-The response will be slightly diffrent this time.  You wont get a new Refresh token.
+The response will be slightly different this time.  You wont get a new Refresh token.
 
 ``` 
 {
@@ -72,7 +73,7 @@ The response will be slightly diffrent this time.  You wont get a new Refresh to
 ```
 
 #### Accessing the endpoints
-  Root url / is a unsecured service that can be accesed with a get petition, i.e.
+  Root url / is a unsecured service that can be accesed with a get request, i.e.
 
 ```
 curl <host>:<port>/
