@@ -59,7 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(properties = "security.enabled=true")
 @AutoConfigureJsonTesters
 @AutoConfigureMockMvc
 public class MetadataApplicationTest {

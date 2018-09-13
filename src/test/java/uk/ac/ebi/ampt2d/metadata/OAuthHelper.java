@@ -44,10 +44,10 @@ import java.util.Set;
 public class OAuthHelper extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
-    AuthorizationServerTokenServices tokenservice;
+    private AuthorizationServerTokenServices tokenservice;
 
     @Autowired
-    ClientDetailsService clientDetailsService;
+    private ClientDetailsService clientDetailsService;
 
     public RequestPostProcessor bearerToken(final String clientid) {
         return mockRequest -> {
