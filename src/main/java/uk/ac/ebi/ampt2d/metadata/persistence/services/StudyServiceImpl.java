@@ -123,10 +123,10 @@ public class StudyServiceImpl implements StudyService {
         List<Study> parents = findParentStudy(study);
         parents.forEach(parent->{
             studies.add(parent);
-            studies.addAll(parent.getLinkedStudies());
+            studies.addAll(parent.getChildStudies());
         });
 
-        studies.addAll(study.getLinkedStudies());
+        studies.addAll(study.getChildStudies());
 
         return studies.stream()
                 .filter(study1 -> !study1.getId().equals(id))
@@ -135,7 +135,7 @@ public class StudyServiceImpl implements StudyService {
 
     private List<Study> findParentStudy(Study child) {
         QStudy study = QStudy.study;
-        Predicate predicate = study.linkedStudies.any().eq(child);
+        Predicate predicate = study.childStudies.any().eq(child);
 
         return findStudiesByPredicate(predicate);
     }

@@ -86,7 +86,7 @@ public class Study extends Auditable<AccessionVersionEntityId> {
     @ApiModelProperty(position = 9)
     @JsonProperty
     @OneToMany
-    private List<Study> linkedStudies;
+    private List<Study> childStudies;
 
     @OneToMany(mappedBy = "study")
     private List<Analysis> analyses;
@@ -109,8 +109,8 @@ public class Study extends Auditable<AccessionVersionEntityId> {
         return releaseDate;
     }
 
-    public List<Study> getLinkedStudies() {
-        return linkedStudies;
+    public List<Study> getChildStudies() {
+        return childStudies;
     }
 
 }

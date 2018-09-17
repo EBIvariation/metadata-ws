@@ -1195,7 +1195,7 @@ public class MetadataApplicationTest {
 
         mockMvc.perform(patch(testStudy1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"linkedStudies\":" +
+                .content("{ \"childStudies\":" +
                         testListJson.write(Arrays.asList(testStudy2, testStudy3)).getJson() +
                         "}"))
                 .andExpect(status().is2xxSuccessful());
@@ -1222,7 +1222,7 @@ public class MetadataApplicationTest {
         String nonexistent = testStudy1.replace("testhuman", "testmouse");
         mockMvc.perform(patch(testStudy1)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"linkedStudies\":" +
+                .content("{ \"childStudies\":" +
                         testListJson.write(Arrays.asList(nonexistent)).getJson() +
                         "}"))
                 .andExpect(status().is2xxSuccessful());
