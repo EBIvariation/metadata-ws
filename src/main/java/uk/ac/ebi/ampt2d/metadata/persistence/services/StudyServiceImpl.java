@@ -26,8 +26,12 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class StudyServiceImpl implements StudyService {
 
@@ -103,6 +107,35 @@ public class StudyServiceImpl implements StudyService {
         QStudy study = QStudy.study;
         Predicate predicate = study.taxonomy.name.equalsIgnoreCase(name).
                 or(study.taxonomy.ancestors.any().name.equalsIgnoreCase(name));
+
+        return findStudiesByPredicate(predicate);
+    }
+
+    @Override
+    public List<Study> findLinkedStudies(AccessionVersionEntityId id) {
+        Study study = studyRepository.findOne(id);
+        if ( study == null ) {
+            return Arrays.asList();
+        }
+
+        Set<Study> studies = new HashSet<>();
+
+        List<Study> parents = findParentStudy(study);
+        parents.forEach(parent->{
+            studies.add(parent);
+            studies.addAll(parent.getChildStudies());
+        });
+
+        studies.addAll(study.getChildStudies());
+
+        return studies.stream()
+                .filter(study1 -> !study1.getId().equals(id))
+                .collect(Collectors.toList());
+    }
+
+    private List<Study> findParentStudy(Study child) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.childStudies.any().eq(child);
 
         return findStudiesByPredicate(predicate);
     }
