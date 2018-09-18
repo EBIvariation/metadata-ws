@@ -1189,7 +1189,7 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void withOutOAuthToken() throws Exception {
+    public void withoutOAuthToken() throws Exception {
         // Any url other than root and swagger is Secured
         mockMvc.perform(get("/taxonomies")).andExpect(status().isUnauthorized());
         mockMvc.perform(get("/studies")).andExpect(status().isUnauthorized());
