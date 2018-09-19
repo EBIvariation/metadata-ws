@@ -62,7 +62,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>9.4-1206-jdbc42</version>
+            <version>42.2.5</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -110,7 +110,7 @@
             <version>2.9.2</version>
         </dependency>
     </dependencies>
-    
+
     <build>
         <directory>${buildDirectory}</directory>
         <plugins>
