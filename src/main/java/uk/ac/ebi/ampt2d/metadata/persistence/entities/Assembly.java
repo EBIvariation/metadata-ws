@@ -48,8 +48,10 @@ public class Assembly  extends Auditable<Long> {
     private String name;
 
     @ApiModelProperty(position = 3, required = true)
+    @Size(min = 1, max = 255)
+    @NotNull
     @JsonProperty
-    @Column(nullable = true)
+    @Column(nullable = false)
     private String patch;
 
     @ApiModelProperty(position = 4, required = true)
