@@ -124,6 +124,14 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.name").value("GRCh37"));
     }
 
+    @Test
+    public void errorWhenCreatingAssemblyWithEmptyPatch() throws Exception {
+        Assembly testAssembly = new Assembly("GRCh37", "", Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+
+        mockMvc.perform(post("/assemblies").content(testAssemblyJson.write(testAssembly).getJson()))
+                .andExpect(status().is4xxClientError());
+    }
+
     private String postTestAssembly(String name, String patch, List<String> accessions) throws Exception {
         Assembly testAssembly = new Assembly(name, patch, accessions);
 
