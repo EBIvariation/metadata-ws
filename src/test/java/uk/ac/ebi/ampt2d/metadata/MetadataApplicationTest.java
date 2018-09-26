@@ -306,6 +306,15 @@ public class MetadataApplicationTest {
     }
 
     @Test
+    public void postWebResourceNullURL() throws Exception {
+        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "");
+
+        mockMvc.perform(post("/webResources")
+                .content(testWebResourceJson.write(testWebResource).getJson()))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
     public void findAssemblyByName() throws Exception {
         String grch37Url = postTestAssembly("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));

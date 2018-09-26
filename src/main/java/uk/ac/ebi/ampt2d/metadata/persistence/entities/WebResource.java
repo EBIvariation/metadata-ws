@@ -19,6 +19,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.URL;
 
 import javax.persistence.Column;
@@ -29,6 +30,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Entity
 public class WebResource extends Auditable<Long> {
@@ -61,6 +63,8 @@ public class WebResource extends Auditable<Long> {
     @URL
     @JsonProperty
     @Column(nullable = false, columnDefinition = "TEXT")
+    @NotEmpty
+    @Pattern(message = "Must be a valid URL.", regexp="^(https?|ftp|file):(//|\\\\)[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")
     private String resourceUrl;
 
     WebResource() {}
