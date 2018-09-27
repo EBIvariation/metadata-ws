@@ -306,12 +306,19 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void postWebResourceNullURL() throws Exception {
+    public void postWebResourceInvalidURL() throws Exception {
         WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "");
 
         mockMvc.perform(post("/webResources")
                 .content(testWebResourceJson.write(testWebResource).getJson()))
                 .andExpect(status().is4xxClientError());
+
+        testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "https://www.ebi.ac.uk<>");
+
+        mockMvc.perform(post("/webResources")
+                .content(testWebResourceJson.write(testWebResource).getJson()))
+                .andExpect(status().is4xxClientError());
+
     }
 
     @Test
