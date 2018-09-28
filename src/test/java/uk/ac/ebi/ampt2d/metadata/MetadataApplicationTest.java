@@ -293,34 +293,6 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.type").value("CENTER_WEB"))
                 .andExpect(jsonPath("$.resourceUrl").value("http:\\www.ebi.ac.uk"));
-
-        location = postTestHTTPWebResource();
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type").value("CENTER_WEB"))
-                .andExpect(jsonPath("$.resourceUrl").value("http://api.plos.org/search?q=title:%22Drosophila%22%20and%20body:%22RNA%22&fl=id,abstract"));
-
-        location = postTestHTTPSWebResource();
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type").value("CENTER_WEB"))
-                .andExpect(jsonPath("$.resourceUrl").value("https://localhost:8090/swagger-ui.html#/WebResource_Entity/saveWebResourceUsingPOST"));
-
-        location = postTestFTPWebResource();
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type").value("CENTER_WEB"))
-                .andExpect(jsonPath("$.resourceUrl").value("ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.study.xsd"));
-
-        location = postTestComplexWebResource();
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type").value("CENTER_WEB"))
-                .andExpect(jsonPath("$.resourceUrl").value("http://MVSXX.COMPANY.COM:04445/CICSPLEXSM//JSMITH/VIEW/OURLOCTRAN?A_TRANID=P*&O_TRANID=NE"));
     }
 
     private String postTestWebResource() throws Exception {
@@ -333,79 +305,66 @@ public class MetadataApplicationTest {
         return mvcResult.getResponse().getHeader("Location");
     }
 
-    private String postTestHTTPWebResource() throws Exception {
-        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "http://api.plos.org/search?q=title:%22Drosophila%22%20and%20body:%22RNA%22&fl=id,abstract");
-
-        MvcResult mvcResult = mockMvc.perform(post("/webResources")
-                .content(testWebResourceJson.write(testWebResource).getJson()))
-                .andExpect(status().isCreated()).andReturn();
-
-        return mvcResult.getResponse().getHeader("Location");
-    }
-
-    private String postTestHTTPSWebResource() throws Exception {
-        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "https://localhost:8090/swagger-ui.html#/WebResource_Entity/saveWebResourceUsingPOST");
-
-        MvcResult mvcResult = mockMvc.perform(post("/webResources")
-                .content(testWebResourceJson.write(testWebResource).getJson()))
-                .andExpect(status().isCreated()).andReturn();
-
-        return mvcResult.getResponse().getHeader("Location");
-    }
-
-    private String postTestFTPWebResource() throws Exception {
-        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.study.xsd");
-
-        MvcResult mvcResult = mockMvc.perform(post("/webResources")
-                .content(testWebResourceJson.write(testWebResource).getJson()))
-                .andExpect(status().isCreated()).andReturn();
-
-        return mvcResult.getResponse().getHeader("Location");
-    }
-
-    private String postTestComplexWebResource() throws Exception {
-        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "http://MVSXX.COMPANY.COM:04445/CICSPLEXSM//JSMITH/VIEW/OURLOCTRAN?A_TRANID=P*&O_TRANID=NE");
-
-        MvcResult mvcResult = mockMvc.perform(post("/webResources")
-                .content(testWebResourceJson.write(testWebResource).getJson()))
-                .andExpect(status().isCreated()).andReturn();
-
-        return mvcResult.getResponse().getHeader("Location");
-    }
-
     @Test
-    public void postWebResourceInvalidURL() throws Exception {
-        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "");
+    public void validateWebResourceURL() throws Exception {
+        // Valid URLs
+        // HTTP protocol
+        String url = "http://api.plos.org/search?q=title:%22Drosophila%22%20and%20body:%22RNA%22&fl=id,abstract";
+        postWebResourceValidURL(url);
+
+        // HTTPS protocol
+        url = "https://localhost:8090/swagger-ui.html#/WebResource_Entity/saveWebResourceUsingPOST";
+        postWebResourceValidURL(url);
+
+        // FTP protocol
+        url = "ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.study.xsd";
+        postWebResourceValidURL(url);
+
+        // Complex URL
+        url = "http://MVSXX.COMPANY.COM:04445/CICSPLEXSM//JSMITH/VIEW/OURLOCTRAN?A_TRANID=P*&O_TRANID=NE";
+        postWebResourceValidURL(url);
+
+        // Invalid URLs
+        // Blank URL
+        url = "";
+        postWebResourceInvalidURL(url);
+
+        // Wrong protocol
+        url = "htttps://www.ebi.ac.uk";
+        postWebResourceInvalidURL(url);
+
+        // Without protocol
+        url = "www.google.com";
+        postWebResourceInvalidURL(url);
+
+        // Invalid characters
+        url = "http://www.space address.org";
+        postWebResourceInvalidURL(url);
+
+        // File resource
+        url = "//fileserver/code/src/main/app.java";
+        postWebResourceInvalidURL(url);
+    }
+
+    private void postWebResourceValidURL(String url) throws Exception {
+        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, url);
+
+        MvcResult mvcResult = mockMvc.perform(post("/webResources")
+                .content(testWebResourceJson.write(testWebResource).getJson()))
+                .andExpect(status().isCreated()).andReturn();
+
+        mockMvc.perform(get(mvcResult.getResponse().getHeader("Location")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type").value("CENTER_WEB"))
+                .andExpect(jsonPath("$.resourceUrl").value(url));
+    }
+
+    private void postWebResourceInvalidURL(String url) throws Exception {
+        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, url);
 
         mockMvc.perform(post("/webResources")
                 .content(testWebResourceJson.write(testWebResource).getJson()))
                 .andExpect(status().is4xxClientError());
-
-        testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "htttps://www.ebi.ac.uk");
-
-        mockMvc.perform(post("/webResources")
-                .content(testWebResourceJson.write(testWebResource).getJson()))
-                .andExpect(status().is4xxClientError());
-
-        testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "www.google.com");
-
-        mockMvc.perform(post("/webResources")
-                .content(testWebResourceJson.write(testWebResource).getJson()))
-                .andExpect(status().is4xxClientError());
-
-        testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "http://www.space address.org");
-
-        mockMvc.perform(post("/webResources")
-                .content(testWebResourceJson.write(testWebResource).getJson()))
-                .andExpect(status().is4xxClientError());
-
-        testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "//fileserver/code/src/main/app.java");
-
-        mockMvc.perform(post("/webResources")
-                .content(testWebResourceJson.write(testWebResource).getJson()))
-                .andExpect(status().is4xxClientError());
-
-
     }
 
     @Test
