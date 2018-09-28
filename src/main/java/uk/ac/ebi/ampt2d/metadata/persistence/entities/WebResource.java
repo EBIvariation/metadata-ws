@@ -62,7 +62,7 @@ public class WebResource extends Auditable<Long> {
     @JsonProperty
     @Column(nullable = false, columnDefinition = "TEXT")
     @NotEmpty
-    @Pattern(message = "Must be a valid URL.", regexp="(^(https?|ftp):(//|\\\\))[-a-zA-Z0-9+&@#/%?=~_|!:,.;$'*\\[\\]()]+")
+    @Pattern(message = "Must be a valid URL.", regexp="(^(https?|ftp):(//|\\\\))[-a-zA-Z0-9+&@#/%?=~_|!:,.;$'`*\\[\\]()]+")
     private String resourceUrl;
 
     WebResource() {}
