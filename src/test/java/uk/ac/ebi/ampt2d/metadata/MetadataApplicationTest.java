@@ -306,6 +306,68 @@ public class MetadataApplicationTest {
     }
 
     @Test
+    public void validateWebResourceURL() throws Exception {
+        // Valid URLs
+        // HTTP protocol
+        String url = "http://api.plos.org/search?q=title:%22Drosophila%22%20and%20body:%22RNA%22&fl=id,abstract";
+        postWebResourceValidURL(url);
+
+        // HTTPS protocol
+        url = "https://localhost:8090/swagger-ui.html#/WebResource_Entity/saveWebResourceUsingPOST";
+        postWebResourceValidURL(url);
+
+        // FTP protocol
+        url = "ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.study.xsd";
+        postWebResourceValidURL(url);
+
+        // Complex URL
+        url = "http://MVSXX.COMPANY.COM:04445/CICSPLEXSM//JSMITH/VIEW/OURLOCTRAN?A_TRANID=P*&O_TRANID=NE";
+        postWebResourceValidURL(url);
+
+        // Invalid URLs
+        // Blank URL
+        url = "";
+        postWebResourceInvalidURL(url);
+
+        // Wrong protocol
+        url = "htttps://www.ebi.ac.uk";
+        postWebResourceInvalidURL(url);
+
+        // Without protocol
+        url = "www.google.com";
+        postWebResourceInvalidURL(url);
+
+        // Invalid characters
+        url = "http://www.space address.org";
+        postWebResourceInvalidURL(url);
+
+        // File resource
+        url = "//fileserver/code/src/main/app.java";
+        postWebResourceInvalidURL(url);
+    }
+
+    private void postWebResourceValidURL(String url) throws Exception {
+        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, url);
+
+        MvcResult mvcResult = mockMvc.perform(post("/webResources")
+                .content(testWebResourceJson.write(testWebResource).getJson()))
+                .andExpect(status().isCreated()).andReturn();
+
+        mockMvc.perform(get(mvcResult.getResponse().getHeader("Location")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.type").value("CENTER_WEB"))
+                .andExpect(jsonPath("$.resourceUrl").value(url));
+    }
+
+    private void postWebResourceInvalidURL(String url) throws Exception {
+        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, url);
+
+        mockMvc.perform(post("/webResources")
+                .content(testWebResourceJson.write(testWebResource).getJson()))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
     public void findAssemblyByName() throws Exception {
         String grch37Url = postTestAssembly("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
