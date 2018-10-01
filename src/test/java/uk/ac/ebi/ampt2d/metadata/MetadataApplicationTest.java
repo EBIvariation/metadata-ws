@@ -51,10 +51,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -1293,6 +1296,16 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
+    }
+
+    @Test
+    public void testCORS() throws Exception {
+        mockMvc.perform(options("/")
+                .header("Access-Control-Request-Method", "GET")
+                .header("Origin", "http://www.evil-url.com"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", "http://www.evil-url.com"))
+                .andExpect(header().string("Allow", containsString("GET")));
     }
 
 }
