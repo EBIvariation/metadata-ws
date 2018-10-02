@@ -16,7 +16,8 @@ pipeline {
     productionHost = credentials('PRODUCTIONHOST')
   }
   parameters {
-    choice(choices: ['validate', 'create'], description: 'Behaviour at connection time (initialize/validate schema)',name: 'dbBehaviour')
+    choice(choices: ['validate', 'create'], description: 'Behaviour at connection time (initialize/validate schema)',
+     name: 'dbBehaviour')
     booleanParam(name: 'DeployToStaging' , defaultValue: false , description: '')
     booleanParam(name: 'DeployToProduction' , defaultValue: false , description: '')
   }
@@ -24,7 +25,7 @@ pipeline {
     stage('Default Build pointing to Staging DB') {
       steps {
         sh "mvn clean package -DskipTests -DbuildDirectory=staging/target -Dmetadata-dbUrl=${stagingPostgresDbUrl} \
-        -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword}
+        -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword} \
         -Dmetadata-ddlBehaviour=${dbBehaviour}"
       }
     }
@@ -37,10 +38,12 @@ pipeline {
       steps {
         echo 'Build pointing to FallBack DB'
         sh "mvn clean package -DskipTests -DbuildDirectory=fallback/target -Dmetadata-dbUrl=${fallBackPostgresDbUrl} \
-        -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword} -Dmetadata-ddlBehaviour=${dbBehaviour}"
+         -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword}  \
+        -Dmetadata-ddlBehaviour=${dbBehaviour}"
         echo 'Build pointing to Production DB'
         sh "mvn clean package -DskipTests -DbuildDirectory=production/target \
-        -Dmetadata-dbUrl=${productionPostgresDbUrl} -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword} -Dmetadata-ddlBehaviour=${dbBehaviour}"
+        -Dmetadata-dbUrl=${productionPostgresDbUrl} -Dmetadata-dbUsername=${postgresDBUserName} \
+        -Dmetadata-dbPassword=${postgresDBPassword} -Dmetadata-ddlBehaviour=${dbBehaviour}"
       }
     }
     stage('Deploy To Staging') {
@@ -51,7 +54,9 @@ pipeline {
       }
       steps {
         echo 'Deploying to Staging'
-        sh "curl --upload-file staging/target/metadata-ws-*.war 'http://'${tomcatCredentials}'@'${stagingHost}':8080/manager/text/deploy?path=/metadata&update=true' | grep 'OK - Deployed application at context path '"
+        sh "curl --upload-file staging/target/metadata-ws-*.war \
+        'http://'${tomcatCredentials}'@'${stagingHost}':8080/manager/text/deploy?path=/metadata&update=true' | \
+        grep 'OK - Deployed application at context path '"
       }
     }
     stage('Deploy To FallBack And Production') {
@@ -62,9 +67,13 @@ pipeline {
       }
       steps {
         echo 'Deploying to Fallback'
-        sh "curl --upload-file fallback/target/metadata-ws-*.war 'http://'${tomcatCredentials}'@'${fallbackHost}':8080/manager/text/deploy?path=/metadata&update=true' | grep 'OK - Deployed application at context path '"
+        sh "curl --upload-file fallback/target/metadata-ws-*.war \
+        'http://'${tomcatCredentials}'@'${fallbackHost}':8080/manager/text/deploy?path=/metadata&update=true' \
+        | grep 'OK - Deployed application at context path '"
         echo 'Deploying to Production'
-        sh "curl --upload-file production/target/metadata-ws-*.war 'http://'${tomcatCredentials}'@'${productionHost}':8080/manager/text/deploy?path=/metadata&update=true' | grep 'OK - Deployed application at context path '"
+        sh "curl --upload-file production/target/metadata-ws-*.war \
+        'http://'${tomcatCredentials}'@'${productionHost}':8080/manager/text/deploy?path=/metadata&update=true' \
+        | grep 'OK - Deployed application at context path '"
         archiveArtifacts artifacts: 'production/target/metadata-ws-*.war' , fingerprint: true
       }
     }
