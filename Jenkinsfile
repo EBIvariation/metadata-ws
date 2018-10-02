@@ -16,13 +16,17 @@ pipeline {
     productionHost = credentials('PRODUCTIONHOST')
   }
   parameters {
+    choice(choices: ['validate', 'create'], description: 'Behaviour at connection time (initialize/validate schema)',
+          name: 'dbBehaviour')
     booleanParam(name: 'DeployToStaging' , defaultValue: false , description: '')
     booleanParam(name: 'DeployToProduction' , defaultValue: false , description: '')
   }
   stages {
     stage('Default Build pointing to Staging DB') {
       steps {
-        sh "mvn clean package -DskipTests -DbuildDirectory=staging/target -Dmetadata-dbUrl=${stagingPostgresDbUrl} -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword}"
+        sh "mvn clean package -DskipTests -DbuildDirectory=staging/target -Dmetadata-dbUrl=${stagingPostgresDbUrl}
+        -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword}
+        -Dmetadata-ddlBehaviour=${dbBehaviour}"
       }
     }
     stage('Build For FallBack And Production') {
@@ -33,9 +37,11 @@ pipeline {
       }
       steps {
         echo 'Build pointing to FallBack DB'
-        sh "mvn clean package -DskipTests -DbuildDirectory=fallback/target -Dmetadata-dbUrl=${fallBackPostgresDbUrl} -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword}"
+        sh "mvn clean package -DskipTests -DbuildDirectory=fallback/target -Dmetadata-dbUrl=${fallBackPostgresDbUrl}
+        -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword} -Dmetadata-ddlBehaviour=${dbBehaviour}"
         echo 'Build pointing to Production DB'
-        sh "mvn clean package -DskipTests -DbuildDirectory=production/target -Dmetadata-dbUrl=${productionPostgresDbUrl} -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword}"
+        sh "mvn clean package -DskipTests -DbuildDirectory=production/target
+        -Dmetadata-dbUrl=${productionPostgresDbUrl} -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword} -Dmetadata-ddlBehaviour=${dbBehaviour}"
       }
     }
     stage('Deploy To Staging') {
