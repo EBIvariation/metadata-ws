@@ -6,8 +6,8 @@ pipeline {
   }
   environment {
     stagingPostgresDbUrl = credentials('STAGINGMETADATAWSDBURL')
-    fallBackPostgresDbUrl = credentials('STAGINGMETADATAWSDBURL')
-    productionPostgresDbUrl = credentials('STAGINGMETADATAWSDBURL')
+    fallBackPostgresDbUrl = credentials('FALLBACKMETADATAWSDBURL')
+    productionPostgresDbUrl = credentials('PRODMETADATAWSDBURL')
     postgresDBUserName = credentials('POSTGRESDBUSERNAME')
     postgresDBPassword = credentials('POSTGRESDBPASSWORD')
     tomcatCredentials = credentials('TOMCATCREDENTIALS')
