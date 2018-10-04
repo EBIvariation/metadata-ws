@@ -130,7 +130,7 @@ public class MetadataApplicationTest {
     private String postTestAssembly(String name, String patch, List<String> accessions) throws Exception {
         ReferenceSequence testReferenceSequence = new ReferenceSequence(name, patch, accessions);
 
-        MvcResult mvcResult = mockMvc.perform(post("/assemblies")
+        MvcResult mvcResult = mockMvc.perform(post("/referenceSequences")
                 .content(testAssemblyJson.write(testReferenceSequence).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
@@ -238,7 +238,7 @@ public class MetadataApplicationTest {
                         "\"name\": \"test_human_analysis\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"study\": \"" + studyUrl + "\"," +
-                        "\"assembly\": \"" + assemblyUrl + "\"," +
+                        "\"referenceSequence\": \"" + assemblyUrl + "\"," +
                         "\"technology\": \"" + technology + "\"," +
                         "\"type\": \"" + type + "\"," +
                         "\"platform\": \"" + platform + "\"" +
@@ -377,26 +377,26 @@ public class MetadataApplicationTest {
         String grch38Url = postTestAssembly("GRCh38", "p2",
                 Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37"))
+        mockMvc.perform(get("/referenceSequences/search?name=GRCh37"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
                 .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch37Url))
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh37"));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh38"))
+        mockMvc.perform(get("/referenceSequences/search?name=GRCh38"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
                 .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch38Url))
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh38"));
 
-        mockMvc.perform(get("/assemblies/search?name=NCBI36"))
+        mockMvc.perform(get("/referenceSequences/search?name=NCBI36"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p2"))
+        mockMvc.perform(get("/referenceSequences/search?name=GRCh37&patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -404,7 +404,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh37"))
                 .andExpect(jsonPath("$..assemblies[0].patch").value("p2"));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh38&patch=p2"))
+        mockMvc.perform(get("/referenceSequences/search?name=GRCh38&patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -412,22 +412,22 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..assemblies[0].name").value("GRCh38"))
                 .andExpect(jsonPath("$..assemblies[0].patch").value("p2"));
 
-        mockMvc.perform(get("/assemblies/search?name=NCBI36&patch=p2"))
+        mockMvc.perform(get("/referenceSequences/search?name=NCBI36&patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p3"))
+        mockMvc.perform(get("/referenceSequences/search?name=GRCh37&patch=p3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh38&patch=p3"))
+        mockMvc.perform(get("/referenceSequences/search?name=GRCh38&patch=p3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?accessions=GCA_000001405.3"))
+        mockMvc.perform(get("/referenceSequences/search?accessions=GCA_000001405.3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -435,7 +435,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..assemblies[0].accessions").isArray())
                 .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItems("GCA_000001405.3")));
 
-        mockMvc.perform(get("/assemblies/search?accessions=GCF_000001405.28"))
+        mockMvc.perform(get("/referenceSequences/search?accessions=GCF_000001405.28"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -443,12 +443,12 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..assemblies[0].accessions").isArray())
                 .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItems("GCF_000001405.28")));
 
-        mockMvc.perform(get("/assemblies/search?accessions=GCA_000001405.2"))
+        mockMvc.perform(get("/referenceSequences/search?accessions=GCA_000001405.2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p2&accessions=GCA_000001405.3"))
+        mockMvc.perform(get("/referenceSequences/search?name=GRCh37&patch=p2&accessions=GCA_000001405.3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(1))
@@ -458,7 +458,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..assemblies[0].patch").value("p2"))
                 .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItems("GCA_000001405.3")));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p3&accessions=GCA_000001405.3"))
+        mockMvc.perform(get("/referenceSequences/search?name=GRCh37&patch=p3&accessions=GCA_000001405.3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..assemblies").isArray())
                 .andExpect(jsonPath("$..assemblies.length()").value(0));

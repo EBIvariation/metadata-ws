@@ -29,10 +29,10 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.QReferenceSequence;
 public interface ReferenceSequenceRepository extends PagingAndSortingRepository<ReferenceSequence, Long>,
         QueryDslPredicateExecutor<ReferenceSequence>, QuerydslBinderCustomizer<QReferenceSequence> {
 
-    default void customize(QuerydslBindings bindings, QReferenceSequence assembly) {
-        bindings.bind(assembly.name, assembly.patch)
+    default void customize(QuerydslBindings bindings, QReferenceSequence referenceSequence) {
+        bindings.bind(referenceSequence.name, referenceSequence.patch)
                 .first((path, value) -> path.equalsIgnoreCase(value));
-        bindings.bind(assembly.accessions)
+        bindings.bind(referenceSequence.accessions)
                 .first((path, value) -> path.any().equalsIgnoreCase(value.iterator().next()));
     }
 
