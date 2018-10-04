@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.AssemblyResource;
 
@@ -43,10 +43,10 @@ import java.util.List;
 @RestController
 @Api(tags = "ReferenceSequence Entity")
 @RequestMapping(path = "assemblies")
-public class AssemblyRestController implements ResourceProcessor<RepositoryLinksResource> {
+public class ReferenceSequenceRestController implements ResourceProcessor<RepositoryLinksResource> {
 
     @Autowired
-    private AssemblyRepository assemblyRepository;
+    private ReferenceSequenceRepository referenceSequenceRepository;
 
     @Autowired
     private GenericResourceAssembler<ReferenceSequence, AssemblyResource> resourceAssembler;
@@ -61,7 +61,7 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
     @ResponseBody
     @SuppressWarnings("unchecked")
     public ResponseEntity<Resources<AssemblyResource>> search(@QuerydslPredicate(root = ReferenceSequence.class) Predicate predicate) {
-        List<ReferenceSequence> assemblies = (List<ReferenceSequence>) assemblyRepository.findAll(predicate);
+        List<ReferenceSequence> assemblies = (List<ReferenceSequence>) referenceSequenceRepository.findAll(predicate);
 
         Resources<AssemblyResource> resources = (Resources<AssemblyResource>) resourceAssembler.toResources(ReferenceSequence.class, assemblies);
 
@@ -70,7 +70,7 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
-        resource.add(ControllerLinkBuilder.linkTo(AssemblyRestController.class).slash("/search").withRel("assemblies"));
+        resource.add(ControllerLinkBuilder.linkTo(ReferenceSequenceRestController.class).slash("/search").withRel("assemblies"));
         return resource;
     }
 

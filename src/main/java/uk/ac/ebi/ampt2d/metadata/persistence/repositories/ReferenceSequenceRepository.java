@@ -26,7 +26,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QReferenceSequence;
 
 @RepositoryRestResource
-public interface AssemblyRepository extends PagingAndSortingRepository<ReferenceSequence, Long>,
+public interface ReferenceSequenceRepository extends PagingAndSortingRepository<ReferenceSequence, Long>,
         QueryDslPredicateExecutor<ReferenceSequence>, QuerydslBinderCustomizer<QReferenceSequence> {
 
     default void customize(QuerydslBindings bindings, QReferenceSequence assembly) {

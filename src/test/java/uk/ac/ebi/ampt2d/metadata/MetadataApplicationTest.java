@@ -38,7 +38,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
@@ -74,7 +74,7 @@ public class MetadataApplicationTest {
     private AnalysisRepository analysisRepository;
 
     @Autowired
-    private AssemblyRepository assemblyRepository;
+    private ReferenceSequenceRepository referenceSequenceRepository;
 
     @Autowired
     private FileRepository fileRepository;
@@ -109,7 +109,7 @@ public class MetadataApplicationTest {
     @Before
     public void cleanDatabases() throws Exception {
         analysisRepository.deleteAll();
-        assemblyRepository.deleteAll();
+        referenceSequenceRepository.deleteAll();
         fileRepository.deleteAll();
         sampleRepository.deleteAll();
         studyRepository.deleteAll();
