@@ -32,9 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Assembly  extends Auditable<Long> {
+public class ReferenceSequence extends Auditable<Long> {
 
-    @ApiModelProperty(position = 1, value = "Assembly auto generated id", required = true, readOnly = true)
+    @ApiModelProperty(position = 1, value = "ReferenceSequence auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -58,9 +58,9 @@ public class Assembly  extends Auditable<Long> {
     @ElementCollection
     private List<String> accessions = new ArrayList<String>();
 
-    Assembly() {}
+    ReferenceSequence() {}
 
-    public Assembly(String name, String patch, List<String> accessions) {
+    public ReferenceSequence(String name, String patch, List<String> accessions) {
         this.name = name;
         this.patch = patch;
         this.accessions = accessions;

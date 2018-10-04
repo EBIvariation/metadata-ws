@@ -31,8 +31,8 @@ public interface StudyRepository extends PagingAndSortingRepository<Study, Acces
         QueryDslPredicateExecutor<Study>, QuerydslBinderCustomizer<QStudy> {
 
     default void customize(QuerydslBindings bindings, QStudy study) {
-        bindings.bind(study.analyses.any().assembly.name,
-                study.analyses.any().assembly.patch)
+        bindings.bind(study.analyses.any().referenceSequence.name,
+                study.analyses.any().referenceSequence.patch)
                 .first((path, value) -> path.equalsIgnoreCase(value));
     }
 

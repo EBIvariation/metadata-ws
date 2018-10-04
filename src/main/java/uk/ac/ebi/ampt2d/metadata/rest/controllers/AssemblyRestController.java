@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.AssemblyResource;
@@ -41,7 +41,7 @@ import uk.ac.ebi.ampt2d.metadata.rest.resources.AssemblyResource;
 import java.util.List;
 
 @RestController
-@Api(tags = "Assembly Entity")
+@Api(tags = "ReferenceSequence Entity")
 @RequestMapping(path = "assemblies")
 public class AssemblyRestController implements ResourceProcessor<RepositoryLinksResource> {
 
@@ -49,7 +49,7 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
     private AssemblyRepository assemblyRepository;
 
     @Autowired
-    private GenericResourceAssembler<Assembly, AssemblyResource> resourceAssembler;
+    private GenericResourceAssembler<ReferenceSequence, AssemblyResource> resourceAssembler;
 
     @ApiOperation(value="Get a filtered list of assemblies based on filtering criteria")
     @ApiImplicitParams({
@@ -60,10 +60,10 @@ public class AssemblyRestController implements ResourceProcessor<RepositoryLinks
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public ResponseEntity<Resources<AssemblyResource>> search(@QuerydslPredicate(root = Assembly.class) Predicate predicate) {
-        List<Assembly> assemblies = (List<Assembly>) assemblyRepository.findAll(predicate);
+    public ResponseEntity<Resources<AssemblyResource>> search(@QuerydslPredicate(root = ReferenceSequence.class) Predicate predicate) {
+        List<ReferenceSequence> assemblies = (List<ReferenceSequence>) assemblyRepository.findAll(predicate);
 
-        Resources<AssemblyResource> resources = (Resources<AssemblyResource>) resourceAssembler.toResources(Assembly.class, assemblies);
+        Resources<AssemblyResource> resources = (Resources<AssemblyResource>) resourceAssembler.toResources(ReferenceSequence.class, assemblies);
 
         return ResponseEntity.ok(resources);
     }

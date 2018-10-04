@@ -33,7 +33,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
@@ -92,7 +92,7 @@ public class MetadataApplicationTest {
     private WebResourceRepository webResourceRepository;
 
     @Autowired
-    private JacksonTester<Assembly> testAssemblyJson;
+    private JacksonTester<ReferenceSequence> testAssemblyJson;
 
     @Autowired
     private JacksonTester<File> testFileJson;
@@ -128,10 +128,10 @@ public class MetadataApplicationTest {
     }
 
     private String postTestAssembly(String name, String patch, List<String> accessions) throws Exception {
-        Assembly testAssembly = new Assembly(name, patch, accessions);
+        ReferenceSequence testReferenceSequence = new ReferenceSequence(name, patch, accessions);
 
         MvcResult mvcResult = mockMvc.perform(post("/assemblies")
-                .content(testAssemblyJson.write(testAssembly).getJson()))
+                .content(testAssemblyJson.write(testReferenceSequence).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
         return mvcResult.getResponse().getHeader("Location");

@@ -33,7 +33,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import uk.ac.ebi.ampt2d.metadata.aop.StudyDeprecationAspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
@@ -80,7 +80,7 @@ public class SpringDataRestConfig {
                 config.getCorsRegistry().addMapping("/**").allowedMethods("*").allowedOrigins("*");
                 config.exposeIdsFor(
                         Analysis.class,
-                        Assembly.class,
+                        ReferenceSequence.class,
                         File.class,
                         Sample.class,
                         Study.class,
@@ -118,8 +118,8 @@ public class SpringDataRestConfig {
     }
 
     @Bean
-    public GenericResourceAssembler<Assembly, AssemblyResource> assemblyResourceAssembler() {
-        return new GenericResourceAssembler<Assembly, AssemblyResource>(AssemblyRestController.class, AssemblyResource.class);
+    public GenericResourceAssembler<ReferenceSequence, AssemblyResource> assemblyResourceAssembler() {
+        return new GenericResourceAssembler<ReferenceSequence, AssemblyResource>(AssemblyRestController.class, AssemblyResource.class);
     }
 
     @Bean

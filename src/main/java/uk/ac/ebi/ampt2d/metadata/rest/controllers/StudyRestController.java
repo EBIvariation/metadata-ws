@@ -61,9 +61,9 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
 
     @ApiOperation(value = "Get a filtered list of studies based on filtering criteria")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "analyses.assembly.name", value = "Assembly's name", dataType = "string",
+            @ApiImplicitParam(name = "analyses.assembly.name", value = "ReferenceSequence's name", dataType = "string",
                     paramType = "query", example = "grch37"),
-            @ApiImplicitParam(name = "analyses.assembly.patch", value = "Assembly's patch number", dataType = "string",
+            @ApiImplicitParam(name = "analyses.assembly.patch", value = "ReferenceSequence's patch number", dataType = "string",
                     paramType = "query", example = "p2"),
             @ApiImplicitParam(name = "analyses.type", value = "Analysis's type", dataType = "string",
                     paramType = "query", example = "CASE_CONTROL")
