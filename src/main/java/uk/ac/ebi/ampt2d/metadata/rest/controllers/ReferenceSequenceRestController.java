@@ -55,7 +55,10 @@ public class ReferenceSequenceRestController implements ResourceProcessor<Reposi
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "name", dataType = "string", paramType = "query", example = "GRCh38"),
             @ApiImplicitParam(name = "patch", value = "patch number", dataType = "string", paramType = "query", example = "p2"),
-            @ApiImplicitParam(name = "accessions", value = "accession", dataType = "string", paramType = "query", example = "GCA_000001405.3")
+            @ApiImplicitParam(name = "accessions", value = "accession", dataType = "string", paramType = "query", example = "GCA_000001405.3"),
+            @ApiImplicitParam(name = "type", value = "ReferenceSequence's type", dataType = "string",
+                    paramType = "query", example = "ASSEMBLY",
+                    allowableValues = "ASSEMBLY,GENE,TRANSCRIPTOME")
     })
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody
