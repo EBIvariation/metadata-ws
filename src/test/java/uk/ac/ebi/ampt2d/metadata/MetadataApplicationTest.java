@@ -92,7 +92,7 @@ public class MetadataApplicationTest {
     private WebResourceRepository webResourceRepository;
 
     @Autowired
-    private JacksonTester<ReferenceSequence> testAssemblyJson;
+    private JacksonTester<ReferenceSequence> testReferenceSequenceJson;
 
     @Autowired
     private JacksonTester<File> testFileJson;
@@ -118,8 +118,8 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void postAssembly() throws Exception {
-        String location = postTestAssembly("GRCh37", "p2",
+    public void postReferenceSequence() throws Exception {
+        String location = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
 
         mockMvc.perform(get(location))
@@ -127,11 +127,11 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.name").value("GRCh37"));
     }
 
-    private String postTestAssembly(String name, String patch, List<String> accessions) throws Exception {
+    private String postTestReferenceSequence(String name, String patch, List<String> accessions) throws Exception {
         ReferenceSequence testReferenceSequence = new ReferenceSequence(name, patch, accessions);
 
         MvcResult mvcResult = mockMvc.perform(post("/referenceSequences")
-                .content(testAssemblyJson.write(testReferenceSequence).getJson()))
+                .content(testReferenceSequenceJson.write(testReferenceSequence).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
         return mvcResult.getResponse().getHeader("Location");
@@ -213,11 +213,11 @@ public class MetadataApplicationTest {
 
     @Test
     public void postAnalysis() throws Exception {
-        String assemblyUrl = postTestAssembly("GRCh37", "p2",
+        String referenceSequenceUrl = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
-        String location = postTestAnalysis("EGAA0001", assemblyUrl, studyUrl, Analysis.Technology.GWAS,
+        String location = postTestAnalysis("EGAA0001", referenceSequenceUrl, studyUrl, Analysis.Technology.GWAS,
                 Analysis.Type.CASE_CONTROL, "Illumina");
 
         mockMvc.perform(get(location))
@@ -225,12 +225,12 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.id.accession").value("EGAA0001"));
     }
 
-    private String postTestAnalysis(String accession, String assemblyUrl, String studyUrl) throws Exception {
-        return postTestAnalysis(accession, assemblyUrl, studyUrl, Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina");
+    private String postTestAnalysis(String accession, String referenceSequenceUrl, String studyUrl) throws Exception {
+        return postTestAnalysis(accession, referenceSequenceUrl, studyUrl, Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina");
 
     }
 
-    private String postTestAnalysis(String accession, String assemblyUrl, String studyUrl, Analysis.Technology
+    private String postTestAnalysis(String accession, String referenceSequenceUrl, String studyUrl, Analysis.Technology
             technology, Analysis.Type type, String platform) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/analyses")
                 .content("{ " +
@@ -238,7 +238,7 @@ public class MetadataApplicationTest {
                         "\"name\": \"test_human_analysis\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"study\": \"" + studyUrl + "\"," +
-                        "\"referenceSequence\": \"" + assemblyUrl + "\"," +
+                        "\"referenceSequence\": \"" + referenceSequenceUrl + "\"," +
                         "\"technology\": \"" + technology + "\"," +
                         "\"type\": \"" + type + "\"," +
                         "\"platform\": \"" + platform + "\"" +
@@ -371,10 +371,10 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void findAssemblyByName() throws Exception {
-        String grch37Url = postTestAssembly("GRCh37", "p2",
+    public void findReferenceSequenceByName() throws Exception {
+        String grch37Url = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String grch38Url = postTestAssembly("GRCh38", "p2",
+        String grch38Url = postTestReferenceSequence("GRCh38", "p2",
                 Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
 
         mockMvc.perform(get("/referenceSequences/search?name=GRCh37"))
@@ -536,13 +536,13 @@ public class MetadataApplicationTest {
     }
 
     private List<String> postTestAnalyses() throws Exception {
-        String humanAssemblyUrl = postTestAssembly("GRCh37", "p2",
+        String humanReferenceSequenceUrl = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         String humanStudyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
-        return Arrays.asList(postTestAnalysis("EGAA0001", humanAssemblyUrl, humanStudyUrl,
+        return Arrays.asList(postTestAnalysis("EGAA0001", humanReferenceSequenceUrl, humanStudyUrl,
                             Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina"),
-                postTestAnalysis("EGAA0002", humanAssemblyUrl, humanStudyUrl,
+                postTestAnalysis("EGAA0002", humanReferenceSequenceUrl, humanStudyUrl,
                                 Analysis.Technology.ARRAY, Analysis.Type.TUMOR, "PacBio"));
     }
 
@@ -554,15 +554,15 @@ public class MetadataApplicationTest {
 
     @Test
     public void findStudies() throws Exception {
-        String grch37AssemblyUrl = postTestAssembly("GRCh37", "p2",
+        String grch37ReferenceSequenceUrl = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String grch38AssemblyUrl = postTestAssembly("GRCh38", "p2",
+        String grch38ReferenceSequenceUrl = postTestReferenceSequence("GRCh38", "p2",
                 Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
         String grch37StudyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
         String grch38StudyUrl = postTestStudy("EGAS0001", 2, "test_human_study");
 
-        postTestAnalysis("EGAA0001", grch37AssemblyUrl, grch37StudyUrl);
-        postTestAnalysis("EGAA0002", grch38AssemblyUrl, grch38StudyUrl);
+        postTestAnalysis("EGAA0001", grch37ReferenceSequenceUrl, grch37StudyUrl);
+        postTestAnalysis("EGAA0002", grch38ReferenceSequenceUrl, grch38StudyUrl);
 
         mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh37"))
                 .andExpect(status().isOk())
@@ -993,17 +993,17 @@ public class MetadataApplicationTest {
     @Test
     public void metadataObjectsAreAuditable() throws Exception {
         ZonedDateTime startTime = ZonedDateTime.now();
-        String testAssembly = postTestAssembly("GRCh37", "p2",
+        String testReferenceSequence = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
         String testStudy = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
-        String testAnalysis = postTestAnalysis("testhuman", testAssembly, testStudy);
+        String testAnalysis = postTestAnalysis("testhuman", testReferenceSequence, testStudy);
         String testFile = postTestFile("testhuman", 1);
         String testSample = postTestSample("testhuman", "test human sample");
         String testWebResource = postTestWebResource();
         ZonedDateTime endTime = ZonedDateTime.now();
 
-        checkLastModifiedDate(testAssembly, "referenceSequence", startTime, endTime);
+        checkLastModifiedDate(testReferenceSequence, "referenceSequence", startTime, endTime);
         checkLastModifiedDate(testTaxonomy, "taxonomy", startTime, endTime);
         checkLastModifiedDate(testStudy, "study", startTime, endTime);
         checkLastModifiedDate(testAnalysis, "analysis", startTime, endTime);
@@ -1012,7 +1012,7 @@ public class MetadataApplicationTest {
         checkLastModifiedDate(testWebResource, "webResource", startTime, endTime);
 
         startTime = ZonedDateTime.now();
-        patchResource(testAssembly);
+        patchResource(testReferenceSequence);
         patchResource(testTaxonomy);
         patchResource(testStudy);
         patchResource(testAnalysis);
@@ -1023,7 +1023,7 @@ public class MetadataApplicationTest {
                 .andExpect(status().is2xxSuccessful());
         endTime = ZonedDateTime.now();
 
-        checkLastModifiedDate(testAssembly, "referenceSequence", startTime, endTime);
+        checkLastModifiedDate(testReferenceSequence, "referenceSequence", startTime, endTime);
         checkLastModifiedDate(testTaxonomy, "taxonomy", startTime, endTime);
         checkLastModifiedDate(testStudy, "study", startTime, endTime);
         checkLastModifiedDate(testAnalysis, "analysis", startTime, endTime);
@@ -1078,7 +1078,7 @@ public class MetadataApplicationTest {
     @Test
     public void findPublicStudiesOnly() throws Exception {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
-        String humanAssemblyUrl = postTestAssembly("GRCh37", "p2",
+        String humanReferenceSequenceUrl = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
@@ -1088,7 +1088,7 @@ public class MetadataApplicationTest {
         String todayReleasedStudyUrl = postTestStudy("1kg", 2, "1kg phase 1", humanTaxonomyUrl, today);
         String tomorrowReleasedStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, tomorrow);
 
-        String yesterdayReleasedAnalysisUrl = postTestAnalysis("analysisReleasedYesterday", humanAssemblyUrl, yesterdayReleasedStudyUrl);
+        String yesterdayReleasedAnalysisUrl = postTestAnalysis("analysisReleasedYesterday", humanReferenceSequenceUrl, yesterdayReleasedStudyUrl);
 
         mockMvc.perform(get("/studies"))
                 .andExpect(status().isOk())
