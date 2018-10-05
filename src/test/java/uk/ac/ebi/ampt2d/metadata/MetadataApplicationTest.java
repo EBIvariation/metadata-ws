@@ -128,13 +128,7 @@ public class MetadataApplicationTest {
     }
 
     private String postTestReferenceSequence(String name, String patch, List<String> accessions) throws Exception {
-        ReferenceSequence testReferenceSequence = new ReferenceSequence(name, patch, accessions, ReferenceSequence.Type.ASSEMBLY);
-
-        MvcResult mvcResult = mockMvc.perform(post("/referenceSequences")
-                .content(testReferenceSequenceJson.write(testReferenceSequence).getJson()))
-                .andExpect(status().isCreated()).andReturn();
-
-        return mvcResult.getResponse().getHeader("Location");
+        return postTestReferenceSequence(name, patch, accessions, ReferenceSequence.Type.ASSEMBLY);
     }
 
     private String postTestReferenceSequence(String name, String patch, List<String> accessions, ReferenceSequence.Type type) throws Exception {
@@ -483,23 +477,23 @@ public class MetadataApplicationTest {
         String grch39Url = postTestReferenceSequence("GRCh39", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
 
-        mockMvc.perform(get("/referenceSequences/search?type=ASSEMBLY"))
+        mockMvc.perform(get("/referenceSequences/search?type=" + ReferenceSequence.Type.ASSEMBLY.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..referenceSequences").isArray())
                 .andExpect(jsonPath("$..referenceSequences.length()").value(2))
                 .andExpect(jsonPath("$..referenceSequences[0]..referenceSequence.href").value(grch37Url))
                 .andExpect(jsonPath("$..referenceSequences[1]..referenceSequence.href").value(grch38Url))
-                .andExpect(jsonPath("$..referenceSequences[0].type").value("ASSEMBLY"))
-                .andExpect(jsonPath("$..referenceSequences[1].type").value("ASSEMBLY"));
+                .andExpect(jsonPath("$..referenceSequences[0].type").value(ReferenceSequence.Type.ASSEMBLY.toString()))
+                .andExpect(jsonPath("$..referenceSequences[1].type").value(ReferenceSequence.Type.ASSEMBLY.toString()));
 
-        mockMvc.perform(get("/referenceSequences/search?type=GENE"))
+        mockMvc.perform(get("/referenceSequences/search?type=" + ReferenceSequence.Type.GENE.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..referenceSequences").isArray())
                 .andExpect(jsonPath("$..referenceSequences.length()").value(1))
                 .andExpect(jsonPath("$..referenceSequences[0]..referenceSequence.href").value(grch39Url))
-                .andExpect(jsonPath("$..referenceSequences[0].type").value("GENE"));
+                .andExpect(jsonPath("$..referenceSequences[0].type").value(ReferenceSequence.Type.GENE.toString()));
 
-        mockMvc.perform(get("/referenceSequences/search?type=TRANSCRIPTOME"))
+        mockMvc.perform(get("/referenceSequences/search?type=" + ReferenceSequence.Type.TRANSCRIPTOME.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..referenceSequences").isArray())
                 .andExpect(jsonPath("$..referenceSequences.length()").value(0));
