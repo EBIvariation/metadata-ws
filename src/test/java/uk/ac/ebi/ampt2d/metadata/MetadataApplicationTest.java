@@ -1024,11 +1024,11 @@ public class MetadataApplicationTest {
 
     private void checkLastModifiedDate(String url, String type, ZonedDateTime startTime, ZonedDateTime endTime)
             throws Exception {
-//        mockMvc.perform(get(url))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.." + type + ".href").value(url))
-//                .andExpect(jsonPath("$.lastModifiedDate").isNotEmpty())
-//                .andExpect(isLastModifiedDateBetween(startTime, endTime));
+        mockMvc.perform(get(url))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.." + type + ".href").value(url))
+                .andExpect(jsonPath("$.lastModifiedDate").isNotEmpty())
+                .andExpect(isLastModifiedDateBetween(startTime, endTime));
     }
 
     private void patchResource(String url) throws Exception {
