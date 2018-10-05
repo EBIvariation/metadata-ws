@@ -128,7 +128,17 @@ public class MetadataApplicationTest {
     }
 
     private String postTestReferenceSequence(String name, String patch, List<String> accessions) throws Exception {
-        ReferenceSequence testReferenceSequence = new ReferenceSequence(name, patch, accessions);
+        ReferenceSequence testReferenceSequence = new ReferenceSequence(name, patch, accessions, ReferenceSequence.Type.ASSEMBLY);
+
+        MvcResult mvcResult = mockMvc.perform(post("/referenceSequences")
+                .content(testReferenceSequenceJson.write(testReferenceSequence).getJson()))
+                .andExpect(status().isCreated()).andReturn();
+
+        return mvcResult.getResponse().getHeader("Location");
+    }
+
+    private String postTestReferenceSequence(String name, String patch, List<String> accessions, ReferenceSequence.Type type) throws Exception {
+        ReferenceSequence testReferenceSequence = new ReferenceSequence(name, patch, accessions, type);
 
         MvcResult mvcResult = mockMvc.perform(post("/referenceSequences")
                 .content(testReferenceSequenceJson.write(testReferenceSequence).getJson()))
@@ -462,6 +472,43 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..referenceSequences").isArray())
                 .andExpect(jsonPath("$..referenceSequences.length()").value(0));
+    }
+
+    @Test
+    public void findReferenceSequenceByType() throws Exception {
+        String grch37Url = postTestReferenceSequence("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.ASSEMBLY);
+        String grch38Url = postTestReferenceSequence("GRCh38", "p2",
+                Arrays.asList("GCA_000001405.17", "GCF_000001405.28"), ReferenceSequence.Type.ASSEMBLY);
+        String grch39Url = postTestReferenceSequence("GRCh39", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
+
+        mockMvc.perform(get("/referenceSequences/search?type=ASSEMBLY"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..referenceSequences").isArray())
+                .andExpect(jsonPath("$..referenceSequences.length()").value(2))
+                .andExpect(jsonPath("$..referenceSequences[0]..referenceSequence.href").value(grch37Url))
+                .andExpect(jsonPath("$..referenceSequences[1]..referenceSequence.href").value(grch38Url))
+                .andExpect(jsonPath("$..referenceSequences[0].type").value("ASSEMBLY"))
+                .andExpect(jsonPath("$..referenceSequences[1].type").value("ASSEMBLY"));
+
+        mockMvc.perform(get("/referenceSequences/search?type=GENE"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..referenceSequences").isArray())
+                .andExpect(jsonPath("$..referenceSequences.length()").value(1))
+                .andExpect(jsonPath("$..referenceSequences[0]..referenceSequence.href").value(grch39Url))
+                .andExpect(jsonPath("$..referenceSequences[0].type").value("GENE"));
+
+        mockMvc.perform(get("/referenceSequences/search?type=TRANSCRIPTOME"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..referenceSequences").isArray())
+                .andExpect(jsonPath("$..referenceSequences.length()").value(0));
+    }
+
+    @Test
+    public void clientErrorWhenSearchReferenceSequenceWithInvalidType() throws Exception {
+        mockMvc.perform(get("/referenceSequences/search?type=UNKNOWN"))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
