@@ -16,8 +16,8 @@ pipeline {
     productionHost = credentials('PRODUCTIONHOST')
   }
   parameters {
-    choice(choices: ['validate', 'create'], description: 'Behaviour at connection time (initialize/validate schema)',
-     name: 'dbBehaviour')
+    choice(choices: ['validate', 'update','create'], description: 'Behaviour at connection time for staging  only
+    (initialize/update/validate schema)', name: 'dbBehaviour')
     booleanParam(name: 'DeployToStaging' , defaultValue: false , description: '')
     booleanParam(name: 'DeployToProduction' , defaultValue: false , description: '')
   }
@@ -39,11 +39,11 @@ pipeline {
         echo 'Build pointing to FallBack DB'
         sh "mvn clean package -DskipTests -DbuildDirectory=fallback/target -Dmetadata-dbUrl=${fallBackPostgresDbUrl} \
          -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword}  \
-        -Dmetadata-ddlBehaviour=${dbBehaviour}"
+        -Dmetadata-ddlBehaviour=validate"
         echo 'Build pointing to Production DB'
         sh "mvn clean package -DskipTests -DbuildDirectory=production/target \
         -Dmetadata-dbUrl=${productionPostgresDbUrl} -Dmetadata-dbUsername=${postgresDBUserName} \
-        -Dmetadata-dbPassword=${postgresDBPassword} -Dmetadata-ddlBehaviour=${dbBehaviour}"
+        -Dmetadata-dbPassword=${postgresDBPassword} -Dmetadata-ddlBehaviour=validate"
       }
     }
     stage('Deploy To Staging') {
