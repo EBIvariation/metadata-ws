@@ -51,14 +51,13 @@ public class ReferenceSequenceRestController implements ResourceProcessor<Reposi
     @Autowired
     private GenericResourceAssembler<ReferenceSequence, ReferenceSequenceResource> resourceAssembler;
 
-    @ApiOperation(value="Get a filtered list of referenceSequences based on filtering criteria")
+    @ApiOperation(value="Get a filtered list of reference sequences based on filtering criteria")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "name", dataType = "string", paramType = "query", example = "GRCh38"),
             @ApiImplicitParam(name = "patch", value = "patch number", dataType = "string", paramType = "query", example = "p2"),
             @ApiImplicitParam(name = "accessions", value = "accession", dataType = "string", paramType = "query", example = "GCA_000001405.3"),
-            @ApiImplicitParam(name = "type", value = "ReferenceSequence's type", dataType = "string",
-                    paramType = "query", example = "ASSEMBLY",
-                    allowableValues = "ASSEMBLY,GENE,TRANSCRIPTOME")
+            @ApiImplicitParam(name = "type", value = "Reference Sequence's type", dataType = "string",
+                    paramType = "query", example = "ASSEMBLY", allowableValues = "ASSEMBLY,GENE,TRANSCRIPTOME")
     })
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody

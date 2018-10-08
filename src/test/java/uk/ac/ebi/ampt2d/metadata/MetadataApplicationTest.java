@@ -119,12 +119,22 @@ public class MetadataApplicationTest {
 
     @Test
     public void postReferenceSequence() throws Exception {
-        String location = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        postReferenceSequence("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.ASSEMBLY);
+
+        postReferenceSequence("GRCh38", "p3",
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
+
+        postReferenceSequence("GRCh39", "p4",
+                Arrays.asList("GCA_000001407.3", "GCF_000001407.14"), ReferenceSequence.Type.TRANSCRIPTOME);
+    }
+
+    private void postReferenceSequence(String name, String patch, List accessions, ReferenceSequence.Type type) throws Exception {
+        String location = postTestReferenceSequence(name, patch, accessions, type);
 
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("GRCh37"));
+                .andExpect(jsonPath("$.name").value(name));
     }
 
     private String postTestReferenceSequence(String name, String patch, List<String> accessions) throws Exception {

@@ -46,7 +46,7 @@ public class ReferenceSequence extends Auditable<Long> {
 
     }
 
-    @ApiModelProperty(position = 1, value = "ReferenceSequence auto generated id", required = true, readOnly = true)
+    @ApiModelProperty(position = 1, value = "Reference Sequence auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

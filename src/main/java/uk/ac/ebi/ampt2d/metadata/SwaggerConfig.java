@@ -76,7 +76,7 @@ public class SwaggerConfig {
                 .pathMapping("/")
                 .tags(
                         new Tag("Analysis Entity", "Analysis metadata"),
-                        new Tag("ReferenceSequence Entity", "ReferenceSequence definition"),
+                        new Tag("ReferenceSequence Entity", "Reference Sequence definition"),
                         new Tag("File Entity", "File metadata"),
                         new Tag("Publication Entity", "Publication Pubmed reference"),
                         new Tag("Sample Entity", "Sample metadata"),
