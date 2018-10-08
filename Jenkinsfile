@@ -16,7 +16,7 @@ pipeline {
     productionHost = credentials('PRODUCTIONHOST')
   }
   parameters {
-    choice(choices: ['validate', 'update','create'], description: 'Behaviour at connection time for staging  only
+    choice(choices: ['validate', 'update','create'], description: 'Behaviour at connection time for staging  only \
     (initialize/update/validate schema)', name: 'dbBehaviour')
     booleanParam(name: 'DeployToStaging' , defaultValue: false , description: '')
     booleanParam(name: 'DeployToProduction' , defaultValue: false , description: '')
