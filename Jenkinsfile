@@ -17,7 +17,7 @@ pipeline {
   }
   parameters {
     choice(choices: ['validate', 'update','create'], description: 'Behaviour at connection time for staging only \
-           (initialize/update/validate schema)', name: 'dbBehaviour')
+           (initialize/update/validate schema)', name: 'ddlBehaviour')
     booleanParam(name: 'DeployToStaging' , defaultValue: false , description: '')
     booleanParam(name: 'DeployToProduction' , defaultValue: false , description: '')
   }
@@ -26,7 +26,7 @@ pipeline {
       steps {
         sh "mvn clean package -DskipTests -DbuildDirectory=staging/target -Dmetadata-dbUrl=${stagingPostgresDbUrl} \
         -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword} \
-        -Dmetadata-ddlBehaviour=${dbBehaviour}"
+        -Dmetadata-ddlBehaviour=${ddlBehaviour}"
       }
     }
     stage('Build For FallBack And Production') {
