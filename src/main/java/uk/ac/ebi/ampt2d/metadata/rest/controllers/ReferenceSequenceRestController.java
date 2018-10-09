@@ -73,7 +73,7 @@ public class ReferenceSequenceRestController implements ResourceProcessor<Reposi
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
-        resource.add(ControllerLinkBuilder.linkTo(ReferenceSequenceRestController.class).slash("/search").withRel("referenceSequences"));
+        resource.add(ControllerLinkBuilder.linkTo(ReferenceSequenceRestController.class).slash("/search").withRel("reference-sequences"));
         return resource;
     }
 
