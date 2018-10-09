@@ -19,15 +19,15 @@ package uk.ac.ebi.ampt2d.metadata.rest.resources;
 
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 
-public class AssemblyResource extends Resource<Assembly> {
+public class ReferenceSequenceResource extends Resource<ReferenceSequence> {
 
-    public AssemblyResource(Assembly content, Link... links) {
+    public ReferenceSequenceResource(ReferenceSequence content, Link... links) {
         super(content, links);
     }
 
-    public AssemblyResource(Assembly content, Iterable<Link> links) {
+    public ReferenceSequenceResource(ReferenceSequence content, Iterable<Link> links) {
         super(content, links);
     }
 

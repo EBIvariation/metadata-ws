@@ -90,10 +90,10 @@ public class Analysis extends Auditable<AccessionVersionEntityId> {
     @ManyToOne(optional = false)
     private Study study;
 
-    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to an Assembly")
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to an Reference Sequence")
     @JsonProperty
     @ManyToOne(optional = false)
-    private Assembly assembly;
+    private ReferenceSequence referenceSequence;
 
     @ApiModelProperty(position = 6, required = true)
     @NotNull

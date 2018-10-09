@@ -22,17 +22,17 @@ import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.QAssembly;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QReferenceSequence;
 
-@RepositoryRestResource
-public interface AssemblyRepository extends PagingAndSortingRepository<Assembly, Long>,
-        QueryDslPredicateExecutor<Assembly>, QuerydslBinderCustomizer<QAssembly> {
+@RepositoryRestResource(collectionResourceRel = "reference-sequences", path = "reference-sequences")
+public interface ReferenceSequenceRepository extends PagingAndSortingRepository<ReferenceSequence, Long>,
+        QueryDslPredicateExecutor<ReferenceSequence>, QuerydslBinderCustomizer<QReferenceSequence> {
 
-    default void customize(QuerydslBindings bindings, QAssembly assembly) {
-        bindings.bind(assembly.name, assembly.patch)
+    default void customize(QuerydslBindings bindings, QReferenceSequence referenceSequence) {
+        bindings.bind(referenceSequence.name, referenceSequence.patch)
                 .first((path, value) -> path.equalsIgnoreCase(value));
-        bindings.bind(assembly.accessions)
+        bindings.bind(referenceSequence.accessions)
                 .first((path, value) -> path.any().equalsIgnoreCase(value.iterator().next()));
     }
 

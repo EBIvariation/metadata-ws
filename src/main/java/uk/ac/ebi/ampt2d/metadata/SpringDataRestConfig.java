@@ -33,7 +33,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import uk.ac.ebi.ampt2d.metadata.aop.StudyDeprecationAspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
@@ -45,10 +45,10 @@ import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.AnalysisRestController;
-import uk.ac.ebi.ampt2d.metadata.rest.controllers.AssemblyRestController;
+import uk.ac.ebi.ampt2d.metadata.rest.controllers.ReferenceSequenceRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.StudyRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.AnalysisResource;
-import uk.ac.ebi.ampt2d.metadata.rest.resources.AssemblyResource;
+import uk.ac.ebi.ampt2d.metadata.rest.resources.ReferenceSequenceResource;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.StudyResource;
 
 @Configuration
@@ -80,7 +80,7 @@ public class SpringDataRestConfig {
                 config.getCorsRegistry().addMapping("/**").allowedMethods("*").allowedOrigins("*");
                 config.exposeIdsFor(
                         Analysis.class,
-                        Assembly.class,
+                        ReferenceSequence.class,
                         File.class,
                         Sample.class,
                         Study.class,
@@ -118,8 +118,8 @@ public class SpringDataRestConfig {
     }
 
     @Bean
-    public GenericResourceAssembler<Assembly, AssemblyResource> assemblyResourceAssembler() {
-        return new GenericResourceAssembler<Assembly, AssemblyResource>(AssemblyRestController.class, AssemblyResource.class);
+    public GenericResourceAssembler<ReferenceSequence, ReferenceSequenceResource> referenceSequenceResourceAssembler() {
+        return new GenericResourceAssembler<ReferenceSequence, ReferenceSequenceResource>(ReferenceSequenceRestController.class, ReferenceSequenceResource.class);
     }
 
     @Bean

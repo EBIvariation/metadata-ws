@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
@@ -33,44 +34,46 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
-import uk.ac.ebi.ampt2d.metadata.rest.resources.AssemblyResource;
+import uk.ac.ebi.ampt2d.metadata.rest.resources.ReferenceSequenceResource;
 
 import java.util.List;
 
 @RestController
-@Api(tags = "Assembly Entity")
-@RequestMapping(path = "assemblies")
-public class AssemblyRestController implements ResourceProcessor<RepositoryLinksResource> {
+@Api(tags = "ReferenceSequence Entity")
+@RequestMapping(path = "reference-sequences")
+public class ReferenceSequenceRestController implements ResourceProcessor<RepositoryLinksResource> {
 
     @Autowired
-    private AssemblyRepository assemblyRepository;
+    private ReferenceSequenceRepository referenceSequenceRepository;
 
     @Autowired
-    private GenericResourceAssembler<Assembly, AssemblyResource> resourceAssembler;
+    private GenericResourceAssembler<ReferenceSequence, ReferenceSequenceResource> resourceAssembler;
 
-    @ApiOperation(value="Get a filtered list of assemblies based on filtering criteria")
+    @ApiOperation(value="Get a filtered list of reference sequences based on filtering criteria")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "name", dataType = "string", paramType = "query", example = "GRCh38"),
             @ApiImplicitParam(name = "patch", value = "patch number", dataType = "string", paramType = "query", example = "p2"),
-            @ApiImplicitParam(name = "accessions", value = "accession", dataType = "string", paramType = "query", example = "GCA_000001405.3")
+            @ApiImplicitParam(name = "accessions", value = "accession", dataType = "string", paramType = "query", example = "GCA_000001405.3"),
+            @ApiImplicitParam(name = "type", value = "Reference Sequence's type", dataType = "string",
+                    paramType = "query", example = "ASSEMBLY", allowableValues = "ASSEMBLY,GENE,TRANSCRIPTOME")
     })
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public ResponseEntity<Resources<AssemblyResource>> search(@QuerydslPredicate(root = Assembly.class) Predicate predicate) {
-        List<Assembly> assemblies = (List<Assembly>) assemblyRepository.findAll(predicate);
+    public ResponseEntity<Resources<ReferenceSequenceResource>> search(@QuerydslPredicate(root = ReferenceSequence.class) Predicate predicate) {
+        List<ReferenceSequence> referenceSequences = (List<ReferenceSequence>) referenceSequenceRepository.findAll(predicate);
 
-        Resources<AssemblyResource> resources = (Resources<AssemblyResource>) resourceAssembler.toResources(Assembly.class, assemblies);
+        Resources<ReferenceSequenceResource> resources = (Resources<ReferenceSequenceResource>) resourceAssembler.toResources(ReferenceSequence.class, referenceSequences);
 
         return ResponseEntity.ok(resources);
     }
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
-        resource.add(ControllerLinkBuilder.linkTo(AssemblyRestController.class).slash("/search").withRel("assemblies"));
+        resource.add(ControllerLinkBuilder.linkTo(ReferenceSequenceRestController.class).slash("/search").withRel("reference-sequences"));
         return resource;
     }
 

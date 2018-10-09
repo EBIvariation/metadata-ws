@@ -26,15 +26,27 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Assembly  extends Auditable<Long> {
+public class ReferenceSequence extends Auditable<Long> {
 
-    @ApiModelProperty(position = 1, value = "Assembly auto generated id", required = true, readOnly = true)
+    public enum Type {
+
+        ASSEMBLY,
+
+        GENE,
+
+        TRANSCRIPTOME
+
+    }
+
+    @ApiModelProperty(position = 1, value = "Reference Sequence auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -58,12 +70,20 @@ public class Assembly  extends Auditable<Long> {
     @ElementCollection
     private List<String> accessions = new ArrayList<String>();
 
-    Assembly() {}
+    @ApiModelProperty(position = 5, required = true)
+    @NotNull
+    @JsonProperty
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Type type;
 
-    public Assembly(String name, String patch, List<String> accessions) {
+    ReferenceSequence() {}
+
+    public ReferenceSequence(String name, String patch, List<String> accessions, Type type) {
         this.name = name;
         this.patch = patch;
         this.accessions = accessions;
+        this.type = type;
     }
 
     public Long getId() {
