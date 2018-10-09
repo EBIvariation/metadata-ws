@@ -25,7 +25,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QReferenceSequence;
 
-@RepositoryRestResource
+@RepositoryRestResource(path = "reference-sequences")
 public interface ReferenceSequenceRepository extends PagingAndSortingRepository<ReferenceSequence, Long>,
         QueryDslPredicateExecutor<ReferenceSequence>, QuerydslBinderCustomizer<QReferenceSequence> {
 
