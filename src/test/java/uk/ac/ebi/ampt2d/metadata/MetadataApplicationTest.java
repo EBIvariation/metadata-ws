@@ -160,6 +160,20 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.name").value("Homo sapiens"));
     }
 
+    @Test
+    public void postTestTaxonomyWithIdLessThanOne() throws Exception {
+        List<String> ancestors = new ArrayList<>();
+        String jsonContent = "{ " +
+                "\"id\": 0," +
+                "\"name\": \"Homo sapiens\"," +
+                "\"ancestors\": " + testListJson.write(ancestors).getJson() + "" +
+                "}";
+
+       mockMvc.perform(post("/taxonomies")
+                .content(jsonContent))
+                .andExpect(status().is4xxClientError());
+    }
+
     private String postTestTaxonomy() throws Exception {
         return postTestTaxonomy(9606, "Homo sapiens");
     }
