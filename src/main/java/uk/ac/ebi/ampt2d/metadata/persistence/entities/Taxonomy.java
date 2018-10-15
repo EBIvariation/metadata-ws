@@ -31,7 +31,7 @@ import java.util.List;
 @Entity
 public class Taxonomy extends Auditable<Long> {
 
-    @ApiModelProperty(position = 1,example = "1")
+    @ApiModelProperty(position = 1, example = "1")
     @NotNull
     @JsonProperty
     @Id
