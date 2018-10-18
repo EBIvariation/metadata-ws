@@ -33,6 +33,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import uk.ac.ebi.ampt2d.metadata.aop.StudyDeprecationAspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Contact;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Dac;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
@@ -80,6 +82,8 @@ public class SpringDataRestConfig {
                 config.getCorsRegistry().addMapping("/**").allowedMethods("*").allowedOrigins("*");
                 config.exposeIdsFor(
                         Analysis.class,
+                        Contact.class,
+                        Dac.class,
                         ReferenceSequence.class,
                         File.class,
                         Sample.class,

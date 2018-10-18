@@ -38,6 +38,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ContactRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.DacRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
@@ -72,6 +74,12 @@ public class MetadataApplicationTest {
 
     @Autowired
     private AnalysisRepository analysisRepository;
+
+    @Autowired
+    private ContactRepository contactRepository;
+
+    @Autowired
+    private DacRepository dacRepository;
 
     @Autowired
     private ReferenceSequenceRepository referenceSequenceRepository;
@@ -109,6 +117,8 @@ public class MetadataApplicationTest {
     @Before
     public void cleanDatabases() throws Exception {
         analysisRepository.deleteAll();
+        dacRepository.deleteAll();
+        contactRepository.deleteAll();
         referenceSequenceRepository.deleteAll();
         fileRepository.deleteAll();
         sampleRepository.deleteAll();
@@ -1359,4 +1369,83 @@ public class MetadataApplicationTest {
                 .andExpect(header().string("Allow", containsString("GET")));
     }
 
+    @Test
+    public void postContact() throws Exception {
+        String location = postTestContact("test@test.com");
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("test@test.com"));
+    }
+
+    private String postTestContact(String email) throws Exception {
+        String jsonContent = "{ " +
+                "\"email\": \"" + email + "\"," +
+                "\"title\": \"" + "Dr." + "\"," +
+                "\"firstName\": \"" + "First" + "\"," +
+                "\"surname\": \"" + "Last" + "\"" +
+                "}";
+
+        MvcResult mvcResult = mockMvc.perform(post("/contacts")
+                .content(jsonContent))
+                .andExpect(status().isCreated()).andReturn();
+
+        return mvcResult.getResponse().getHeader("Location");
+    }
+
+    @Test
+    public void postDac() throws Exception {
+        String contact = postTestContact("test@test.com");
+        String location = postTestDac("testdac", 1, contact);
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id.accession").value("testdac"));
+
+        mockMvc.perform(get(location + "/mainContact"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..contact.href").value(contact));
+    }
+
+    private String postTestDac(String accession, int version, String mainContact) throws Exception {
+        String jsonContent = "{ " +
+                "\"id\":{ \"accession\": \"" + accession + "\",\"version\": " + version + "}," +
+                "\"title\": \"" + "title" + "\"," +
+                "\"center\": \"" + "center" + "\"," +
+                "\"mainContact\": \"" + mainContact + "\"" +
+                "}";
+
+        MvcResult mvcResult = mockMvc.perform(post("/dacs")
+                .content(jsonContent))
+                .andExpect(status().isCreated()).andReturn();
+
+        return mvcResult.getResponse().getHeader("Location");
+    }
+
+    @Test
+    public void findDacByAccession() throws Exception {
+        String contact = postTestContact("test@test.com");
+        String testDac1 = postTestDac("testDac1", 1, contact);
+        String testDac2 = postTestDac("testDac1", 2, contact);
+        String testDac3 = postTestDac("testDac3", 1, contact);
+
+        mockMvc.perform(get("/dacs/search/accession").param("accession", "testDac1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..dacs").isArray())
+                .andExpect(jsonPath("$..dacs.length()").value(1))
+                .andExpect(jsonPath("$..dacs[0]..dac.href").value(testDac2))
+                .andExpect(jsonPath("$..dacs[0].id.accession").value("testDac1"))
+                .andExpect(jsonPath("$..dacs[0].id.version").value(2));
+        mockMvc.perform(get("/dacs/search/accession").param("accession", "testDac3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..dacs").isArray())
+                .andExpect(jsonPath("$..dacs.length()").value(1))
+                .andExpect(jsonPath("$..dacs[0]..dac.href").value(testDac3))
+                .andExpect(jsonPath("$..dacs[0].id.accession").value("testDac3"))
+                .andExpect(jsonPath("$..dacs[0].id.version").value(1));
+        mockMvc.perform(get("/dacs/search/accession").param("accession", "unexisted"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..dacs").isArray())
+                .andExpect(jsonPath("$..dacs.length()").value(0));
+    }
 }
