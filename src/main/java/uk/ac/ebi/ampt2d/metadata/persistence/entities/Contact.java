@@ -46,11 +46,10 @@ public class Contact extends Auditable<Long> {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @ApiModelProperty(position = 3, required = true)
+    @ApiModelProperty(position = 3)
     @Size(min = 1, max = 16)
-    @NotNull
     @JsonProperty
-    @Column(nullable = false)
+    @Column
     private String title;
 
     @ApiModelProperty(position = 4, required = true)
@@ -60,10 +59,10 @@ public class Contact extends Auditable<Long> {
     @Column(nullable = false)
     private String firstName;
 
-    @ApiModelProperty(position = 5, required = true)
+    @ApiModelProperty(position = 5)
     @Size(min = 1, max = 32)
     @JsonProperty
-    @Column(nullable = true)
+    @Column
     private String middleInitials;
 
     @ApiModelProperty(position = 6, required = true)
@@ -73,22 +72,22 @@ public class Contact extends Auditable<Long> {
     @Column(nullable = false)
     private String surname;
 
-    @ApiModelProperty(position = 7, required = true)
+    @ApiModelProperty(position = 7)
     @Size(min = 1, max = 256)
     @JsonProperty
-    @Column(nullable = true)
+    @Column
     private String address;
 
-    @ApiModelProperty(position = 8, required = true)
+    @ApiModelProperty(position = 8)
     @Size(min = 1, max = 16)
     @JsonProperty
-    @Column(nullable = true)
+    @Column
     private String telephone;
 
-    @ApiModelProperty(position = 9, required = false)
+    @ApiModelProperty(position = 9)
     @Size(min = 1, max = 256)
     @JsonProperty
-    @Column(nullable = true)
+    @Column
     private String organisation;
 
     public Long getId() {
