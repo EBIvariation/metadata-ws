@@ -26,7 +26,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Embeddable
-public class AccessionVersionEntityId implements Serializable {
+public class AccessionVersionId implements Serializable {
 
     @Size(min = 1, max = 255)
     @NotNull
@@ -36,10 +36,10 @@ public class AccessionVersionEntityId implements Serializable {
     @ApiModelProperty(example = "1")
     private int version;
 
-    AccessionVersionEntityId() {
+    AccessionVersionId() {
     }
 
-    public AccessionVersionEntityId(String accession, int version) {
+    public AccessionVersionId(String accession, int version) {
         this.accession = accession;
         this.version = version;
     }
@@ -57,10 +57,10 @@ public class AccessionVersionEntityId implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        AccessionVersionEntityId accessionVersionEntityId = (AccessionVersionEntityId) o;
+        AccessionVersionId accessionVersionId = (AccessionVersionId) o;
 
-        if (getVersion() != accessionVersionEntityId.getVersion()) return false;
-        return getAccession() != null ? getAccession().equals(accessionVersionEntityId.getAccession()) : accessionVersionEntityId.getAccession() == null;
+        if (getVersion() != accessionVersionId.getVersion()) return false;
+        return getAccession() != null ? getAccession().equals(accessionVersionId.getAccession()) : accessionVersionId.getAccession() == null;
     }
 
     @Override

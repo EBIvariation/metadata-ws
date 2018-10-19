@@ -86,6 +86,7 @@ public class ReferenceSequence extends Auditable<Long> {
         this.type = type;
     }
 
+    @Override
     public Long getId() {
         return id;
     }

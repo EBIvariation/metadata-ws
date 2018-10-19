@@ -21,21 +21,31 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-public class Sample extends Auditable<AccessionVersionEntityId> {
+public class Sample extends Auditable<Long> {
 
-    @ApiModelProperty(position = 1, required = true)
-    @Valid
-    @EmbeddedId
-    private AccessionVersionEntityId id;
+    @ApiModelProperty(position = 1, value = "Sample auto generated id", required = true, readOnly = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
     @ApiModelProperty(position = 2, required = true)
+    @Valid
+    @Embedded
+    @Column(unique = true)
+    private AccessionVersionId accessionVersionId;
+
+    @ApiModelProperty(position = 3, required = true)
     @Size(min = 1, max = 255)
     @NotNull
     @Column(nullable = false)
@@ -45,12 +55,17 @@ public class Sample extends Auditable<AccessionVersionEntityId> {
     Sample() {
     }
 
-    public Sample(AccessionVersionEntityId id, String name) {
-        this.id = id;
+    public Sample(AccessionVersionId accessionVersionId, String name) {
+        this.accessionVersionId = accessionVersionId;
         this.name = name;
     }
 
-    public AccessionVersionEntityId getId() {
+    public AccessionVersionId getAccessionVersionId() {
+        return accessionVersionId;
+    }
+
+    @Override
+    public Long getId() {
         return id;
     }
 }

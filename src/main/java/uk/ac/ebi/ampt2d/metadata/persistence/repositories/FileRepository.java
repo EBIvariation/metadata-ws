@@ -22,15 +22,15 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 
 import java.util.List;
 
 @RepositoryRestResource
-public interface FileRepository extends PagingAndSortingRepository<File, AccessionVersionEntityId> {
+public interface FileRepository extends PagingAndSortingRepository<File, Long> {
 
     @ApiOperation(value = "Get the latest version of File based on accession")
     @RestResource(path = "/accession")
-    List<File> findFirstById_AccessionOrderById_VersionDesc(@Param("accession") String accession);
+    List<File> findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc
+            (@Param("accession") String accession);
 }

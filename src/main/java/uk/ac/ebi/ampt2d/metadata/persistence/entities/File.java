@@ -20,18 +20,20 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
-
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-public class File extends Auditable<AccessionVersionEntityId> {
+public class File extends Auditable<Long> {
 
     public enum Type {
 
@@ -42,30 +44,37 @@ public class File extends Auditable<AccessionVersionEntityId> {
         BINARY
     }
 
-    @ApiModelProperty(position = 1, required = true)
-    @Valid
-    @EmbeddedId
-    private AccessionVersionEntityId id;
+    @ApiModelProperty(position = 1, value = "File auto generated id", required = true, readOnly = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @ApiModelProperty(position = 2, required = true)
-    @NotNull
-    @Size(min = 1, max = 255)
-    @JsonProperty
-    @Column(nullable = false)
-    private String hash;
+    @Valid
+    @Embedded
+    @Column(unique = true)
+    private AccessionVersionId accessionVersionId;
 
     @ApiModelProperty(position = 3, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
     @Column(nullable = false)
-    private String name;
+    private String hash;
 
     @ApiModelProperty(position = 4, required = true)
+    @NotNull
+    @Size(min = 1, max = 255)
+    @JsonProperty
+    @Column(nullable = false)
+    private String name;
+
+    @ApiModelProperty(position = 5, required = true)
     @JsonProperty
     private long size;
 
-    @ApiModelProperty(position = 5, required = true)
+    @ApiModelProperty(position = 6, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
@@ -74,15 +83,20 @@ public class File extends Auditable<AccessionVersionEntityId> {
 
     File() {}
 
-    public File(AccessionVersionEntityId id, String hash, String name, long size, Type type) {
-        this.id = id;
+    public File(AccessionVersionId accessionVersionId, String hash, String name, long size, Type type) {
+        this.accessionVersionId = accessionVersionId;
         this.hash = hash;
         this.name = name;
         this.size = size;
         this.type = type;
     }
 
-    public AccessionVersionEntityId getId() {
+    public AccessionVersionId getAccessionVersionId() {
+        return accessionVersionId;
+    }
+
+    @Override
+    public Long getId() {
         return id;
     }
 }

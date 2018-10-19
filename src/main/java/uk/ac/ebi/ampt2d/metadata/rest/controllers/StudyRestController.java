@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
@@ -160,7 +159,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @ApiParam(name = "id", value = "Study's id (accession.version)", type = "string", required = true, example = "EGAS0001.1")
     @RequestMapping(method = RequestMethod.GET, path = "{id}/linkedStudies", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Resources<StudyResource>> getLinkedStudies(@PathVariable("id") AccessionVersionEntityId id) {
+    public ResponseEntity<Resources<StudyResource>> getLinkedStudies(@PathVariable("id") long id) {
         List<Study> studies = studyService.findLinkedStudies(id);
 
         Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
@@ -176,9 +175,9 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     @RequestMapping(method = RequestMethod.PATCH, path = "{id}/patch", produces = "application/json", consumes = "application/json")
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public ResponseEntity<Resource<Study>> patch(@PathVariable("id") AccessionVersionEntityId id,
+    public ResponseEntity<Resource<Study>> patch(@PathVariable("id") long id,
                                                  @RequestBody String json) {
-        Study study = studyService.findOneStudyByAccession(id);
+        Study study = studyService.findOneStudyById(id);
 
         if ( study == null ) {
             return ResponseEntity.notFound().build();

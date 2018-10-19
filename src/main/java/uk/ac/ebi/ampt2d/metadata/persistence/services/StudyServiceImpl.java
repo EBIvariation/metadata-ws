@@ -20,7 +20,6 @@ package uk.ac.ebi.ampt2d.metadata.persistence.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
@@ -47,11 +46,9 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
-    public Study findOneStudyByAccession(AccessionVersionEntityId id) {
+    public Study findOneStudyById(Long id) {
         QStudy study = QStudy.study;
-        Predicate predicate = study.id.accession.equalsIgnoreCase(id.getAccession())
-                .and(study.id.version.eq(id.getVersion()));
-
+        Predicate predicate = study.id.eq(id);
         return findOneStudyByPredicate(predicate);
     }
 
@@ -63,14 +60,14 @@ public class StudyServiceImpl implements StudyService {
     @Override
     public Study findStudyByAccession(String accession) {
         QStudy study = QStudy.study;
-        Predicate predicate = study.id.accession.equalsIgnoreCase(accession);
+        Predicate predicate = study.accessionVersionId.accession.equalsIgnoreCase(accession);
 
         List<Study> studies = findStudiesByPredicate(predicate);
 
         studies.sort((new Comparator<Study>() {
             @Override
             public int compare(Study o1, Study o2) {
-                return o1.getId().getVersion() - o2.getId().getVersion();
+                return o1.getAccessionVersionId().getVersion() - o2.getAccessionVersionId().getVersion();
             }
         }).reversed());
 
@@ -97,7 +94,8 @@ public class StudyServiceImpl implements StudyService {
     @Override
     public List<Study> findStudiesByTaxonomyId(long id) {
         QStudy study = QStudy.study;
-        Predicate predicate = study.taxonomy.id.eq(id).or(study.taxonomy.ancestors.any().id.eq(id));
+        Predicate predicate = study.taxonomy.taxonomyIdentifier.eq(id).
+                or(study.taxonomy.ancestors.any().taxonomyIdentifier.eq(id));
 
         return findStudiesByPredicate(predicate);
     }
@@ -112,16 +110,16 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
-    public List<Study> findLinkedStudies(AccessionVersionEntityId id) {
+    public List<Study> findLinkedStudies(Long id) {
         Study study = studyRepository.findOne(id);
-        if ( study == null ) {
+        if (study == null) {
             return Arrays.asList();
         }
 
         Set<Study> studies = new HashSet<>();
 
         List<Study> parents = findParentStudy(study);
-        parents.forEach(parent->{
+        parents.forEach(parent -> {
             studies.add(parent);
             studies.addAll(parent.getChildStudies());
         });
