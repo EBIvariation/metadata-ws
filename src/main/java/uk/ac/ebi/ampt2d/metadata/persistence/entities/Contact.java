@@ -66,26 +66,26 @@ public class Contact extends Auditable<Long> {
     @Column(nullable = true)
     private String middleInitials;
 
-    @ApiModelProperty(position = 5, required = true)
+    @ApiModelProperty(position = 6, required = true)
     @Size(min = 1, max = 32)
     @NotNull
     @JsonProperty
     @Column(nullable = false)
     private String surname;
 
-    @ApiModelProperty(position = 6, required = true)
+    @ApiModelProperty(position = 7, required = true)
     @Size(min = 1, max = 256)
     @JsonProperty
     @Column(nullable = true)
     private String address;
 
-    @ApiModelProperty(position = 7, required = true)
+    @ApiModelProperty(position = 8, required = true)
     @Size(min = 1, max = 16)
     @JsonProperty
     @Column(nullable = true)
     private String telephone;
 
-    @ApiModelProperty(position = 8, required = false)
+    @ApiModelProperty(position = 9, required = false)
     @Size(min = 1, max = 256)
     @JsonProperty
     @Column(nullable = true)
