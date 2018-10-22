@@ -156,7 +156,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     }
 
     @ApiOperation(value = "Get a list of studies linked to a given study")
-    @ApiParam(name = "id", value = "Study's id (accession.version)", type = "string", required = true, example = "EGAS0001.1")
+    @ApiParam(name = "id", value = "StudyId", type = "string", required = true)
     @RequestMapping(method = RequestMethod.GET, path = "{id}/linkedStudies", produces = "application/json")
     @ResponseBody
     public ResponseEntity<Resources<StudyResource>> getLinkedStudies(@PathVariable("id") long id) {
@@ -171,12 +171,11 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
             "deprecated, it is not possible to update that study object through PATCH /studies/{id} method, it will " +
             "result in NOT FOUND. This new method (PATCH /studies/{id}/patch) allows that study object to be found and" +
             " updated.")
-    @ApiParam(name = "id", value = "Study's id (accession.version)", type = "string", required = true, example = "EGAS0001.1")
+    @ApiParam(name = "id", value = "StudyId", type = "string", required = true)
     @RequestMapping(method = RequestMethod.PATCH, path = "{id}/patch", produces = "application/json", consumes = "application/json")
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public ResponseEntity<Resource<Study>> patch(@PathVariable("id") long id,
-                                                 @RequestBody String json) {
+    public ResponseEntity<Resource<Study>> patch(@PathVariable("id") long id, @RequestBody String json) {
         Study study = studyService.findOneStudyById(id);
 
         if ( study == null ) {
@@ -189,12 +188,10 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
             Resource<Study> resource = resourceAssembler.toResource(study1);
 
             return ResponseEntity.ok(resource);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
-
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {

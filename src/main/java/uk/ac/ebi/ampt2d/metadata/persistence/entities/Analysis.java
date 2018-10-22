@@ -31,12 +31,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession","version"}))
 public class Analysis extends Auditable<Long> {
 
     public enum Type {
@@ -77,7 +80,6 @@ public class Analysis extends Auditable<Long> {
 
     @ApiModelProperty(position = 2, required = true)
     @Valid
-    @Column(unique = true)
     @Embedded
     private AccessionVersionId accessionVersionId;
 

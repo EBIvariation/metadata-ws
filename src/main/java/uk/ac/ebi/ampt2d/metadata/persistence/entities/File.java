@@ -28,11 +28,14 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession","version"}))
 public class File extends Auditable<Long> {
 
     public enum Type {
@@ -53,7 +56,6 @@ public class File extends Auditable<Long> {
     @ApiModelProperty(position = 2, required = true)
     @Valid
     @Embedded
-    @Column(unique = true)
     private AccessionVersionId accessionVersionId;
 
     @ApiModelProperty(position = 3, required = true)

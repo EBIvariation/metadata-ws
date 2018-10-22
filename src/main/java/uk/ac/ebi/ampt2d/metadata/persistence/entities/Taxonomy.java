@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -39,10 +40,11 @@ public class Taxonomy extends Auditable<Long> {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @ApiModelProperty(position = 2)
+    @ApiModelProperty(position = 2, example = "1")
     @NotNull
     @JsonProperty
     @Min(1)
+    @Column(unique = true)
     private long taxonomyIdentifier;
 
     @ApiModelProperty(position = 3)

@@ -319,7 +319,6 @@ public class MetadataApplicationTest {
     @Test
     public void postWebResource() throws Exception {
         String location = postTestWebResource();
-
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.type").value("CENTER_WEB"))
@@ -619,12 +618,13 @@ public class MetadataApplicationTest {
 
     @Test
     public void findStudies() throws Exception {
+        String taxonomyUrl = postTestTaxonomy();
         String grch37ReferenceSequenceUrl = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         String grch38ReferenceSequenceUrl = postTestReferenceSequence("GRCh38", "p2",
                 Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
-        String grch37StudyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
-        String grch38StudyUrl = postTestStudy("EGAS0001", 2, "test_human_study");
+        String grch37StudyUrl = postTestStudy("EGAS0001", 1, "test_human_study",taxonomyUrl);
+        String grch38StudyUrl = postTestStudy("EGAS0001", 2, "test_human_study",taxonomyUrl);
 
         postTestAnalysis("EGAA0001", grch37ReferenceSequenceUrl, grch37StudyUrl);
         postTestAnalysis("EGAA0002", grch38ReferenceSequenceUrl, grch38StudyUrl);
@@ -709,8 +709,9 @@ public class MetadataApplicationTest {
 
     @Test
     public void searchStudy() throws Exception {
-        postTestStudy("EGAS0001", 1, "test human study based on GRCh37");
-        postTestStudy("EGAS0002", 1, "test human study based on GRCh38");
+        String taxonomyUrl = postTestTaxonomy();
+        postTestStudy("EGAS0001", 1, "test human study based on GRCh37",taxonomyUrl);
+        postTestStudy("EGAS0002", 1, "test human study based on GRCh38",taxonomyUrl);
 
         mockMvc.perform(get("/studies/search/text").param("searchTerm", "human"))
                 .andExpect(status().isOk())
@@ -729,9 +730,10 @@ public class MetadataApplicationTest {
 
     @Test
     public void searchStudyByAccession() throws Exception {
-        String testStudy1 = postTestStudy("EGAS0001", 1, "test human study based on GRCh37");
-        String testStudy2 = postTestStudy("EGAS0001", 2, "test human study based on GRCh38");
-        String testStudy3 = postTestStudy("EGAS0002", 3, "test human study based on GRCh38");
+        String taxonomyUrl = postTestTaxonomy();
+        String testStudy1 = postTestStudy("EGAS0001", 1, "test human study based on GRCh37",taxonomyUrl);
+        String testStudy2 = postTestStudy("EGAS0001", 2, "test human study based on GRCh38",taxonomyUrl);
+        String testStudy3 = postTestStudy("EGAS0002", 3, "test human study based on GRCh38",taxonomyUrl);
 
         mockMvc.perform(get("/studies/search/accession").param("accession", "EGAS0001"))
                 .andExpect(status().isOk())
@@ -752,7 +754,7 @@ public class MetadataApplicationTest {
         String taxonomyUrl = postTestTaxonomy();
         mockMvc.perform(post("/studies")
                 .content("{ " +
-                        "\"id\":{ \"accession\": \"EGAS0001\",\"version\":  0 }," +
+                        "\"accessionVersionId\":{ \"accession\": \"EGAS0001\",\"version\":  0 }," +
                         "\"name\": \" study1\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"center\": \"EBI\"," +
@@ -764,7 +766,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.errors[0].message").value("must be greater than or equal to 1"));
         mockMvc.perform(post("/studies")
                 .content("{ " +
-                        "\"id\":{ \"version\":  1 }," +
+                        "\"accessionVersionId\":{ \"version\":  1 }," +
                         "\"name\": \" study1\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"center\": \"EBI\"," +
@@ -774,14 +776,16 @@ public class MetadataApplicationTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.errors[0].property").value("accessionVersionId.accession"))
                 .andExpect(jsonPath("$.errors[0].message").value("may not be null"));
-        postTestStudy("EGAS0001", 1, "test_study");
-        mockMvc.perform(get("/studies/EGAS0001")).andExpect(status().is4xxClientError()).andExpect(jsonPath("$" +
+        postTestStudy("EGAS0001", 1, "test_study",taxonomyUrl);
+        mockMvc.perform(get("/studies?accessionVersionId=EGAS0001")).andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$" +
                 ".message").value("Please provide an ID in the form accession.version"));
-        mockMvc.perform(get("/studies/EGAS0001.S1")).andExpect(status().is4xxClientError())
+        mockMvc.perform(get("/studies?accessionVersionId=EGAS0001.S1")).andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.message").value("Please provide an ID in the form accession.version"));
-        mockMvc.perform(get("/studies/EGAS0001.1")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAS0001"));
-        mockMvc.perform(get("/studies/EGAS0001.2")).andExpect(status().isNotFound());
+        mockMvc.perform(get("/studies?accessionVersionId=EGAS0001.1")).andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies[0].accessionVersionId.accession").value("EGAS0001"));
+        mockMvc.perform(get("/studies?accessionVersionId=EGAS0001.2")).andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies.length()").value(0));
     }
 
     @Test
@@ -1293,8 +1297,9 @@ public class MetadataApplicationTest {
 
     @Test
     public void searchStudyByPagingAndSorting() throws Exception {
-        String humanStudyUrlB = postTestStudy("EGAS0001", 1, "test human B");
-        String humanStudyUrlA = postTestStudy("EGAS0002", 1, "test human A");
+        String taxonomyUrl = postTestTaxonomy();
+        String humanStudyUrlB = postTestStudy("EGAS0001", 1, "test human B",taxonomyUrl);
+        String humanStudyUrlA = postTestStudy("EGAS0002", 1, "test human A",taxonomyUrl);
 
         mockMvc.perform(get("/studies"))
                 .andExpect(status().isOk())
@@ -1371,6 +1376,49 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Access-Control-Allow-Origin", "http://www.evil-url.com"))
                 .andExpect(header().string("Allow", containsString("GET")));
+    }
+
+    @Test
+    public void testDuplicateKeyValidation() throws Exception {
+        String taxonomyUrl = postTestTaxonomy();
+
+        //Post same taxonomy again
+        mockMvc.perform(post("/taxonomies")
+                .content("{ " +
+                        "\"taxonomyIdentifier\": 9606," +
+                        "\"name\": \"Homo Sapiens\"," +
+                        "\"ancestors\": " + testListJson.write(new ArrayList()).getJson() + "" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.error").value("Conflict"))
+                .andExpect(jsonPath("$.message").value("Duplicate id or index provided"));
+
+        postTestStudy("EGAS0001",1,"study1",taxonomyUrl);
+
+        //Post same study again
+        mockMvc.perform(post("/studies")
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\": \"EGAS0001\",\"version\":1}," +
+                        "\"name\": \" study1\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"center\": \"EBI\"," +
+                        "\"releaseDate\": \"" + LocalDate.now() + "\"," +
+                        "\"taxonomy\": \"" + taxonomyUrl + "\"" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.error").value("Conflict"))
+                .andExpect(jsonPath("$.message").value("Duplicate id or index provided"));
+
+        postWebResource();
+
+        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "http:\\www.ebi.ac.uk");
+
+        //Post same webresource again
+        mockMvc.perform(post("/webResources")
+                .content(testWebResourceJson.write(testWebResource).getJson()))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.error").value("Conflict"))
+                .andExpect(jsonPath("$.message").value("Duplicate id or index provided"));
     }
 
 }
