@@ -102,26 +102,52 @@ public class Analysis extends Auditable<Long> {
     @ManyToOne(optional = false)
     private Study study;
 
+<<<<<<< HEAD:metadata-ws/src/main/java/uk/ac/ebi/ampt2d/metadata/persistence/entities/Analysis.java
     @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to an Reference Sequence")
+=======
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to an Assembly")
+>>>>>>> Only multiple genes with single analysis:src/main/java/uk/ac/ebi/ampt2d/metadata/persistence/entities/Analysis.java
     @JsonProperty
     @ManyToOne(optional = false)
-    private ReferenceSequence referenceSequence;
+    private Assembly assembly;
 
+<<<<<<< HEAD:metadata-ws/src/main/java/uk/ac/ebi/ampt2d/metadata/persistence/entities/Analysis.java
     @ApiModelProperty(position = 7, required = true)
+=======
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a Transcriptome")
+    @JsonProperty
+    @ManyToOne(optional = false)
+    private Transcriptome transcriptome;
+
+    @ApiModelProperty(position = 7, dataType = "java.lang.String", example = "[url1, url2]", notes = "Url to Gene List")
+    @JsonProperty
+    @ManyToMany
+    private List<Gene> genes;
+
+    @ApiModelProperty(position = 8, required = true)
+>>>>>>> Only multiple genes with single analysis:src/main/java/uk/ac/ebi/ampt2d/metadata/persistence/entities/Analysis.java
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Technology technology;
 
+<<<<<<< HEAD:metadata-ws/src/main/java/uk/ac/ebi/ampt2d/metadata/persistence/entities/Analysis.java
     @ApiModelProperty(position = 8, required = true)
+=======
+    @ApiModelProperty(position = 9, required = true)
+>>>>>>> Only multiple genes with single analysis:src/main/java/uk/ac/ebi/ampt2d/metadata/persistence/entities/Analysis.java
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Type type;
 
+<<<<<<< HEAD:metadata-ws/src/main/java/uk/ac/ebi/ampt2d/metadata/persistence/entities/Analysis.java
     @ApiModelProperty(position = 9, required = true)
+=======
+    @ApiModelProperty(position = 10, required = true)
+>>>>>>> Only multiple genes with single analysis:src/main/java/uk/ac/ebi/ampt2d/metadata/persistence/entities/Analysis.java
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
