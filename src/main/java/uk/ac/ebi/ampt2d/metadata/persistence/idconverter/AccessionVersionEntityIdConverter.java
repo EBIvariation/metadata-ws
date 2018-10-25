@@ -20,7 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.idconverter;
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 
-public class CustomBackendIdConverter implements Converter<String, AccessionVersionEntityId> {
+public class AccessionVersionEntityIdConverter implements Converter<String, AccessionVersionEntityId> {
 
     @Override
     public AccessionVersionEntityId convert(String id) {

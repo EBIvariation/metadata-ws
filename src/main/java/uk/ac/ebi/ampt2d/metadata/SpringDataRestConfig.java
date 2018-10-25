@@ -34,15 +34,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import uk.ac.ebi.ampt2d.metadata.aop.StudyDeprecationAspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Contact;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.CrossReference;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Dac;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Duo;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Policy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
-import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
+import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.AccessionVersionEntityIdConverter;
 import uk.ac.ebi.ampt2d.metadata.aop.StudyReleaseDateAspect;
+import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.DbIdVersionEntityIdConverter;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
@@ -67,7 +71,8 @@ public class SpringDataRestConfig {
         return new WebMvcConfigurerAdapter() {
             @Override
             public void addFormatters(FormatterRegistry registry) {
-                registry.addConverter(new CustomBackendIdConverter());
+                registry.addConverter(new AccessionVersionEntityIdConverter());
+                registry.addConverter(new DbIdVersionEntityIdConverter());
                 super.addFormatters(registry);
             }
         };
@@ -83,9 +88,12 @@ public class SpringDataRestConfig {
                 config.exposeIdsFor(
                         Analysis.class,
                         Contact.class,
+                        CrossReference.class,
                         Dac.class,
+                        Duo.class,
                         ReferenceSequence.class,
                         File.class,
+                        Policy.class,
                         Sample.class,
                         Study.class,
                         Taxonomy.class,
@@ -97,7 +105,8 @@ public class SpringDataRestConfig {
             @Override
             public void configureConversionService(ConfigurableConversionService conversionService) {
                 super.configureConversionService(conversionService);
-                conversionService.addConverter(new CustomBackendIdConverter());
+                conversionService.addConverter(new AccessionVersionEntityIdConverter());
+                conversionService.addConverter(new DbIdVersionEntityIdConverter());
             }
 
             @Override

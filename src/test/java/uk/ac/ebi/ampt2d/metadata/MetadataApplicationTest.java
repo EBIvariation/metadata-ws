@@ -33,13 +33,17 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.DbIdVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ContactRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.CrossReferenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.DacRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.DuoRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PolicyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
@@ -79,13 +83,22 @@ public class MetadataApplicationTest {
     private ContactRepository contactRepository;
 
     @Autowired
+    private CrossReferenceRepository crossReferenceRepository;
+
+    @Autowired
     private DacRepository dacRepository;
+
+    @Autowired
+    private DuoRepository duoRepository;
 
     @Autowired
     private ReferenceSequenceRepository referenceSequenceRepository;
 
     @Autowired
     private FileRepository fileRepository;
+
+    @Autowired
+    private PolicyRepository policyRepository;
 
     @Autowired
     private SampleRepository sampleRepository;
@@ -98,6 +111,9 @@ public class MetadataApplicationTest {
 
     @Autowired
     private WebResourceRepository webResourceRepository;
+
+    @Autowired
+    private JacksonTester<DbIdVersionEntityId> testDbIdVersionEntityIdJson;
 
     @Autowired
     private JacksonTester<ReferenceSequence> testReferenceSequenceJson;
@@ -117,6 +133,9 @@ public class MetadataApplicationTest {
     @Before
     public void cleanDatabases() throws Exception {
         analysisRepository.deleteAll();
+        policyRepository.deleteAll();
+        duoRepository.deleteAll();
+        crossReferenceRepository.deleteAll();
         dacRepository.deleteAll();
         contactRepository.deleteAll();
         referenceSequenceRepository.deleteAll();
@@ -179,6 +198,10 @@ public class MetadataApplicationTest {
     }
 
     private String postTestTaxonomy(long id, String name, List<String> ancestors) throws Exception {
+        if ( ancestors == null ) {
+            ancestors = Arrays.asList();
+        }
+
         String jsonContent = "{ " +
                 "\"id\": " + Long.toString(id) + "," +
                 "\"name\": \"" + name + "\"," +
@@ -1448,4 +1471,169 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..dacs").isArray())
                 .andExpect(jsonPath("$..dacs.length()").value(0));
     }
+
+    @Test
+    public void postCrossReference() throws Exception {
+        String location = postTestCrossReference("DUO", "0000005");
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id.db").value("DUO"))
+                .andExpect(jsonPath("$.id.id").value("0000005"));
+    }
+
+    private String postTestCrossReference(String db, String id) throws Exception {
+        DbIdVersionEntityId dbIdVersionEntityId = new DbIdVersionEntityId(db, id);
+        String jsonContent = "{ " +
+                "\"id\": " + testDbIdVersionEntityIdJson.write(dbIdVersionEntityId).getJson() + "," +
+                "\"label\": \"" + "label" + "\"," +
+                "\"url\": \"" + "url" + "\"" +
+                "}";
+
+        MvcResult mvcResult = mockMvc.perform(post("/crossReferences")
+                .content(jsonContent))
+                .andExpect(status().isCreated()).andReturn();
+
+        return mvcResult.getResponse().getHeader("Location");
+    }
+
+    @Test
+    public void postDuo() throws Exception {
+        String crUrl = postTestCrossReference("DUO", "0000007");
+        String duoUrl = postTestDuo(crUrl, null);
+
+        mockMvc.perform(get(duoUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..self.href").value(duoUrl));
+
+        mockMvc.perform(get(duoUrl + "/condition"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..self.href").value(crUrl));
+
+        String modifierUrl = postTestCrossReference("DUO", "0000008");
+        String duoWithModifierUrl = postTestDuo(crUrl, Arrays.asList(modifierUrl));
+
+        mockMvc.perform(get(duoWithModifierUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..self.href").value(duoWithModifierUrl));
+
+        mockMvc.perform(get(duoWithModifierUrl + "/condition"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..self.href").value(crUrl));
+
+        mockMvc.perform(get(duoWithModifierUrl + "/modifiers"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..crossReferences").isArray())
+                .andExpect(jsonPath("$..crossReferences.length()").value(1))
+                .andExpect(jsonPath("$..crossReferences[0]..crossReference.href").value(modifierUrl));
+    }
+
+    private String postTestDuo(String conditionUrl, List<String> modifierUrls) throws Exception {
+        if ( modifierUrls == null ) {
+            modifierUrls = Arrays.asList();
+        }
+
+        String jsonContent = "{ " +
+                "\"condition\": \"" + conditionUrl + "\"," +
+                "\"modifiers\": " + testListJson.write(modifierUrls).getJson() + "" +
+                "}";
+
+        MvcResult mvcResult = mockMvc.perform(post("/duos")
+                .content(jsonContent))
+                .andExpect(status().isCreated()).andReturn();
+
+        return mvcResult.getResponse().getHeader("Location");
+    }
+
+    @Test
+    public void postPolicy() throws Exception {
+        String contact = postTestContact("test@test.com");
+        String dacUrl = postTestDac("testDac1", 1, contact);
+        String policyUrl = postTestPolicy("testPolicy1", 1, dacUrl, null);
+
+        mockMvc.perform(get(policyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id.accession").value("testPolicy1"))
+                .andExpect(jsonPath("$..self.href").value(policyUrl));
+
+        mockMvc.perform(get(policyUrl + "/dac"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id.accession").value("testDac1"))
+                .andExpect(jsonPath("$..self.href").value(dacUrl));
+
+        mockMvc.perform(get(policyUrl + "/dataUseConditions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..duos").isArray())
+                .andExpect(jsonPath("$..duos.length()").value(0));
+
+        String crUrl = postTestCrossReference("DUO", "0000007");
+        String duoUrl = postTestDuo(crUrl, null);
+        policyUrl = postTestPolicy("testPolicy2", 1, dacUrl, Arrays.asList(duoUrl));
+
+        mockMvc.perform(get(policyUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id.accession").value("testPolicy2"))
+                .andExpect(jsonPath("$..self.href").value(policyUrl));
+
+        mockMvc.perform(get(policyUrl + "/dac"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id.accession").value("testDac1"))
+                .andExpect(jsonPath("$..self.href").value(dacUrl));
+
+        mockMvc.perform(get(policyUrl + "/dataUseConditions"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..duos").isArray())
+                .andExpect(jsonPath("$..duos.length()").value(1))
+                .andExpect(jsonPath("$..duos[0]..self.href").value(duoUrl));
+    }
+
+    private String postTestPolicy(String accession, int version, String dacUrl, List<String> duoUrls) throws Exception {
+        if ( duoUrls == null ) {
+            duoUrls = Arrays.asList();
+        }
+
+        String jsonContent = "{ " +
+                "\"id\":{ \"accession\": \"" + accession + "\",\"version\":" + version + "}," +
+                "\"title\": \"" + "title" + "\"," +
+                "\"center\": \"" + "center" + "\"," +
+                "\"content\": \"" + "content" + "\"," +
+                "\"dac\": \"" + dacUrl + "\"," +
+                "\"dataUseConditions\": " + testListJson.write(duoUrls).getJson() +
+                "}";
+
+        MvcResult mvcResult = mockMvc.perform(post("/policies")
+                .content(jsonContent))
+                .andExpect(status().isCreated()).andReturn();
+
+        return mvcResult.getResponse().getHeader("Location");
+    }
+
+    @Test
+    public void findPolicyByAccession() throws Exception {
+        String contact = postTestContact("test@test.com");
+        String dacUrl = postTestDac("testDac1", 1, contact);
+        String testPolicy1 = postTestPolicy("testPolicy1", 1, dacUrl, null);
+        String testPolicy2 = postTestPolicy("testPolicy1", 2, dacUrl, null);
+        String testPolicy3 = postTestPolicy("testPolicy3", 1, dacUrl, null);
+
+        mockMvc.perform(get("/policies/search/accession").param("accession", "testPolicy1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..policies").isArray())
+                .andExpect(jsonPath("$..policies.length()").value(1))
+                .andExpect(jsonPath("$..policies[0]..policy.href").value(testPolicy2))
+                .andExpect(jsonPath("$..policies[0].id.accession").value("testPolicy1"))
+                .andExpect(jsonPath("$..policies[0].id.version").value(2));
+        mockMvc.perform(get("/policies/search/accession").param("accession", "testPolicy3"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..policies").isArray())
+                .andExpect(jsonPath("$..policies.length()").value(1))
+                .andExpect(jsonPath("$..policies[0]..policy.href").value(testPolicy3))
+                .andExpect(jsonPath("$..policies[0].id.accession").value("testPolicy3"))
+                .andExpect(jsonPath("$..policies[0].id.version").value(1));
+        mockMvc.perform(get("/policies/search/accession").param("accession", "unexisted"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..policies").isArray())
+                .andExpect(jsonPath("$..policies.length()").value(0));
+    }
+
 }
