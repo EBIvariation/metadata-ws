@@ -21,8 +21,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.Valid;
@@ -31,12 +34,18 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
-public class Policy extends Auditable<AccessionVersionEntityId>  {
+public class Policy extends Auditable<Long>  {
+
+    @ApiModelProperty(position = 1, value = "Policy auto generated id", required = true, readOnly = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
     @ApiModelProperty(position = 1, required = true)
     @Valid
-    @EmbeddedId
-    private AccessionVersionEntityId id;
+    @Embedded
+    private AccessionVersionEntityId accessionVersionEntityId;
 
     @ApiModelProperty(position = 2)
     @Size(min = 1, max = 255)
@@ -70,7 +79,11 @@ public class Policy extends Auditable<AccessionVersionEntityId>  {
     @OneToMany
     private List<WebResource> resources;
 
-    public AccessionVersionEntityId getId() {
+    public Long getId() {
         return id;
+    }
+
+    public AccessionVersionEntityId getAccessionVersionEntityId() {
+        return accessionVersionEntityId;
     }
 }

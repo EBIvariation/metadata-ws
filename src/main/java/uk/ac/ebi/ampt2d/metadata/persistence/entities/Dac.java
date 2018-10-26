@@ -21,8 +21,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -32,28 +35,34 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
-public class Dac extends Auditable<AccessionVersionEntityId> {
+public class Dac extends Auditable<Long> {
 
-    @ApiModelProperty(position = 1, required = true)
-    @Valid
-    @EmbeddedId
-    private AccessionVersionEntityId id;
+    @ApiModelProperty(position = 1, value = "Dac auto generated id", required = true, readOnly = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
     @ApiModelProperty(position = 2, required = true)
-    @Size(min = 1, max = 255)
-    @NotNull
-    @JsonProperty
-    @Column(nullable = false)
-    private String title;
+    @Valid
+    @Embedded
+    private AccessionVersionEntityId accessionVersionEntityId;
 
     @ApiModelProperty(position = 3, required = true)
     @Size(min = 1, max = 255)
     @NotNull
     @JsonProperty
     @Column(nullable = false)
+    private String title;
+
+    @ApiModelProperty(position = 4, required = true)
+    @Size(min = 1, max = 255)
+    @NotNull
+    @JsonProperty
+    @Column(nullable = false)
     private String center;
 
-    @ApiModelProperty(position = 4, dataType = "java.lang.String", notes = "Url to main contact")
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to main contact")
     @JsonProperty
     @ManyToOne(optional = false)
     private Contact mainContact;
@@ -64,8 +73,12 @@ public class Dac extends Auditable<AccessionVersionEntityId> {
     @OneToMany
     private List<WebResource> resources;
 
-    public AccessionVersionEntityId getId() {
+    public Long getId() {
         return id;
+    }
+
+    public AccessionVersionEntityId getAccessionVersionEntityId() {
+        return accessionVersionEntityId;
     }
 
 }

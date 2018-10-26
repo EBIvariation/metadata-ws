@@ -46,7 +46,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.AccessionVersionEntityIdConverter;
 import uk.ac.ebi.ampt2d.metadata.aop.StudyReleaseDateAspect;
-import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.DbIdVersionEntityIdConverter;
+import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.DbIdVersionIdConverter;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
@@ -72,7 +72,7 @@ public class SpringDataRestConfig {
             @Override
             public void addFormatters(FormatterRegistry registry) {
                 registry.addConverter(new AccessionVersionEntityIdConverter());
-                registry.addConverter(new DbIdVersionEntityIdConverter());
+                registry.addConverter(new DbIdVersionIdConverter());
                 super.addFormatters(registry);
             }
         };
@@ -106,7 +106,7 @@ public class SpringDataRestConfig {
             public void configureConversionService(ConfigurableConversionService conversionService) {
                 super.configureConversionService(conversionService);
                 conversionService.addConverter(new AccessionVersionEntityIdConverter());
-                conversionService.addConverter(new DbIdVersionEntityIdConverter());
+                conversionService.addConverter(new DbIdVersionIdConverter());
             }
 
             @Override

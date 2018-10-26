@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public class DbIdVersionEntityId implements Comparable<DbIdVersionEntityId>, Serializable {
+public class DbAccessionVersionId implements Comparable<DbAccessionVersionId>, Serializable {
 
     @Size(min = 1, max = 32)
     @NotNull
@@ -32,21 +32,21 @@ public class DbIdVersionEntityId implements Comparable<DbIdVersionEntityId>, Ser
 
     @Size(min = 1, max = 32)
     @NotNull
-    private String id;
+    private String accession;
 
     @Size(min = 1, max = 32)
     private String version;
 
-    DbIdVersionEntityId() {
+    DbAccessionVersionId() {
     }
 
-    public DbIdVersionEntityId(String db, String id) {
-        this(db, id, "1");
+    public DbAccessionVersionId(String db, String accession) {
+        this(db, accession, "1");
     }
 
-    public DbIdVersionEntityId(String db, String id, String version) {
+    public DbAccessionVersionId(String db, String accession, String version) {
         this.db = db;
-        this.id = id;
+        this.accession = accession;
         this.version = version;
     }
 
@@ -54,8 +54,8 @@ public class DbIdVersionEntityId implements Comparable<DbIdVersionEntityId>, Ser
         return db;
     }
 
-    public String getId() {
-        return id;
+    public String getAccession() {
+        return accession;
     }
 
     public String getVersion() {
@@ -66,28 +66,28 @@ public class DbIdVersionEntityId implements Comparable<DbIdVersionEntityId>, Ser
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DbIdVersionEntityId that = (DbIdVersionEntityId) o;
+        DbAccessionVersionId that = (DbAccessionVersionId) o;
         return Objects.equals(db, that.db) &&
-                Objects.equals(id, that.id) &&
+                Objects.equals(accession, that.accession) &&
                 Objects.equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
         int result = db.hashCode();
-        result = 31 * result + id.hashCode();
+        result = 31 * result + accession.hashCode();
         result = 31 * result + version.hashCode();
         return result;
     }
 
     @Override
-    public int compareTo(DbIdVersionEntityId o) {
+    public int compareTo(DbAccessionVersionId o) {
         if ( !db.equals(o.getDb()) ) {
             return db.compareTo(o.getDb());
         }
 
-        if ( !id.equals(o.getId()) ) {
-            return id.compareTo(o.getId());
+        if ( !accession.equals(o.getAccession()) ) {
+            return accession.compareTo(o.getAccession());
         }
 
         return version.compareTo(o.getVersion());
@@ -95,6 +95,6 @@ public class DbIdVersionEntityId implements Comparable<DbIdVersionEntityId>, Ser
 
     @Override
     public String toString() {
-        return db + "_" + id + "." + version;
+        return db + "_" + accession + "." + version;
     }
 }

@@ -19,7 +19,6 @@ package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.CrossReference;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.DbIdVersionEntityId;
 
-public interface CrossReferenceRepository extends PagingAndSortingRepository<CrossReference, DbIdVersionEntityId> {
+public interface CrossReferenceRepository extends PagingAndSortingRepository<CrossReference, Long> {
 }

@@ -33,7 +33,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.DbIdVersionEntityId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.DbAccessionVersionId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
@@ -113,7 +113,7 @@ public class MetadataApplicationTest {
     private WebResourceRepository webResourceRepository;
 
     @Autowired
-    private JacksonTester<DbIdVersionEntityId> testDbIdVersionEntityIdJson;
+    private JacksonTester<DbAccessionVersionId> testDbAccessionVersionIdJson;
 
     @Autowired
     private JacksonTester<ReferenceSequence> testReferenceSequenceJson;
@@ -1423,7 +1423,7 @@ public class MetadataApplicationTest {
 
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id.accession").value("testdac"));
+                .andExpect(jsonPath("$.accessionVersionEntityId.accession").value("testdac"));
 
         mockMvc.perform(get(location + "/mainContact"))
                 .andExpect(status().isOk())
@@ -1432,7 +1432,7 @@ public class MetadataApplicationTest {
 
     private String postTestDac(String accession, int version, String mainContact) throws Exception {
         String jsonContent = "{ " +
-                "\"id\":{ \"accession\": \"" + accession + "\",\"version\": " + version + "}," +
+                "\"accessionVersionEntityId\":{ \"accession\": \"" + accession + "\",\"version\": " + version + "}," +
                 "\"title\": \"" + "title" + "\"," +
                 "\"center\": \"" + "center" + "\"," +
                 "\"mainContact\": \"" + mainContact + "\"" +
@@ -1457,15 +1457,15 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..dacs").isArray())
                 .andExpect(jsonPath("$..dacs.length()").value(1))
                 .andExpect(jsonPath("$..dacs[0]..dac.href").value(testDac2))
-                .andExpect(jsonPath("$..dacs[0].id.accession").value("testDac1"))
-                .andExpect(jsonPath("$..dacs[0].id.version").value(2));
+                .andExpect(jsonPath("$..dacs[0].accessionVersionEntityId.accession").value("testDac1"))
+                .andExpect(jsonPath("$..dacs[0].accessionVersionEntityId.version").value(2));
         mockMvc.perform(get("/dacs/search/accession").param("accession", "testDac3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..dacs").isArray())
                 .andExpect(jsonPath("$..dacs.length()").value(1))
                 .andExpect(jsonPath("$..dacs[0]..dac.href").value(testDac3))
-                .andExpect(jsonPath("$..dacs[0].id.accession").value("testDac3"))
-                .andExpect(jsonPath("$..dacs[0].id.version").value(1));
+                .andExpect(jsonPath("$..dacs[0].accessionVersionEntityId.accession").value("testDac3"))
+                .andExpect(jsonPath("$..dacs[0].accessionVersionEntityId.version").value(1));
         mockMvc.perform(get("/dacs/search/accession").param("accession", "unexisted"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..dacs").isArray())
@@ -1478,14 +1478,14 @@ public class MetadataApplicationTest {
 
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id.db").value("DUO"))
-                .andExpect(jsonPath("$.id.id").value("0000005"));
+                .andExpect(jsonPath("$.dbAccessionVersionId.db").value("DUO"))
+                .andExpect(jsonPath("$.dbAccessionVersionId.accession").value("0000005"));
     }
 
-    private String postTestCrossReference(String db, String id) throws Exception {
-        DbIdVersionEntityId dbIdVersionEntityId = new DbIdVersionEntityId(db, id);
+    private String postTestCrossReference(String db, String accession) throws Exception {
+        DbAccessionVersionId dbAccessionVersionId = new DbAccessionVersionId(db, accession);
         String jsonContent = "{ " +
-                "\"id\": " + testDbIdVersionEntityIdJson.write(dbIdVersionEntityId).getJson() + "," +
+                "\"dbAccessionVersionId\": " + testDbAccessionVersionIdJson.write(dbAccessionVersionId).getJson() + "," +
                 "\"label\": \"" + "label" + "\"," +
                 "\"url\": \"" + "url" + "\"" +
                 "}";
@@ -1553,12 +1553,12 @@ public class MetadataApplicationTest {
 
         mockMvc.perform(get(policyUrl))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id.accession").value("testPolicy1"))
+                .andExpect(jsonPath("$.accessionVersionEntityId.accession").value("testPolicy1"))
                 .andExpect(jsonPath("$..self.href").value(policyUrl));
 
         mockMvc.perform(get(policyUrl + "/dac"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id.accession").value("testDac1"))
+                .andExpect(jsonPath("$.accessionVersionEntityId.accession").value("testDac1"))
                 .andExpect(jsonPath("$..self.href").value(dacUrl));
 
         mockMvc.perform(get(policyUrl + "/dataUseConditions"))
@@ -1572,12 +1572,12 @@ public class MetadataApplicationTest {
 
         mockMvc.perform(get(policyUrl))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id.accession").value("testPolicy2"))
+                .andExpect(jsonPath("$.accessionVersionEntityId.accession").value("testPolicy2"))
                 .andExpect(jsonPath("$..self.href").value(policyUrl));
 
         mockMvc.perform(get(policyUrl + "/dac"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id.accession").value("testDac1"))
+                .andExpect(jsonPath("$.accessionVersionEntityId.accession").value("testDac1"))
                 .andExpect(jsonPath("$..self.href").value(dacUrl));
 
         mockMvc.perform(get(policyUrl + "/dataUseConditions"))
@@ -1593,7 +1593,7 @@ public class MetadataApplicationTest {
         }
 
         String jsonContent = "{ " +
-                "\"id\":{ \"accession\": \"" + accession + "\",\"version\":" + version + "}," +
+                "\"accessionVersionEntityId\":{ \"accession\": \"" + accession + "\",\"version\":" + version + "}," +
                 "\"title\": \"" + "title" + "\"," +
                 "\"center\": \"" + "center" + "\"," +
                 "\"content\": \"" + "content" + "\"," +
@@ -1621,15 +1621,15 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..policies").isArray())
                 .andExpect(jsonPath("$..policies.length()").value(1))
                 .andExpect(jsonPath("$..policies[0]..policy.href").value(testPolicy2))
-                .andExpect(jsonPath("$..policies[0].id.accession").value("testPolicy1"))
-                .andExpect(jsonPath("$..policies[0].id.version").value(2));
+                .andExpect(jsonPath("$..policies[0].accessionVersionEntityId.accession").value("testPolicy1"))
+                .andExpect(jsonPath("$..policies[0].accessionVersionEntityId.version").value(2));
         mockMvc.perform(get("/policies/search/accession").param("accession", "testPolicy3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..policies").isArray())
                 .andExpect(jsonPath("$..policies.length()").value(1))
                 .andExpect(jsonPath("$..policies[0]..policy.href").value(testPolicy3))
-                .andExpect(jsonPath("$..policies[0].id.accession").value("testPolicy3"))
-                .andExpect(jsonPath("$..policies[0].id.version").value(1));
+                .andExpect(jsonPath("$..policies[0].accessionVersionEntityId.accession").value("testPolicy3"))
+                .andExpect(jsonPath("$..policies[0].accessionVersionEntityId.version").value(1));
         mockMvc.perform(get("/policies/search/accession").param("accession", "unexisted"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..policies").isArray())

@@ -21,29 +21,46 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.validation.constraints.Size;
 import java.util.Objects;
 
 @Entity
-public class CrossReference extends Auditable<DbIdVersionEntityId> implements Comparable<CrossReference> {
+public class CrossReference extends Auditable<Long> implements Comparable<CrossReference> {
 
-    @ApiModelProperty(position = 1, required = true)
-    @EmbeddedId
-    private DbIdVersionEntityId id;
+    @ApiModelProperty(position = 1, value = "Cross reference auto generated id", required = true, readOnly = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
-    @ApiModelProperty(position = 2)
-    @Size(min = 1, max = 255)
-    @JsonProperty
-    @Column
-    private String label;
+    @ApiModelProperty(position = 2, required = true)
+    @Embedded
+    private DbAccessionVersionId dbAccessionVersionId;
 
     @ApiModelProperty(position = 3)
     @Size(min = 1, max = 255)
     @JsonProperty
     @Column
+    private String label;
+
+    @ApiModelProperty(position = 4)
+    @Size(min = 1, max = 255)
+    @JsonProperty
+    @Column
     private String url;
+
+    public Long getId() {
+        return id;
+    }
+
+    public DbAccessionVersionId getDbAccessionVersionId() {
+        return dbAccessionVersionId;
+    }
 
     public String getLabel() {
         return label;
@@ -58,21 +75,17 @@ public class CrossReference extends Auditable<DbIdVersionEntityId> implements Co
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CrossReference that = (CrossReference) o;
-        return id != null && Objects.equals(id, that.id);
+        return dbAccessionVersionId != null && Objects.equals(dbAccessionVersionId, that.dbAccessionVersionId);
     }
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return dbAccessionVersionId.hashCode();
     }
 
     @Override
     public int compareTo(CrossReference o) {
-        return id.compareTo(o.getId());
-    }
-
-    public DbIdVersionEntityId getId() {
-        return id;
+        return dbAccessionVersionId.compareTo(o.getDbAccessionVersionId());
     }
 
 }
