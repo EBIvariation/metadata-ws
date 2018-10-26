@@ -30,7 +30,7 @@ public class DbIdVersionEntityIdConverter implements Converter<String, DbIdVersi
             String[] DbId = DbIdVersion[0].split("\\_");
             dbIdVersionEntityId = new DbIdVersionEntityId(DbId[0], DbId[1], DbIdVersion[1]);
         } catch (Exception ex) {
-            throw new IllegalArgumentException("Please provide an ID in the form accession.version");
+            throw new IllegalArgumentException("Please provide an ID in the form db_id.version");
         }
         return dbIdVersionEntityId;
     }
