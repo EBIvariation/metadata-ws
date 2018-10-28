@@ -1401,6 +1401,22 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.email").value("test@test.com"));
     }
 
+    @Test
+    public void clientErrorWhenPostContactWithDuplicatedEmails() throws Exception {
+        String email = "test@test.com";
+        String jsonContent = "{ " +
+                "\"email\": \"" + email + "\"," +
+                "\"title\": \"" + "Dr." + "\"," +
+                "\"firstName\": \"" + "First" + "\"," +
+                "\"surname\": \"" + "Last" + "\"" +
+                "}";
+
+        postTestContact(email);
+        mockMvc.perform(post("/contacts")
+                .content(jsonContent))
+                .andExpect(status().is4xxClientError());
+    }
+
     private String postTestContact(String email) throws Exception {
         String jsonContent = "{ " +
                 "\"email\": \"" + email + "\"," +
@@ -1428,6 +1444,25 @@ public class MetadataApplicationTest {
         mockMvc.perform(get(location + "/mainContact"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..contact.href").value(contact));
+    }
+
+    @Test
+    public void clientErrorWhenPostDacWithDuplicatedAccessions() throws Exception {
+        String accession = "testdac";
+        int version = 1;
+        String contact = postTestContact("test@test.com");
+        String location = postTestDac(accession, version, contact);
+
+        String jsonContent = "{ " +
+                "\"accessionVersionEntityId\":{ \"accession\": \"" + accession + "\",\"version\": " + version + "}," +
+                "\"title\": \"" + "title" + "\"," +
+                "\"center\": \"" + "center" + "\"," +
+                "\"mainContact\": \"" + contact + "\"" +
+                "}";
+
+        mockMvc.perform(post("/dacs")
+                .content(jsonContent))
+                .andExpect(status().is4xxClientError());
     }
 
     private String postTestDac(String accession, int version, String mainContact) throws Exception {
@@ -1482,6 +1517,24 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.dbAccessionVersionId.accession").value("0000005"));
     }
 
+    @Test
+    public void clientErrorWhenPostSameCrossReference() throws Exception {
+        String db = "DUO";
+        String accession = "0000005";
+        postTestCrossReference(db, accession);
+
+        DbAccessionVersionId dbAccessionVersionId = new DbAccessionVersionId(db, accession);
+        String jsonContent = "{ " +
+                "\"dbAccessionVersionId\": " + testDbAccessionVersionIdJson.write(dbAccessionVersionId).getJson() + "," +
+                "\"label\": \"" + "label" + "\"," +
+                "\"url\": \"" + "url" + "\"" +
+                "}";
+
+        mockMvc.perform(post("/crossReferences")
+                .content(jsonContent))
+                .andExpect(status().is4xxClientError());
+    }
+
     private String postTestCrossReference(String db, String accession) throws Exception {
         DbAccessionVersionId dbAccessionVersionId = new DbAccessionVersionId(db, accession);
         String jsonContent = "{ " +
@@ -1526,6 +1579,54 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..crossReferences").isArray())
                 .andExpect(jsonPath("$..crossReferences.length()").value(1))
                 .andExpect(jsonPath("$..crossReferences[0]..crossReference.href").value(modifierUrl));
+    }
+
+    @Test
+    public void clientErrorWhenPostDuosWithDuplicatedConditions() throws Exception {
+        List<String> modifiers = new ArrayList<>();
+        String crUrl = postTestCrossReference("DUO", "0000007");
+        String jsonContent = "{ " +
+                "\"condition\": \"" + crUrl + "\"," +
+                "\"modifiers\": " + testListJson.write(modifiers).getJson() + "" +
+                "}";
+
+        mockMvc.perform(post("/duos")
+                .content(jsonContent))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/duos")
+                .content(jsonContent))
+                .andExpect(status().is4xxClientError());
+
+        String modifierOneUrl = postTestCrossReference("DS", "0001");
+        modifiers.add(modifierOneUrl);
+        jsonContent = "{ " +
+                "\"condition\": \"" + crUrl + "\"," +
+                "\"modifiers\": " + testListJson.write(modifiers).getJson() + "" +
+                "}";
+
+        mockMvc.perform(post("/duos")
+                .content(jsonContent))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/duos")
+                .content(jsonContent))
+                .andExpect(status().is4xxClientError());
+
+        String modifierTwoUrl = postTestCrossReference("DS", "0002");
+        modifiers.add(modifierTwoUrl);
+        jsonContent = "{ " +
+                "\"condition\": \"" + crUrl + "\"," +
+                "\"modifiers\": " + testListJson.write(modifiers).getJson() + "" +
+                "}";
+
+        mockMvc.perform(post("/duos")
+                .content(jsonContent))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/duos")
+                .content(jsonContent))
+                .andExpect(status().is4xxClientError());
     }
 
     private String postTestDuo(String conditionUrl, List<String> modifierUrls) throws Exception {
@@ -1585,6 +1686,30 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..duos").isArray())
                 .andExpect(jsonPath("$..duos.length()").value(1))
                 .andExpect(jsonPath("$..duos[0]..self.href").value(duoUrl));
+    }
+
+    @Test
+    public void clientErrorWhenPostPolicyWithDuplicatedAccessions() throws Exception {
+        String accession = "testpolicy";
+        int version = 1;
+        String contact = postTestContact("test@test.com");
+        String dac = postTestDac("testdac", 1, contact);
+        List<String> duos = new ArrayList<>();
+
+        postTestPolicy(accession, version, dac, duos);
+
+        String jsonContent = "{ " +
+                "\"accessionVersionEntityId\":{ \"accession\": \"" + accession + "\",\"version\":" + version + "}," +
+                "\"title\": \"" + "title" + "\"," +
+                "\"center\": \"" + "center" + "\"," +
+                "\"content\": \"" + "content" + "\"," +
+                "\"dac\": \"" + dac + "\"," +
+                "\"dataUseConditions\": " + testListJson.write(duos).getJson() +
+                "}";
+
+        mockMvc.perform(post("/policies")
+                .content(jsonContent))
+                .andExpect(status().is4xxClientError());
     }
 
     private String postTestPolicy(String accession, int version, String dacUrl, List<String> duoUrls) throws Exception {

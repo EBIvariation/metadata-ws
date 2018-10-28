@@ -19,10 +19,10 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -34,10 +34,12 @@ import java.util.List;
 @Entity
 public class Duo extends Auditable<Long> {
 
-    @ApiModelProperty(position = 1, value = "Data use ontology auto generated id", readOnly = true, required = true)
+    @ApiModelProperty(position = 1, value = "Data use ontology custom generated id", readOnly = true, required = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GenericGenerator(name = "duo_hash_generator",
+            strategy = "uk.ac.ebi.ampt2d.metadata.persistence.idgenerator.DuoIdGenerator")
+    @GeneratedValue(generator = "duo_hash_generator")
     private long id;
 
     @ApiModelProperty(position = 2, dataType = "java.lang.String", notes = "Url to a data use condition")

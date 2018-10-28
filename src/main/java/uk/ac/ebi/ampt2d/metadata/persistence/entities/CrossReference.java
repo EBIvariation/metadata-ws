@@ -26,10 +26,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Size;
 import java.util.Objects;
 
 @Entity
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"db", "accession", "version"})})
 public class CrossReference extends Auditable<Long> implements Comparable<CrossReference> {
 
     @ApiModelProperty(position = 1, value = "Cross reference auto generated id", required = true, readOnly = true)
