@@ -20,19 +20,13 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Embeddable;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Embeddable
 public class AccessionVersionId implements Serializable {
 
-    @Size(min = 1, max = 255)
-    @NotNull
     private String accession;
 
-    @Min(1)
     @ApiModelProperty(example = "1")
     private int version;
 

@@ -48,8 +48,7 @@ public class Study extends Auditable<Long> {
     @Id
     private long id;
 
-    @ApiModelProperty(position = 2, required = true)
-    @Valid
+    @ApiModelProperty(position = 2)
     @Embedded
     private AccessionVersionId accessionVersionId;
 

@@ -53,8 +53,7 @@ public class File extends Auditable<Long> {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ApiModelProperty(position = 2, required = true)
-    @Valid
+    @ApiModelProperty(position = 2)
     @Embedded
     private AccessionVersionId accessionVersionId;
 
@@ -93,12 +92,12 @@ public class File extends Auditable<Long> {
         this.type = type;
     }
 
-    public AccessionVersionId getAccessionVersionId() {
-        return accessionVersionId;
-    }
-
     @Override
     public Long getId() {
         return id;
+    }
+
+    public AccessionVersionId getAccessionVersionId() {
+        return accessionVersionId;
     }
 }

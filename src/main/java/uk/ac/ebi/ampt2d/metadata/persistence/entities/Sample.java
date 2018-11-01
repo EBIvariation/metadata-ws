@@ -42,8 +42,7 @@ public class Sample extends Auditable<Long> {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @ApiModelProperty(position = 2, required = true)
-    @Valid
+    @ApiModelProperty(position = 2)
     @Embedded
     private AccessionVersionId accessionVersionId;
 
@@ -62,12 +61,12 @@ public class Sample extends Auditable<Long> {
         this.name = name;
     }
 
-    public AccessionVersionId getAccessionVersionId() {
-        return accessionVersionId;
-    }
-
     @Override
     public Long getId() {
         return id;
+    }
+
+    public AccessionVersionId getAccessionVersionId() {
+        return accessionVersionId;
     }
 }

@@ -45,7 +45,7 @@ public class Taxonomy extends Auditable<Long> {
     @JsonProperty
     @Min(1)
     @Column(unique = true)
-    private long taxonomyIdentifier;
+    private long taxonomyId;
 
     @ApiModelProperty(position = 3)
     @NotNull
