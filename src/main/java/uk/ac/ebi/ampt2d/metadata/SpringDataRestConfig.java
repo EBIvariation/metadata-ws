@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.support.ConfigurableConversionService;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
@@ -88,6 +89,13 @@ public class SpringDataRestConfig {
                         Publication.class,
                         WebResource.class
                 );
+
+            }
+
+            @Override
+            public void configureConversionService(ConfigurableConversionService conversionService) {
+                super.configureConversionService(conversionService);
+                conversionService.addConverter(new CustomBackendIdConverter());
             }
 
             @Override
@@ -123,7 +131,7 @@ public class SpringDataRestConfig {
 
     /**
      * Inject StudyDeprecationAspect bean
-     * <p>
+     *
      * The StudyDeprecationAspect ensures every GET request returns only not yet deprecated studies
      *
      * @return StudyDeprecationAspect
@@ -135,7 +143,7 @@ public class SpringDataRestConfig {
 
     /**
      * Inject StudyReleaseDateAspect bean conditionally
-     * <p>
+     *
      * The StudyReleaseDateAspect ensures every GET request returns only published studies
      * Set "endpoints.studies.date.restricted" to false if you don't want this restriction
      *
