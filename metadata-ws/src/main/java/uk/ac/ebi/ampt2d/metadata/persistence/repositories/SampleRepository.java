@@ -27,6 +27,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QSample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QSample;
 
 import java.util.List;
 
@@ -34,7 +35,9 @@ import java.util.List;
 public interface SampleRepository extends PagingAndSortingRepository<Sample, Long>, QueryDslPredicateExecutor<Sample>,
         QuerydslBinderCustomizer<QSample> {
 
-    default void customize(QuerydslBindings bindings, QSample sample) {
+    default void customize(QuerydslBindings bindings, QSample qSample) {
+        bindings.bind(qSample.taxonomies.any().name)
+                .first((path, value) -> path.equalsIgnoreCase(value));
     }
 
     @ApiOperation(value = "Get the latest version of Sample based on accession")

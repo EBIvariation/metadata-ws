@@ -300,12 +300,19 @@ public class MetadataApplicationTest {
 
     @Test
     public void postSample() throws Exception {
-        String location = postTestSample("EGAN0001", "testSample");
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl);
+        taxonomyUrl = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl);
+
+        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
 
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
-                .andExpect(jsonPath("$.name").value("testSample"));
+                .andExpect(jsonPath("$.name").value("testSample"))
+                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
     }
 
     private String postTestSample(String accession, String name) throws Exception {
@@ -317,9 +324,23 @@ public class MetadataApplicationTest {
         return mvcResult.getResponse().getHeader("Location");
     }
 
+    private String postTestSample(String accession, String name, List<String> taxonomyUrlList) throws Exception {
+        Sample testSample = new Sample(new AccessionVersionId(accession, 1), name);/////
+        MvcResult mvcResult = mockMvc.perform(post("/samples")
+        .content("{ " +
+                "\"id\":{ \"accession\": \"" + accession + "\",\"version\": " + 1 + "}," +
+                "\"name\": \"" + name + "\"," +
+                "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
+                "}"))
+        .andExpect(status().isCreated()).andReturn();
+
+        return mvcResult.getResponse().getHeader("Location");
+    }
+
     @Test
     public void postWebResource() throws Exception {
         String location = postTestWebResource();
+
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.type").value("CENTER_WEB"))
@@ -1410,46 +1431,4 @@ public class MetadataApplicationTest {
                 .andExpect(header().string("Allow", containsString("GET")));
     }
 
-    @Test
-    public void testDuplicateKeyValidation() throws Exception {
-        String taxonomyUrl = postTestTaxonomy();
-
-        //Post same taxonomy again
-        mockMvc.perform(post("/taxonomies")
-                .content("{ " +
-                        "\"taxonomyId\": 9606," +
-                        "\"name\": \"Homo Sapiens\"," +
-                        "\"ancestors\": " + testListJson.write(new ArrayList()).getJson() + "" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.error").value("Conflict"))
-                .andExpect(jsonPath("$.message").value("Duplicate id or index provided"));
-
-        postTestStudy("EGAS0001", 1, "study1", taxonomyUrl);
-
-        //Post same study again
-        mockMvc.perform(post("/studies")
-                .content("{ " +
-                        "\"accessionVersionId\":{ \"accession\": \"EGAS0001\",\"version\":1}," +
-                        "\"name\": \" study1\"," +
-                        "\"description\": \"Nothing important\"," +
-                        "\"center\": \"EBI\"," +
-                        "\"releaseDate\": \"" + LocalDate.now() + "\"," +
-                        "\"taxonomy\": \"" + taxonomyUrl + "\"" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.error").value("Conflict"))
-                .andExpect(jsonPath("$.message").value("Duplicate id or index provided"));
-
-        postWebResource();
-
-        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "http:\\www.ebi.ac.uk");
-
-        //Post same webresource again
-        mockMvc.perform(post("/webResources")
-                .content(testWebResourceJson.write(testWebResource).getJson()))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.error").value("Conflict"))
-                .andExpect(jsonPath("$.message").value("Duplicate id or index provided"));
-    }
 }
