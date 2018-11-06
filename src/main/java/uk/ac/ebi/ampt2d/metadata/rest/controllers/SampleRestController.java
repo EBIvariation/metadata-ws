@@ -50,12 +50,13 @@ public class SampleRestController implements ResourceProcessor<RepositoryLinksRe
     @Autowired
     private GenericResourceAssembler<Sample, SampleResource> resourceAssembler;
 
-    @ApiOperation(value = "Get a filtered list of samples based on taxonomy name")
+    @ApiOperation(value = "Get a filtered list of samples based on taxonomy name/id")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "taxonomies.name", value = "Sample's taxonomy", dataType = "string",
-                    paramType = "query", example = "Homo Sapiens")
+            @ApiImplicitParam(name = "taxonomies.name", value = "Sample's taxonomy name", dataType = "string",
+                    paramType = "query", example = "Homo Sapiens"),
+            @ApiImplicitParam(name = "taxonomies.id", value = "Sample's taxonomy id", dataType = "long",
+                    paramType = "query", example = "9606")
     })
-
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody
     @SuppressWarnings("unchecked")

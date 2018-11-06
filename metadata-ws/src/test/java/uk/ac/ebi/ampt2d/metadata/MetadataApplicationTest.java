@@ -301,10 +301,10 @@ public class MetadataApplicationTest {
     @Test
     public void postSample() throws Exception {
         List<String> taxonomyUrlList = new ArrayList<String>();
-        String taxonomyUrl = postTestTaxonomy(1, "Species1");
-        taxonomyUrlList.add(taxonomyUrl);
-        taxonomyUrl = postTestTaxonomy(2, "Species2");
-        taxonomyUrlList.add(taxonomyUrl);
+        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl1);
+        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl2);
 
         String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
 
@@ -313,15 +313,27 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
                 .andExpect(jsonPath("$.name").value("testSample"))
                 .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(2))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
+                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
     }
 
     private String postTestSample(String accession, String name) throws Exception {
-        Sample testSample = new Sample(new AccessionVersionId(accession, 1), name);
-        MvcResult mvcResult = mockMvc.perform(post("/samples")
-                .content(testSampleJson.write(testSample).getJson()))
-                .andExpect(status().isCreated()).andReturn();
+//        Sample testSample = new Sample(new AccessionVersionId(accession, 1), name);
+//        MvcResult mvcResult = mockMvc.perform(post("/samples")
+//                .content(testSampleJson.write(testSample).getJson())) //////
+//                .andExpect(status().isCreated()).andReturn();
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl);
+        taxonomyUrl = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl);
 
-        return mvcResult.getResponse().getHeader("Location");
+        return postTestSample(accession, name, taxonomyUrlList);
     }
 
     private String postTestSample(String accession, String name, List<String> taxonomyUrlList) throws Exception {
@@ -1431,4 +1443,96 @@ public class MetadataApplicationTest {
                 .andExpect(header().string("Allow", containsString("GET")));
     }
 
+    @Test
+    public void findSampleByTaxonomyName() throws Exception {
+        String homininesTaxonomyUrl = postTestTaxonomy(207598, "Homininae");
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        List<String> taxonomiesUrlList1 = Arrays.asList(homininesTaxonomyUrl, humanTaxonomyUrl);
+        String bonoboTaxonomyUrl = postTestTaxonomy(9597, "Pan paniscus");
+        String chimpanzeeTaxonomyUrl = postTestTaxonomy(9598, "Pan troglodytes");
+        List<String> taxonomiesUrlList2 = Arrays.asList(bonoboTaxonomyUrl, chimpanzeeTaxonomyUrl);
+
+        String sampleUrl1 = postTestSample("Species1", "Species collection1", taxonomiesUrlList1);
+        String sampleUrl2 = postTestSample("Species2", "Species collection2", taxonomiesUrlList2);
+        String sampleUrl3 = postTestSample("Species3", "Species collection3",
+                Arrays.asList(homininesTaxonomyUrl, bonoboTaxonomyUrl));
+
+        mockMvc.perform(get("/samples/search?taxonomies.name=Homininae"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(2))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl1))
+                .andExpect(jsonPath("$..samples[1]..sample.href").value(sampleUrl3));
+
+        mockMvc.perform(get("/samples/search?taxonomies.name=Homo sapiens"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(1))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl1));
+
+        mockMvc.perform(get("/samples/search?taxonomies.name=Pan paniscus"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(2))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl2))
+                .andExpect(jsonPath("$..samples[1]..sample.href").value(sampleUrl3));
+
+        mockMvc.perform(get("/samples/search?taxonomies.name=Pan troglodytes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(1))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl2));
+
+        mockMvc.perform(get("/samples/search?taxonomies.name=NonExisting"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(0));
+    }
+
+    @Test
+    public void findSampleByTaxonomyId() throws Exception {
+        String homininesTaxonomyUrl = postTestTaxonomy(207598, "Homininae");
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        List<String> taxonomiesUrlList1 = Arrays.asList(homininesTaxonomyUrl, humanTaxonomyUrl);
+        String bonoboTaxonomyUrl = postTestTaxonomy(9597, "Pan paniscus");
+        String chimpanzeeTaxonomyUrl = postTestTaxonomy(9598, "Pan troglodytes");
+        List<String> taxonomiesUrlList2 = Arrays.asList(bonoboTaxonomyUrl, chimpanzeeTaxonomyUrl);
+
+        String sampleUrl1 = postTestSample("Species1", "Species collection1", taxonomiesUrlList1);
+        String sampleUrl2 = postTestSample("Species2", "Species collection2", taxonomiesUrlList2);
+        String sampleUrl3 = postTestSample("Species3", "Species collection3",
+                Arrays.asList(homininesTaxonomyUrl, bonoboTaxonomyUrl));
+
+
+        mockMvc.perform(get("/samples/search?taxonomies.id=207598"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(2))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl1))
+                .andExpect(jsonPath("$..samples[1]..sample.href").value(sampleUrl3));
+
+        mockMvc.perform(get("/samples/search?taxonomies.id=9606"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(1))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl1));
+
+        mockMvc.perform(get("/samples/search?taxonomies.id=9597"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(2))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl2))
+                .andExpect(jsonPath("$..samples[1]..sample.href").value(sampleUrl3));
+
+        mockMvc.perform(get("/samples/search?taxonomies.id=9598"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(1))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl2));
+
+        mockMvc.perform(get("/samples/search?taxonomies.id=0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(0));
+    }
 }
