@@ -322,6 +322,16 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
     }
 
+    @Test
+    public void postSampleInvalid() throws Exception {
+        mockMvc.perform(post("/samples")
+                .content("{ " +
+                        "\"id\":{ \"accession\": \"" + "species1" + "\",\"version\": " + 1 + "}," +
+                        "\"name\": \"" + "test sample" + "\"" +
+                        "}"))
+        .andExpect(status().is4xxClientError()).andReturn();
+    }
+
     private String postTestSample(String accession, String name) throws Exception {
 //        Sample testSample = new Sample(new AccessionVersionId(accession, 1), name);
 //        MvcResult mvcResult = mockMvc.perform(post("/samples")
