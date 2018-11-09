@@ -54,14 +54,6 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
-    public Study findOneStudyByAccessionVersionId(AccessionVersionId accessionVersionId) {
-        QStudy study = QStudy.study;
-        Predicate predicate = study.accessionVersionId.accession.equalsIgnoreCase(accessionVersionId.getAccession())
-                .and(study.accessionVersionId.version.eq(accessionVersionId.getVersion()));
-        return findOneStudyByPredicate(predicate);
-    }
-
-    @Override
     public List<Study> findStudiesByPredicate(Predicate predicate) {
         return (List<Study>) studyRepository.findAll(predicate);
     }
@@ -122,7 +114,7 @@ public class StudyServiceImpl implements StudyService {
     public List<Study> findLinkedStudies(AccessionVersionId accessionVersionId) {
         Study study = findOneStudyByAccessionVersionId(accessionVersionId);
         //findOne returns only released/non-deprecated study
-        if (study == null && studyRepository.findOne(study.getId())==null) {
+        if (study == null && studyRepository.findOne(study.getId()) == null) {
             return Arrays.asList();
         }
 
@@ -141,18 +133,25 @@ public class StudyServiceImpl implements StudyService {
                 .collect(Collectors.toList());
     }
 
-    private List<Study> findParentStudy(Study child) {
-        QStudy study = QStudy.study;
-        Predicate predicate = study.childStudies.any().eq(child);
-
-        return findStudiesByPredicate(predicate);
-    }
-
     @Override
     public Study patch(Study study, String patch) throws Exception {
         Study study1 = objectMapper.readerForUpdating(study).readValue(patch);
 
         return studyRepository.save(study1);
+    }
+
+    private Study findOneStudyByAccessionVersionId(AccessionVersionId accessionVersionId) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.accessionVersionId.accession.equalsIgnoreCase(accessionVersionId.getAccession())
+                .and(study.accessionVersionId.version.eq(accessionVersionId.getVersion()));
+        return findOneStudyByPredicate(predicate);
+    }
+
+    private List<Study> findParentStudy(Study child) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.childStudies.any().eq(child);
+
+        return findStudiesByPredicate(predicate);
     }
 
 }

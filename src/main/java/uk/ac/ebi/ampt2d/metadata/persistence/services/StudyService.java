@@ -45,6 +45,4 @@ public interface StudyService {
     List<Study> findLinkedStudies(AccessionVersionId accessionVersionId);
 
     Study patch(Study study, String patch) throws Exception;
-
-    Study findOneStudyByAccessionVersionId(AccessionVersionId accessionVersionId);
 }

@@ -35,7 +35,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession","version"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
 public class File extends Auditable<Long> {
 
     public enum Type {
