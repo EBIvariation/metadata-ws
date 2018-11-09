@@ -40,7 +40,7 @@ public class File extends Auditable<Long> {
 
     public enum Type {
 
-        tab, bam, bai, cram, crai, vcf, vcf_aggregate, bcf, tabix, wig, bed, gff, fasta, fastq, flatfile,
+        tsv, tab, bam, bai, cram, crai, vcf, vcf_aggregate, bcf, tabix, wig, bed, gff, fasta, fastq, flatfile,
         chromosome_list, sample_list, readme_file, phenotype_file, BioNano_native, Kallisto_native, agp,
         unlocalised_list, info, manifest, other
     }

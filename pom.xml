@@ -8,8 +8,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>metadataapi</module>
-        <module>metadataload</module>
+        <module>metadata-api</module>
+        <module>metadata-load</module>
     </modules>
 
     <name>metadata-ws</name>

@@ -289,7 +289,7 @@ public class MetadataApplicationTest {
 
     private String postTestFile(String accession, int version) throws Exception {
         File testFile = new File(new AccessionVersionId(accession, version), "asd123", "test_file",
-                100, File.Type.TSV);
+                100, File.Type.tsv);
 
         MvcResult mvcResult = mockMvc.perform(post("/files")
                 .content(testFileJson.write(testFile).getJson()))

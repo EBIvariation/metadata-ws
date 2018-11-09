@@ -17,8 +17,6 @@
  */
 package uk.ac.ebi.ampt2d.metadata.converter;
 
-import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,8 +25,6 @@ public interface SRAToAMPT2DConverter<SOURCE, DESTINATION> {
     DESTINATION convert(SOURCE source);
 
     default List<DESTINATION> convertModels(List<SOURCE> sources) {
-        AnalysisFileType.Filetype.Enum analysisFileType = AnalysisFileType.Filetype.Enum.forString("VCF");
-
         return sources.stream().map(source -> convert(source)).collect(Collectors.toList());
     }
 }
