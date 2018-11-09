@@ -779,9 +779,9 @@ public class MetadataApplicationTest {
         mockMvc.perform(get("/studies?accessionVersionId=EGAS0001.1")).andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies[0].accessionVersionId.accession").value("EGAS0001"));
         mockMvc.perform(get("/files?accessionVersionId=EGAF0001.1")).andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies[0].accessionVersionId.accession").value("EGAF0001"));
+                .andExpect(jsonPath("$..files[0].accessionVersionId.accession").value("EGAF0001"));
         mockMvc.perform(get("/samples?accessionVersionId=EGAN0001.1")).andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies[0].accessionVersionId.accession").value("EGAN0001"));
+                .andExpect(jsonPath("$..samples[0].accessionVersionId.accession").value("EGAN0001"));
     }
 
     @Test
