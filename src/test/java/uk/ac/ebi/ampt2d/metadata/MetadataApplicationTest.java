@@ -711,17 +711,22 @@ public class MetadataApplicationTest {
     public void searchStudy() throws Exception {
         String taxonomyUrl = postTestTaxonomy();
         postTestStudy("EGAS0001", 1, "test human study based on GRCh37", taxonomyUrl);
+        postTestStudy("EGAS0001", 2, "test human study based on GRCh37", taxonomyUrl);
         postTestStudy("EGAS0002", 1, "test human study based on GRCh38", taxonomyUrl);
 
+        mockMvc.perform(get("/studies/search/accession").param("accession", "EGAS0001"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAS0001"))
+                .andExpect(jsonPath("$.accessionVersionId.version").value(2));
         mockMvc.perform(get("/studies/search/text").param("searchTerm", "human"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies.length()").value(2));
+                .andExpect(jsonPath("$..studies.length()").value(3));
         mockMvc.perform(get("/studies/search/text").param("searchTerm", "important"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies.length()").value(2));
+                .andExpect(jsonPath("$..studies.length()").value(3));
         mockMvc.perform(get("/studies/search/text").param("searchTerm", "grCh37"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[0].accessionVersionId.accession").value("EGAS0001"));
         mockMvc.perform(get("/studies/search/text").param("searchTerm", "GrCh39"))
                 .andExpect(status().isOk())
@@ -763,6 +768,20 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies[0].accessionVersionId.accession").value("EGAS0001"));
         mockMvc.perform(get("/studies?accessionVersionId=EGAS0001.2")).andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies.length()").value(0));
+    }
+
+    @Test
+    public void testSearchByAccessionVersionId() throws Exception {
+        String taxonomyUrl = postTestTaxonomy();
+        postTestStudy("EGAS0001", 1, "test_study", taxonomyUrl);
+        postTestFile("EGAF0001", 1);
+        postTestSample("EGAN0001", "Sample1");
+        mockMvc.perform(get("/studies?accessionVersionId=EGAS0001.1")).andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies[0].accessionVersionId.accession").value("EGAS0001"));
+        mockMvc.perform(get("/files?accessionVersionId=EGAF0001.1")).andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies[0].accessionVersionId.accession").value("EGAF0001"));
+        mockMvc.perform(get("/samples?accessionVersionId=EGAN0001.1")).andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies[0].accessionVersionId.accession").value("EGAN0001"));
     }
 
     @Test
@@ -1310,22 +1329,22 @@ public class MetadataApplicationTest {
                         testListJson.write(Arrays.asList(testStudy2, testStudy3)).getJson() +
                         "}"))
                 .andExpect(status().is2xxSuccessful());
-        mockMvc.perform(get("/studies/testhuman.1/linkedStudies"))
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[*]..study.href", hasItems(testStudy2, testStudy3)));
-        mockMvc.perform(get("/studies/testhuman.2/linkedStudies"))
+        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[*]..study.href", hasItems(testStudy1, testStudy3)));
-        mockMvc.perform(get("/studies/testhuman.3/linkedStudies"))
+        mockMvc.perform(get(testStudy3 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
                 .andExpect(jsonPath("$..studies[*]..study.href", hasItems(testStudy1, testStudy2)));
-        mockMvc.perform(get("/studies/testhuman.4/linkedStudies"))
+        mockMvc.perform(get(testStudy4 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
@@ -1338,7 +1357,7 @@ public class MetadataApplicationTest {
                         "}"))
                 .andExpect(status().is2xxSuccessful());
 
-        mockMvc.perform(get("/studies/testhuman.1/linkedStudies"))
+        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));

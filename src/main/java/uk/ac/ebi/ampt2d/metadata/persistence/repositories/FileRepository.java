@@ -18,16 +18,24 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
 import io.swagger.annotations.ApiOperation;
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QFile;
 
 import java.util.List;
 
 @RepositoryRestResource
-public interface FileRepository extends PagingAndSortingRepository<File, Long> {
+public interface FileRepository extends PagingAndSortingRepository<File, Long>, QueryDslPredicateExecutor<File>,
+        QuerydslBinderCustomizer<QFile> {
+
+    default void customize(QuerydslBindings bindings, QFile file) {
+    }
 
     @ApiOperation(value = "Get the latest version of File based on accession")
     @RestResource(path = "/accession")

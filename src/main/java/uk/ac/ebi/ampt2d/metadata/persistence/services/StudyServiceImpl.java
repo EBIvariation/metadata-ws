@@ -20,7 +20,6 @@ package uk.ac.ebi.ampt2d.metadata.persistence.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
@@ -111,10 +110,9 @@ public class StudyServiceImpl implements StudyService {
     }
 
     @Override
-    public List<Study> findLinkedStudies(AccessionVersionId accessionVersionId) {
-        Study study = findOneStudyByAccessionVersionId(accessionVersionId);
-        //findOne returns only released/non-deprecated study
-        if (study == null && studyRepository.findOne(study.getId()) == null) {
+    public List<Study> findLinkedStudies(long id) {
+        Study study = studyRepository.findOne(id);
+        if (study == null) {
             return Arrays.asList();
         }
 
@@ -138,13 +136,6 @@ public class StudyServiceImpl implements StudyService {
         Study study1 = objectMapper.readerForUpdating(study).readValue(patch);
 
         return studyRepository.save(study1);
-    }
-
-    private Study findOneStudyByAccessionVersionId(AccessionVersionId accessionVersionId) {
-        QStudy study = QStudy.study;
-        Predicate predicate = study.accessionVersionId.accession.equalsIgnoreCase(accessionVersionId.getAccession())
-                .and(study.accessionVersionId.version.eq(accessionVersionId.getVersion()));
-        return findOneStudyByPredicate(predicate);
     }
 
     private List<Study> findParentStudy(Study child) {
