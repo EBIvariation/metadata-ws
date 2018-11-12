@@ -99,4 +99,20 @@ public class File extends Auditable<Long> {
     public AccessionVersionId getAccessionVersionId() {
         return accessionVersionId;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public Type getType() {
+        return type;
+    }
 }
