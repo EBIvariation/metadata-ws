@@ -19,8 +19,8 @@ public class SRAToAMPT2DConverterTest {
     @Test
     public void testFileConverter() {
         initializeAnalysisFileType();
-        SRAToAMPT2DConverter fileTypeConverter = new FileTypeConverter();
-        File file = (File) fileTypeConverter.convert(analysisFileType);
+        SRAToAMPT2DConverter<AnalysisFileType,File> fileTypeConverter = new FileTypeConverter();
+        File file = fileTypeConverter.convert(analysisFileType);
         assertAnalysisFileTypeEqualsFile(analysisFileType, file);
     }
 
