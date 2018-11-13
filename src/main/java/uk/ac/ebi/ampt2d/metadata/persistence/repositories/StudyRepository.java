@@ -43,7 +43,7 @@ public interface StudyRepository extends PagingAndSortingRepository<Study, Long>
 
     @ApiOperation(value = "Get the latest version of Study based on accession")
     @RestResource(path = "/accession")
-    List<Sample> findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc
+    List<Study> findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc
             (@Param("accession") String accession);
 
 }
