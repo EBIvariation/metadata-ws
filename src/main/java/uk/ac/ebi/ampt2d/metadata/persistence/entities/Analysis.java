@@ -33,6 +33,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -79,6 +80,7 @@ public class Analysis extends Auditable<Long> {
 
     @ApiModelProperty(position = 2)
     @Embedded
+    @Valid
     private AccessionVersionId accessionVersionId;
 
     @ApiModelProperty(position = 3, required = true)

@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Min;
 import java.io.Serializable;
 
 @Embeddable
@@ -28,12 +29,13 @@ public class AccessionVersionId implements Serializable {
     private String accession;
 
     @ApiModelProperty(example = "1")
-    private int version;
+    @Min(1)
+    private Integer version;
 
     AccessionVersionId() {
     }
 
-    public AccessionVersionId(String accession, int version) {
+    public AccessionVersionId(String accession, Integer version) {
         this.accession = accession;
         this.version = version;
     }
@@ -42,7 +44,7 @@ public class AccessionVersionId implements Serializable {
         return accession;
     }
 
-    public int getVersion() {
+    public Integer getVersion() {
         return version;
     }
 

@@ -33,7 +33,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession","version"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
 public class Sample extends Auditable<Long> {
 
     @ApiModelProperty(position = 1, value = "Sample auto generated id", required = true, readOnly = true)
@@ -44,6 +44,7 @@ public class Sample extends Auditable<Long> {
 
     @ApiModelProperty(position = 2)
     @Embedded
+    @Valid
     private AccessionVersionId accessionVersionId;
 
     @ApiModelProperty(position = 3, required = true)

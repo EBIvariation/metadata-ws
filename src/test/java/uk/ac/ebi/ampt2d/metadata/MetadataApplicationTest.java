@@ -53,6 +53,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -614,6 +615,27 @@ public class MetadataApplicationTest {
     public void clientErrorWhenSearchAnalysesWithInvalidType() throws Exception {
         mockMvc.perform(get("/analyses/search?type=unknown"))
                 .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void testAccessionVersionIdPost() throws Exception{
+        Sample testSample = new Sample(null, "Sample1");
+        String testSampleUrl = mockMvc.perform(post("/samples")
+                .content(testSampleJson.write(testSample).getJson()))
+                .andExpect(status().isCreated()).andReturn().getResponse().getHeader("Location");
+
+        mockMvc.perform(get(testSampleUrl))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.accessionVersionId").value(nullValue()));
+
+        Sample testSample1 = new Sample(new AccessionVersionId("EGAN0001",0), "Sample1");
+        mockMvc.perform(post("/samples")
+                .content(testSampleJson.write(testSample1).getJson()))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.errors[0].property").value("accessionVersionId.version"))
+                .andExpect(jsonPath("$.errors[0].message").value("must be greater than or equal to 1"));
+
     }
 
     @Test

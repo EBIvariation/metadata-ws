@@ -55,6 +55,7 @@ public class File extends Auditable<Long> {
 
     @ApiModelProperty(position = 2)
     @Embedded
+    @Valid
     private AccessionVersionId accessionVersionId;
 
     @ApiModelProperty(position = 3, required = true)
@@ -82,7 +83,8 @@ public class File extends Auditable<Long> {
     @Column(nullable = false)
     private Type type;
 
-    File() {}
+    File() {
+    }
 
     public File(AccessionVersionId accessionVersionId, String hash, String name, long size, Type type) {
         this.accessionVersionId = accessionVersionId;

@@ -39,7 +39,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession","version"}))
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
 public class Study extends Auditable<Long> {
 
     @ApiModelProperty(position = 1, value = "Study auto generated id", required = true, readOnly = true)
@@ -50,6 +50,7 @@ public class Study extends Auditable<Long> {
 
     @ApiModelProperty(position = 2)
     @Embedded
+    @Valid
     private AccessionVersionId accessionVersionId;
 
     @ApiModelProperty(position = 3, required = true)
