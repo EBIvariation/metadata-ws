@@ -618,7 +618,8 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void testAccessionVersionIdPost() throws Exception{
+    public void testAccessionVersionIdPost() throws Exception {
+        //AccessionVersionId can be null but in case of provided values,accession and version should be valid.
         Sample testSample = new Sample(null, "Sample1");
         String testSampleUrl = mockMvc.perform(post("/samples")
                 .content(testSampleJson.write(testSample).getJson()))
@@ -629,7 +630,21 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.accessionVersionId").value(nullValue()));
 
-        Sample testSample1 = new Sample(new AccessionVersionId("EGAN0001",0), "Sample1");
+        Sample testSampleWithNullAccessionAndValidVersion = new Sample(new AccessionVersionId(null, 1), "Sample1");
+        mockMvc.perform(post("/samples")
+                .content(testSampleJson.write(testSampleWithNullAccessionAndValidVersion).getJson()))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.errors[0].property").value("accessionVersionId.accession"))
+                .andExpect(jsonPath("$.errors[0].message").value("may not be null"));
+
+        Sample testSampleWithInvalidAccession = new Sample(new AccessionVersionId("", 1), "Sample1");
+        mockMvc.perform(post("/samples")
+                .content(testSampleJson.write(testSampleWithInvalidAccession).getJson()))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("$.errors[0].property").value("accessionVersionId.accession"))
+                .andExpect(jsonPath("$.errors[0].message").value("size must be between 1 and 255"));
+
+        Sample testSample1 = new Sample(new AccessionVersionId("EGAN0001", 0), "Sample1");
         mockMvc.perform(post("/samples")
                 .content(testSampleJson.write(testSample1).getJson()))
                 .andExpect(status().is4xxClientError())

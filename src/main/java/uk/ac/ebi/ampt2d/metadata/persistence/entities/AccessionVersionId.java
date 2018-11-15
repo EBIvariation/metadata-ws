@@ -21,11 +21,16 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Embeddable;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Embeddable
 public class AccessionVersionId implements Serializable {
 
+    @ApiModelProperty(position = 1)
+    @NotNull
+    @Size(min = 1, max = 255)
     private String accession;
 
     @ApiModelProperty(example = "1")
