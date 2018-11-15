@@ -83,6 +83,12 @@ public class File extends Auditable<Long> {
 
     File() {}
 
+    public File(String hash, String name, String type) {
+        this.hash = hash;
+        this.name = name;
+        this.type = Type.valueOf(type);
+    }
+
     public File(AccessionVersionId accessionVersionId, String hash, String name, long size, Type type) {
         this.accessionVersionId = accessionVersionId;
         this.hash = hash;
