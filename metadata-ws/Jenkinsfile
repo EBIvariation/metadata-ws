@@ -6,7 +6,7 @@ pipeline {
   }
   environment {
     stagingPostgresDbUrl = credentials('STAGINGMETADATAWSDBURL')
-    fallBackPostgresDbUrl = credentials('FALLBACKMETADATAWSDBURL')
+    fallBackPostgresDbUrl = credentials('PRODMETADATAWSDBURL')
     productionPostgresDbUrl = credentials('PRODMETADATAWSDBURL')
     postgresDBUserName = credentials('POSTGRESDBUSERNAME')
     postgresDBPassword = credentials('POSTGRESDBPASSWORD')
@@ -55,7 +55,7 @@ pipeline {
       steps {
         echo 'Deploying to Staging'
         sh "curl --upload-file staging/target/metadata-ws-*.war \
-        'http://'${tomcatCredentials}'@'${stagingHost}':8080/manager/text/deploy?path=/metadata&update=true' | \
+        'http://'${tomcatCredentials}'@'${stagingHost}':8080/manager/text/deploy?path=/dev/metadata&update=true' | \
         grep 'OK - Deployed application at context path '"
       }
     }
