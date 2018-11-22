@@ -40,9 +40,9 @@ public class File extends Auditable<Long> {
 
     public enum Type {
 
-        tsv, tab, bam, bai, cram, crai, vcf, vcf_aggregate, bcf, tabix, wig, bed, gff, fasta, fastq, flatfile,
-        chromosome_list, sample_list, readme_file, phenotype_file, BioNano_native, Kallisto_native, agp,
-        unlocalised_list, info, manifest, other
+        AGP, BAI, BAM, BCF, BED, BIONANO_NATIVE, CHROMOSOME_LIST, CRAI, CRAM, FASTA, FASTQ, FLATFILE, GFF,
+        INFO, KALLISTO_NATIVE, MANIFEST, OTHER, PHENOTYPE_FILE, README_FILE, SAMPLE_LIST, TAB, TABIX,
+        TSV, UNLOCALISED_LIST, VCF, VCF_AGGREGATE, WIG
     }
 
     @ApiModelProperty(position = 1, value = "File auto generated id", required = true, readOnly = true)

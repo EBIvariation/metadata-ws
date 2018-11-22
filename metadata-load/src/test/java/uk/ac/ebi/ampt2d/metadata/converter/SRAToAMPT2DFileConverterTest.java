@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SRAToAMPT2DConverterTest {
+public class SRAToAMPT2DFileConverterTest {
 
     @Mock
     private AnalysisFileType analysisFileType;
@@ -32,7 +32,7 @@ public class SRAToAMPT2DConverterTest {
 
     private void assertAnalysisFileTypeEqualsFile(AnalysisFileType analysisFileType, File file) {
         assertEquals(analysisFileType.getFilename(), file.getName());
-        assertEquals(analysisFileType.getFiletype().toString(), file.getType().toString());
+        assertEquals(analysisFileType.getFiletype().toString().toUpperCase(), file.getType().toString());
         assertEquals(analysisFileType.getUnencryptedChecksum(), file.getHash());
     }
 

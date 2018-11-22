@@ -21,9 +21,10 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
 public class FileTypeConverter implements SRAToAMPT2DConverter<AnalysisFileType, File> {
+
     @Override
     public File convert(AnalysisFileType analysisFileType) {
-        return new File(analysisFileType.getUnencryptedChecksum(), analysisFileType.getFilename(), analysisFileType
-                .getFiletype().toString());
+        return new File(analysisFileType.getUnencryptedChecksum(), analysisFileType.getFilename(),
+                analysisFileType.getFiletype().toString().toUpperCase());
     }
 }
