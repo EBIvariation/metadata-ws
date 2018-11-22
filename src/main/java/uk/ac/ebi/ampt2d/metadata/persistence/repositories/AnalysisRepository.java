@@ -25,14 +25,13 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QAnalysis;
 
 import java.util.List;
 
 @RepositoryRestResource
-public interface AnalysisRepository extends PagingAndSortingRepository<Analysis, AccessionVersionEntityId>,
+public interface AnalysisRepository extends PagingAndSortingRepository<Analysis, Long>,
         QueryDslPredicateExecutor<Analysis>, QuerydslBinderCustomizer<QAnalysis> {
 
     default void customize(QuerydslBindings bindings, QAnalysis qAnalysis) {
@@ -41,5 +40,6 @@ public interface AnalysisRepository extends PagingAndSortingRepository<Analysis,
 
     @ApiOperation(value = "Get the latest version of Analysis based on accession")
     @RestResource(path = "/accession")
-    List<Analysis> findFirstById_AccessionOrderById_VersionDesc(@Param("accession") String accession);
+    List<Analysis> findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc
+            (@Param("accession") String accession);
 }

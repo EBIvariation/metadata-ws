@@ -22,11 +22,16 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -34,56 +39,63 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-public class Study extends Auditable<AccessionVersionEntityId> {
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
+public class Study extends Auditable<Long> {
 
-    @ApiModelProperty(position = 1, required = true)
+    @ApiModelProperty(position = 1, value = "Study auto generated id", required = true, readOnly = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    private long id;
+
+    @ApiModelProperty(position = 2)
+    @Embedded
     @Valid
-    @EmbeddedId
-    private AccessionVersionEntityId id;
+    private AccessionVersionId accessionVersionId;
 
-    @ApiModelProperty(position = 2, required = true)
+    @ApiModelProperty(position = 3, required = true)
     @Size(min = 1, max = 255)
     @NotNull
     @JsonProperty
     @Column(nullable = false)
     private String name;
 
-    @ApiModelProperty(position = 3, required = true)
+    @ApiModelProperty(position = 4, required = true)
     @NotNull
     @NotBlank
     @JsonProperty
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ApiModelProperty(position = 4, required = true)
+    @ApiModelProperty(position = 5, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
     @Column(nullable = false)
     private String center;
 
-    @ApiModelProperty(position = 5, required = true, example = "2018-01-01")
+    @ApiModelProperty(position = 6, required = true, example = "2018-01-01")
     @NotNull
     @JsonProperty
     @Column(nullable = false)
     private LocalDate releaseDate;
 
-    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a Taxonomy")
+    @ApiModelProperty(position = 7, dataType = "java.lang.String", notes = "Url to a Taxonomy")
     @JsonProperty
     @ManyToOne(optional = false)
     private Taxonomy taxonomy;
 
-    @ApiModelProperty(position = 7, example = "false")
+    @ApiModelProperty(position = 8, example = "false")
     @JsonProperty(defaultValue = "false", access = JsonProperty.Access.WRITE_ONLY)
     @Column
     private boolean deprecated;
 
-    @ApiModelProperty(position = 8, example = "false")
+    @ApiModelProperty(position = 9, example = "false")
     @JsonProperty(defaultValue = "false")
     @Column
     private boolean browsable;
 
-    @ApiModelProperty(position = 9)
+    @ApiModelProperty(position = 10)
     @JsonProperty
     @OneToMany
     private List<Study> childStudies;
@@ -97,8 +109,13 @@ public class Study extends Auditable<AccessionVersionEntityId> {
     @ManyToMany
     private List<Publication> publications;
 
-    public AccessionVersionEntityId getId() {
+    @Override
+    public Long getId() {
         return id;
+    }
+
+    public AccessionVersionId getAccessionVersionId() {
+        return accessionVersionId;
     }
 
     public boolean isDeprecated() {

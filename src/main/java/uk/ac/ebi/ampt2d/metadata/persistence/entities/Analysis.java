@@ -22,19 +22,25 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
-public class Analysis extends Auditable<AccessionVersionEntityId> {
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
+public class Analysis extends Auditable<Long> {
 
     public enum Type {
 
@@ -66,50 +72,56 @@ public class Analysis extends Auditable<AccessionVersionEntityId> {
 
     }
 
-    @ApiModelProperty(position = 1, required = true)
-    @Valid
-    @EmbeddedId
-    private AccessionVersionEntityId id;
+    @ApiModelProperty(position = 1, value = "Analysis auto generated id", required = true, readOnly = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
-    @ApiModelProperty(position = 2, required = true)
+    @ApiModelProperty(position = 2)
+    @Embedded
+    @Valid
+    private AccessionVersionId accessionVersionId;
+
+    @ApiModelProperty(position = 3, required = true)
     @Size(min = 1, max = 255)
     @NotNull
     @JsonProperty
     @Column(nullable = false)
     private String name;
 
-    @ApiModelProperty(position = 3, required = true)
+    @ApiModelProperty(position = 4, required = true)
     @NotNull
     @NotBlank
     @JsonProperty
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ApiModelProperty(position = 4, dataType = "java.lang.String", notes = "Url to a Study")
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Study")
     @JsonProperty
     @ManyToOne(optional = false)
     private Study study;
 
-    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to an Reference Sequence")
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to an Reference Sequence")
     @JsonProperty
     @ManyToOne(optional = false)
     private ReferenceSequence referenceSequence;
-
-    @ApiModelProperty(position = 6, required = true)
-    @NotNull
-    @JsonProperty
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Technology technology;
 
     @ApiModelProperty(position = 7, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Type type;
+    private Technology technology;
 
     @ApiModelProperty(position = 8, required = true)
+    @NotNull
+    @JsonProperty
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Type type;
+
+    @ApiModelProperty(position = 9, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
@@ -122,7 +134,14 @@ public class Analysis extends Auditable<AccessionVersionEntityId> {
     @ManyToMany
     private List<File> files;
 
-    public AccessionVersionEntityId getId() {
+    @Override
+    public Long getId() {
         return id;
     }
+
+    public AccessionVersionId getAccessionVersionId() {
+        return accessionVersionId;
+    }
+
+
 }

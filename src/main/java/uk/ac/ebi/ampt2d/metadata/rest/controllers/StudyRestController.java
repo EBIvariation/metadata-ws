@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
@@ -87,7 +86,7 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     public ResponseEntity<Resource<Study>> findStudiesByAccession(String accession) {
         Study study = studyService.findStudyByAccession(accession);
 
-        if ( study == null ) {
+        if (study == null) {
             return ResponseEntity.notFound().build();
         }
 
@@ -157,10 +156,10 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
     }
 
     @ApiOperation(value = "Get a list of studies linked to a given study")
-    @ApiParam(name = "id", value = "Study's id (accession.version)", type = "string", required = true, example = "EGAS0001.1")
+    @ApiParam(name = "id", value = "Study's id", type = "long", required = true)
     @RequestMapping(method = RequestMethod.GET, path = "{id}/linkedStudies", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<Resources<StudyResource>> getLinkedStudies(@PathVariable("id") AccessionVersionEntityId id) {
+    public ResponseEntity<Resources<StudyResource>> getLinkedStudies(@PathVariable("id") long id) {
         List<Study> studies = studyService.findLinkedStudies(id);
 
         Resources<StudyResource> resources = (Resources<StudyResource>) resourceAssembler.toResources(Study.class, studies);
@@ -172,15 +171,14 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
             "deprecated, it is not possible to update that study object through PATCH /studies/{id} method, it will " +
             "result in NOT FOUND. This new method (PATCH /studies/{id}/patch) allows that study object to be found and" +
             " updated.")
-    @ApiParam(name = "id", value = "Study's id (accession.version)", type = "string", required = true, example = "EGAS0001.1")
+    @ApiParam(name = "id", value = "Study's id", type = "long", required = true)
     @RequestMapping(method = RequestMethod.PATCH, path = "{id}/patch", produces = "application/json", consumes = "application/json")
     @ResponseBody
     @SuppressWarnings("unchecked")
-    public ResponseEntity<Resource<Study>> patch(@PathVariable("id") AccessionVersionEntityId id,
-                                                 @RequestBody String json) {
-        Study study = studyService.findOneStudyByAccession(id);
+    public ResponseEntity<Resource<Study>> patch(@PathVariable("id") long id, @RequestBody String json) {
+        Study study = studyService.findOneStudyById(id);
 
-        if ( study == null ) {
+        if (study == null) {
             return ResponseEntity.notFound().build();
         }
 
@@ -190,12 +188,10 @@ public class StudyRestController implements ResourceProcessor<RepositoryLinksRes
             Resource<Study> resource = resourceAssembler.toResource(study1);
 
             return ResponseEntity.ok(resource);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
     }
-
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {

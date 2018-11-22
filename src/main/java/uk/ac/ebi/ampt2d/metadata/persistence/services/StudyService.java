@@ -18,7 +18,6 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
 import com.querydsl.core.types.Predicate;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
 import java.time.LocalDate;
@@ -28,7 +27,7 @@ public interface StudyService {
 
     Study findOneStudyByPredicate(Predicate predicate);
 
-    Study findOneStudyByAccession(AccessionVersionEntityId id);
+    Study findOneStudyById(long id);
 
     List<Study> findStudiesByPredicate(Predicate predicate);
 
@@ -42,8 +41,7 @@ public interface StudyService {
 
     List<Study> findStudiesByTaxonomyName(String name);
 
-    List<Study> findLinkedStudies(AccessionVersionEntityId id);
+    List<Study> findLinkedStudies(long id);
 
     Study patch(Study study, String patch) throws Exception;
-
 }

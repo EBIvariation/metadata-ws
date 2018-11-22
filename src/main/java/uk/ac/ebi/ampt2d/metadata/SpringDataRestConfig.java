@@ -32,15 +32,16 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import uk.ac.ebi.ampt2d.metadata.aop.StudyDeprecationAspect;
+import uk.ac.ebi.ampt2d.metadata.aop.StudyReleaseDateAspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Publication;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
-import uk.ac.ebi.ampt2d.metadata.aop.StudyReleaseDateAspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
@@ -85,6 +86,7 @@ public class SpringDataRestConfig {
                         Sample.class,
                         Study.class,
                         Taxonomy.class,
+                        Publication.class,
                         WebResource.class
                 );
 

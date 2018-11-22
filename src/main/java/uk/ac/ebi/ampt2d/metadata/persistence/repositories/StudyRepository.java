@@ -17,17 +17,22 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
+import org.springframework.data.rest.core.annotation.RestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
+import java.util.List;
+
 @RepositoryRestResource
-public interface StudyRepository extends PagingAndSortingRepository<Study, AccessionVersionEntityId>,
+public interface StudyRepository extends PagingAndSortingRepository<Study, Long>,
         QueryDslPredicateExecutor<Study>, QuerydslBinderCustomizer<QStudy> {
 
     default void customize(QuerydslBindings bindings, QStudy study) {
@@ -35,5 +40,10 @@ public interface StudyRepository extends PagingAndSortingRepository<Study, Acces
                 study.analyses.any().referenceSequence.patch)
                 .first((path, value) -> path.equalsIgnoreCase(value));
     }
+
+    @ApiOperation(value = "Get the latest version of Study based on accession")
+    @RestResource(path = "/accession")
+    List<Study> findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc
+            (@Param("accession") String accession);
 
 }

@@ -28,10 +28,13 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"type","resourceUrl"}))
 public class WebResource extends Auditable<Long> {
 
     public enum Type {
@@ -60,7 +63,7 @@ public class WebResource extends Auditable<Long> {
     @ApiModelProperty(position = 3, required = true)
     @NotNull
     @JsonProperty
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false)
     @NotEmpty
     @Pattern(message = "Must be a valid URL.", regexp="(^(https?|ftp):(//|\\\\))[-a-zA-Z0-9+&@#/%?=~_|!:,.;$'`*\\[\\]()]+")
     private String resourceUrl;
