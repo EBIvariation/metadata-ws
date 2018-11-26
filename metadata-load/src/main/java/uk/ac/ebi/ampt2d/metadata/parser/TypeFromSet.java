@@ -17,8 +17,10 @@
  */
 package uk.ac.ebi.ampt2d.metadata.parser;
 
-public interface TypeFromDocument<SUBSET, SUPERSET> {
+import java.util.List;
 
-    SUBSET extract(SUPERSET superSet);
+public interface TypeFromSet<SUBSET, SUPERSET> {
+
+    List<SUBSET> extract(SUPERSET superSet);
 
 }
