@@ -56,7 +56,7 @@ public class Sample extends Auditable<Long> {
     @JsonProperty
     private String name;
 
-    @ApiModelProperty(position = 3, dataType = "java.lang.String", example = "[url1, url2]", notes = "Url to Taxonomy List")
+    @ApiModelProperty(position = 4, dataType = "java.lang.String", example = "[url1, url2]", notes = "Url to Taxonomy List")
     @JsonProperty
     @ManyToMany
     @NotNull
@@ -64,11 +64,6 @@ public class Sample extends Auditable<Long> {
     private List<Taxonomy> taxonomies;
 
     Sample() {
-    }
-
-    public Sample(AccessionVersionId accessionVersionId, String name) {
-        this.accessionVersionId = accessionVersionId;
-        this.name = name;
     }
 
     @Override

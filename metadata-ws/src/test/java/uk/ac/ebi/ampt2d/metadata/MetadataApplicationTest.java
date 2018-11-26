@@ -333,10 +333,6 @@ public class MetadataApplicationTest {
     }
 
     private String postTestSample(String accession, String name) throws Exception {
-//        Sample testSample = new Sample(new AccessionVersionId(accession, 1), name);
-//        MvcResult mvcResult = mockMvc.perform(post("/samples")
-//                .content(testSampleJson.write(testSample).getJson())) //////
-//                .andExpect(status().isCreated()).andReturn();
         List<String> taxonomyUrlList = new ArrayList<String>();
         String taxonomyUrl = postTestTaxonomy(1, "Species1");
         taxonomyUrlList.add(taxonomyUrl);
@@ -347,10 +343,9 @@ public class MetadataApplicationTest {
     }
 
     private String postTestSample(String accession, String name, List<String> taxonomyUrlList) throws Exception {
-        Sample testSample = new Sample(new AccessionVersionId(accession, 1), name);/////
         MvcResult mvcResult = mockMvc.perform(post("/samples")
         .content("{ " +
-                "\"id\":{ \"accession\": \"" + accession + "\",\"version\": " + 1 + "}," +
+                "\"accessionVersionId\":{ \"accession\": \"" + accession + "\",\"version\": " + 1 + "}," +
                 "\"name\": \"" + name + "\"," +
                 "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
                 "}"))
@@ -663,37 +658,55 @@ public class MetadataApplicationTest {
     @Test
     public void testAccessionVersionIdPost() throws Exception {
         //AccessionVersionId can be null but in case of provided values,accession and version should be valid.
-        Sample testSample = new Sample(null, "Sample1");
-        String testSampleUrl = mockMvc.perform(post("/samples")
-                .content(testSampleJson.write(testSample).getJson()))
-                .andExpect(status().isCreated()).andReturn().getResponse().getHeader("Location");
+        String homininesTaxonomyUrl = postTestTaxonomy(207598, "Homininae");
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        List<String> taxonomyUrlList = Arrays.asList(homininesTaxonomyUrl, humanTaxonomyUrl);
 
+        // no accession
+        MvcResult mvcResult = mockMvc.perform(post("/samples")
+                .content("{ " +
+                        "\"name\": \"" + "Sample1" + "\"," +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
+                        "}"))
+                .andExpect(status().isCreated()).andReturn();
+        String testSampleUrl = mvcResult.getResponse().getHeader("Location");
         mockMvc.perform(get(testSampleUrl))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.accessionVersionId").value(nullValue()));
 
-        Sample testSampleWithNullAccessionAndValidVersion = new Sample(new AccessionVersionId(null, 1), "Sample1");
+        // null acession
         mockMvc.perform(post("/samples")
-                .content(testSampleJson.write(testSampleWithNullAccessionAndValidVersion).getJson()))
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\":" + null + ",\"version\": " + 1 + "}," +
+                        "\"name\": \"" + "Sample1" + "\"," +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
+                        "}"))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.errors[0].property").value("accessionVersionId.accession"))
                 .andExpect(jsonPath("$.errors[0].message").value("may not be null"));
 
-        Sample testSampleWithInvalidAccession = new Sample(new AccessionVersionId("", 1), "Sample1");
+        // blank acession
         mockMvc.perform(post("/samples")
-                .content(testSampleJson.write(testSampleWithInvalidAccession).getJson()))
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\": \"" + "\",\"version\": " + 1 + "}," +
+                        "\"name\": \"" + "Sample1" + "\"," +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
+                        "}"))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.errors[0].property").value("accessionVersionId.accession"))
                 .andExpect(jsonPath("$.errors[0].message").value("size must be between 1 and 255"));
 
-        Sample testSample1 = new Sample(new AccessionVersionId("EGAN0001", 0), "Sample1");
+        // 0 version
         mockMvc.perform(post("/samples")
-                .content(testSampleJson.write(testSample1).getJson()))
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAN0001" + "\",\"version\": " + 0 + "}," +
+                        "\"name\": \"" + "Sample1" + "\"," +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
+                        "}"))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.errors[0].property").value("accessionVersionId.version"))
                 .andExpect(jsonPath("$.errors[0].message").value("must be greater than or equal to 1"));
-
     }
 
     @Test
@@ -1514,33 +1527,33 @@ public class MetadataApplicationTest {
                 Arrays.asList(homininesTaxonomyUrl, bonoboTaxonomyUrl));
 
 
-        mockMvc.perform(get("/samples/search?taxonomies.id=207598"))
+        mockMvc.perform(get("/samples/search?taxonomies.taxonomyId=207598"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..samples").isArray())
                 .andExpect(jsonPath("$..samples.length()").value(2))
                 .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl1))
                 .andExpect(jsonPath("$..samples[1]..sample.href").value(sampleUrl3));
 
-        mockMvc.perform(get("/samples/search?taxonomies.id=9606"))
+        mockMvc.perform(get("/samples/search?taxonomies.taxonomyId=9606"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..samples").isArray())
                 .andExpect(jsonPath("$..samples.length()").value(1))
                 .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl1));
 
-        mockMvc.perform(get("/samples/search?taxonomies.id=9597"))
+        mockMvc.perform(get("/samples/search?taxonomies.taxonomyId=9597"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..samples").isArray())
                 .andExpect(jsonPath("$..samples.length()").value(2))
                 .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl2))
                 .andExpect(jsonPath("$..samples[1]..sample.href").value(sampleUrl3));
 
-        mockMvc.perform(get("/samples/search?taxonomies.id=9598"))
+        mockMvc.perform(get("/samples/search?taxonomies.taxonomyId=9598"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..samples").isArray())
                 .andExpect(jsonPath("$..samples.length()").value(1))
                 .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl2));
 
-        mockMvc.perform(get("/samples/search?taxonomies.id=0"))
+        mockMvc.perform(get("/samples/search?taxonomies.taxonomyId=0"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..samples").isArray())
                 .andExpect(jsonPath("$..samples.length()").value(0));
