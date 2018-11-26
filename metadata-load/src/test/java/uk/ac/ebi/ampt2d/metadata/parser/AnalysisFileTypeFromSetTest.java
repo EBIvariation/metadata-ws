@@ -24,8 +24,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 import uk.ac.ebi.ena.sra.xml.AnalysisSetType;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;

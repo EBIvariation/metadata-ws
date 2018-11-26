@@ -22,5 +22,4 @@ import java.util.List;
 public interface TypeFromSet<SUBSET, SUPERSET> {
 
     List<SUBSET> extract(SUPERSET superSet);
-
 }
