@@ -20,7 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.converter;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface SRAToAMPT2DConverter<SOURCE, DESTINATION> {
+public interface SraToAmpt2dConverter<SOURCE, DESTINATION> {
 
     DESTINATION convert(SOURCE source);
 

@@ -20,7 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.converter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
-public class FileTypeConverter implements SRAToAMPT2DConverter<AnalysisFileType, File> {
+public class FileTypeConverter implements SraToAmpt2dConverter<AnalysisFileType, File> {
 
     @Override
     public File convert(AnalysisFileType analysisFileType) {
