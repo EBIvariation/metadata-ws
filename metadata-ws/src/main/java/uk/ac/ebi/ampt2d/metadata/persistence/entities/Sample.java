@@ -27,6 +27,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
@@ -73,5 +74,12 @@ public class Sample extends Auditable<Long> {
 
     public AccessionVersionId getAccessionVersionId() {
         return accessionVersionId;
+    }
+
+    @PrePersist
+    public void validateTaxonomies() {
+        if (this.taxonomies == null || this.taxonomies.size() == 0 || this.taxonomies.get(0) == null) {
+            throw new IllegalArgumentException ("Please provide Taxonomies; it can not be null or blank");
+        }
     }
 }

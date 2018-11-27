@@ -323,13 +323,28 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void postSampleInvalid() throws Exception {
+    public void postSampleInvalidNoTaxonomies() throws Exception {
         mockMvc.perform(post("/samples")
                 .content("{ " +
-                        "\"id\":{ \"accession\": \"" + "species1" + "\",\"version\": " + 1 + "}," +
+                        "\"accessionVersionId\":{ \"accession\": \"" + "species1" + "\",\"version\": " + 1 + "}," +
                         "\"name\": \"" + "test sample" + "\"" +
                         "}"))
-        .andExpect(status().is4xxClientError()).andReturn();
+        .andExpect(status().is4xxClientError())
+        .andExpect(jsonPath("$.errors[0].property").value("taxonomies"))
+        .andExpect(jsonPath("$.errors[0].message").value("may not be null"));
+    }
+
+    @Test
+    public void postSampleInvalidBlankTaxonomies() throws Exception {
+        List<String> taxonomyUrlList = new ArrayList<>();
+        mockMvc.perform(post("/samples")
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\": \"" + "species1" + "\",\"version\": " + 1 + "}," +
+                        "\"name\": \"" + "test sample" + "\"," +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andReturn().getResolvedException().getClass().getName().compareTo("java.lang.IllegalArgumentException");
     }
 
     private String postTestSample(String accession, String name) throws Exception {
