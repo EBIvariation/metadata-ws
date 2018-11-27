@@ -24,7 +24,7 @@ public class FileTypeConverter implements SraToAmpt2dConverter<AnalysisFileType,
 
     @Override
     public File convert(AnalysisFileType analysisFileType) {
-        return new File(analysisFileType.getUnencryptedChecksum(), analysisFileType.getFilename(),
+        return new File(analysisFileType.getChecksum(), analysisFileType.getFilename(),
                 analysisFileType.getFiletype().toString().toUpperCase());
     }
 }

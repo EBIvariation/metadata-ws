@@ -27,13 +27,13 @@ public class SraToAmpt2dFileConverterTest {
     private void initializeAnalysisFileType() {
         when(analysisFileType.getFilename()).thenReturn("EGAF00001");
         when(analysisFileType.getFiletype()).thenReturn(AnalysisFileType.Filetype.VCF);
-        when(analysisFileType.getUnencryptedChecksum()).thenReturn("checksum");
+        when(analysisFileType.getChecksum()).thenReturn("checksum");
     }
 
     private void assertAnalysisFileTypeEqualsFile(AnalysisFileType analysisFileType, File file) {
         assertEquals(analysisFileType.getFilename(), file.getName());
         assertEquals(analysisFileType.getFiletype().toString().toUpperCase(), file.getType().toString());
-        assertEquals(analysisFileType.getUnencryptedChecksum(), file.getHash());
+        assertEquals(analysisFileType.getChecksum(), file.getHash());
     }
 
 }
