@@ -9,4 +9,4 @@ install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -PTravis
 
 script:
-  - mvn test
+  - mvn test -PTravis
