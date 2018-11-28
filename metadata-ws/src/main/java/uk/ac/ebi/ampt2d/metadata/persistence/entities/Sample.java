@@ -28,6 +28,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
@@ -77,7 +78,14 @@ public class Sample extends Auditable<Long> {
     }
 
     @PrePersist
-    public void validateTaxonomies() {
+    public void validateTaxonomiesPersist() {
+        if (this.taxonomies == null || this.taxonomies.size() == 0 || this.taxonomies.get(0) == null) {
+            throw new IllegalArgumentException ("Please provide Taxonomies; it can not be null or blank");
+        }
+    }
+
+    @PreUpdate
+    public void validateTaxonomiesUpdate() {
         if (this.taxonomies == null || this.taxonomies.size() == 0 || this.taxonomies.get(0) == null) {
             throw new IllegalArgumentException ("Please provide Taxonomies; it can not be null or blank");
         }

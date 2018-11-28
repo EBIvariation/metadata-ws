@@ -44,6 +44,7 @@ import java.util.List;
 @Api(tags = "Sample Entity")
 @RequestMapping(path = "samples")
 public class SampleRestController implements ResourceProcessor<RepositoryLinksResource> {
+
     @Autowired
     private SampleRepository sampleRepository;
 
