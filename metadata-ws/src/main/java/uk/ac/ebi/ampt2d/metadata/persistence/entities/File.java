@@ -40,11 +40,9 @@ public class File extends Auditable<Long> {
 
     public enum Type {
 
-        TSV,
-
-        VCF,
-
-        BINARY
+        AGP, BAI, BAM, BCF, BED, BIONANO_NATIVE, CHROMOSOME_LIST, CRAI, CRAM, FASTA, FASTQ, FLATFILE, GFF,
+        INFO, KALLISTO_NATIVE, MANIFEST, OTHER, PHENOTYPE_FILE, README_FILE, SAMPLE_LIST, TAB, TABIX,
+        TSV, UNLOCALISED_LIST, VCF, VCF_AGGREGATE, WIG
     }
 
     @ApiModelProperty(position = 1, value = "File auto generated id", required = true, readOnly = true)
@@ -83,7 +81,12 @@ public class File extends Auditable<Long> {
     @Column(nullable = false)
     private Type type;
 
-    File() {
+    File() {}
+
+    public File(String hash, String name, String type) {
+        this.hash = hash;
+        this.name = name;
+        this.type = Type.valueOf(type);
     }
 
     public File(AccessionVersionId accessionVersionId, String hash, String name, long size, Type type) {
@@ -101,5 +104,21 @@ public class File extends Auditable<Long> {
 
     public AccessionVersionId getAccessionVersionId() {
         return accessionVersionId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public long getSize() {
+        return size;
+    }
+
+    public Type getType() {
+        return type;
     }
 }
