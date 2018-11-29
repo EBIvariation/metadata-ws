@@ -25,19 +25,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SraAnalysisFileTypeLoader {
+public class SraAnalysisFileTypeLoader extends SraObjectLoaderFromAnalysisDocument<AnalysisFileType> {
 
-    private SraAnalysisDocumentLoader sraAnalysisDocumentLoader;
-
-    public SraAnalysisFileTypeLoader(SraAnalysisDocumentLoader sraAnalysisDocumentLoader) {
-        this.sraAnalysisDocumentLoader = sraAnalysisDocumentLoader;
+    public SraAnalysisFileTypeLoader(SraObjectLoaderByAccession<ANALYSISDocument> sraAnalysisDocumentLoader) {
+        super(sraAnalysisDocumentLoader);
     }
 
-    public Map<String, List<AnalysisFileType>> getSraAnalysisFileTypes(List<String> analysisAccessionIds) {
-        List<ANALYSISDocument> analysisDocumentList =
-                sraAnalysisDocumentLoader.getSraAnalysisDocuments(analysisAccessionIds);
+    @Override
+    public Map<String, List<AnalysisFileType>> getSraObjectsFromAnalysisDocument(List<String> analysisAccessionIds) {
+        Map<String, ANALYSISDocument> analysisDocumentMap =
+                sraAnalysisDocumentLoader.getSraObjects(analysisAccessionIds);
         Map<String, List<AnalysisFileType>> analysisFiles = new HashMap<>();
-        for (ANALYSISDocument analysisDocument : analysisDocumentList) {
+        for (String analysisAccessionKeys : analysisDocumentMap.keySet()) {
+            ANALYSISDocument analysisDocument = analysisDocumentMap.get(analysisAccessionKeys);
             analysisFiles.put(analysisDocument.getANALYSIS().getAccession(),
                     Arrays.asList(analysisDocument.getANALYSIS().getFILES().getFILEArray()));
         }

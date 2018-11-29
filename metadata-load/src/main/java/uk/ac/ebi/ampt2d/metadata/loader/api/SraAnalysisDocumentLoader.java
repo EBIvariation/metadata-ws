@@ -17,20 +17,20 @@
  */
 package uk.ac.ebi.ampt2d.metadata.loader.api;
 
-import org.apache.xmlbeans.XmlException;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.ena.sra.xml.ANALYSISDocument;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class SraAnalysisDocumentLoader {
+public class SraAnalysisDocumentLoader implements SraObjectLoaderByAccession<ANALYSISDocument> {
 
-    private static final String ANALYSIS_XML_URL = "https://www.ebi.ac.uk/ena/data/view/{projectId}&display=xml";
-    private static final Logger sraAnalysisLogger = Logger.getLogger(SraAnalysisDocumentLoader.class.getName());
+    private static final Logger SRA_ANALYSIS_LOGGER = Logger.getLogger(SraAnalysisDocumentLoader.class.getName());
 
     private RestTemplate restTemplate;
 
@@ -38,23 +38,28 @@ public class SraAnalysisDocumentLoader {
         this.restTemplate = restTemplate;
     }
 
-    public static String getAnalysisXmlUrl() {
-        return ANALYSIS_XML_URL;
+    public static String getEnaApiUrl() {
+        return ENA_API_URL;
     }
 
-    public List<ANALYSISDocument> getSraAnalysisDocuments(List<String> accessionIds) {
-        return accessionIds.stream().map(accessionId -> parseAnalysisType(restTemplate.exchange(ANALYSIS_XML_URL,
-                HttpMethod.GET, null, String.class, accessionId).getBody(), accessionId))
-                .filter(analysisDocument -> analysisDocument != null).collect(Collectors.toList());
+    @Override
+    public Map<String, ANALYSISDocument> getSraObjects(List<String> accessionIds) {
+        return accessionIds.stream()
+                .map(accessionId -> parseAnalysisType(restTemplate.exchange(ENA_API_URL,
+                        HttpMethod.GET, null, String.class, accessionId).getBody(), accessionId))
+                .filter(analysisDocument -> analysisDocument != null)
+                .collect(Collectors.toMap(analysisDocument -> analysisDocument.getANALYSIS().getAccession(),
+                        Function.identity()));
     }
 
     private ANALYSISDocument parseAnalysisType(String xmlString, String accessionId) {
         ANALYSISDocument analysisDocument = null;
+        xmlString = removeRootTagsFromXmlString(xmlString);
         try {
-            xmlString = xmlString.replaceAll("(</ROOT>|<ROOT.*display=xml\">)", "");
             analysisDocument = ANALYSISDocument.Factory.parse(xmlString);
-        } catch (XmlException xmlException) {
-            sraAnalysisLogger.log(Level.SEVERE, "Parse exception for accession " + accessionId);
+        } catch (Exception exception) {
+            SRA_ANALYSIS_LOGGER.log(Level.SEVERE, "Parse exception for accession " + accessionId);
+            exception.printStackTrace();
         }
         return analysisDocument;
     }

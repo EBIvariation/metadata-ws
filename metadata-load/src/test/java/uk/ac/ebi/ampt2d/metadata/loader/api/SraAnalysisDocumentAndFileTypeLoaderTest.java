@@ -50,50 +50,49 @@ public class SraAnalysisDocumentAndFileTypeLoaderTest {
     @Mock
     private RestTemplate restTemplate;
 
-    private SraAnalysisDocumentLoader sraAnalysisDocumentLoader;
+    private SraObjectLoaderByAccession<ANALYSISDocument> sraObjectLoaderByAccession;
 
-    private SraAnalysisFileTypeLoader sraAnalysisFileTypeLoader;
+    private SraObjectLoaderFromAnalysisDocument<AnalysisFileType> sraObjectLoaderFromAnalysisDocument;
 
     @Before
     public void restTemplateSetup() throws Exception {
-        when(restTemplate.exchange(SraAnalysisDocumentLoader.getAnalysisXmlUrl(),
+        when(restTemplate.exchange(SraAnalysisDocumentLoader.getEnaApiUrl(),
                 HttpMethod.GET, null, String.class, ANALYSIS_ACCESSION)).
                 thenReturn(new ResponseEntity(new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
                         .getResource(ANALYSIS_DOCUMENT_XML).toURI()))), HttpStatus.OK));
-        when(restTemplate.exchange(SraAnalysisDocumentLoader.getAnalysisXmlUrl(),
+        when(restTemplate.exchange(SraAnalysisDocumentLoader.getEnaApiUrl(),
                 HttpMethod.GET, null, String.class, ANALYSIS_INVALID_ACCESSION)).
                 thenReturn(new ResponseEntity(new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
                         .getResource(ANALYSIS_DOCUMENT_NOT_FOUND).toURI()))), HttpStatus.OK));
-        sraAnalysisDocumentLoader = new SraAnalysisDocumentLoader(restTemplate);
-        sraAnalysisFileTypeLoader = new SraAnalysisFileTypeLoader(sraAnalysisDocumentLoader);
+        sraObjectLoaderByAccession = new SraAnalysisDocumentLoader(restTemplate);
+        sraObjectLoaderFromAnalysisDocument = new SraAnalysisFileTypeLoader(sraObjectLoaderByAccession);
     }
 
     @Test
     public void testAnalysisLoad() {
-        List<ANALYSISDocument> listOfAnalysisType =
-                sraAnalysisDocumentLoader.getSraAnalysisDocuments(Arrays.asList(ANALYSIS_ACCESSION));
+        Map<String,ANALYSISDocument> listOfAnalysisType =
+                sraObjectLoaderByAccession.getSraObjects(Arrays.asList(ANALYSIS_ACCESSION));
         assertEquals(1, listOfAnalysisType.size());
 
-        ANALYSISDocument analysisDocument = listOfAnalysisType.get(0);
-        String studyRefAccession = "ERP107353";
+        ANALYSISDocument analysisDocument = listOfAnalysisType.get(ANALYSIS_ACCESSION);
         assertEquals(ANALYSIS_ACCESSION, analysisDocument.getANALYSIS().getAccession());
-        assertEquals(studyRefAccession, analysisDocument.getANALYSIS().getSTUDYREF().getAccession());
+        assertEquals("ERP107353", analysisDocument.getANALYSIS().getSTUDYREF().getAccession());
     }
 
     @Test
     public void testInvalidAnalysisLoad() {
-        List<ANALYSISDocument> listOfAnalysisType =
-                sraAnalysisDocumentLoader.getSraAnalysisDocuments(Arrays.asList(ANALYSIS_INVALID_ACCESSION));
+        Map<String,ANALYSISDocument> listOfAnalysisType =
+                sraObjectLoaderByAccession.getSraObjects(Arrays.asList(ANALYSIS_INVALID_ACCESSION));
         assertEquals(0, listOfAnalysisType.size());
     }
 
     @Test
     public void testAnalysisFileTypeLoad() {
-        Map<String, List<AnalysisFileType>> mapOfAnalysisToAnlaysisFileTypes =
-                sraAnalysisFileTypeLoader.getSraAnalysisFileTypes(Arrays.asList(ANALYSIS_ACCESSION));
-        assertEquals(1, mapOfAnalysisToAnlaysisFileTypes.size());
+        Map<String, List<AnalysisFileType>> mapOfAnalysisToAnalysisFileTypes =
+                sraObjectLoaderFromAnalysisDocument.getSraObjectsFromAnalysisDocument(Arrays.asList(ANALYSIS_ACCESSION));
+        assertEquals(1, mapOfAnalysisToAnalysisFileTypes.size());
 
-        List<AnalysisFileType> analysisFileTypes = mapOfAnalysisToAnlaysisFileTypes.get(ANALYSIS_ACCESSION);
+        List<AnalysisFileType> analysisFileTypes = mapOfAnalysisToAnalysisFileTypes.get(ANALYSIS_ACCESSION);
 
         assertTrue(analysisFileTypes != null);
         assertEquals(2, analysisFileTypes.size());
@@ -112,7 +111,7 @@ public class SraAnalysisDocumentAndFileTypeLoaderTest {
     @Test
     public void testInvalidAnalysisLoadForFiles() {
         Map<String, List<AnalysisFileType>> mapOfAnalysisToAnlaysisFileTypes =
-                sraAnalysisFileTypeLoader.getSraAnalysisFileTypes(Arrays.asList(ANALYSIS_INVALID_ACCESSION));
+                sraObjectLoaderFromAnalysisDocument.getSraObjectsFromAnalysisDocument(Arrays.asList(ANALYSIS_INVALID_ACCESSION));
         assertEquals(0, mapOfAnalysisToAnlaysisFileTypes.size());
     }
 
