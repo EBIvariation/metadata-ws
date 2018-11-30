@@ -56,11 +56,18 @@ public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, An
     }
 
     public AnalysisSetType getAnalysisSet(String xmlStr) throws XmlException {
-        return ANALYSISSETDocument.Factory.parse(xmlStr).getANALYSISSET();
+        AnalysisSetType analysisSetType = null;
+        try {
+            analysisSetType = ANALYSISSETDocument.Factory.parse(xmlStr).getANALYSISSET();
+        } catch (XmlException e) {
+            logger.warn("Unable to parse the XML file: {}",  xmlStr, e);
+            throw e;
+        }
+        return  analysisSetType;
     }
 
     public List<AnalysisFileType> extractFromSqlXml(SQLXML sqlXml) {
-        String xmlStr = null;
+        String xmlStr;
         List<AnalysisFileType> analysisFileList = new ArrayList<>();
 
         try {
@@ -69,9 +76,9 @@ public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, An
             analysisSet = getAnalysisSet(xmlStr);
             analysisFileList = extract(analysisSet);
         } catch (XmlException e) {
-            logger.info("Unable to convert XML String to AnalysisSet:");
+            logger.warn("Unable to convert XML String to AnalysisSet:",  e);
         } catch (SQLException e) {
-            logger.info("Unable to convert SQLXML Object to String: ", sqlXml.toString());
+            logger.warn("Unable to convert SQLXML Object to String: {}", sqlXml.toString(), e);
         }
         return analysisFileList;
     }
@@ -132,7 +139,7 @@ public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, An
 
             }
         } catch (SQLException e) {
-            logger.info("Unable to establish JDBC connection with Oracle server");
+            logger.error("Unable to establish JDBC connection with Oracle server", e);
             throw e;
         } finally {
             if (resultSet != null) {

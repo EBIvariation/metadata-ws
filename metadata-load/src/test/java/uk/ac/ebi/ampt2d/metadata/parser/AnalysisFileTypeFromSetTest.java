@@ -21,9 +21,13 @@ import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.util.ResourceUtils;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 import uk.ac.ebi.ena.sra.xml.AnalysisSetType;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -32,37 +36,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @RunWith(SpringRunner.class)
 public class AnalysisFileTypeFromSetTest {
 
+    private String getXmlFile(String fileName) throws IOException {
+        File file = ResourceUtils.getFile(fileName);
+        return new String(Files.readAllBytes(file.toPath()));
+    }
+
     @Test
     public void testAnalysisFileParser() throws Exception {
-        String xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<ANALYSIS_SET>\n" +
-                "  <ANALYSIS alias=\"uk10k_scoop5013826.vcf.gz-vcf_analysis-sc-20120330\" center_name=\"SC\" broker_name=\"EGA\" analysis_center=\"SC\" accession=\"ERZ000011\">\n" +
-                "    <IDENTIFIERS>\n" +
-                "      <PRIMARY_ID>ERZ000011</PRIMARY_ID>\n" +
-                "      <SUBMITTER_ID namespace=\"SC\">uk10k_scoop5013826.vcf.gz-vcf_analysis-sc-20120330</SUBMITTER_ID>\n" +
-                "    </IDENTIFIERS>\n" +
-                "    <TITLE>Variant calling of UK10K_SCOOP5013826</TITLE>\n" +
-                "    <DESCRIPTION>REL-2011-07-14_variant_calling_of_UK10K_OBESITY_SCOOP</DESCRIPTION>\n" +
-                "    <STUDY_REF refname=\"UK10K_exome_sequence__SCOOP_samples-sc-2011-08-18T14:40:03Z-1706\" refcenter=\"SC\" accession=\"ERP000860\"/>\n" +
-                "    <SAMPLE_REF refname=\"UK10K_SCOOP5013826-sc-2011-08-18T15:01:15Z-1027679\" refcenter=\"SC\" label=\"UK10K_SCOOP5013826\" accession=\"ERS049026\">\n" +
-                "      <IDENTIFIERS>\n" +
-                "        <PRIMARY_ID>ERS049026</PRIMARY_ID>\n" +
-                "      </IDENTIFIERS>\n" +
-                "    </SAMPLE_REF>\n" +
-                "    <ANALYSIS_TYPE>\n" +
-                "      <SEQUENCE_VARIATION>\n" +
-                "        <ASSEMBLY>\n" +
-                "          <STANDARD refname=\"GRCh37\"/>\n" +
-                "        </ASSEMBLY>\n" +
-                "      </SEQUENCE_VARIATION>\n" +
-                "    </ANALYSIS_TYPE>\n" +
-                "    <FILES>\n" +
-                "      <FILE filename=\"UK10K_SCOOP5013826.vcf.gz\" filetype=\"vcf\" checksum_method=\"MD5\" checksum=\"980aad09354c5bc984e23d2f74efdf3b\" unencrypted_checksum=\"641127f130e67cf39a65a5e245c9ecb\"/>\n" +
-                "      <FILE filename=\"ERZ000/ERZ000001/do131_Input_liver_none_mmuC57BL65_CRI01.sra.sorted.bam\" filetype=\"bam\" checksum_method=\"MD5\" checksum=\"15191d68bdd5c1ad23c943c3da3730c7\"/>" +
-                "    </FILES>\n" +
-                "  </ANALYSIS>\n" +
-                "</ANALYSIS_SET>\n";
-
+        String xmlStr = getXmlFile("classpath:ERZ000011.xml");
         AnalysisFileTypeFromSet analysisFileTypeFromSet = new AnalysisFileTypeFromSet();
         AnalysisSetType analysisSetType = analysisFileTypeFromSet.getAnalysisSet(xmlStr);
         List<AnalysisFileType> analysisFileList = analysisFileTypeFromSet.extract(analysisSetType);
