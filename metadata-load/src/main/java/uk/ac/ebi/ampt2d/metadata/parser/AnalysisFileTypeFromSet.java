@@ -20,15 +20,13 @@ package uk.ac.ebi.ampt2d.metadata.parser;
 import org.apache.xmlbeans.XmlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.ac.ebi.ampt2d.metadata.database.JdbcConnection;
 import uk.ac.ebi.ena.sra.xml.ANALYSISSETDocument;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 import uk.ac.ebi.ena.sra.xml.AnalysisSetType;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -37,11 +35,10 @@ import java.sql.SQLException;
 import java.sql.SQLXML;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, AnalysisSetType> {
+
     private static final Logger logger = LoggerFactory.getLogger(AnalysisFileTypeFromSet.class);
-    private static final String propertiesFile = "application.properties";
 
     @Override
     public List<AnalysisFileType> extract(AnalysisSetType analysisSet) {
@@ -63,73 +60,69 @@ public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, An
     }
 
     public List<AnalysisFileType> extractFromSqlXml(SQLXML sqlXml) {
-        String xmlStr;
+        String xmlStr = null;
         List<AnalysisFileType> analysisFileList = new ArrayList<>();
 
         try {
             xmlStr = sqlXml.getString();
             AnalysisSetType analysisSet;
-            try {
-                analysisSet = getAnalysisSet(xmlStr);
-                analysisFileList = extract(analysisSet);
-            } catch (XmlException e) {
-                logger.info("Unable to convert XML String to AnalysisSet: ", xmlStr);
-            }
+            analysisSet = getAnalysisSet(xmlStr);
+            analysisFileList = extract(analysisSet);
+        } catch (XmlException e) {
+            logger.info("Unable to convert XML String to AnalysisSet:");
         } catch (SQLException e) {
             logger.info("Unable to convert SQLXML Object to String: ", sqlXml.toString());
         }
         return analysisFileList;
     }
 
-    private Properties loadPropertiesFile() throws IOException {
-        Properties properties = new Properties();
-        InputStream inFile = null;
-        try {
-            inFile = new FileInputStream(propertiesFile);
-            try {
-                properties.load(inFile);
-            } catch (IOException e) {
-                logger.info("Unable to load JDBC connection properties file");
-                throw e;
-            }
-        } catch (FileNotFoundException e) {
-            logger.info("JDBC connection properties file not found: " + propertiesFile);
-            throw e;
-        } finally {
-            if (inFile != null) {
-                inFile.close();
-            }
+    private String createCompleteUrl(JdbcConnection jdbcConnection) {
+        String url = null;
+        String host = null;
+        String protocol = null;
+        String serviceName = null;
+        String port = null;
+        if ((jdbcConnection.getUrl() == null || jdbcConnection.getUrl().trim().isEmpty()) ||
+                (jdbcConnection.getHost() == null || jdbcConnection.getHost().trim().isEmpty()) ||
+                (jdbcConnection.getPort() == null || jdbcConnection.getPort().trim().isEmpty()) ||
+                (jdbcConnection.getProtocol() == null || jdbcConnection.getProtocol().trim().isEmpty()) ||
+                (jdbcConnection.getServiceName() == null || jdbcConnection.getServiceName().trim().isEmpty())) {
+            throw new IllegalArgumentException("Some fields are not present in properties file.");
+        } else {
+            url = jdbcConnection.getUrl();
+            host = jdbcConnection.getHost();
+            protocol = jdbcConnection.getProtocol();
+            serviceName = jdbcConnection.getServiceName();
+            port = jdbcConnection.getPort();
         }
-        return properties;
-    }
 
-    private String createUrl(Properties appProperties) {
-        String url = appProperties.getProperty("OracleJDBC.url");
-        String host = appProperties.getProperty("OracleJDBC.host");
-        String protocol = appProperties.getProperty("OracleJDBC.protocol");
-        String serviceName = appProperties.getProperty("OracleJDBC.servicename");
-        String port = appProperties.getProperty("OracleJDBC.port");
         url = url + ":@(DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = " + protocol + ")(HOST = " + host + ")(PORT = " +
                 port + ")))(CONNECT_DATA =(SERVER = DEDICATED)(SERVICE_NAME = " + serviceName + ")))";
 
         return url;
     }
 
-    public List<AnalysisFileType> getAnalysisFileObject() throws IOException, SQLException {
+    public List<AnalysisFileType> getAnalysisFileObject(JdbcConnection jdbcConnection) throws IOException, SQLException {
         String prepSql = "select ANALYSIS_XML from ERA.ANALYSIS";
         Connection dbConnection = null;
         PreparedStatement prepStatement = null;
         ResultSet resultSet = null;
         SQLXML sqlXml;
         List<AnalysisFileType> analysisFileList = new ArrayList<>();
+        String userName = null;
+        String password = null;
 
-        Properties appProperties = loadPropertiesFile();
-        String url = createUrl(appProperties);
-        String username = appProperties.getProperty("OracleJDBC.username");
-        String password = appProperties.getProperty("OracleJDBC.password");
+        String completeUrl = createCompleteUrl(jdbcConnection);
+        if ((jdbcConnection.getUserName() == null || jdbcConnection.getUserName().trim().isEmpty()) ||
+                (jdbcConnection.getPassword() == null || jdbcConnection.getPassword().trim().isEmpty())) {
+            throw new IllegalArgumentException("Some fields are not present in properties file.");
+        } else {
+            userName = jdbcConnection.getUserName();
+            password = jdbcConnection.getPassword();
+        }
 
         try {
-            dbConnection = DriverManager.getConnection(url, username, password);
+            dbConnection = DriverManager.getConnection(completeUrl, userName, password);
             prepStatement = dbConnection.prepareStatement(prepSql);
             resultSet = prepStatement.executeQuery();
             while (resultSet.next()) {
@@ -154,4 +147,5 @@ public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, An
         }
         return analysisFileList;
     }
+
 }

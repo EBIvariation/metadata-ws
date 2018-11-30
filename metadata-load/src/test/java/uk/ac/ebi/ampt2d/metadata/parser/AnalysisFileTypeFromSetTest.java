@@ -20,7 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.parser;
 import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 import uk.ac.ebi.ena.sra.xml.AnalysisSetType;
 
@@ -29,8 +29,9 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringRunner.class)
 public class AnalysisFileTypeFromSetTest {
+
     @Test
     public void testAnalysisFileParser() throws Exception {
         String xmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -92,4 +93,5 @@ public class AnalysisFileTypeFromSetTest {
         Throwable exception = assertThrows(XmlException.class, () -> analysisFileTypeFromSet.getAnalysisSet(xmlStr));
         assertEquals("error: Unexpected element: CDATA", exception.getMessage());
     }
+
 }
