@@ -84,11 +84,11 @@ public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, An
     }
 
     private String createCompleteUrl(JdbcConnection jdbcConnection) {
-        String url = null;
-        String host = null;
-        String protocol = null;
-        String serviceName = null;
-        String port = null;
+        String url;
+        String host;
+        String protocol;
+        String serviceName;
+        String port;
         if ((jdbcConnection.getUrl() == null || jdbcConnection.getUrl().trim().isEmpty()) ||
                 (jdbcConnection.getHost() == null || jdbcConnection.getHost().trim().isEmpty()) ||
                 (jdbcConnection.getPort() == null || jdbcConnection.getPort().trim().isEmpty()) ||
@@ -116,8 +116,8 @@ public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, An
         ResultSet resultSet = null;
         SQLXML sqlXml;
         List<AnalysisFileType> analysisFileList = new ArrayList<>();
-        String userName = null;
-        String password = null;
+        String userName;
+        String password;
 
         String completeUrl = createCompleteUrl(jdbcConnection);
         if ((jdbcConnection.getUserName() == null || jdbcConnection.getUserName().trim().isEmpty()) ||
