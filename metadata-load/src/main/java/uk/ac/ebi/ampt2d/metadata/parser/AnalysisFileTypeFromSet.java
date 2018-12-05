@@ -51,13 +51,14 @@ public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, An
 
     public AnalysisSetType getAnalysisSet(String xmlStr) throws XmlException {
         AnalysisSetType analysisSetType;
+
         try {
             analysisSetType = ANALYSISSETDocument.Factory.parse(xmlStr).getANALYSISSET();
         } catch (XmlException e) {
             logger.warn("Unable to parse the XML file: {}",  xmlStr, e);
             throw e;
         }
-        return  analysisSetType;
+        return analysisSetType;
     }
 
     public List<AnalysisFileType> extractFromSqlXml(SQLXML sqlXml) {

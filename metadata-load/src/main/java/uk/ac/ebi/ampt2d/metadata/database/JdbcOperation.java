@@ -19,8 +19,6 @@ package uk.ac.ebi.ampt2d.metadata.database;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.ebi.ampt2d.metadata.parser.AnalysisFileTypeFromSet;
-import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -67,13 +65,11 @@ public class JdbcOperation {
         return url;
     }
 
-
-    public List<AnalysisFileType> getAnalysisFileType() throws SQLException {
+    private List<SQLXML> getSqlXml(String prepSql, String column) throws SQLException {
         Connection dbConnection = null;
         PreparedStatement prepStatement = null;
         ResultSet resultSet = null;
-        SQLXML sqlXml;
-        List<AnalysisFileType> analysisFileList = new ArrayList<>();
+        List<SQLXML> sqlxmlList = new ArrayList<>();
 
         String completeUrl = createCompleteUrl(jdbcConnection);
         String userName;
@@ -87,16 +83,11 @@ public class JdbcOperation {
         }
 
         try {
-            String prepSql = "select ANALYSIS_XML from ERA.ANALYSIS";
             dbConnection = DriverManager.getConnection(completeUrl, userName, password);
             prepStatement = dbConnection.prepareStatement(prepSql);
             resultSet = prepStatement.executeQuery();
-            AnalysisFileTypeFromSet analysisFileTypeFromSet = new AnalysisFileTypeFromSet();
-            List<AnalysisFileType> subAnalysisFileList;
             while (resultSet.next()) {
-                sqlXml =  resultSet.getSQLXML("ANALYSIS_XML");
-                subAnalysisFileList = analysisFileTypeFromSet.extractFromSqlXml(sqlXml);
-                analysisFileList.addAll(subAnalysisFileList);
+                sqlxmlList.add(resultSet.getSQLXML(column));
             }
         } catch (SQLException e) {
             logger.error("Unable to establish JDBC connection with Oracle server", e);
@@ -112,7 +103,13 @@ public class JdbcOperation {
                 dbConnection.close();
             }
         }
-        return analysisFileList;
+        return sqlxmlList;
+    }
+
+    public List<SQLXML> getAnalysislXml() throws SQLException {
+        String prepAnalysisSql = "select ANALYSIS_XML from ERA.ANALYSIS";
+        String columnAnalysis = "ANALYSIS_XML";
+        return getSqlXml(prepAnalysisSql, columnAnalysis);
     }
 
 }
