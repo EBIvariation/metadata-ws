@@ -59,7 +59,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -332,8 +331,8 @@ public class MetadataApplicationTest {
                         "\"name\": \"" + "test sample" + "\"" +
                         "}"))
         .andExpect(status().is4xxClientError())
-        .andExpect(jsonPath("$.errors[0].property").value("taxonomies"))
-        .andExpect(jsonPath("$.errors[0].message").value("may not be null"));
+        .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
+        .andExpect(jsonPath("message").value("Please provide Taxonomies; it can not be null or blank"));
     }
 
     @Test
@@ -351,7 +350,7 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void putSampleInvalidNoTaxonomies() throws Exception {
+    public void deleteSampleTaxonomies() throws Exception {
         List<String> taxonomyUrlList = new ArrayList<String>();
         String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
         taxonomyUrlList.add(taxonomyUrl1);
@@ -360,118 +359,17 @@ public class MetadataApplicationTest {
 
         String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
         mockMvc.perform(get(location))
-                .andExpect(status().isOk())
+                .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$..sample.href").value(location));
 
         String idStr = taxonomyUrl1.substring(taxonomyUrl1.lastIndexOf('/') + 1);
-        int id = Integer.parseInt(idStr);
-        mockMvc.perform(delete(location + "/taxonomies/" + id));
+        mockMvc.perform(delete(location + "/taxonomies/" + idStr))
+                .andExpect(status().is2xxSuccessful());
         idStr = taxonomyUrl2.substring(taxonomyUrl2.lastIndexOf('/') + 1);
-        id = Integer.parseInt(idStr);
-        mockMvc.perform(delete(location + "/taxonomies/" + id));
-
-        mockMvc.perform(put(location)
-                .content("{ " +
-                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAN0001" + "\",\"version\": " + 1 + "}," +
-                        "\"name\": \"" + "testSampleNew" + "\"" +
-                        "}"))
+        mockMvc.perform(delete(location + "/taxonomies/" + idStr))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-                .andExpect(jsonPath("message").value("Please provide Taxonomies; it can not be null or blank"));
-    }
-
-    @Test
-    public void putSampleInvalidBlankTaxonomies() throws Exception {
-        List<String> taxonomyUrlList = new ArrayList<String>();
-        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
-        taxonomyUrlList.add(taxonomyUrl1);
-        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
-        taxonomyUrlList.add(taxonomyUrl2);
-
-        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..sample.href").value(location));
-
-        String idStr = taxonomyUrl1.substring(taxonomyUrl1.lastIndexOf('/') + 1);
-        int id = Integer.parseInt(idStr);
-        mockMvc.perform(delete(location + "/taxonomies/" + id));
-        idStr = taxonomyUrl2.substring(taxonomyUrl2.lastIndexOf('/') + 1);
-        id = Integer.parseInt(idStr);
-        mockMvc.perform(delete(location + "/taxonomies/" + id));
-
-        List<String> taxonomyUrlListBlank = new ArrayList<String>();
-        mockMvc.perform(put(location)
-                .content("{ " +
-                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAN0001" + "\",\"version\": " + 1 + "}," +
-                        "\"name\": \"" + "testSampleNew" + "\"," +
-                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListBlank).getJson() + "" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-                .andExpect(jsonPath("message").value("Please provide Taxonomies; it can not be null or blank"));
-    }
-
-    @Test
-    public void patchSampleInvalidNoTaxonomies() throws Exception {
-        List<String> taxonomyUrlList = new ArrayList<String>();
-        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
-        taxonomyUrlList.add(taxonomyUrl1);
-        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
-        taxonomyUrlList.add(taxonomyUrl2);
-
-        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..sample.href").value(location));
-
-        String idStr = taxonomyUrl1.substring(taxonomyUrl1.lastIndexOf('/') + 1);
-        int id = Integer.parseInt(idStr);
-        mockMvc.perform(delete(location + "/taxonomies/" + id));
-        idStr = taxonomyUrl2.substring(taxonomyUrl2.lastIndexOf('/') + 1);
-        id = Integer.parseInt(idStr);
-        mockMvc.perform(delete(location + "/taxonomies/" + id));
-
-        mockMvc.perform(patch(location)
-                .content("{ " +
-                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAN0001" + "\",\"version\": " + 1 + "}," +
-                        "\"name\": \"" + "testSampleNew" + "\"" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-                .andExpect(jsonPath("message").value("Please provide Taxonomies; it can not be null or blank"));
-    }
-
-    @Test
-    public void patchSampleInvalidBlankTaxonomies() throws Exception {
-        List<String> taxonomyUrlList = new ArrayList<String>();
-        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
-        taxonomyUrlList.add(taxonomyUrl1);
-        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
-        taxonomyUrlList.add(taxonomyUrl2);
-
-        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..sample.href").value(location));
-
-        String idStr = taxonomyUrl1.substring(taxonomyUrl1.lastIndexOf('/') + 1);
-        int id = Integer.parseInt(idStr);
-        mockMvc.perform(delete(location + "/taxonomies/" + id));
-        idStr = taxonomyUrl2.substring(taxonomyUrl2.lastIndexOf('/') + 1);
-        id = Integer.parseInt(idStr);
-        mockMvc.perform(delete(location + "/taxonomies/" + id));
-
-        List<String> taxonomyUrlListBlank = new ArrayList<String>();
-        mockMvc.perform(patch(location)
-                .content("{ " +
-                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAN0001" + "\",\"version\": " + 1 + "}," +
-                        "\"name\": \"" + "testSampleNew" + "\"," +
-                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListBlank).getJson() + "" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-                .andExpect(jsonPath("message").value("Please provide Taxonomies; it can not be null or blank"));
+                .andExpect(jsonPath("message").value("Sample must have atleast one Taxonomy"));
     }
 
     private String postTestSample(String accession, String name) throws Exception {
