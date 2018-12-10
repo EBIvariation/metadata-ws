@@ -23,7 +23,7 @@ import java.util.Date;
 
 public class ErrorMessage {
 
-    public final static String SAMPLE_WITHOUT_TAXONOMY = "A Sample must have atleast one Taxonomy";
+    public final static String SAMPLE_WITHOUT_TAXONOMY = "A sample must have atleast one taxonomy";
 
     private long timestamp;
     private int status;
