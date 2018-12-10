@@ -31,6 +31,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
+import uk.ac.ebi.ampt2d.metadata.exceptionhandling.ErrorMessage;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
@@ -324,6 +325,46 @@ public class MetadataApplicationTest {
     }
 
     @Test
+    public void postSampleAndUpdate() throws Exception {
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl1);
+        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl2);
+
+        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
+                .andExpect(jsonPath("$.name").value("testSample"))
+                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(2))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
+                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
+
+        List<String> taxonomyUrlListNew = new ArrayList<String>();
+        String taxonomyUrl3 = postTestTaxonomy(3, "Species3");
+        taxonomyUrlListNew.add(taxonomyUrl3);
+
+        mockMvc.perform(patch(location)
+                .content("{ " +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListNew).getJson() + "" +
+                        "}"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(1))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl3));
+    }
+
+    @Test
     public void postSampleInvalidNoTaxonomies() throws Exception {
         mockMvc.perform(post("/samples")
                 .content("{ " +
@@ -332,7 +373,7 @@ public class MetadataApplicationTest {
                         "}"))
         .andExpect(status().is4xxClientError())
         .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-        .andExpect(jsonPath("message").value("Please provide Taxonomies; it can not be null or blank"));
+        .andExpect(jsonPath("message").value(ErrorMessage.SAMPLE_WITHOUT_TAXONOMY));
     }
 
     @Test
@@ -346,7 +387,7 @@ public class MetadataApplicationTest {
                         "}"))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-                .andExpect(jsonPath("message").value("Please provide Taxonomies; it can not be null or blank"));
+                .andExpect(jsonPath("message").value(ErrorMessage.SAMPLE_WITHOUT_TAXONOMY));
     }
 
     @Test
@@ -369,7 +410,50 @@ public class MetadataApplicationTest {
         mockMvc.perform(delete(location + "/taxonomies/" + idStr))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-                .andExpect(jsonPath("message").value("Sample must have atleast one Taxonomy"));
+                .andExpect(jsonPath("message").value(ErrorMessage.SAMPLE_WITHOUT_TAXONOMY));
+    }
+
+    @Test
+    public void postSampleAndUpdateInvalidTaxonomies() throws Exception {
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl1);
+        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl2);
+
+        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
+                .andExpect(jsonPath("$.name").value("testSample"))
+                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(2))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
+                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
+
+        List<String> taxonomyUrlListInvalid = new ArrayList<String>();
+        mockMvc.perform(patch(location)
+                .content("{ " +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListInvalid).getJson() + "" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
+                .andExpect(jsonPath("message").value(ErrorMessage.SAMPLE_WITHOUT_TAXONOMY));
+
+        taxonomyUrlListInvalid.add("http://localhost/taxonomies/9998");
+        taxonomyUrlListInvalid.add("http://localhost/taxonomies/9999");
+        mockMvc.perform(patch(location)
+                .content("{ " +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListInvalid).getJson() + "" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
+                .andExpect(jsonPath("message").value(ErrorMessage.SAMPLE_WITHOUT_TAXONOMY));
     }
 
     private String postTestSample(String accession, String name) throws Exception {

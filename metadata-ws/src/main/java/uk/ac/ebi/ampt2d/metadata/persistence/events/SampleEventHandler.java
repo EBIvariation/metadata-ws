@@ -22,6 +22,7 @@ import org.springframework.data.rest.core.annotation.HandleBeforeLinkDelete;
 import org.springframework.data.rest.core.annotation.HandleBeforeLinkSave;
 import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
+import uk.ac.ebi.ampt2d.metadata.exceptionhandling.ErrorMessage;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 
 @RepositoryEventHandler(Sample.class)
@@ -31,7 +32,7 @@ public class SampleEventHandler {
     @HandleBeforeSave
     public void validateTaxonomies(Sample sample) {
         if (sample.getTaxonomies() == null || sample.getTaxonomies().size() == 0 || sample.getTaxonomies().get(0) == null) {
-            throw new IllegalArgumentException ("Please provide Taxonomies; it can not be null or blank");
+            throw new IllegalArgumentException (ErrorMessage.SAMPLE_WITHOUT_TAXONOMY);
         }
     }
 
@@ -39,7 +40,7 @@ public class SampleEventHandler {
     @HandleBeforeLinkSave
     public void validateTaxonomies(Sample sample, Object taxonomy) {
         if (sample.getTaxonomies() == null || sample.getTaxonomies().size() == 0 || sample.getTaxonomies().get(0) == null) {
-            throw new IllegalArgumentException ("Sample must have atleast one Taxonomy");
+            throw new IllegalArgumentException (ErrorMessage.SAMPLE_WITHOUT_TAXONOMY);
         }
     }
 
