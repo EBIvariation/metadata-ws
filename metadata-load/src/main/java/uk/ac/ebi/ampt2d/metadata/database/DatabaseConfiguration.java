@@ -17,14 +17,20 @@
  */
 package uk.ac.ebi.ampt2d.metadata.database;
 
+import oracle.jdbc.pool.OracleDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 
 @Configuration
 public class DatabaseConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(DatabaseConfiguration.class);
 
     @Autowired
     JdbcConnection jdbcConnection;
@@ -33,13 +39,24 @@ public class DatabaseConfiguration {
         this.jdbcConnection = jdbcConnection;
     }
 
-    public DataSource getdataSource() {
-        DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
-        driverManagerDataSource.setUrl(jdbcConnection.getCompleteUrl());
-        driverManagerDataSource.setUsername(jdbcConnection.getUserName());
-        driverManagerDataSource.setPassword(jdbcConnection.getPassword());
-        driverManagerDataSource.setDriverClassName(jdbcConnection.getDriver());
-        return driverManagerDataSource;
+    @Bean
+    public DataSource getdataSource() throws SQLException {
+        OracleDataSource oracleDataSource;
+        try {
+            oracleDataSource = new OracleDataSource();
+            if ((jdbcConnection.getUserName() == null || jdbcConnection.getUserName().trim().isEmpty()) ||
+                    (jdbcConnection.getPassword() == null || jdbcConnection.getPassword().trim().isEmpty())) {
+                throw new IllegalArgumentException("Some fields are not present in properties file.");
+            } else {
+                oracleDataSource.setUser(jdbcConnection.getUserName());
+                oracleDataSource.setPassword(jdbcConnection.getPassword());
+                oracleDataSource.setURL(jdbcConnection.getCompleteUrl());
+            }
+        } catch (SQLException ex) {
+            logger.error("Could not create OracleDataSource ", ex);
+            throw ex;
+        }
+        return oracleDataSource;
     }
 
 }

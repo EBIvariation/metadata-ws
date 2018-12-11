@@ -17,30 +17,24 @@
  */
 package uk.ac.ebi.ampt2d.metadata.enaobject;
 
-import uk.ac.ebi.ampt2d.metadata.database.DatabaseConfiguration;
 import uk.ac.ebi.ampt2d.metadata.database.SqlxmlJdbcTemplate;
 import uk.ac.ebi.ampt2d.metadata.parser.AnalysisFileTypeFromSet;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
+import javax.sql.DataSource;
 import java.sql.SQLXML;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class EnaObjectCollect {
 
-    private DatabaseConfiguration databaseConfiguration;
-
-    public EnaObjectCollect(DatabaseConfiguration databaseConfiguration) {
-        this.databaseConfiguration = databaseConfiguration;
-    }
-
-    public List<AnalysisFileType> getEnaAnalysisFileFomDb() {
+    public List<AnalysisFileType> getEnaAnalysisFileFomDb(DataSource dataSource) {
         List<SQLXML> sqlxmlList;
         List<List<AnalysisFileType>> analysisFileMultiList;
         String sqlAnalysis = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS";
         String columnAnalysisXml = "ANALYSIS_XML";
 
-        SqlxmlJdbcTemplate sqlxmlJdbcTemplate = new SqlxmlJdbcTemplate(databaseConfiguration.getdataSource(),
+        SqlxmlJdbcTemplate sqlxmlJdbcTemplate = new SqlxmlJdbcTemplate(dataSource,
                 sqlAnalysis, columnAnalysisXml);
         sqlxmlList = sqlxmlJdbcTemplate.listSqlxml();
 

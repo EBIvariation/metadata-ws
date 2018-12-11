@@ -26,9 +26,6 @@ import org.springframework.context.annotation.Configuration;
     @Value("${" + DbParametersName.DB_URL + ":#{null}}")
     private String url;
 
-    @Value("${" + DbParametersName.DB_DRIVER + ":#{null}}")
-    private String driver;
-
     @Value("${" + DbParametersName.DB_HOST + ":#{null}}")
     private String host;
 
@@ -38,9 +35,6 @@ import org.springframework.context.annotation.Configuration;
     @Value("${" + DbParametersName.DB_PORT + ":#{null}}")
     private String port;
 
-    @Value("${" + DbParametersName.DB_PROTOCOL + ":#{null}}")
-    private String protocol;
-
     @Value("${" + DbParametersName.DB_USERNAME + ":#{null}}")
     private String userName;
 
@@ -49,10 +43,6 @@ import org.springframework.context.annotation.Configuration;
 
     private String getUrl() {
         return url;
-    }
-
-    public String getDriver() {
-        return driver;
     }
 
     private String getHost() {
@@ -67,10 +57,6 @@ import org.springframework.context.annotation.Configuration;
         return port;
     }
 
-    private String getProtocol() {
-        return protocol;
-    }
-
     public String getUserName() {
         return userName;
     }
@@ -82,26 +68,22 @@ import org.springframework.context.annotation.Configuration;
     public String getCompleteUrl() {
         String url;
         String host;
-        String protocol;
         String serviceName;
         String port;
+
         if ((this.getUrl() == null || this.getUrl().trim().isEmpty()) ||
                 (this.getHost() == null || this.getHost().trim().isEmpty()) ||
                 (this.getPort() == null || this.getPort().trim().isEmpty()) ||
-                (this.getProtocol() == null || this.getProtocol().trim().isEmpty()) ||
                 (this.getServiceName() == null || this.getServiceName().trim().isEmpty())) {
             throw new IllegalArgumentException("Some fields are not present in properties file.");
         } else {
             url = this.getUrl();
             host = this.getHost();
-            protocol = this.getProtocol();
             serviceName = this.getServiceName();
             port = this.getPort();
         }
 
-        url = url + ":@(DESCRIPTION =(ADDRESS_LIST =(ADDRESS = (PROTOCOL = " + protocol + ")(HOST = " + host + ")(PORT = " +
-                port + ")))(CONNECT_DATA =(SERVER = DEDICATED)(SERVICE_NAME = " + serviceName + ")))";
-
+        url = url + host + ":" + port + "/" + serviceName;
         return url;
     }
 

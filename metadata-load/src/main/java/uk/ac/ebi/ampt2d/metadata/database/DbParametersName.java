@@ -20,11 +20,9 @@ package uk.ac.ebi.ampt2d.metadata.database;
 public class DbParametersName {
 
     public static final String DB_URL = "OracleJDBC.url";
-    public static final String DB_DRIVER = "OracleJDBC.Driver";
     public static final String DB_HOST = "OracleJDBC.host";
     public static final String DB_SERVICENAME = "OracleJDBC.servicename";
     public static final String DB_PORT = "OracleJDBC.port";
-    public static final String DB_PROTOCOL = "OracleJDBC.protocol";
     public static final String DB_USERNAME = "OracleJDBC.username";
     public static final String DB_PASSWORD = "OracleJDBC.password";
 
