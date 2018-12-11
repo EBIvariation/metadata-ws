@@ -21,37 +21,51 @@ import oracle.jdbc.pool.OracleDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
+import javax.validation.constraints.NotNull;
 import java.sql.SQLException;
 
 @Configuration
+@ConfigurationProperties("ena-database")
 public class DatabaseConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseConfiguration.class);
 
-    @Autowired
-    JdbcConnection jdbcConnection;
+    @NotNull
+    private String url;
 
-    public DatabaseConfiguration(JdbcConnection jdbcConnection) {
-        this.jdbcConnection = jdbcConnection;
+    @NotNull
+    private String username;
+
+    @NotNull
+    private String password;
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Bean
     public DataSource getdataSource() throws SQLException {
+
         OracleDataSource oracleDataSource;
         try {
             oracleDataSource = new OracleDataSource();
-            if ((jdbcConnection.getUserName() == null || jdbcConnection.getUserName().trim().isEmpty()) ||
-                    (jdbcConnection.getPassword() == null || jdbcConnection.getPassword().trim().isEmpty())) {
-                throw new IllegalArgumentException("Some fields are not present in properties file.");
-            } else {
-                oracleDataSource.setUser(jdbcConnection.getUserName());
-                oracleDataSource.setPassword(jdbcConnection.getPassword());
-                oracleDataSource.setURL(jdbcConnection.getCompleteUrl());
-            }
+            oracleDataSource.setURL(url);
+            oracleDataSource.setUser(username);
+            oracleDataSource.setPassword(password);
         } catch (SQLException ex) {
             logger.error("Could not create OracleDataSource ", ex);
             throw ex;
