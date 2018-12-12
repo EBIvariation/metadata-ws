@@ -24,6 +24,7 @@ import java.util.Date;
 public class ErrorMessage {
 
     public final static String SAMPLE_WITHOUT_TAXONOMY = "A sample must have atleast one taxonomy";
+    public final static String INVALID_TAXONOMY = "Atleast one of the taxonomy link is invalid";
 
     private long timestamp;
     private int status;

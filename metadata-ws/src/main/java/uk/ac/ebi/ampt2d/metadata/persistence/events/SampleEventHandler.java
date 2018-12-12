@@ -31,16 +31,26 @@ public class SampleEventHandler {
     @HandleBeforeCreate
     @HandleBeforeSave
     public void validateTaxonomies(Sample sample) {
-        if (sample.getTaxonomies() == null || sample.getTaxonomies().size() == 0 || sample.getTaxonomies().get(0) == null) {
-            throw new IllegalArgumentException (ErrorMessage.SAMPLE_WITHOUT_TAXONOMY);
-        }
+        validateTaxonomyLink(sample);
     }
 
     @HandleBeforeLinkDelete
     @HandleBeforeLinkSave
     public void validateTaxonomies(Sample sample, Object taxonomy) {
-        if (sample.getTaxonomies() == null || sample.getTaxonomies().size() == 0 || sample.getTaxonomies().get(0) == null) {
+        validateTaxonomyLink(sample);
+    }
+
+    private void validateTaxonomyLink(Sample sample) {
+        if (sample.getTaxonomies() == null || sample.getTaxonomies().size() == 0) {
             throw new IllegalArgumentException (ErrorMessage.SAMPLE_WITHOUT_TAXONOMY);
+        } else if (sample.getTaxonomies().size() > 0) {
+            long invalid = sample.getTaxonomies()
+                    .stream()
+                    .filter(t -> t == null)
+                    .count();
+            if (invalid > 0) {
+                throw new IllegalArgumentException (ErrorMessage.INVALID_TAXONOMY);
+            }
         }
     }
 
