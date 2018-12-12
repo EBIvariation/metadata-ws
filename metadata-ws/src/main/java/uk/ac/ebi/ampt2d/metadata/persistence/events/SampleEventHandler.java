@@ -43,14 +43,8 @@ public class SampleEventHandler {
     private void validateTaxonomyLink(Sample sample) {
         if (sample.getTaxonomies() == null || sample.getTaxonomies().size() == 0) {
             throw new IllegalArgumentException (ErrorMessage.SAMPLE_WITHOUT_TAXONOMY);
-        } else if (sample.getTaxonomies().size() > 0) {
-            long invalid = sample.getTaxonomies()
-                    .stream()
-                    .filter(t -> t == null)
-                    .count();
-            if (invalid > 0) {
+        } else if (sample.getTaxonomies().contains(null)) {
                 throw new IllegalArgumentException (ErrorMessage.INVALID_TAXONOMY);
-            }
         }
     }
 
