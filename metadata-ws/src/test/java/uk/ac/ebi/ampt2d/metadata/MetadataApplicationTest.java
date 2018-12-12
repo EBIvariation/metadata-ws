@@ -454,6 +454,21 @@ public class MetadataApplicationTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
                 .andExpect(jsonPath("message").value(ErrorMessage.SAMPLE_WITHOUT_TAXONOMY));
+
+        List<String> taxonomyUrlListMixed = new ArrayList<String>();
+        taxonomyUrlListMixed.add(taxonomyUrl1);
+        taxonomyUrlListMixed.add("http://localhost/taxonomies/9999");
+        mockMvc.perform(patch(location)
+                .content("{ " +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListMixed).getJson() + "" +
+                        "}"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(1))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1));
     }
 
     private String postTestSample(String accession, String name) throws Exception {
