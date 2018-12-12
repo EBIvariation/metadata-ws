@@ -414,7 +414,7 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void postSampleAndUpdateInvalidTaxonomies() throws Exception {
+    public void postSampleAndUpdateWithoutTaxonomies() throws Exception {
         List<String> taxonomyUrlList = new ArrayList<String>();
         String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
         taxonomyUrlList.add(taxonomyUrl1);
@@ -444,9 +444,34 @@ public class MetadataApplicationTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
                 .andExpect(jsonPath("message").value(ErrorMessage.SAMPLE_WITHOUT_TAXONOMY));
+    }
 
-        taxonomyUrlListInvalid.add("http://localhost/taxonomies/9998");
-        taxonomyUrlListInvalid.add("http://localhost/taxonomies/9999");
+    @Test
+    public void postSampleAndUpdateInvalidTaxonomies() throws Exception {
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl1);
+        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl2);
+
+        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
+                .andExpect(jsonPath("$.name").value("testSample"))
+                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(2))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
+                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
+
+        List<String> taxonomyUrlListInvalid = new ArrayList<String>();
+        taxonomyUrlListInvalid.add("http://nohost/taxonomies/9998");
+        taxonomyUrlListInvalid.add("http://nohost/taxonomies/9999");
         mockMvc.perform(patch(location)
                 .content("{ " +
                         "\"taxonomies\": " + testListJson.write(taxonomyUrlListInvalid).getJson() + "" +
@@ -454,10 +479,34 @@ public class MetadataApplicationTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
                 .andExpect(jsonPath("message").value(ErrorMessage.INVALID_TAXONOMY));
+    }
+
+    @Test
+    public void postSampleAndUpdatePartialInvalidTaxonomies() throws Exception {
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl1);
+        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl2);
+
+        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
+                .andExpect(jsonPath("$.name").value("testSample"))
+                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(2))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
+                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
 
         List<String> taxonomyUrlListMixed = new ArrayList<String>();
         taxonomyUrlListMixed.add(taxonomyUrl1);
-        taxonomyUrlListMixed.add("http://localhost/taxonomies/9999");
+        taxonomyUrlListMixed.add("http://nohost/taxonomies/9999");
         mockMvc.perform(patch(location)
                 .content("{ " +
                         "\"taxonomies\": " + testListJson.write(taxonomyUrlListMixed).getJson() + "" +
@@ -810,7 +859,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.accessionVersionId").value(nullValue()));
 
-        // null acession
+        // null accession
         mockMvc.perform(post("/samples")
                 .content("{ " +
                         "\"accessionVersionId\":{ \"accession\":" + null + ",\"version\": " + 1 + "}," +
@@ -821,7 +870,7 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.errors[0].property").value("accessionVersionId.accession"))
                 .andExpect(jsonPath("$.errors[0].message").value("may not be null"));
 
-        // blank acession
+        // blank accession
         mockMvc.perform(post("/samples")
                 .content("{ " +
                         "\"accessionVersionId\":{ \"accession\": \"" + "\",\"version\": " + 1 + "}," +
