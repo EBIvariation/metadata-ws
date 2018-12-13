@@ -23,9 +23,6 @@ import java.util.Date;
 
 public class ErrorMessage {
 
-    public final static String SAMPLE_WITHOUT_TAXONOMY = "A sample must have at least one taxonomy";
-    public final static String INVALID_TAXONOMY = "At least one of the taxonomy URL is invalid";
-
     private long timestamp;
 
     private int status;

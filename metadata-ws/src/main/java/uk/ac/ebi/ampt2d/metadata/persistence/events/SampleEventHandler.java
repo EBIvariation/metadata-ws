@@ -22,7 +22,8 @@ import org.springframework.data.rest.core.annotation.HandleBeforeLinkDelete;
 import org.springframework.data.rest.core.annotation.HandleBeforeLinkSave;
 import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
-import uk.ac.ebi.ampt2d.metadata.exceptionhandling.ErrorMessage;
+import uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidTaxonomyException;
+import uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 
 @RepositoryEventHandler(Sample.class)
@@ -42,9 +43,9 @@ public class SampleEventHandler {
 
     private void validateTaxonomyLink(Sample sample) {
         if (sample.getTaxonomies() == null || sample.getTaxonomies().size() == 0) {
-            throw new IllegalArgumentException(ErrorMessage.SAMPLE_WITHOUT_TAXONOMY);
+            throw new SampleWithoutTaxonomyException();
         } else if (sample.getTaxonomies().contains(null)) {
-            throw new IllegalArgumentException(ErrorMessage.INVALID_TAXONOMY);
+            throw new InvalidTaxonomyException();
         }
     }
 

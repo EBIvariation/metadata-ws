@@ -31,7 +31,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
-import uk.ac.ebi.ampt2d.metadata.exceptionhandling.ErrorMessage;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
@@ -372,8 +371,7 @@ public class MetadataApplicationTest {
                         "\"name\": \"" + "test sample" + "\"" +
                         "}"))
         .andExpect(status().is4xxClientError())
-        .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-        .andExpect(jsonPath("message").value(ErrorMessage.SAMPLE_WITHOUT_TAXONOMY));
+        .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException"));
     }
 
     @Test
@@ -386,8 +384,7 @@ public class MetadataApplicationTest {
                         "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
                         "}"))
                 .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-                .andExpect(jsonPath("message").value(ErrorMessage.SAMPLE_WITHOUT_TAXONOMY));
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException"));
     }
 
     @Test
@@ -409,8 +406,7 @@ public class MetadataApplicationTest {
         idStr = taxonomyUrl2.substring(taxonomyUrl2.lastIndexOf('/') + 1);
         mockMvc.perform(delete(location + "/taxonomies/" + idStr))
                 .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-                .andExpect(jsonPath("message").value(ErrorMessage.SAMPLE_WITHOUT_TAXONOMY));
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException"));
     }
 
     @Test
@@ -442,8 +438,7 @@ public class MetadataApplicationTest {
                         "\"taxonomies\": " + testListJson.write(taxonomyUrlListInvalid).getJson() + "" +
                         "}"))
                 .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-                .andExpect(jsonPath("message").value(ErrorMessage.SAMPLE_WITHOUT_TAXONOMY));
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException"));
     }
 
     @Test
@@ -477,8 +472,7 @@ public class MetadataApplicationTest {
                         "\"taxonomies\": " + testListJson.write(taxonomyUrlListInvalid).getJson() + "" +
                         "}"))
                 .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-                .andExpect(jsonPath("message").value(ErrorMessage.INVALID_TAXONOMY));
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidTaxonomyException"));
     }
 
     @Test
@@ -512,8 +506,7 @@ public class MetadataApplicationTest {
                         "\"taxonomies\": " + testListJson.write(taxonomyUrlListMixed).getJson() + "" +
                         "}"))
                 .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("java.lang.IllegalArgumentException"))
-                .andExpect(jsonPath("message").value(ErrorMessage.INVALID_TAXONOMY));
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidTaxonomyException"));
     }
 
     private String postTestSample(String accession, String name) throws Exception {
