@@ -17,60 +17,33 @@
  */
 package uk.ac.ebi.ampt2d.metadata.database;
 
-import oracle.jdbc.pool.OracleDataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
-import javax.validation.constraints.NotNull;
-import java.sql.SQLException;
 
 @Configuration
-@ConfigurationProperties("ena-database")
 public class DatabaseConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseConfiguration.class);
-
-    @NotNull
-    private String url;
-
-    @NotNull
-    private String username;
-
-    @NotNull
-    private String password;
-
-    public void setUrl(String url) {
-        this.url = url;
+    @Bean ("db_datasource_properties")
+    @ConfigurationProperties("ena.datasource.db")
+    public DataSourceProperties dbDataSourceProperties() {
+        return new DataSourceProperties();
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    @Bean ("db_datasource")
+    @ConfigurationProperties("ena.datasource.db.hikari")
+    public DataSource dbDataSource() {
+        return dbDataSourceProperties().initializeDataSourceBuilder().type(HikariDataSource.class).build();
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @Bean
-    public DataSource getdataSource() throws SQLException {
-
-        OracleDataSource oracleDataSource;
-        try {
-            oracleDataSource = new OracleDataSource();
-            oracleDataSource.setURL(url);
-            oracleDataSource.setUser(username);
-            oracleDataSource.setPassword(password);
-        } catch (SQLException ex) {
-            logger.error("Could not create OracleDataSource ", ex);
-            throw ex;
-        }
-        return oracleDataSource;
+    @Bean("db_transaction_manager")
+    public DataSourceTransactionManager dbTransactionManager() {
+        return new DataSourceTransactionManager(dbDataSource());
     }
 
 }

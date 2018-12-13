@@ -55,7 +55,7 @@ public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, An
         try {
             analysisSetType = ANALYSISSETDocument.Factory.parse(xmlStr).getANALYSISSET();
         } catch (XmlException e) {
-            logger.warn("Unable to parse the XML file: {}",  xmlStr, e);
+            logger.error("Unable to parse the XML file: {}",  xmlStr, e);
             throw e;
         }
         return analysisSetType;
@@ -71,9 +71,9 @@ public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, An
             analysisSet = getAnalysisSet(xmlStr);
             analysisFileList = extract(analysisSet);
         } catch (XmlException e) {
-            logger.warn("Unable to convert XML String to AnalysisSet:",  e);
+            logger.error("Unable to convert XML String to AnalysisSet:",  e);
         } catch (SQLException e) {
-            logger.warn("Unable to convert SQLXML Object to String: {}", sqlXml.toString(), e);
+            logger.error("Unable to convert SQLXML Object to String: {}", sqlXml.toString(), e);
         }
         return analysisFileList;
     }
