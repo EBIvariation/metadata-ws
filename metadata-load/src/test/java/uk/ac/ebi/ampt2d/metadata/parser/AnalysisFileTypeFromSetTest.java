@@ -31,7 +31,6 @@ import java.nio.file.Files;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RunWith(SpringRunner.class)
 public class AnalysisFileTypeFromSetTest {
@@ -62,7 +61,7 @@ public class AnalysisFileTypeFromSetTest {
         assertEquals(analysisFileList.get(1).getChecksumMethod(), AnalysisFileType.ChecksumMethod.Enum.forString("MD5"));
     }
 
-    @Test
+    @Test(expected = XmlException.class)
     public void testAnalysisFileParserWrongInput() throws Exception {
         String xmlStr = "/<?wrong xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
                 "<ANALYSIS_SET>\n" +
@@ -71,8 +70,7 @@ public class AnalysisFileTypeFromSetTest {
                 "</ANALYSIS_SET>\n";
 
         AnalysisFileTypeFromSet analysisFileTypeFromSet = new AnalysisFileTypeFromSet();
-        Throwable exception = assertThrows(XmlException.class, () -> analysisFileTypeFromSet.getAnalysisSet(xmlStr));
-        assertEquals("error: Unexpected element: CDATA", exception.getMessage());
+        analysisFileTypeFromSet.getAnalysisSet(xmlStr);
     }
 
 }

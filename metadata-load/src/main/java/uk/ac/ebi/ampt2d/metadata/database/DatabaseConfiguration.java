@@ -17,7 +17,6 @@
  */
 package uk.ac.ebi.ampt2d.metadata.database;
 
-import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -38,7 +37,7 @@ public class DatabaseConfiguration {
     @Bean ("db_datasource")
     @ConfigurationProperties("ena.datasource.db.hikari")
     public DataSource dbDataSource() {
-        return dbDataSourceProperties().initializeDataSourceBuilder().type(HikariDataSource.class).build();
+        return dbDataSourceProperties().initializeDataSourceBuilder().build();
     }
 
     @Bean("db_transaction_manager")
