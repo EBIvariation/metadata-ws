@@ -32,8 +32,6 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import uk.ac.ebi.ampt2d.metadata.aop.StudyDeprecationAspect;
-<<<<<<< HEAD:metadata-ws/src/main/java/uk/ac/ebi/ampt2d/metadata/SpringDataRestConfig.java
-<<<<<<< HEAD:metadata-ws/src/main/java/uk/ac/ebi/ampt2d/metadata/SpringDataRestConfig.java
 import uk.ac.ebi.ampt2d.metadata.aop.StudyReleaseDateAspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
@@ -43,26 +41,10 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
-=======
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.*;
->>>>>>> Only multiple genes with single analysis:src/main/java/uk/ac/ebi/ampt2d/metadata/SpringDataRestConfig.java
-=======
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Gene;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Transcriptome;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
->>>>>>> Code review changes: Name changes for gene and transcriptome:src/main/java/uk/ac/ebi/ampt2d/metadata/SpringDataRestConfig.java
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
-<<<<<<< HEAD:metadata-ws/src/main/java/uk/ac/ebi/ampt2d/metadata/SpringDataRestConfig.java
-<<<<<<< HEAD:metadata-ws/src/main/java/uk/ac/ebi/ampt2d/metadata/SpringDataRestConfig.java
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.AnalysisRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.ReferenceSequenceRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.SampleRestController;
@@ -71,22 +53,6 @@ import uk.ac.ebi.ampt2d.metadata.rest.resources.AnalysisResource;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.ReferenceSequenceResource;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.SampleResource;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.StudyResource;
-=======
-import uk.ac.ebi.ampt2d.metadata.rest.controllers.*;
-import uk.ac.ebi.ampt2d.metadata.rest.resources.*;
->>>>>>> Only multiple genes with single analysis:src/main/java/uk/ac/ebi/ampt2d/metadata/SpringDataRestConfig.java
-=======
-import uk.ac.ebi.ampt2d.metadata.rest.controllers.AnalysisRestController;
-import uk.ac.ebi.ampt2d.metadata.rest.controllers.AssemblyRestController;
-import uk.ac.ebi.ampt2d.metadata.rest.controllers.GeneRestController;
-import uk.ac.ebi.ampt2d.metadata.rest.controllers.StudyRestController;
-import uk.ac.ebi.ampt2d.metadata.rest.controllers.TranscriptomeRestController;
-import uk.ac.ebi.ampt2d.metadata.rest.resources.AnalysisResource;
-import uk.ac.ebi.ampt2d.metadata.rest.resources.AssemblyResource;
-import uk.ac.ebi.ampt2d.metadata.rest.resources.GeneResource;
-import uk.ac.ebi.ampt2d.metadata.rest.resources.StudyResource;
-import uk.ac.ebi.ampt2d.metadata.rest.resources.TranscriptomeResource;
->>>>>>> Code review changes: Name changes for gene and transcriptome:src/main/java/uk/ac/ebi/ampt2d/metadata/SpringDataRestConfig.java
 
 @Configuration
 @EnableJpaAuditing
@@ -117,9 +83,7 @@ public class SpringDataRestConfig {
                 config.getCorsRegistry().addMapping("/**").allowedMethods("*").allowedOrigins("*");
                 config.exposeIdsFor(
                         Analysis.class,
-                        Assembly.class,
-                        Transcriptome.class,
-                        Gene.class,
+                        ReferenceSequence.class,
                         File.class,
                         Sample.class,
                         Study.class,
@@ -158,18 +122,8 @@ public class SpringDataRestConfig {
     }
 
     @Bean
-    public GenericResourceAssembler<Assembly, AssemblyResource> assemblyResourceAssembler() {
-        return new GenericResourceAssembler<Assembly, AssemblyResource>(AssemblyRestController.class, AssemblyResource.class);
-    }
-
-    @Bean
-    public GenericResourceAssembler<Transcriptome, TranscriptomeResource> transcriptomeResourceAssembler() {
-        return new GenericResourceAssembler<Transcriptome, TranscriptomeResource>(TranscriptomeRestController.class, TranscriptomeResource.class);
-    }
-
-    @Bean
-    public GenericResourceAssembler<Gene, GeneResource> geneResourceAssembler() {
-        return new GenericResourceAssembler<Gene, GeneResource>(GeneRestController.class, GeneResource.class);
+    public GenericResourceAssembler<ReferenceSequence, ReferenceSequenceResource> referenceSequenceResourceAssembler() {
+        return new GenericResourceAssembler<ReferenceSequence, ReferenceSequenceResource>(ReferenceSequenceRestController.class, ReferenceSequenceResource.class);
     }
 
     @Bean

@@ -31,8 +31,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
-<<<<<<< HEAD:metadata-ws/src/test/java/uk/ac/ebi/ampt2d/metadata/MetadataApplicationTest.java
-<<<<<<< HEAD:metadata-ws/src/test/java/uk/ac/ebi/ampt2d/metadata/MetadataApplicationTest.java
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
@@ -46,30 +44,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
-=======
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.*;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.*;
->>>>>>> Only multiple genes with single analysis:src/test/java/uk/ac/ebi/ampt2d/metadata/MetadataApplicationTest.java
-=======
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionEntityId;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Assembly;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Gene;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Transcriptome;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AssemblyRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.GeneRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TranscriptomeRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
->>>>>>> Code review changes: Name changes for gene and transcriptome:src/test/java/uk/ac/ebi/ampt2d/metadata/MetadataApplicationTest.java
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -102,13 +76,7 @@ public class MetadataApplicationTest {
     private AnalysisRepository analysisRepository;
 
     @Autowired
-    private AssemblyRepository assemblyRepository;
-
-    @Autowired
-    private TranscriptomeRepository transcriptomeRepository;
-
-    @Autowired
-    private GeneRepository geneRepository;
+    private ReferenceSequenceRepository referenceSequenceRepository;
 
     @Autowired
     private FileRepository fileRepository;
@@ -126,13 +94,7 @@ public class MetadataApplicationTest {
     private WebResourceRepository webResourceRepository;
 
     @Autowired
-    private JacksonTester<Assembly> testAssemblyJson;
-
-    @Autowired
-    private JacksonTester<Transcriptome> testTranscriptomeJson;
-
-    @Autowired
-    private JacksonTester<Gene> testGeneJson;
+    private JacksonTester<ReferenceSequence> testReferenceSequenceJson;
 
     @Autowired
     private JacksonTester<File> testFileJson;
@@ -149,9 +111,7 @@ public class MetadataApplicationTest {
     @Before
     public void cleanDatabases() throws Exception {
         analysisRepository.deleteAll();
-        assemblyRepository.deleteAll();
-        transcriptomeRepository.deleteAll();
-        geneRepository.deleteAll();
+        referenceSequenceRepository.deleteAll();
         fileRepository.deleteAll();
         sampleRepository.deleteAll();
         studyRepository.deleteAll();
@@ -160,60 +120,34 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void postAssembly() throws Exception {
-        String location = postTestAssembly("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+    public void postReferenceSequence() throws Exception {
+        postReferenceSequence("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.ASSEMBLY);
 
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("GRCh37"));
+        postReferenceSequence("GRCh38", "p3",
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
+
+        postReferenceSequence("GRCh39", "p4",
+                Arrays.asList("GCA_000001407.3", "GCF_000001407.14"), ReferenceSequence.Type.TRANSCRIPTOME);
     }
 
-    private String postTestAssembly(String name, String patch, List<String> accessions) throws Exception {
-        Assembly testAssembly = new Assembly(name, patch, accessions);
-
-        MvcResult mvcResult = mockMvc.perform(post("/assemblies")
-                .content(testAssemblyJson.write(testAssembly).getJson()))
-                .andExpect(status().isCreated()).andReturn();
-
-        return mvcResult.getResponse().getHeader("Location");
-    }
-
-    @Test
-    public void postTranscriptome() throws Exception {
-        String name = "Trans1";
-        String location = postTestTranscriptome(name, "p2", Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+    private void postReferenceSequence(String name, String patch, List accessions, ReferenceSequence.Type type) throws Exception {
+        String location = postTestReferenceSequence(name, patch, accessions, type);
 
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(name));
     }
 
-    private String postTestTranscriptome(String name, String patch, List<String> accessions) throws Exception {
-        Transcriptome testTranscriptome = new Transcriptome(name, patch, accessions);
-
-        MvcResult mvcResult = mockMvc.perform(post("/transcriptomes")
-                .content(testTranscriptomeJson.write(testTranscriptome).getJson()))
-                .andExpect(status().isCreated()).andReturn();
-
-        return mvcResult.getResponse().getHeader("Location");
+    private String postTestReferenceSequence(String name, String patch, List<String> accessions) throws Exception {
+        return postTestReferenceSequence(name, patch, accessions, ReferenceSequence.Type.ASSEMBLY);
     }
 
-    @Test
-    public void postGene() throws Exception {
-        String name = "Gene1";
-        String location = postTestGene(name, "p3", Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+    private String postTestReferenceSequence(String name, String patch, List<String> accessions, ReferenceSequence.Type type) throws Exception {
+        ReferenceSequence testReferenceSequence = new ReferenceSequence(name, patch, accessions, type);
 
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(name));
-    }
-
-    private String postTestGene(String name, String patch, List<String> accessions) throws Exception {
-        Gene testGene = new Gene(name, patch, accessions);
-
-        MvcResult mvcResult = mockMvc.perform(post("/genes")
-                .content(testGeneJson.write(testGene).getJson()))
+        MvcResult mvcResult = mockMvc.perform(post("/reference-sequences")
+                .content(testReferenceSequenceJson.write(testReferenceSequence).getJson()))
                 .andExpect(status().isCreated()).andReturn();
 
         return mvcResult.getResponse().getHeader("Location");
@@ -309,20 +243,11 @@ public class MetadataApplicationTest {
 
     @Test
     public void postAnalysis() throws Exception {
-        String assemblyUrl = postTestAssembly("GRCh37", "p2",
+        String referenceSequenceUrl = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String transcriptomeUrl = postTestTranscriptome("Trans1", "p3",
-                Arrays.asList("GCA_000001405.4", "GCF_000001405.15"));
-        List<String> geneUrlList = new ArrayList<String>();
-        String geneUrl = postTestGene("Gene1", "p4",
-                Arrays.asList("GCA_000001405.5", "GCF_000001405.16"));
-        geneUrlList.add(geneUrl);
-        geneUrl = postTestGene("Gene2", "p5",
-                Arrays.asList("GCA_000001405.5", "GCF_000001405.16"));
-        geneUrlList.add(geneUrl);
         String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
-        String location = postTestAnalysis("EGAA0001", assemblyUrl, transcriptomeUrl, geneUrlList, studyUrl, Analysis.Technology.GWAS,
+        String location = postTestAnalysis("EGAA0001", referenceSequenceUrl, studyUrl, Analysis.Technology.GWAS,
                 Analysis.Type.CASE_CONTROL, "Illumina");
 
         mockMvc.perform(get(location))
@@ -330,22 +255,20 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
     }
 
-    private String postTestAnalysis(String accession, String assemblyUrl, String transcriptomeUrl, List<String> geneUrlList, String studyUrl) throws Exception {
-        return postTestAnalysis(accession, assemblyUrl, transcriptomeUrl, geneUrlList, studyUrl, Analysis.Technology.GWAS,
-                Analysis.Type.CASE_CONTROL, "Illumina");
+    private String postTestAnalysis(String accession, String referenceSequenceUrl, String studyUrl) throws Exception {
+        return postTestAnalysis(accession, referenceSequenceUrl, studyUrl, Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina");
+
     }
 
-    private String postTestAnalysis(String accession, String assemblyUrl, String transcriptomeUrl, List<String> geneUrlList,
-                                    String studyUrl, Analysis.Technology technology, Analysis.Type type, String platform) throws Exception {
+    private String postTestAnalysis(String accession, String referenceSequenceUrl, String studyUrl, Analysis.Technology
+            technology, Analysis.Type type, String platform) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/analyses")
                 .content("{ " +
                         "\"accessionVersionId\":{ \"accession\": \"" + accession + "\",\"version\":  1 }," +
                         "\"name\": \"test_human_analysis\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"study\": \"" + studyUrl + "\"," +
-                        "\"assembly\": \"" + assemblyUrl + "\"," +
-                        "\"transcriptome\": \"" + transcriptomeUrl + "\"," +
-                        "\"genes\": " + testListJson.write(geneUrlList).getJson() + "," +
+                        "\"referenceSequence\": \"" + referenceSequenceUrl + "\"," +
                         "\"technology\": \"" + technology + "\"," +
                         "\"type\": \"" + type + "\"," +
                         "\"platform\": \"" + platform + "\"" +
@@ -691,285 +614,134 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void findAssemblyByName() throws Exception {
-        String grch37Url = postTestAssembly("GRCh37", "p2",
+    public void findReferenceSequenceByName() throws Exception {
+        String grch37Url = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String grch38Url = postTestAssembly("GRCh38", "p2",
+        String grch38Url = postTestReferenceSequence("GRCh38", "p2",
                 Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37"))
+        mockMvc.perform(get("/reference-sequences/search?name=GRCh37"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(1))
-                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch37Url))
-                .andExpect(jsonPath("$..assemblies[0].name").value("GRCh37"));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch37Url))
+                .andExpect(jsonPath("$..reference-sequences[0].name").value("GRCh37"));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh38"))
+        mockMvc.perform(get("/reference-sequences/search?name=GRCh38"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(1))
-                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch38Url))
-                .andExpect(jsonPath("$..assemblies[0].name").value("GRCh38"));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch38Url))
+                .andExpect(jsonPath("$..reference-sequences[0].name").value("GRCh38"));
 
-        mockMvc.perform(get("/assemblies/search?name=NCBI36"))
+        mockMvc.perform(get("/reference-sequences/search?name=NCBI36"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(0));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p2"))
+        mockMvc.perform(get("/reference-sequences/search?name=GRCh37&patch=p2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(1))
-                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch37Url))
-                .andExpect(jsonPath("$..assemblies[0].name").value("GRCh37"))
-                .andExpect(jsonPath("$..assemblies[0].patch").value("p2"));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch37Url))
+                .andExpect(jsonPath("$..reference-sequences[0].name").value("GRCh37"))
+                .andExpect(jsonPath("$..reference-sequences[0].patch").value("p2"));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh38&patch=p2"))
+        mockMvc.perform(get("/reference-sequences/search?name=GRCh38&patch=p2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(1))
-                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch38Url))
-                .andExpect(jsonPath("$..assemblies[0].name").value("GRCh38"))
-                .andExpect(jsonPath("$..assemblies[0].patch").value("p2"));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch38Url))
+                .andExpect(jsonPath("$..reference-sequences[0].name").value("GRCh38"))
+                .andExpect(jsonPath("$..reference-sequences[0].patch").value("p2"));
 
-        mockMvc.perform(get("/assemblies/search?name=NCBI36&patch=p2"))
+        mockMvc.perform(get("/reference-sequences/search?name=NCBI36&patch=p2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(0));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p3"))
+        mockMvc.perform(get("/reference-sequences/search?name=GRCh37&patch=p3"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(0));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh38&patch=p3"))
+        mockMvc.perform(get("/reference-sequences/search?name=GRCh38&patch=p3"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(0));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?accessions=GCA_000001405.3"))
+        mockMvc.perform(get("/reference-sequences/search?accessions=GCA_000001405.3"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(1))
-                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch37Url))
-                .andExpect(jsonPath("$..assemblies[0].accessions").isArray())
-                .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItems("GCA_000001405.3")));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch37Url))
+                .andExpect(jsonPath("$..reference-sequences[0].accessions").isArray())
+                .andExpect(jsonPath("$..reference-sequences[0].accessions[*]", hasItems("GCA_000001405.3")));
 
-        mockMvc.perform(get("/assemblies/search?accessions=GCF_000001405.28"))
+        mockMvc.perform(get("/reference-sequences/search?accessions=GCF_000001405.28"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(1))
-                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch38Url))
-                .andExpect(jsonPath("$..assemblies[0].accessions").isArray())
-                .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItems("GCF_000001405.28")));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch38Url))
+                .andExpect(jsonPath("$..reference-sequences[0].accessions").isArray())
+                .andExpect(jsonPath("$..reference-sequences[0].accessions[*]", hasItems("GCF_000001405.28")));
 
-        mockMvc.perform(get("/assemblies/search?accessions=GCA_000001405.2"))
+        mockMvc.perform(get("/reference-sequences/search?accessions=GCA_000001405.2"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(0));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p2&accessions=GCA_000001405.3"))
+        mockMvc.perform(get("/reference-sequences/search?name=GRCh37&patch=p2&accessions=GCA_000001405.3"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(1))
-                .andExpect(jsonPath("$..assemblies[0]..assembly.href").value(grch37Url))
-                .andExpect(jsonPath("$..assemblies[0].accessions").isArray())
-                .andExpect(jsonPath("$..assemblies[0].name").value("GRCh37"))
-                .andExpect(jsonPath("$..assemblies[0].patch").value("p2"))
-                .andExpect(jsonPath("$..assemblies[0].accessions[*]", hasItems("GCA_000001405.3")));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch37Url))
+                .andExpect(jsonPath("$..reference-sequences[0].accessions").isArray())
+                .andExpect(jsonPath("$..reference-sequences[0].name").value("GRCh37"))
+                .andExpect(jsonPath("$..reference-sequences[0].patch").value("p2"))
+                .andExpect(jsonPath("$..reference-sequences[0].accessions[*]", hasItems("GCA_000001405.3")));
 
-        mockMvc.perform(get("/assemblies/search?name=GRCh37&patch=p3&accessions=GCA_000001405.3"))
+        mockMvc.perform(get("/reference-sequences/search?name=GRCh37&patch=p3&accessions=GCA_000001405.3"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..assemblies").isArray())
-                .andExpect(jsonPath("$..assemblies.length()").value(0));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
     }
 
     @Test
-    public void findTranscriptomeByName() throws Exception {
-        String trans1Url = postTestTranscriptome("Trans1", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String trans2Url = postTestTranscriptome("Trans2", "p2",
-                Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
+    public void findReferenceSequenceByType() throws Exception {
+        String grch37Url = postTestReferenceSequence("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.ASSEMBLY);
+        String grch38Url = postTestReferenceSequence("GRCh38", "p2",
+                Arrays.asList("GCA_000001405.17", "GCF_000001405.28"), ReferenceSequence.Type.ASSEMBLY);
+        String grch39Url = postTestReferenceSequence("GRCh39", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
 
-        mockMvc.perform(get("/transcriptomes/search?name=Trans1"))
+        mockMvc.perform(get("/reference-sequences/search?type=" + ReferenceSequence.Type.ASSEMBLY.toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(1))
-                .andExpect(jsonPath("$..transcriptomes[0]..transcriptome.href").value(trans1Url))
-                .andExpect(jsonPath("$..transcriptomes[0].name").value("Trans1"));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(2))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch37Url))
+                .andExpect(jsonPath("$..reference-sequences[1]..referenceSequence.href").value(grch38Url))
+                .andExpect(jsonPath("$..reference-sequences[0].type").value(ReferenceSequence.Type.ASSEMBLY.toString()))
+                .andExpect(jsonPath("$..reference-sequences[1].type").value(ReferenceSequence.Type.ASSEMBLY.toString()));
 
-        mockMvc.perform(get("/transcriptomes/search?name=Trans2"))
+        mockMvc.perform(get("/reference-sequences/search?type=" + ReferenceSequence.Type.GENE.toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(1))
-                .andExpect(jsonPath("$..transcriptomes[0]..transcriptome.href").value(trans2Url))
-                .andExpect(jsonPath("$..transcriptomes[0].name").value("Trans2"));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch39Url))
+                .andExpect(jsonPath("$..reference-sequences[0].type").value(ReferenceSequence.Type.GENE.toString()));
 
-        mockMvc.perform(get("/transcriptomes/search?name=NCBI36"))
+        mockMvc.perform(get("/reference-sequences/search?type=" + ReferenceSequence.Type.TRANSCRIPTOME.toString()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(0));
-
-        mockMvc.perform(get("/transcriptomes/search?name=Trans1&patch=p2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(1))
-                .andExpect(jsonPath("$..transcriptomes[0]..transcriptome.href").value(trans1Url))
-                .andExpect(jsonPath("$..transcriptomes[0].name").value("Trans1"))
-                .andExpect(jsonPath("$..transcriptomes[0].patch").value("p2"));
-
-        mockMvc.perform(get("/transcriptomes/search?name=Trans2&patch=p2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(1))
-                .andExpect(jsonPath("$..transcriptomes[0]..transcriptome.href").value(trans2Url))
-                .andExpect(jsonPath("$..transcriptomes[0].name").value("Trans2"))
-                .andExpect(jsonPath("$..transcriptomes[0].patch").value("p2"));
-
-        mockMvc.perform(get("/transcriptomes/search?name=NCBI36&patch=p2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(0));
-
-        mockMvc.perform(get("/transcriptomes/search?name=Trans1&patch=p3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(0));
-
-        mockMvc.perform(get("/transcriptomes/search?name=Trans2&patch=p3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(0));
-
-        mockMvc.perform(get("/transcriptomes/search?accessions=GCA_000001405.3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(1))
-                .andExpect(jsonPath("$..transcriptomes[0]..transcriptome.href").value(trans1Url))
-                .andExpect(jsonPath("$..transcriptomes[0].accessions").isArray())
-                .andExpect(jsonPath("$..transcriptomes[0].accessions[*]", hasItems("GCA_000001405.3")));
-
-        mockMvc.perform(get("/transcriptomes/search?accessions=GCF_000001405.28"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(1))
-                .andExpect(jsonPath("$..transcriptomes[0]..transcriptome.href").value(trans2Url))
-                .andExpect(jsonPath("$..transcriptomes[0].accessions").isArray())
-                .andExpect(jsonPath("$..transcriptomes[0].accessions[*]", hasItems("GCF_000001405.28")));
-
-        mockMvc.perform(get("/transcriptomes/search?accessions=GCA_000001405.2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(0));
-
-        mockMvc.perform(get("/transcriptomes/search?name=Trans1&patch=p2&accessions=GCA_000001405.3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(1))
-                .andExpect(jsonPath("$..transcriptomes[0]..transcriptome.href").value(trans1Url))
-                .andExpect(jsonPath("$..transcriptomes[0].accessions").isArray())
-                .andExpect(jsonPath("$..transcriptomes[0].name").value("Trans1"))
-                .andExpect(jsonPath("$..transcriptomes[0].patch").value("p2"))
-                .andExpect(jsonPath("$..transcriptomes[0].accessions[*]", hasItems("GCA_000001405.3")));
-
-        mockMvc.perform(get("/transcriptomes/search?name=Trans1&patch=p3&accessions=GCA_000001405.3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..transcriptomes").isArray())
-                .andExpect(jsonPath("$..transcriptomes.length()").value(0));
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
     }
 
     @Test
-    public void findGeneByName() throws Exception {
-        String gene1Url = postTestGene("Gene1", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String gene2Url = postTestGene("Gene2", "p2",
-                Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
-
-        mockMvc.perform(get("/genes/search?name=Gene1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(1))
-                .andExpect(jsonPath("$..genes[0]..gene.href").value(gene1Url))
-                .andExpect(jsonPath("$..genes[0].name").value("Gene1"));
-
-        mockMvc.perform(get("/genes/search?name=Gene2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(1))
-                .andExpect(jsonPath("$..genes[0]..gene.href").value(gene2Url))
-                .andExpect(jsonPath("$..genes[0].name").value("Gene2"));
-
-        mockMvc.perform(get("/genes/search?name=NCBI36"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(0));
-
-        mockMvc.perform(get("/genes/search?name=Gene1&patch=p2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(1))
-                .andExpect(jsonPath("$..genes[0]..gene.href").value(gene1Url))
-                .andExpect(jsonPath("$..genes[0].name").value("Gene1"))
-                .andExpect(jsonPath("$..genes[0].patch").value("p2"));
-
-        mockMvc.perform(get("/genes/search?name=Gene2&patch=p2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(1))
-                .andExpect(jsonPath("$..genes[0]..gene.href").value(gene2Url))
-                .andExpect(jsonPath("$..genes[0].name").value("Gene2"))
-                .andExpect(jsonPath("$..genes[0].patch").value("p2"));
-
-        mockMvc.perform(get("/genes/search?name=NCBI36&patch=p2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(0));
-
-        mockMvc.perform(get("/genes/search?name=Gene1&patch=p3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(0));
-
-        mockMvc.perform(get("/genes/search?name=Gene2&patch=p3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(0));
-
-        mockMvc.perform(get("/genes/search?accessions=GCA_000001405.3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(1))
-                .andExpect(jsonPath("$..genes[0]..gene.href").value(gene1Url))
-                .andExpect(jsonPath("$..genes[0].accessions").isArray())
-                .andExpect(jsonPath("$..genes[0].accessions[*]", hasItems("GCA_000001405.3")));
-
-        mockMvc.perform(get("/genes/search?accessions=GCF_000001405.28"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(1))
-                .andExpect(jsonPath("$..genes[0]..gene.href").value(gene2Url))
-                .andExpect(jsonPath("$..genes[0].accessions").isArray())
-                .andExpect(jsonPath("$..genes[0].accessions[*]", hasItems("GCF_000001405.28")));
-
-        mockMvc.perform(get("/genes/search?accessions=GCA_000001405.2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(0));
-
-        mockMvc.perform(get("/genes/search?name=Gene1&patch=p2&accessions=GCA_000001405.3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(1))
-                .andExpect(jsonPath("$..genes[0]..gene.href").value(gene1Url))
-                .andExpect(jsonPath("$..genes[0].accessions").isArray())
-                .andExpect(jsonPath("$..genes[0].name").value("Gene1"))
-                .andExpect(jsonPath("$..genes[0].patch").value("p2"))
-                .andExpect(jsonPath("$..genes[0].accessions[*]", hasItems("GCA_000001405.3")));
-
-        mockMvc.perform(get("/genes/search?name=Gene1&patch=p3&accessions=GCA_000001405.3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..genes").isArray())
-                .andExpect(jsonPath("$..genes.length()").value(0));
+    public void clientErrorWhenSearchReferenceSequenceWithInvalidType() throws Exception {
+        mockMvc.perform(get("/reference-sequences/search?type=UNKNOWN"))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -1044,31 +816,14 @@ public class MetadataApplicationTest {
     }
 
     private List<String> postTestAnalyses() throws Exception {
-        String humanAssemblyUrl = postTestAssembly("GRCh37", "p2",
+        String humanReferenceSequenceUrl = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String humanTranscriptomeUrl = postTestTranscriptome("Trans1", "p3",
-                Arrays.asList("GCA_000001405.4", "GCF_000001405.15"));
-        List<String> humanGeneUrlList = new ArrayList<String>();
-        String humanGeneUrl = postTestGene("Gene1", "p4",
-                Arrays.asList("GCA_000001405.5", "GCF_000001405.16"));
-        humanGeneUrlList.add(humanGeneUrl);
-        humanGeneUrl = postTestGene("Gene2", "p5",
-                Arrays.asList("GCA_000001405.5", "GCF_000001405.16"));
-        humanGeneUrlList.add(humanGeneUrl);
-
         String humanStudyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
-<<<<<<< HEAD:metadata-ws/src/test/java/uk/ac/ebi/ampt2d/metadata/MetadataApplicationTest.java
         return Arrays.asList(postTestAnalysis("EGAA0001", humanReferenceSequenceUrl, humanStudyUrl,
                 Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina"),
                 postTestAnalysis("EGAA0002", humanReferenceSequenceUrl, humanStudyUrl,
                         Analysis.Technology.ARRAY, Analysis.Type.TUMOR, "PacBio"));
-=======
-        return Arrays.asList(postTestAnalysis("EGAA0001", humanAssemblyUrl, humanTranscriptomeUrl, humanGeneUrlList,
-                            humanStudyUrl, Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina"),
-                postTestAnalysis("EGAA0002", humanAssemblyUrl, humanTranscriptomeUrl, humanGeneUrlList, humanStudyUrl,
-                                Analysis.Technology.ARRAY, Analysis.Type.TUMOR, "PacBio"));
->>>>>>> Only multiple genes with single analysis:src/test/java/uk/ac/ebi/ampt2d/metadata/MetadataApplicationTest.java
     }
 
     @Test
@@ -1133,239 +888,62 @@ public class MetadataApplicationTest {
 
     @Test
     public void findStudies() throws Exception {
-<<<<<<< HEAD:metadata-ws/src/test/java/uk/ac/ebi/ampt2d/metadata/MetadataApplicationTest.java
         String taxonomyUrl = postTestTaxonomy();
         String grch37ReferenceSequenceUrl = postTestReferenceSequence("GRCh37", "p2",
-=======
-        String grch37AssemblyUrl = postTestAssembly("GRCh37", "p2",
->>>>>>> Only multiple genes with single analysis:src/test/java/uk/ac/ebi/ampt2d/metadata/MetadataApplicationTest.java
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String grch38AssemblyUrl = postTestAssembly("GRCh38", "p2",
+        String grch38ReferenceSequenceUrl = postTestReferenceSequence("GRCh38", "p2",
                 Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
-<<<<<<< HEAD:metadata-ws/src/test/java/uk/ac/ebi/ampt2d/metadata/MetadataApplicationTest.java
-<<<<<<< HEAD:metadata-ws/src/test/java/uk/ac/ebi/ampt2d/metadata/MetadataApplicationTest.java
         String grch37StudyUrl = postTestStudy("EGAS0001", 1, "test_human_study", taxonomyUrl);
         String grch38StudyUrl = postTestStudy("EGAS0001", 2, "test_human_study", taxonomyUrl);
-=======
-        String grch39TranscriptomeUrl = postTestTranscriptome("GRCh39", "p3",
-=======
-        String trans1TranscriptomeUrl = postTestTranscriptome("Trans1", "p3",
->>>>>>> Code review changes: Name changes for gene and transcriptome:src/test/java/uk/ac/ebi/ampt2d/metadata/MetadataApplicationTest.java
-                Arrays.asList("GCA_000001405.4", "GCF_000001405.15"));
-        String trans2TranscriptomeUrl = postTestTranscriptome("Trans2", "p3",
-                Arrays.asList("GCA_000001405.18", "GCF_000001405.29"));
-        List<String> gene1GeneUrlList = new ArrayList<String>();
-        String gene1GeneUrl = postTestGene("Gene1", "p4",
-                Arrays.asList("GCA_000001405.5", "GCF_000001405.16"));
-        gene1GeneUrlList.add(gene1GeneUrl);
-        gene1GeneUrl = postTestGene("Gene1", "p4",
-                Arrays.asList("GCA_000001405.6", "GCF_000001405.17"));
-        gene1GeneUrlList.add(gene1GeneUrl);
-        List<String> gene2GeneUrlList = new ArrayList<String>();
-        String gene2GeneUrl = postTestGene("Gene2", "p4",
-                Arrays.asList("GCA_000001405.19", "GCF_000001405.30"));
-        gene2GeneUrlList.add(gene2GeneUrl);
-        gene2GeneUrl = postTestGene("Gene2", "p4",
-                Arrays.asList("GCA_000001405.20", "GCF_000001405.31"));
-        gene2GeneUrlList.add(gene2GeneUrl);
 
-        String grchStudyUrlv1 = postTestStudy("EGAS0001", 1, "test_human_study");
-        String grchStudyUrlv2 = postTestStudy("EGAS0001", 2, "test_human_study");
+        postTestAnalysis("EGAA0001", grch37ReferenceSequenceUrl, grch37StudyUrl);
+        postTestAnalysis("EGAA0002", grch38ReferenceSequenceUrl, grch38StudyUrl);
 
-        postTestAnalysis("EGAA0001", grch37AssemblyUrl, trans1TranscriptomeUrl, gene1GeneUrlList, grchStudyUrlv1);
-        postTestAnalysis("EGAA0002", grch38AssemblyUrl, trans2TranscriptomeUrl, gene2GeneUrlList, grchStudyUrlv2);
-
-        // Assembly related tests
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh37"))
+        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh37"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv1));
+                .andExpect(jsonPath("$..studies[0]..study.href").value(grch37StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38"))
+        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh38"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv2));
->>>>>>> Only multiple genes with single analysis:src/test/java/uk/ac/ebi/ampt2d/metadata/MetadataApplicationTest.java
+                .andExpect(jsonPath("$..studies[0]..study.href").value(grch38StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=NCBI36"))
+        mockMvc.perform(get("/studies?analyses.referenceSequence.name=NCBI36"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh37&analyses.assembly.patch=p2"))
+        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh37&analyses.referenceSequence.patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv1));
+                .andExpect(jsonPath("$..studies[0]..study.href").value(grch37StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.assembly.patch=p2"))
+        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh38&analyses.referenceSequence.patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv2));
+                .andExpect(jsonPath("$..studies[0]..study.href").value(grch38StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=NCBI36&analyses.assembly.patch=p2"))
+        mockMvc.perform(get("/studies?analyses.referenceSequence.name=NCBI36&analyses.referenceSequence.patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh37&analyses.assembly.patch=p3"))
+        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh37&analyses.referenceSequence.patch=p3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.type=CASE_CONTROL"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv2));
-
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.type=TUMOR"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.assembly.name=GRCh38&analyses.type=COLLECTION"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.assembly.name=NCBI36&analyses.type=CASE_CONTROL"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        // Transcriptome related tests
-        mockMvc.perform(get("/studies?analyses.transcriptome.name=Trans1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv1));
-
-        mockMvc.perform(get("/studies?analyses.transcriptome.name=Trans2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv2));
-
-        mockMvc.perform(get("/studies?analyses.transcriptome.name=NCBI36"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.transcriptome.name=Trans1&analyses.transcriptome.patch=p3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv1));
-
-        mockMvc.perform(get("/studies?analyses.transcriptome.name=Trans2&analyses.transcriptome.patch=p3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv2));
-
-        mockMvc.perform(get("/studies?analyses.transcriptome.name=NCBI36&analyses.transcriptome.patch=p3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.transcriptome.name=Trans1&analyses.transcriptome.patch=p4"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.transcriptome.name=Trans2&analyses.type=CASE_CONTROL"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv2));
-
-        mockMvc.perform(get("/studies?analyses.transcriptome.name=Trans2&analyses.type=TUMOR"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.transcriptome.name=Trans2&analyses.type=COLLECTION"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.transcriptome.name=NCBI36&analyses.type=CASE_CONTROL"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        // Gene related tests
-        mockMvc.perform(get("/studies?analyses.genes.name=Gene1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv1));
-
-        mockMvc.perform(get("/studies?analyses.genes.name=Gene2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv2));
-
-        mockMvc.perform(get("/studies?analyses.genes.name=NCBI36"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.genes.name=Gene1&analyses.genes.patch=p4"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv1));
-
-        mockMvc.perform(get("/studies?analyses.genes.name=Gene2&analyses.genes.patch=p4"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv2));
-
-        mockMvc.perform(get("/studies?analyses.genes.name=NCBI36&analyses.genes.patch=p4"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.genes.name=Gene1&analyses.genes.patch=p5"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.genes.name=Gene2&analyses.type=CASE_CONTROL"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(1))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv2));
-
-        mockMvc.perform(get("/studies?analyses.genes.name=Gene2&analyses.type=TUMOR"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.genes.name=Gene2&analyses.type=COLLECTION"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        mockMvc.perform(get("/studies?analyses.genes.name=NCBI36&analyses.type=CASE_CONTROL"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        // Type related tests
         mockMvc.perform(get("/studies?analyses.type=CASE_CONTROL"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(2))
-                .andExpect(jsonPath("$..studies[0]..study.href").value(grchStudyUrlv1))
-                .andExpect(jsonPath("$..studies[1]..study.href").value(grchStudyUrlv2));
+                .andExpect(jsonPath("$..studies[0]..study.href").value(grch37StudyUrl))
+                .andExpect(jsonPath("$..studies[1]..study.href").value(grch38StudyUrl));
 
         mockMvc.perform(get("/studies?analyses.type=TUMOR"))
                 .andExpect(status().isOk())
@@ -1373,6 +951,27 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
         mockMvc.perform(get("/studies?analyses.type=COLLECTION"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh38&analyses.type=CASE_CONTROL"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1))
+                .andExpect(jsonPath("$..studies[0]..study.href").value(grch38StudyUrl));
+
+        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh38&analyses.type=TUMOR"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh38&analyses.type=COLLECTION"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+
+        mockMvc.perform(get("/studies?analyses.referenceSequence.name=NCBI36&analyses.type=CASE_CONTROL"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
@@ -1729,29 +1328,17 @@ public class MetadataApplicationTest {
     @Test
     public void metadataObjectsAreAuditable() throws Exception {
         ZonedDateTime startTime = ZonedDateTime.now();
-        String testAssembly = postTestAssembly("GRCh37", "p2",
+        String testReferenceSequence = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String testTranscriptome = postTestTranscriptome("Trans1", "p3",
-                Arrays.asList("GCA_000001405.4", "GCF_000001405.15"));
-        List<String> testGeneList = new ArrayList<String>();
-        String testGene = postTestGene("Gene1", "p4",
-                Arrays.asList("GCA_000001405.5", "GCF_000001405.16"));
-        testGeneList.add(testGene);
-        testGene = postTestGene("Gene2", "p4",
-                Arrays.asList("GCA_000001405.6", "GCF_000001405.17"));
-        testGeneList.add(testGene);
-
         String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
         String testStudy = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
-        String testAnalysis = postTestAnalysis("testhuman", testAssembly, testTranscriptome, testGeneList, testStudy);
+        String testAnalysis = postTestAnalysis("testhuman", testReferenceSequence, testStudy);
         String testFile = postTestFile("testhuman", 1);
         String testSample = postTestSample("testhuman", "test human sample");
         String testWebResource = postTestWebResource();
         ZonedDateTime endTime = ZonedDateTime.now();
 
-        checkLastModifiedDate(testAssembly, "assembly", startTime, endTime);
-        checkLastModifiedDate(testTranscriptome, "transcriptome", startTime, endTime);
-        checkLastModifiedDate(testGene, "gene", startTime, endTime);
+        checkLastModifiedDate(testReferenceSequence, "referenceSequence", startTime, endTime);
         checkLastModifiedDate(testTaxonomy, "taxonomy", startTime, endTime);
         checkLastModifiedDate(testStudy, "study", startTime, endTime);
         checkLastModifiedDate(testAnalysis, "analysis", startTime, endTime);
@@ -1760,9 +1347,7 @@ public class MetadataApplicationTest {
         checkLastModifiedDate(testWebResource, "webResource", startTime, endTime);
 
         startTime = ZonedDateTime.now();
-        patchResource(testAssembly);
-        patchResource(testTranscriptome);
-        patchResource(testGene);
+        patchResource(testReferenceSequence);
         patchResource(testTaxonomy);
         patchResource(testStudy);
         patchResource(testAnalysis);
@@ -1773,9 +1358,7 @@ public class MetadataApplicationTest {
                 .andExpect(status().is2xxSuccessful());
         endTime = ZonedDateTime.now();
 
-        checkLastModifiedDate(testAssembly, "assembly", startTime, endTime);
-        checkLastModifiedDate(testTranscriptome, "transcriptome", startTime, endTime);
-        checkLastModifiedDate(testGene, "gene", startTime, endTime);
+        checkLastModifiedDate(testReferenceSequence, "referenceSequence", startTime, endTime);
         checkLastModifiedDate(testTaxonomy, "taxonomy", startTime, endTime);
         checkLastModifiedDate(testStudy, "study", startTime, endTime);
         checkLastModifiedDate(testAnalysis, "analysis", startTime, endTime);
@@ -1830,18 +1413,8 @@ public class MetadataApplicationTest {
     @Test
     public void findPublicStudiesOnly() throws Exception {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
-        String humanAssemblyUrl = postTestAssembly("GRCh37", "p2",
+        String humanReferenceSequenceUrl = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String humanTranscriptomeUrl = postTestTranscriptome("Trans1", "p3",
-                Arrays.asList("GCA_000001405.4", "GCF_000001405.15"));
-        List<String> humanGeneUrlList = new ArrayList<String>();
-        String humanGeneUrl = postTestGene("Gene1", "p4",
-                Arrays.asList("GCA_000001405.5", "GCF_000001405.16"));
-        humanGeneUrlList.add(humanGeneUrl);
-        humanGeneUrl = postTestGene("Gene2", "p4",
-                Arrays.asList("GCA_000001405.6", "GCF_000001405.17"));
-        humanGeneUrlList.add(humanGeneUrl);
-
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
         LocalDate tomorrow = today.plusDays(1);
@@ -1850,7 +1423,7 @@ public class MetadataApplicationTest {
         String todayReleasedStudyUrl = postTestStudy("1kg", 2, "1kg phase 1", humanTaxonomyUrl, today);
         String tomorrowReleasedStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, tomorrow);
 
-        String yesterdayReleasedAnalysisUrl = postTestAnalysis("analysisReleasedYesterday", humanAssemblyUrl, humanTranscriptomeUrl, humanGeneUrlList, yesterdayReleasedStudyUrl);
+        String yesterdayReleasedAnalysisUrl = postTestAnalysis("analysisReleasedYesterday", humanReferenceSequenceUrl, yesterdayReleasedStudyUrl);
 
         mockMvc.perform(get("/studies"))
                 .andExpect(status().isOk())
