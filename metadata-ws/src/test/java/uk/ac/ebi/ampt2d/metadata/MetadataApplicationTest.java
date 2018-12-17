@@ -54,6 +54,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -300,19 +301,232 @@ public class MetadataApplicationTest {
 
     @Test
     public void postSample() throws Exception {
-        String location = postTestSample("EGAN0001", "testSample");
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl1);
+        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl2);
+
+        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
 
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
-                .andExpect(jsonPath("$.name").value("testSample"));
+                .andExpect(jsonPath("$.name").value("testSample"))
+                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(2))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
+                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
+    }
+
+    @Test
+    public void postSampleAndUpdate() throws Exception {
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl1);
+        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl2);
+
+        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
+                .andExpect(jsonPath("$.name").value("testSample"))
+                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(2))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
+                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
+
+        List<String> taxonomyUrlListNew = new ArrayList<String>();
+        String taxonomyUrl3 = postTestTaxonomy(3, "Species3");
+        taxonomyUrlListNew.add(taxonomyUrl3);
+
+        mockMvc.perform(patch(location)
+                .content("{ " +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListNew).getJson() + "" +
+                        "}"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(1))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl3));
+    }
+
+    @Test
+    public void postSampleInvalidNoTaxonomies() throws Exception {
+        mockMvc.perform(post("/samples")
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\": \"" + "species1" + "\",\"version\": " + 1 + "}," +
+                        "\"name\": \"" + "test sample" + "\"" +
+                        "}"))
+        .andExpect(status().is4xxClientError())
+        .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException"));
+    }
+
+    @Test
+    public void postSampleInvalidBlankTaxonomies() throws Exception {
+        List<String> taxonomyUrlList = new ArrayList<>();
+        mockMvc.perform(post("/samples")
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\": \"" + "species1" + "\",\"version\": " + 1 + "}," +
+                        "\"name\": \"" + "test sample" + "\"," +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException"));
+    }
+
+    @Test
+    public void deleteSampleTaxonomies() throws Exception {
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl1);
+        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl2);
+
+        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
+        mockMvc.perform(get(location))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$..sample.href").value(location));
+
+        String idStr = taxonomyUrl1.substring(taxonomyUrl1.lastIndexOf('/') + 1);
+        mockMvc.perform(delete(location + "/taxonomies/" + idStr))
+                .andExpect(status().is2xxSuccessful());
+        idStr = taxonomyUrl2.substring(taxonomyUrl2.lastIndexOf('/') + 1);
+        mockMvc.perform(delete(location + "/taxonomies/" + idStr))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException"));
+    }
+
+    @Test
+    public void postSampleAndUpdateWithoutTaxonomies() throws Exception {
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl1);
+        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl2);
+
+        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
+                .andExpect(jsonPath("$.name").value("testSample"))
+                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(2))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
+                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
+
+        List<String> taxonomyUrlListInvalid = new ArrayList<String>();
+        mockMvc.perform(patch(location)
+                .content("{ " +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListInvalid).getJson() + "" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException"));
+    }
+
+    @Test
+    public void postSampleAndUpdateInvalidTaxonomies() throws Exception {
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl1);
+        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl2);
+
+        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
+                .andExpect(jsonPath("$.name").value("testSample"))
+                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(2))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
+                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
+
+        List<String> taxonomyUrlListInvalid = new ArrayList<String>();
+        taxonomyUrlListInvalid.add("http://nohost/taxonomies/9998");
+        taxonomyUrlListInvalid.add("http://nohost/taxonomies/9999");
+        mockMvc.perform(patch(location)
+                .content("{ " +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListInvalid).getJson() + "" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidTaxonomyException"));
+    }
+
+    @Test
+    public void postSampleAndUpdatePartialInvalidTaxonomies() throws Exception {
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl1);
+        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl2);
+
+        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
+                .andExpect(jsonPath("$.name").value("testSample"))
+                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
+
+        mockMvc.perform(get(location+ "/" + "taxonomies"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(2))
+                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
+                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
+
+        List<String> taxonomyUrlListMixed = new ArrayList<String>();
+        taxonomyUrlListMixed.add(taxonomyUrl1);
+        taxonomyUrlListMixed.add("http://nohost/taxonomies/9999");
+        mockMvc.perform(patch(location)
+                .content("{ " +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListMixed).getJson() + "" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidTaxonomyException"));
     }
 
     private String postTestSample(String accession, String name) throws Exception {
-        Sample testSample = new Sample(new AccessionVersionId(accession, 1), name);
+        List<String> taxonomyUrlList = new ArrayList<String>();
+        String taxonomyUrl = postTestTaxonomy(1, "Species1");
+        taxonomyUrlList.add(taxonomyUrl);
+        taxonomyUrl = postTestTaxonomy(2, "Species2");
+        taxonomyUrlList.add(taxonomyUrl);
+
+        return postTestSample(accession, name, taxonomyUrlList);
+    }
+
+    private String postTestSample(String accession, String name, List<String> taxonomyUrlList) throws Exception {
         MvcResult mvcResult = mockMvc.perform(post("/samples")
-                .content(testSampleJson.write(testSample).getJson()))
-                .andExpect(status().isCreated()).andReturn();
+        .content("{ " +
+                "\"accessionVersionId\":{ \"accession\": \"" + accession + "\",\"version\": " + 1 + "}," +
+                "\"name\": \"" + name + "\"," +
+                "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
+                "}"))
+        .andExpect(status().isCreated()).andReturn();
 
         return mvcResult.getResponse().getHeader("Location");
     }
@@ -320,6 +534,7 @@ public class MetadataApplicationTest {
     @Test
     public void postWebResource() throws Exception {
         String location = postTestWebResource();
+
         mockMvc.perform(get(location))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.type").value("CENTER_WEB"))
@@ -620,37 +835,55 @@ public class MetadataApplicationTest {
     @Test
     public void testAccessionVersionIdPost() throws Exception {
         //AccessionVersionId can be null but in case of provided values,accession and version should be valid.
-        Sample testSample = new Sample(null, "Sample1");
-        String testSampleUrl = mockMvc.perform(post("/samples")
-                .content(testSampleJson.write(testSample).getJson()))
-                .andExpect(status().isCreated()).andReturn().getResponse().getHeader("Location");
+        String homininesTaxonomyUrl = postTestTaxonomy(207598, "Homininae");
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        List<String> taxonomyUrlList = Arrays.asList(homininesTaxonomyUrl, humanTaxonomyUrl);
 
+        // no accession
+        MvcResult mvcResult = mockMvc.perform(post("/samples")
+                .content("{ " +
+                        "\"name\": \"" + "Sample1" + "\"," +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
+                        "}"))
+                .andExpect(status().isCreated()).andReturn();
+        String testSampleUrl = mvcResult.getResponse().getHeader("Location");
         mockMvc.perform(get(testSampleUrl))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").isNumber())
                 .andExpect(jsonPath("$.accessionVersionId").value(nullValue()));
 
-        Sample testSampleWithNullAccessionAndValidVersion = new Sample(new AccessionVersionId(null, 1), "Sample1");
+        // null accession
         mockMvc.perform(post("/samples")
-                .content(testSampleJson.write(testSampleWithNullAccessionAndValidVersion).getJson()))
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\":" + null + ",\"version\": " + 1 + "}," +
+                        "\"name\": \"" + "Sample1" + "\"," +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
+                        "}"))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.errors[0].property").value("accessionVersionId.accession"))
                 .andExpect(jsonPath("$.errors[0].message").value("may not be null"));
 
-        Sample testSampleWithInvalidAccession = new Sample(new AccessionVersionId("", 1), "Sample1");
+        // blank accession
         mockMvc.perform(post("/samples")
-                .content(testSampleJson.write(testSampleWithInvalidAccession).getJson()))
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\": \"" + "\",\"version\": " + 1 + "}," +
+                        "\"name\": \"" + "Sample1" + "\"," +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
+                        "}"))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.errors[0].property").value("accessionVersionId.accession"))
                 .andExpect(jsonPath("$.errors[0].message").value("size must be between 1 and 255"));
 
-        Sample testSample1 = new Sample(new AccessionVersionId("EGAN0001", 0), "Sample1");
+        // 0 version
         mockMvc.perform(post("/samples")
-                .content(testSampleJson.write(testSample1).getJson()))
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAN0001" + "\",\"version\": " + 0 + "}," +
+                        "\"name\": \"" + "Sample1" + "\"," +
+                        "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
+                        "}"))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.errors[0].property").value("accessionVersionId.version"))
                 .andExpect(jsonPath("$.errors[0].message").value("must be greater than or equal to 1"));
-
     }
 
     @Test
@@ -1411,45 +1644,95 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void testDuplicateKeyValidation() throws Exception {
-        String taxonomyUrl = postTestTaxonomy();
+    public void findSampleByTaxonomyName() throws Exception {
+        String homininesTaxonomyUrl = postTestTaxonomy(207598, "Homininae");
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        List<String> taxonomiesUrlList1 = Arrays.asList(homininesTaxonomyUrl, humanTaxonomyUrl);
+        String bonoboTaxonomyUrl = postTestTaxonomy(9597, "Pan paniscus");
+        String chimpanzeeTaxonomyUrl = postTestTaxonomy(9598, "Pan troglodytes");
+        List<String> taxonomiesUrlList2 = Arrays.asList(bonoboTaxonomyUrl, chimpanzeeTaxonomyUrl);
 
-        //Post same taxonomy again
-        mockMvc.perform(post("/taxonomies")
-                .content("{ " +
-                        "\"taxonomyId\": 9606," +
-                        "\"name\": \"Homo Sapiens\"," +
-                        "\"ancestors\": " + testListJson.write(new ArrayList()).getJson() + "" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.error").value("Conflict"))
-                .andExpect(jsonPath("$.message").value("Duplicate id or index provided"));
+        String sampleUrl1 = postTestSample("Species1", "Species collection1", taxonomiesUrlList1);
+        String sampleUrl2 = postTestSample("Species2", "Species collection2", taxonomiesUrlList2);
+        String sampleUrl3 = postTestSample("Species3", "Species collection3",
+                Arrays.asList(homininesTaxonomyUrl, bonoboTaxonomyUrl));
 
-        postTestStudy("EGAS0001", 1, "study1", taxonomyUrl);
+        mockMvc.perform(get("/samples/search?taxonomies.name=Homininae"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(2))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl1))
+                .andExpect(jsonPath("$..samples[1]..sample.href").value(sampleUrl3));
 
-        //Post same study again
-        mockMvc.perform(post("/studies")
-                .content("{ " +
-                        "\"accessionVersionId\":{ \"accession\": \"EGAS0001\",\"version\":1}," +
-                        "\"name\": \" study1\"," +
-                        "\"description\": \"Nothing important\"," +
-                        "\"center\": \"EBI\"," +
-                        "\"releaseDate\": \"" + LocalDate.now() + "\"," +
-                        "\"taxonomy\": \"" + taxonomyUrl + "\"" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.error").value("Conflict"))
-                .andExpect(jsonPath("$.message").value("Duplicate id or index provided"));
+        mockMvc.perform(get("/samples/search?taxonomies.name=Homo sapiens"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(1))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl1));
 
-        postWebResource();
+        mockMvc.perform(get("/samples/search?taxonomies.name=Pan paniscus"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(2))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl2))
+                .andExpect(jsonPath("$..samples[1]..sample.href").value(sampleUrl3));
 
-        WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "http:\\www.ebi.ac.uk");
+        mockMvc.perform(get("/samples/search?taxonomies.name=Pan troglodytes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(1))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl2));
 
-        //Post same webresource again
-        mockMvc.perform(post("/webResources")
-                .content(testWebResourceJson.write(testWebResource).getJson()))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.error").value("Conflict"))
-                .andExpect(jsonPath("$.message").value("Duplicate id or index provided"));
+        mockMvc.perform(get("/samples/search?taxonomies.name=NonExisting"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(0));
+    }
+
+    @Test
+    public void findSampleByTaxonomyId() throws Exception {
+        String homininesTaxonomyUrl = postTestTaxonomy(207598, "Homininae");
+        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
+        List<String> taxonomiesUrlList1 = Arrays.asList(homininesTaxonomyUrl, humanTaxonomyUrl);
+        String bonoboTaxonomyUrl = postTestTaxonomy(9597, "Pan paniscus");
+        String chimpanzeeTaxonomyUrl = postTestTaxonomy(9598, "Pan troglodytes");
+        List<String> taxonomiesUrlList2 = Arrays.asList(bonoboTaxonomyUrl, chimpanzeeTaxonomyUrl);
+
+        String sampleUrl1 = postTestSample("Species1", "Species collection1", taxonomiesUrlList1);
+        String sampleUrl2 = postTestSample("Species2", "Species collection2", taxonomiesUrlList2);
+        String sampleUrl3 = postTestSample("Species3", "Species collection3",
+                Arrays.asList(homininesTaxonomyUrl, bonoboTaxonomyUrl));
+
+
+        mockMvc.perform(get("/samples/search?taxonomies.taxonomyId=207598"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(2))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl1))
+                .andExpect(jsonPath("$..samples[1]..sample.href").value(sampleUrl3));
+
+        mockMvc.perform(get("/samples/search?taxonomies.taxonomyId=9606"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(1))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl1));
+
+        mockMvc.perform(get("/samples/search?taxonomies.taxonomyId=9597"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(2))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl2))
+                .andExpect(jsonPath("$..samples[1]..sample.href").value(sampleUrl3));
+
+        mockMvc.perform(get("/samples/search?taxonomies.taxonomyId=9598"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(1))
+                .andExpect(jsonPath("$..samples[0]..sample.href").value(sampleUrl2));
+
+        mockMvc.perform(get("/samples/search?taxonomies.taxonomyId=0"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(0));
     }
 }

@@ -34,7 +34,9 @@ import java.util.List;
 public interface SampleRepository extends PagingAndSortingRepository<Sample, Long>, QueryDslPredicateExecutor<Sample>,
         QuerydslBinderCustomizer<QSample> {
 
-    default void customize(QuerydslBindings bindings, QSample sample) {
+    default void customize(QuerydslBindings bindings, QSample qSample) {
+        bindings.bind(qSample.taxonomies.any().name)
+                .first((path, value) -> path.equalsIgnoreCase(value));
     }
 
     @ApiOperation(value = "Get the latest version of Sample based on accession")

@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import java.util.Date;
 
 public class ErrorMessage {
+
     private long timestamp;
 
     private int status;
@@ -36,7 +37,6 @@ public class ErrorMessage {
         timestamp = new Date().getTime();
         this.status = status.value();
         this.error = status.getReasonPhrase();
-
         this.exception = ex.getClass().getCanonicalName();
         this.message = message;
     }

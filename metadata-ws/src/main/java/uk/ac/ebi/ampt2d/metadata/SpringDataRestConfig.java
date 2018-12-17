@@ -47,9 +47,11 @@ import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.AnalysisRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.ReferenceSequenceRestController;
+import uk.ac.ebi.ampt2d.metadata.rest.controllers.SampleRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.StudyRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.AnalysisResource;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.ReferenceSequenceResource;
+import uk.ac.ebi.ampt2d.metadata.rest.resources.SampleResource;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.StudyResource;
 
 @Configuration
@@ -127,6 +129,11 @@ public class SpringDataRestConfig {
     @Bean
     public GenericResourceAssembler<Study, StudyResource> studyResourceAssembler() {
         return new GenericResourceAssembler<Study, StudyResource>(StudyRestController.class, StudyResource.class);
+    }
+
+    @Bean
+    public GenericResourceAssembler<Sample, SampleResource> sampleResourceAssembler() {
+        return new GenericResourceAssembler<Sample, SampleResource>(SampleRestController.class, SampleResource.class);
     }
 
     /**
