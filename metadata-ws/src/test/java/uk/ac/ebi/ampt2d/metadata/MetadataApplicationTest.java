@@ -247,7 +247,9 @@ public class MetadataApplicationTest {
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
-        String location = postTestAnalysis("EGAA0001", referenceSequenceUrl, studyUrl, Analysis.Technology.GWAS,
+        List<String> referenceSequenceList = new ArrayList<>();
+        referenceSequenceList.add(referenceSequenceUrl);
+        String location = postTestAnalysis("EGAA0001", referenceSequenceList, studyUrl, Analysis.Technology.GWAS,
                 Analysis.Type.CASE_CONTROL, "Illumina");
 
         mockMvc.perform(get(location))
@@ -255,20 +257,21 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
     }
 
-    private String postTestAnalysis(String accession, String referenceSequenceUrl, String studyUrl) throws Exception {
-        return postTestAnalysis(accession, referenceSequenceUrl, studyUrl, Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina");
+    private String postTestAnalysis(String accession, List<String> referenceSequenceList, String studyUrl) throws Exception {
+        return postTestAnalysis(accession, referenceSequenceList, studyUrl, Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina");
 
     }
 
-    private String postTestAnalysis(String accession, String referenceSequenceUrl, String studyUrl, Analysis.Technology
+    private String postTestAnalysis(String accession, List<String> referenceSequenceList, String studyUrl, Analysis.Technology
             technology, Analysis.Type type, String platform) throws Exception {
+
         MvcResult mvcResult = mockMvc.perform(post("/analyses")
                 .content("{ " +
                         "\"accessionVersionId\":{ \"accession\": \"" + accession + "\",\"version\":  1 }," +
                         "\"name\": \"test_human_analysis\"," +
                         "\"description\": \"Nothing important\"," +
                         "\"study\": \"" + studyUrl + "\"," +
-                        "\"referenceSequence\": \"" + referenceSequenceUrl + "\"," +
+                        "\"referenceSequences\": " + testListJson.write(referenceSequenceList).getJson() + "," +
                         "\"technology\": \"" + technology + "\"," +
                         "\"type\": \"" + type + "\"," +
                         "\"platform\": \"" + platform + "\"" +
@@ -820,9 +823,11 @@ public class MetadataApplicationTest {
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         String humanStudyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
-        return Arrays.asList(postTestAnalysis("EGAA0001", humanReferenceSequenceUrl, humanStudyUrl,
+        List<String> referenceSequenceList = new ArrayList<>();
+        referenceSequenceList.add(humanReferenceSequenceUrl);
+        return Arrays.asList(postTestAnalysis("EGAA0001", referenceSequenceList, humanStudyUrl,
                 Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina"),
-                postTestAnalysis("EGAA0002", humanReferenceSequenceUrl, humanStudyUrl,
+                postTestAnalysis("EGAA0002", referenceSequenceList, humanStudyUrl,
                         Analysis.Technology.ARRAY, Analysis.Type.TUMOR, "PacBio"));
     }
 
@@ -896,44 +901,48 @@ public class MetadataApplicationTest {
         String grch37StudyUrl = postTestStudy("EGAS0001", 1, "test_human_study", taxonomyUrl);
         String grch38StudyUrl = postTestStudy("EGAS0001", 2, "test_human_study", taxonomyUrl);
 
-        postTestAnalysis("EGAA0001", grch37ReferenceSequenceUrl, grch37StudyUrl);
-        postTestAnalysis("EGAA0002", grch38ReferenceSequenceUrl, grch38StudyUrl);
+        List<String> referenceSequenceList = new ArrayList<>();
+        referenceSequenceList.add(grch37ReferenceSequenceUrl);
+        postTestAnalysis("EGAA0001", referenceSequenceList, grch37StudyUrl);
+        referenceSequenceList.clear();
+        referenceSequenceList.add(grch38ReferenceSequenceUrl);
+        postTestAnalysis("EGAA0002", referenceSequenceList, grch38StudyUrl);
 
-        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh37"))
+        mockMvc.perform(get("/studies?analyses.referenceSequences.name=GRCh37"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(grch37StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh38"))
+        mockMvc.perform(get("/studies?analyses.referenceSequences.name=GRCh38"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(grch38StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.referenceSequence.name=NCBI36"))
+        mockMvc.perform(get("/studies?analyses.referenceSequences.name=NCBI36"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh37&analyses.referenceSequence.patch=p2"))
+        mockMvc.perform(get("/studies?analyses.referenceSequences.name=GRCh37&analyses.referenceSequences.patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(grch37StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh38&analyses.referenceSequence.patch=p2"))
+        mockMvc.perform(get("/studies?analyses.referenceSequences.name=GRCh38&analyses.referenceSequences.patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(grch38StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.referenceSequence.name=NCBI36&analyses.referenceSequence.patch=p2"))
+        mockMvc.perform(get("/studies?analyses.referenceSequences.name=NCBI36&analyses.referenceSequences.patch=p2"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh37&analyses.referenceSequence.patch=p3"))
+        mockMvc.perform(get("/studies?analyses.referenceSequences.name=GRCh37&analyses.referenceSequences.patch=p3"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
@@ -955,23 +964,23 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh38&analyses.type=CASE_CONTROL"))
+        mockMvc.perform(get("/studies?analyses.referenceSequences.name=GRCh38&analyses.type=CASE_CONTROL"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1))
                 .andExpect(jsonPath("$..studies[0]..study.href").value(grch38StudyUrl));
 
-        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh38&analyses.type=TUMOR"))
+        mockMvc.perform(get("/studies?analyses.referenceSequences.name=GRCh38&analyses.type=TUMOR"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.referenceSequence.name=GRCh38&analyses.type=COLLECTION"))
+        mockMvc.perform(get("/studies?analyses.referenceSequences.name=GRCh38&analyses.type=COLLECTION"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
 
-        mockMvc.perform(get("/studies?analyses.referenceSequence.name=NCBI36&analyses.type=CASE_CONTROL"))
+        mockMvc.perform(get("/studies?analyses.referenceSequences.name=NCBI36&analyses.type=CASE_CONTROL"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(0));
@@ -1332,7 +1341,9 @@ public class MetadataApplicationTest {
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
         String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
         String testStudy = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
-        String testAnalysis = postTestAnalysis("testhuman", testReferenceSequence, testStudy);
+        List<String> referenceSequenceList = new ArrayList<>();
+        referenceSequenceList.add(testReferenceSequence);
+        String testAnalysis = postTestAnalysis("testhuman", referenceSequenceList, testStudy);
         String testFile = postTestFile("testhuman", 1);
         String testSample = postTestSample("testhuman", "test human sample");
         String testWebResource = postTestWebResource();
@@ -1423,7 +1434,9 @@ public class MetadataApplicationTest {
         String todayReleasedStudyUrl = postTestStudy("1kg", 2, "1kg phase 1", humanTaxonomyUrl, today);
         String tomorrowReleasedStudyUrl = postTestStudy("1kg", 3, "1kg phase 3", humanTaxonomyUrl, tomorrow);
 
-        String yesterdayReleasedAnalysisUrl = postTestAnalysis("analysisReleasedYesterday", humanReferenceSequenceUrl, yesterdayReleasedStudyUrl);
+        List<String> referenceSequenceList = new ArrayList<>();
+        referenceSequenceList.add(humanReferenceSequenceUrl);
+        String yesterdayReleasedAnalysisUrl = postTestAnalysis("analysisReleasedYesterday", referenceSequenceList, yesterdayReleasedStudyUrl);
 
         mockMvc.perform(get("/studies"))
                 .andExpect(status().isOk())
