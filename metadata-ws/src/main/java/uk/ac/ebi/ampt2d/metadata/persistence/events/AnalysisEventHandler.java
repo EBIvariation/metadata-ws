@@ -25,6 +25,7 @@ import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException;
 import uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 
 @RepositoryEventHandler(Analysis.class)
 public class AnalysisEventHandler {
@@ -46,6 +47,13 @@ public class AnalysisEventHandler {
             throw new AnalysisWithoutReferenceSequenceException();
         } else if (analysis.getReferenceSequences().contains(null)) {
             throw new InvalidReferenceSequenceException();
+        } else if (analysis.getReferenceSequences().size() >= 2) {
+            boolean invalidRefSeq = analysis.getReferenceSequences().stream().anyMatch(r -> r.getType().equals(ReferenceSequence.Type.ASSEMBLY) ||
+                    r.getType().equals(ReferenceSequence.Type.TRANSCRIPTOME));
+            if (invalidRefSeq) {
+                throw new InvalidReferenceSequenceException("Invalid type of reference sequences. " +
+                        "If the reference sequence URL list is more than one, all of them should be of gene type");
+            }
         }
     }
 

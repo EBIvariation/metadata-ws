@@ -260,9 +260,9 @@ public class MetadataApplicationTest {
     @Test
     public void postAnalysisAndUpdate() throws Exception {
         String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
         String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"));
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
         String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
         List<String> referenceSequenceList = new ArrayList<>();
@@ -277,7 +277,7 @@ public class MetadataApplicationTest {
 
         List<String> referenceSequencUrlListNew = new ArrayList<>();
         String referenceSequenceUrl3 = postTestReferenceSequence("GRCh37", "p4",
-                Arrays.asList("GCA_000001407.4", "GCF_000001407.15"));
+                Arrays.asList("GCA_000001407.4", "GCF_000001407.15"), ReferenceSequence.Type.GENE);
         referenceSequencUrlListNew.add(referenceSequenceUrl3);
 
         mockMvc.perform(patch(location)
@@ -332,9 +332,9 @@ public class MetadataApplicationTest {
     @Test
     public void deleteAnalysisReferenceSequence() throws Exception {
         String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
         String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"));
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
         String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
         List<String> referenceSequenceList = new ArrayList<>();
@@ -359,9 +359,9 @@ public class MetadataApplicationTest {
     @Test
     public void postAnalysisAndUpdateWithoutReferenceSequence() throws Exception {
         String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
         String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"));
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
         String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
         List<String> referenceSequenceList = new ArrayList<>();
@@ -392,9 +392,9 @@ public class MetadataApplicationTest {
     @Test
     public void postAnalysisAndUpdateInvalidReferenceSequence() throws Exception {
         String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
         String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"));
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
         String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
         List<String> referenceSequenceList = new ArrayList<>();
@@ -427,9 +427,9 @@ public class MetadataApplicationTest {
     @Test
     public void postAnalysisAndUpdatePartialInvalidReferenceSequence() throws Exception {
         String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
         String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"));
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
         String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
 
         List<String> referenceSequenceList = new ArrayList<>();
@@ -450,7 +450,7 @@ public class MetadataApplicationTest {
 
         List<String> referenceSequencUrlListNew = new ArrayList<>();
         String referenceSequenceUrl3 = postTestReferenceSequence("GRCh37", "p4",
-                Arrays.asList("GCA_000001406.4", "GCF_000001406.14"));
+                Arrays.asList("GCA_000001406.4", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
         referenceSequencUrlListNew.add(referenceSequenceUrl3);
         referenceSequencUrlListNew.add("http://nohost/referenceSequences/9999");
         mockMvc.perform(patch(location)
@@ -459,6 +459,64 @@ public class MetadataApplicationTest {
                         "}"))
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException"));
+    }
+
+    @Test
+    public void postAnalysisInvalidReferenceSequenceType() throws Exception {
+        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.ASSEMBLY);
+        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.TRANSCRIPTOME);
+        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
+
+        List<String> referenceSequenceList = new ArrayList<>();
+        referenceSequenceList.add(referenceSequenceUrl1);
+        referenceSequenceList.add(referenceSequenceUrl2);
+
+        mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAA0001" + "\",\"version\":  1 }," +
+                        "\"name\": \"test_human_analysis\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"study\": \"" + studyUrl + "\"," +
+                        "\"referenceSequences\": " + testListJson.write(referenceSequenceList).getJson() + "," +
+                        "\"technology\": \"" + Analysis.Technology.GWAS + "\"," +
+                        "\"type\": \"" + Analysis.Type.CASE_CONTROL + "\"," +
+                        "\"platform\": \"" + "Illumina" + "\"" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException"))
+                .andExpect(jsonPath("message").value("Invalid type of reference sequences. " +
+                        "If the reference sequence URL list is more than one, all of them should be of gene type"));
+    }
+
+    @Test
+    public void postAnalysisMixedReferenceSequenceType() throws Exception {
+        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.ASSEMBLY);
+        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
+        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
+
+        List<String> referenceSequenceList = new ArrayList<>();
+        referenceSequenceList.add(referenceSequenceUrl1);
+        referenceSequenceList.add(referenceSequenceUrl2);
+
+        mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAA0001" + "\",\"version\":  1 }," +
+                        "\"name\": \"test_human_analysis\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"study\": \"" + studyUrl + "\"," +
+                        "\"referenceSequences\": " + testListJson.write(referenceSequenceList).getJson() + "," +
+                        "\"technology\": \"" + Analysis.Technology.GWAS + "\"," +
+                        "\"type\": \"" + Analysis.Type.CASE_CONTROL + "\"," +
+                        "\"platform\": \"" + "Illumina" + "\"" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException"))
+                .andExpect(jsonPath("message").value("Invalid type of reference sequences. " +
+                        "If the reference sequence URL list is more than one, all of them should be of gene type"));
     }
 
     private String postTestAnalysis(String accession, List<String> referenceSequenceList, String studyUrl) throws Exception {
