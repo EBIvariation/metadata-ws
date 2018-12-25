@@ -15,24 +15,22 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.persistence.configuration;
+package uk.ac.ebi.ampt2d.metadata.exceptionhandling;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import uk.ac.ebi.ampt2d.metadata.persistence.events.AnalysisEventHandler;
-import uk.ac.ebi.ampt2d.metadata.persistence.events.SampleEventHandler;
+public class AnalysisWithoutReferenceSequenceException extends IllegalArgumentException {
 
-@Configuration
-public class RepositoryConfiguration {
+    private static final long serialVersionUID = 5740339279937775231L;
 
-    @Bean
-    SampleEventHandler sampleEventHandler() {
-        return new SampleEventHandler();
+    public AnalysisWithoutReferenceSequenceException() {
+        super("An analysis must have at least one reference sequence");
     }
 
-    @Bean
-    AnalysisEventHandler analysisEventHandler() {
-        return new AnalysisEventHandler();
+    public AnalysisWithoutReferenceSequenceException(String message) {
+        super(message);
+    }
+
+    public AnalysisWithoutReferenceSequenceException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 
 }

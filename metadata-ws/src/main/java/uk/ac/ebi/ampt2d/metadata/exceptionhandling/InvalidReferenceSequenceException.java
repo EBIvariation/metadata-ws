@@ -15,24 +15,22 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.persistence.configuration;
+package uk.ac.ebi.ampt2d.metadata.exceptionhandling;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import uk.ac.ebi.ampt2d.metadata.persistence.events.AnalysisEventHandler;
-import uk.ac.ebi.ampt2d.metadata.persistence.events.SampleEventHandler;
+public class InvalidReferenceSequenceException extends IllegalArgumentException {
 
-@Configuration
-public class RepositoryConfiguration {
+    private static final long serialVersionUID = 7071006298434627630L;
 
-    @Bean
-    SampleEventHandler sampleEventHandler() {
-        return new SampleEventHandler();
+    public InvalidReferenceSequenceException() {
+        super("At least one of the reference sequence URL is invalid");
     }
 
-    @Bean
-    AnalysisEventHandler analysisEventHandler() {
-        return new AnalysisEventHandler();
+    public InvalidReferenceSequenceException(String message) {
+        super(message);
+    }
+
+    public InvalidReferenceSequenceException(String message, Throwable throwable) {
+        super(message, throwable);
     }
 
 }

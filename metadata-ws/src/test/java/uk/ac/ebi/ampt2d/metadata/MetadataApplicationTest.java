@@ -257,6 +257,210 @@ public class MetadataApplicationTest {
                 .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
     }
 
+    @Test
+    public void postAnalysisAndUpdate() throws Exception {
+        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"));
+        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
+
+        List<String> referenceSequenceList = new ArrayList<>();
+        referenceSequenceList.add(referenceSequenceUrl1);
+        referenceSequenceList.add(referenceSequenceUrl2);
+        String location = postTestAnalysis("EGAA0001", referenceSequenceList, studyUrl, Analysis.Technology.GWAS,
+                Analysis.Type.CASE_CONTROL, "Illumina");
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
+
+        List<String> referenceSequencUrlListNew = new ArrayList<>();
+        String referenceSequenceUrl3 = postTestReferenceSequence("GRCh37", "p4",
+                Arrays.asList("GCA_000001407.4", "GCF_000001407.15"));
+        referenceSequencUrlListNew.add(referenceSequenceUrl3);
+
+        mockMvc.perform(patch(location)
+                .content("{ " +
+                        "\"referenceSequences\": " + testListJson.write(referenceSequencUrlListNew).getJson() + "" +
+                        "}"))
+                .andExpect(status().is2xxSuccessful());
+
+        mockMvc.perform(get(location+ "/" + "referenceSequences"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(referenceSequenceUrl3));
+    }
+
+    @Test
+    public void postAnalysisInvalidNoReferenceSequence() throws Exception {
+        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
+        mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAA0001" + "\",\"version\":  1 }," +
+                        "\"name\": \"test_human_analysis\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"study\": \"" + studyUrl + "\"," +
+                        "\"technology\": \"" + Analysis.Technology.GWAS + "\"," +
+                        "\"type\": \"" + Analysis.Type.CASE_CONTROL + "\"," +
+                        "\"platform\": \"" + "Illumina" + "\"" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException"));
+    }
+
+    @Test
+    public void postAnalysisInvalidBlankReferenceSequence() throws Exception {
+        List<String> referenceSequenceList = new ArrayList<>();
+        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
+        mockMvc.perform(post("/analyses")
+                .content("{ " +
+                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAA0001" + "\",\"version\":  1 }," +
+                        "\"name\": \"test_human_analysis\"," +
+                        "\"description\": \"Nothing important\"," +
+                        "\"study\": \"" + studyUrl + "\"," +
+                        "\"referenceSequences\": " + testListJson.write(referenceSequenceList).getJson() + "," +
+                        "\"technology\": \"" + Analysis.Technology.GWAS + "\"," +
+                        "\"type\": \"" + Analysis.Type.CASE_CONTROL + "\"," +
+                        "\"platform\": \"" + "Illumina" + "\"" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException"));
+    }
+
+    @Test
+    public void deleteAnalysisReferenceSequence() throws Exception {
+        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"));
+        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
+
+        List<String> referenceSequenceList = new ArrayList<>();
+        referenceSequenceList.add(referenceSequenceUrl1);
+        referenceSequenceList.add(referenceSequenceUrl2);
+        String location = postTestAnalysis("EGAA0001", referenceSequenceList, studyUrl, Analysis.Technology.GWAS,
+                Analysis.Type.CASE_CONTROL, "Illumina");
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
+
+        String idStr = referenceSequenceUrl1.substring(referenceSequenceUrl1.lastIndexOf('/') + 1);
+        mockMvc.perform(delete(location + "/referenceSequences/" + idStr))
+                .andExpect(status().is2xxSuccessful());
+        idStr = referenceSequenceUrl2.substring(referenceSequenceUrl2.lastIndexOf('/') + 1);
+        mockMvc.perform(delete(location + "/referenceSequences/" + idStr))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException"));
+    }
+
+    @Test
+    public void postAnalysisAndUpdateWithoutReferenceSequence() throws Exception {
+        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"));
+        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
+
+        List<String> referenceSequenceList = new ArrayList<>();
+        referenceSequenceList.add(referenceSequenceUrl1);
+        referenceSequenceList.add(referenceSequenceUrl2);
+        String location = postTestAnalysis("EGAA0001", referenceSequenceList, studyUrl, Analysis.Technology.GWAS,
+                Analysis.Type.CASE_CONTROL, "Illumina");
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
+        mockMvc.perform(get(location+ "/" + "referenceSequences"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(2))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(referenceSequenceUrl1))
+                .andExpect(jsonPath("$..reference-sequences[1]..referenceSequence.href").value(referenceSequenceUrl2));
+
+        List<String> referenceSequencUrlListNew = new ArrayList<>();
+        mockMvc.perform(patch(location)
+                .content("{ " +
+                        "\"referenceSequences\": " + testListJson.write(referenceSequencUrlListNew).getJson() + "" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException"));
+    }
+
+    @Test
+    public void postAnalysisAndUpdateInvalidReferenceSequence() throws Exception {
+        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"));
+        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
+
+        List<String> referenceSequenceList = new ArrayList<>();
+        referenceSequenceList.add(referenceSequenceUrl1);
+        referenceSequenceList.add(referenceSequenceUrl2);
+        String location = postTestAnalysis("EGAA0001", referenceSequenceList, studyUrl, Analysis.Technology.GWAS,
+                Analysis.Type.CASE_CONTROL, "Illumina");
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
+        mockMvc.perform(get(location+ "/" + "referenceSequences"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(2))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(referenceSequenceUrl1))
+                .andExpect(jsonPath("$..reference-sequences[1]..referenceSequence.href").value(referenceSequenceUrl2));
+
+        List<String> referenceSequencUrlListNew = new ArrayList<>();
+        referenceSequencUrlListNew.add("http://nohost/referenceSequences/9998");
+        referenceSequencUrlListNew.add("http://nohost/referenceSequences/9999");
+        mockMvc.perform(patch(location)
+                .content("{ " +
+                        "\"referenceSequences\": " + testListJson.write(referenceSequencUrlListNew).getJson() + "" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException"));
+    }
+
+    @Test
+    public void postAnalysisAndUpdatePartialInvalidReferenceSequence() throws Exception {
+        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
+                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
+        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
+                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"));
+        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
+
+        List<String> referenceSequenceList = new ArrayList<>();
+        referenceSequenceList.add(referenceSequenceUrl1);
+        referenceSequenceList.add(referenceSequenceUrl2);
+        String location = postTestAnalysis("EGAA0001", referenceSequenceList, studyUrl, Analysis.Technology.GWAS,
+                Analysis.Type.CASE_CONTROL, "Illumina");
+
+        mockMvc.perform(get(location))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
+        mockMvc.perform(get(location+ "/" + "referenceSequences"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(2))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(referenceSequenceUrl1))
+                .andExpect(jsonPath("$..reference-sequences[1]..referenceSequence.href").value(referenceSequenceUrl2));
+
+        List<String> referenceSequencUrlListNew = new ArrayList<>();
+        String referenceSequenceUrl3 = postTestReferenceSequence("GRCh37", "p4",
+                Arrays.asList("GCA_000001406.4", "GCF_000001406.14"));
+        referenceSequencUrlListNew.add(referenceSequenceUrl3);
+        referenceSequencUrlListNew.add("http://nohost/referenceSequences/9999");
+        mockMvc.perform(patch(location)
+                .content("{ " +
+                        "\"referenceSequences\": " + testListJson.write(referenceSequencUrlListNew).getJson() + "" +
+                        "}"))
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException"));
+    }
+
     private String postTestAnalysis(String accession, List<String> referenceSequenceList, String studyUrl) throws Exception {
         return postTestAnalysis(accession, referenceSequenceList, studyUrl, Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina");
 
