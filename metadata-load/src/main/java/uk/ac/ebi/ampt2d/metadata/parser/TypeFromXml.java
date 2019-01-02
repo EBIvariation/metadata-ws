@@ -19,7 +19,7 @@ package uk.ac.ebi.ampt2d.metadata.parser;
 
 import java.util.List;
 
-public interface TypeFromXmlFile<ELEMENT, XMLFILE> {
+public interface TypeFromXml<ELEMENT, XML> {
 
-    List<ELEMENT> extractFromSqlXml(XMLFILE file);
+    List<ELEMENT> extractFromSqlXml(XML str);
 }

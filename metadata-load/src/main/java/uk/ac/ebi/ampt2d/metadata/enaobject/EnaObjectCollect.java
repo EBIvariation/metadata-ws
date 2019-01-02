@@ -17,20 +17,35 @@
  */
 package uk.ac.ebi.ampt2d.metadata.enaobject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.ac.ebi.ampt2d.metadata.database.SqlxmlJdbcTemplate;
-import uk.ac.ebi.ampt2d.metadata.parser.AnalysisFileTypeFromXmlFile;
+import uk.ac.ebi.ampt2d.metadata.parser.AnalysisFileTypeFromXml;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
 import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.sql.SQLXML;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class EnaObjectCollect {
+    AnalysisFileTypeFromXml analysisFileTypeFromXml = new AnalysisFileTypeFromXml();
+    private static final Logger logger = LoggerFactory.getLogger(EnaObjectCollect.class);
+
+    private List<AnalysisFileType> getAnalysisFile(SQLXML sqlxml) {
+        List<AnalysisFileType> analysisFileTypeList = new ArrayList<>();
+        try {
+            analysisFileTypeList = analysisFileTypeFromXml.extractFromSqlXml(sqlxml.getString());
+        } catch (SQLException e) {
+            logger.error("Unable to convert SQLXML Object to String: {}", sqlxml.toString(), e);
+        }
+        return analysisFileTypeList;
+    }
 
     public List<AnalysisFileType> getEnaAnalysisFileFromDb(DataSource dataSource) {
         List<SQLXML> sqlxmlList;
-        List<List<AnalysisFileType>> analysisFileMultiList;
         String sqlAnalysis = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS";
         String columnAnalysisXml = "ANALYSIS_XML";
 
@@ -38,10 +53,8 @@ public class EnaObjectCollect {
                 sqlAnalysis, columnAnalysisXml);
         sqlxmlList = sqlxmlJdbcTemplate.listSqlxml();
 
-        AnalysisFileTypeFromXmlFile analysisFileTypeFromSet = new AnalysisFileTypeFromXmlFile();
         return sqlxmlList.stream()
-                .map(sqlxml -> analysisFileTypeFromSet
-                        .extractFromSqlXml(sqlxml))
+                .map(this::getAnalysisFile)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }

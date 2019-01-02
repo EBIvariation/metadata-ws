@@ -25,16 +25,14 @@ import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 import uk.ac.ebi.ena.sra.xml.AnalysisSetType;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
-import java.sql.SQLException;
-import java.sql.SQLXML;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AnalysisFileTypeFromXmlFile implements TypeFromXmlFile<AnalysisFileType, SQLXML> {
+public class AnalysisFileTypeFromXml implements TypeFromXml<AnalysisFileType, String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AnalysisFileTypeFromXmlFile.class);
+    private static final Logger logger = LoggerFactory.getLogger(AnalysisFileTypeFromXml.class);
 
-    public List<AnalysisFileType> extract(AnalysisSetType analysisSet) {
+    private List<AnalysisFileType> extract(AnalysisSetType analysisSet) {
         List<AnalysisFileType> subAnalysisFileList = new ArrayList<>();
 
         AnalysisType[] analysisType = analysisSet.getANALYSISArray();
@@ -48,7 +46,7 @@ public class AnalysisFileTypeFromXmlFile implements TypeFromXmlFile<AnalysisFile
         return subAnalysisFileList;
     }
 
-    public AnalysisSetType getAnalysisSet(String xmlStr) throws XmlException {
+    private AnalysisSetType getAnalysisSet(String xmlStr) throws XmlException {
         AnalysisSetType analysisSetType;
 
         try {
@@ -61,19 +59,14 @@ public class AnalysisFileTypeFromXmlFile implements TypeFromXmlFile<AnalysisFile
     }
 
     @Override
-    public List<AnalysisFileType> extractFromSqlXml(SQLXML sqlXml) {
-        String xmlStr;
+    public List<AnalysisFileType> extractFromSqlXml(String xmlStr) {
         List<AnalysisFileType> analysisFileList = new ArrayList<>();
-
         try {
-            xmlStr = sqlXml.getString();
             AnalysisSetType analysisSet;
             analysisSet = getAnalysisSet(xmlStr);
             analysisFileList = extract(analysisSet);
         } catch (XmlException e) {
             logger.error("Unable to convert XML String to AnalysisSet:",  e);
-        } catch (SQLException e) {
-            logger.error("Unable to convert SQLXML Object to String: {}", sqlXml.toString(), e);
         }
         return analysisFileList;
     }
