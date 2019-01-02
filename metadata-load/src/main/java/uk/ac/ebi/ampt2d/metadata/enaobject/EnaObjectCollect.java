@@ -18,7 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.enaobject;
 
 import uk.ac.ebi.ampt2d.metadata.database.SqlxmlJdbcTemplate;
-import uk.ac.ebi.ampt2d.metadata.parser.AnalysisFileTypeFromSet;
+import uk.ac.ebi.ampt2d.metadata.parser.AnalysisFileTypeFromXmlFile;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
 import javax.sql.DataSource;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 public class EnaObjectCollect {
 
-    public List<AnalysisFileType> getEnaAnalysisFileFomDb(DataSource dataSource) {
+    public List<AnalysisFileType> getEnaAnalysisFileFromDb(DataSource dataSource) {
         List<SQLXML> sqlxmlList;
         List<List<AnalysisFileType>> analysisFileMultiList;
         String sqlAnalysis = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS";
@@ -38,13 +38,10 @@ public class EnaObjectCollect {
                 sqlAnalysis, columnAnalysisXml);
         sqlxmlList = sqlxmlJdbcTemplate.listSqlxml();
 
-        AnalysisFileTypeFromSet analysisFileTypeFromSet = new AnalysisFileTypeFromSet();
-        analysisFileMultiList = sqlxmlList.stream()
-                .map(xml -> analysisFileTypeFromSet
-                        .extractFromSqlXml(xml))
-                .collect(Collectors.toList());
-        return analysisFileMultiList
-                .stream()
+        AnalysisFileTypeFromXmlFile analysisFileTypeFromSet = new AnalysisFileTypeFromXmlFile();
+        return sqlxmlList.stream()
+                .map(sqlxml -> analysisFileTypeFromSet
+                        .extractFromSqlXml(sqlxml))
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }

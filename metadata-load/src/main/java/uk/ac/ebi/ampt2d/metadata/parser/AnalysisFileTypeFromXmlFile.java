@@ -30,11 +30,10 @@ import java.sql.SQLXML;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, AnalysisSetType> {
+public class AnalysisFileTypeFromXmlFile implements TypeFromXmlFile<AnalysisFileType, SQLXML> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AnalysisFileTypeFromSet.class);
+    private static final Logger logger = LoggerFactory.getLogger(AnalysisFileTypeFromXmlFile.class);
 
-    @Override
     public List<AnalysisFileType> extract(AnalysisSetType analysisSet) {
         List<AnalysisFileType> subAnalysisFileList = new ArrayList<>();
 
@@ -61,6 +60,7 @@ public class AnalysisFileTypeFromSet implements TypeFromSet<AnalysisFileType, An
         return analysisSetType;
     }
 
+    @Override
     public List<AnalysisFileType> extractFromSqlXml(SQLXML sqlXml) {
         String xmlStr;
         List<AnalysisFileType> analysisFileList = new ArrayList<>();

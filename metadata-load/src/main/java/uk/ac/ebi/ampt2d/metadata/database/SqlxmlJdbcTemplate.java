@@ -42,12 +42,7 @@ public class SqlxmlJdbcTemplate {
 
     public List<SQLXML> listSqlxml() {
         List<SQLXML> sqlxmlList;
-        try {
-            sqlxmlList = jdbcTemplate.query(sql, new SqlxmlMapper(column));
-        } catch (DataAccessException ex) {
-            logger.error("Could not complete SQL statement: {}", sql, ex);
-            throw ex;
-        }
+        sqlxmlList = jdbcTemplate.query(sql, new SqlxmlMapper(column));
         return sqlxmlList;
     }
 

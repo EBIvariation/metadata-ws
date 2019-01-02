@@ -33,7 +33,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
-public class AnalysisFileTypeFromSetTest {
+public class AnalysisFileTypeFromXmlFileTest {
 
     private String getXmlFile(String fileName) throws IOException {
         File file = ResourceUtils.getFile(fileName);
@@ -43,7 +43,7 @@ public class AnalysisFileTypeFromSetTest {
     @Test
     public void testAnalysisFileParser() throws Exception {
         String xmlStr = getXmlFile("classpath:ERZ000011.xml");
-        AnalysisFileTypeFromSet analysisFileTypeFromSet = new AnalysisFileTypeFromSet();
+        AnalysisFileTypeFromXmlFile analysisFileTypeFromSet = new AnalysisFileTypeFromXmlFile();
         AnalysisSetType analysisSetType = analysisFileTypeFromSet.getAnalysisSet(xmlStr);
         List<AnalysisFileType> analysisFileList = analysisFileTypeFromSet.extract(analysisSetType);
         assertAnalysisFileList(analysisFileList);
@@ -69,7 +69,7 @@ public class AnalysisFileTypeFromSetTest {
                 "  </ANALYSIS>\n" +
                 "</ANALYSIS_SET>\n";
 
-        AnalysisFileTypeFromSet analysisFileTypeFromSet = new AnalysisFileTypeFromSet();
+        AnalysisFileTypeFromXmlFile analysisFileTypeFromSet = new AnalysisFileTypeFromXmlFile();
         analysisFileTypeFromSet.getAnalysisSet(xmlStr);
     }
 
