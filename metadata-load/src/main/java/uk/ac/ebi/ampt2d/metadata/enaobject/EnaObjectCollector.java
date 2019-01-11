@@ -30,10 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EnaObjectCollect {
+public class EnaObjectCollector {
 
     AnalysisFileTypeFromXml analysisFileTypeFromXml = new AnalysisFileTypeFromXml();
-    private static final Logger logger = LoggerFactory.getLogger(EnaObjectCollect.class);
+    private static final Logger logger = LoggerFactory.getLogger(EnaObjectCollector.class);
 
     private List<AnalysisFileType> getAnalysisList(SQLXML sqlxml) {
         List<AnalysisFileType> analysisFileTypeList = new ArrayList<>();
