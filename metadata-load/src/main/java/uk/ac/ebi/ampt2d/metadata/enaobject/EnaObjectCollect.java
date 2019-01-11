@@ -19,8 +19,8 @@ package uk.ac.ebi.ampt2d.metadata.enaobject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import uk.ac.ebi.ampt2d.metadata.database.SqlxmlJdbcTemplate;
 import uk.ac.ebi.ampt2d.metadata.parser.AnalysisFileTypeFromXml;
+import uk.ac.ebi.ampt2d.metadata.service.DbService;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
 import javax.sql.DataSource;
@@ -37,7 +37,7 @@ public class EnaObjectCollect {
     private List<AnalysisFileType> getAnalysisFile(SQLXML sqlxml) {
         List<AnalysisFileType> analysisFileTypeList = new ArrayList<>();
         try {
-            analysisFileTypeList = analysisFileTypeFromXml.extractFromSqlXml(sqlxml.getString());
+            analysisFileTypeList = analysisFileTypeFromXml.extractFromXml(sqlxml.getString());
         } catch (SQLException e) {
             logger.error("Unable to convert SQLXML Object to String: {}", sqlxml.toString(), e);
         }
@@ -46,12 +46,8 @@ public class EnaObjectCollect {
 
     public List<AnalysisFileType> getEnaAnalysisFileFromDb(DataSource dataSource) {
         List<SQLXML> sqlxmlList;
-        String sqlAnalysis = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS";
-        String columnAnalysisXml = "ANALYSIS_XML";
-
-        SqlxmlJdbcTemplate sqlxmlJdbcTemplate = new SqlxmlJdbcTemplate(dataSource,
-                sqlAnalysis, columnAnalysisXml);
-        sqlxmlList = sqlxmlJdbcTemplate.listSqlxml();
+        DbService dbService = new DbService();
+        sqlxmlList = dbService.getEnaAnalysisXml(dataSource);
 
         return sqlxmlList.stream()
                 .map(this::getAnalysisFile)

@@ -59,7 +59,7 @@ public class AnalysisFileTypeFromXml implements TypeFromXml<AnalysisFileType, St
     }
 
     @Override
-    public List<AnalysisFileType> extractFromSqlXml(String xmlStr) {
+    public List<AnalysisFileType> extractFromXml(String xmlStr) {
         List<AnalysisFileType> analysisFileList = new ArrayList<>();
         try {
             AnalysisSetType analysisSet;

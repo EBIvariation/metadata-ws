@@ -21,5 +21,5 @@ import java.util.List;
 
 public interface TypeFromXml<ELEMENT, XML> {
 
-    List<ELEMENT> extractFromSqlXml(XML str);
+    List<ELEMENT> extractFromXml(XML str);
 }

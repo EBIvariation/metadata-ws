@@ -15,30 +15,24 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.database;
+package uk.ac.ebi.ampt2d.metadata.service;
 
-import org.springframework.jdbc.core.JdbcTemplate;
+import uk.ac.ebi.ampt2d.metadata.database.SqlxmlJdbcTemplate;
 
 import javax.sql.DataSource;
 import java.sql.SQLXML;
 import java.util.List;
 
-public class SqlxmlJdbcTemplate {
+public class DbService {
 
-    private JdbcTemplate jdbcTemplate;
-    private String sql;
-    private String column;
+    private String sqlAnalysis = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS";
+    private String columnAnalysisXml = "ANALYSIS_XML";
 
-    public SqlxmlJdbcTemplate(DataSource dataSource, String sql, String column) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-        this.sql = sql;
-        this.column = column;
-    }
-
-    public List<SQLXML> listSqlxml() {
+    public List<SQLXML> getEnaAnalysisXml(DataSource dataSource) {
         List<SQLXML> sqlxmlList;
-        sqlxmlList = jdbcTemplate.query(sql, new SqlxmlMapper(column));
+        SqlxmlJdbcTemplate sqlxmlJdbcTemplate = new SqlxmlJdbcTemplate(dataSource,
+                sqlAnalysis, columnAnalysisXml);
+        sqlxmlList = sqlxmlJdbcTemplate.listSqlxml();
         return sqlxmlList;
     }
-
 }

@@ -42,7 +42,7 @@ public class AnalysisFileTypeFromXmlTest {
     public void testAnalysisFileParser() throws Exception {
         String xmlStr = getXmlFile("classpath:ERZ000011.xml");
         AnalysisFileTypeFromXml analysisFileTypeFromSet = new AnalysisFileTypeFromXml();
-        List<AnalysisFileType> analysisFileList = analysisFileTypeFromSet.extractFromSqlXml(xmlStr);
+        List<AnalysisFileType> analysisFileList = analysisFileTypeFromSet.extractFromXml(xmlStr);
         assertAnalysisFileList(analysisFileList);
     }
 
