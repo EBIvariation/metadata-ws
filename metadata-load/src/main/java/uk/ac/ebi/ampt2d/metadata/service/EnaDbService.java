@@ -17,20 +17,25 @@
  */
 package uk.ac.ebi.ampt2d.metadata.service;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import uk.ac.ebi.ampt2d.metadata.database.SqlxmlJdbcTemplate;
 
-import javax.sql.DataSource;
 import java.sql.SQLXML;
 import java.util.List;
 
-public class DbService {
+public class EnaDbService {
 
-    private String sqlAnalysis = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS";
-    private String columnAnalysisXml = "ANALYSIS_XML";
+    private static final String sqlAnalysis = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS";
+    private static final String columnAnalysisXml = "ANALYSIS_XML";
+    private JdbcTemplate jdbcTemplate;
 
-    public List<SQLXML> getEnaAnalysisXml(DataSource dataSource) {
+    public EnaDbService(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public List<SQLXML> getEnaAnalysisXml() {
         List<SQLXML> sqlxmlList;
-        SqlxmlJdbcTemplate sqlxmlJdbcTemplate = new SqlxmlJdbcTemplate(dataSource,
+        SqlxmlJdbcTemplate sqlxmlJdbcTemplate = new SqlxmlJdbcTemplate(jdbcTemplate,
                 sqlAnalysis, columnAnalysisXml);
         sqlxmlList = sqlxmlJdbcTemplate.listSqlxml();
         return sqlxmlList;

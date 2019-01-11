@@ -19,7 +19,6 @@ package uk.ac.ebi.ampt2d.metadata.database;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.sql.DataSource;
 import java.sql.SQLXML;
 import java.util.List;
 
@@ -29,8 +28,8 @@ public class SqlxmlJdbcTemplate {
     private String sql;
     private String column;
 
-    public SqlxmlJdbcTemplate(DataSource dataSource, String sql, String column) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    public SqlxmlJdbcTemplate(JdbcTemplate jdbcTemplate, String sql, String column) {
+        this.jdbcTemplate = jdbcTemplate;
         this.sql = sql;
         this.column = column;
     }

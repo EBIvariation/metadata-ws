@@ -21,6 +21,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
@@ -43,6 +44,11 @@ public class DatabaseConfiguration {
     @Bean("db_transaction_manager")
     public DataSourceTransactionManager dbTransactionManager() {
         return new DataSourceTransactionManager(dbDataSource());
+    }
+
+    @Bean("ena_jdbc_template")
+    public JdbcTemplate EnaJdbcTemplate() {
+        return new JdbcTemplate(dbDataSource());
     }
 
 }
