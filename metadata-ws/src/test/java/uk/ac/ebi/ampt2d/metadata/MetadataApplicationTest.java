@@ -275,6 +275,13 @@ public class MetadataApplicationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
 
+        mockMvc.perform(get(location+ "/" + "referenceSequences"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$..reference-sequences").isArray())
+                .andExpect(jsonPath("$..reference-sequences.length()").value(2))
+                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(referenceSequenceUrl1))
+                .andExpect(jsonPath("$..reference-sequences[1]..referenceSequence.href").value(referenceSequenceUrl2));
+
         List<String> referenceSequencUrlListNew = new ArrayList<>();
         String referenceSequenceUrl3 = postTestReferenceSequence("GRCh37", "p4",
                 Arrays.asList("GCA_000001407.4", "GCF_000001407.15"), ReferenceSequence.Type.GENE);
