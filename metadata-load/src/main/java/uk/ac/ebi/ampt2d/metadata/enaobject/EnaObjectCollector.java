@@ -17,6 +17,7 @@
  */
 package uk.ac.ebi.ampt2d.metadata.enaobject;
 
+import org.apache.xmlbeans.XmlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -35,12 +36,14 @@ public class EnaObjectCollector {
     AnalysisFileTypeFromXml analysisFileTypeFromXml = new AnalysisFileTypeFromXml();
     private static final Logger logger = LoggerFactory.getLogger(EnaObjectCollector.class);
 
-    private List<AnalysisFileType> getAnalysisList(SQLXML sqlxml) {
+    private List<AnalysisFileType> AnalysisFileTypeList(SQLXML sqlxml) {
         List<AnalysisFileType> analysisFileTypeList = new ArrayList<>();
         try {
             analysisFileTypeList = analysisFileTypeFromXml.extractFromXml(sqlxml.getString());
         } catch (SQLException e) {
             logger.error("Unable to convert SQLXML Object to String: {}", sqlxml.toString(), e);
+        } catch (XmlException e) {
+            logger.error("Unable to convert XML String to AnalysisSet: {}", sqlxml.toString(), e);
         }
         return analysisFileTypeList;
     }
@@ -51,7 +54,7 @@ public class EnaObjectCollector {
         sqlxmlList = enaDbService.getEnaAnalysisXml();
 
         return sqlxmlList.stream()
-                .map(this::getAnalysisList)
+                .map(this::AnalysisFileTypeList)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }

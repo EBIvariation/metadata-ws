@@ -17,6 +17,7 @@
  */
 package uk.ac.ebi.ampt2d.metadata.parser;
 
+import org.apache.xmlbeans.XmlException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -56,6 +57,18 @@ public class AnalysisFileTypeFromXmlTest {
         assertEquals(analysisFileList.get(1).getFiletype(), AnalysisFileType.Filetype.Enum.forInt(AnalysisFileType.Filetype.INT_BAM));
         assertEquals(analysisFileList.get(1).getChecksum(), "15191d68bdd5c1ad23c943c3da3730c7");
         assertEquals(analysisFileList.get(1).getChecksumMethod(), AnalysisFileType.ChecksumMethod.Enum.forString("MD5"));
+    }
+
+
+    @Test(expected = XmlException.class)
+    public void testAnalysisFileParserWrongInput() throws Exception {
+        String xmlStr = "/<?wrong xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<ANALYSIS_SET>\n" +
+                "  <ANALYSIS alias=\"uk10k_scoop5013826.vcf.gz-vcf_analysis-sc-20120330\" center_name=\"SC\" broker_name=\"EGA\" analysis_center=\"SC\" accession=\"ERZ000011\">\n" +
+                "  </ANALYSIS>\n" +
+                "</ANALYSIS_SET>\n";
+        AnalysisFileTypeFromXml analysisFileTypeFromSet = new AnalysisFileTypeFromXml();
+        analysisFileTypeFromSet.extractFromXml(xmlStr);
     }
 
 }

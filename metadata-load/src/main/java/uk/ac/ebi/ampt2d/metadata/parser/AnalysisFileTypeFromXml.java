@@ -35,12 +35,12 @@ public class AnalysisFileTypeFromXml implements TypeFromXml<AnalysisFileType, St
     private List<AnalysisFileType> extract(AnalysisSetType analysisSet) {
         List<AnalysisFileType> subAnalysisFileList = new ArrayList<>();
 
-        AnalysisType[] analysisType = analysisSet.getANALYSISArray();
-        for (AnalysisType analysis : analysisType) {
+        AnalysisType[] analysesType = analysisSet.getANALYSISArray();
+        for (AnalysisType analysis : analysesType) {
             AnalysisType.FILES analysisFILES = analysis.getFILES();
-            AnalysisFileType[] analysisFile = analysisFILES.getFILEArray();
-            for (AnalysisFileType anaFile : analysisFile) {
-                subAnalysisFileList.add(anaFile);
+            AnalysisFileType[] analysesFile = analysisFILES.getFILEArray();
+            for (AnalysisFileType element : analysesFile) {
+                subAnalysisFileList.add(element);
             }
         }
         return subAnalysisFileList;
@@ -59,15 +59,9 @@ public class AnalysisFileTypeFromXml implements TypeFromXml<AnalysisFileType, St
     }
 
     @Override
-    public List<AnalysisFileType> extractFromXml(String xmlStr) {
-        List<AnalysisFileType> analysisFileList = new ArrayList<>();
-        try {
-            AnalysisSetType analysisSet;
-            analysisSet = getAnalysisSet(xmlStr);
-            analysisFileList = extract(analysisSet);
-        } catch (XmlException e) {
-            logger.error("Unable to convert XML String to AnalysisSet:",  e);
-        }
+    public List<AnalysisFileType> extractFromXml(String xmlStr) throws XmlException {
+        List<AnalysisFileType> analysisFileList;
+        analysisFileList = extract(getAnalysisSet(xmlStr));
         return analysisFileList;
     }
 

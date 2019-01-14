@@ -34,7 +34,7 @@ public class SqlxmlJdbcTemplate {
         this.column = column;
     }
 
-    public List<SQLXML> listSqlxml() {
+    public List<SQLXML> getSqlxmlList() {
         List<SQLXML> sqlxmlList;
         sqlxmlList = jdbcTemplate.query(sql, new SqlxmlMapper(column));
         return sqlxmlList;

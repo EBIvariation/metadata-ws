@@ -17,9 +17,11 @@
  */
 package uk.ac.ebi.ampt2d.metadata.parser;
 
+import org.apache.xmlbeans.XmlException;
+
 import java.util.List;
 
 public interface TypeFromXml<ELEMENT, XML> {
 
-    List<ELEMENT> extractFromXml(XML str);
+    List<ELEMENT> extractFromXml(XML str) throws XmlException;
 }

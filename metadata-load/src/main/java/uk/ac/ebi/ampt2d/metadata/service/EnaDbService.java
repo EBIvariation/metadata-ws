@@ -25,8 +25,8 @@ import java.util.List;
 
 public class EnaDbService {
 
-    private static final String sqlAnalysis = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS";
-    private static final String columnAnalysisXml = "ANALYSIS_XML";
+    private static final String SQL_ANALYSIS = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS";
+    private static final String COLUMN_ANALYSIS_XML = "ANALYSIS_XML";
     private JdbcTemplate jdbcTemplate;
 
     public EnaDbService(JdbcTemplate jdbcTemplate) {
@@ -36,8 +36,8 @@ public class EnaDbService {
     public List<SQLXML> getEnaAnalysisXml() {
         List<SQLXML> sqlxmlList;
         SqlxmlJdbcTemplate sqlxmlJdbcTemplate = new SqlxmlJdbcTemplate(jdbcTemplate,
-                sqlAnalysis, columnAnalysisXml);
-        sqlxmlList = sqlxmlJdbcTemplate.listSqlxml();
+                SQL_ANALYSIS, COLUMN_ANALYSIS_XML);
+        sqlxmlList = sqlxmlJdbcTemplate.getSqlxmlList();
         return sqlxmlList;
     }
 }
