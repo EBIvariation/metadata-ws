@@ -36,7 +36,7 @@ public class EnaObjectCollector {
     AnalysisFileTypeFromXml analysisFileTypeFromXml = new AnalysisFileTypeFromXml();
     private static final Logger logger = LoggerFactory.getLogger(EnaObjectCollector.class);
 
-    private List<AnalysisFileType> AnalysisFileTypeList(SQLXML sqlxml) {
+    private List<AnalysisFileType> getAnalysisFileTypeList(SQLXML sqlxml) {
         List<AnalysisFileType> analysisFileTypeList = new ArrayList<>();
         try {
             analysisFileTypeList = analysisFileTypeFromXml.extractFromXml(sqlxml.getString());
@@ -54,7 +54,7 @@ public class EnaObjectCollector {
         sqlxmlList = enaDbService.getEnaAnalysisXml();
 
         return sqlxmlList.stream()
-                .map(this::AnalysisFileTypeList)
+                .map(this::getAnalysisFileTypeList)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
