@@ -30,7 +30,14 @@ import java.util.List;
 
 public class AnalysisFileTypeFromXml implements TypeFromXml<AnalysisFileType, String> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AnalysisFileTypeFromXml.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AnalysisFileTypeFromXml.class);
+
+    @Override
+    public List<AnalysisFileType> extractFromXml(String xmlStr) throws XmlException {
+        List<AnalysisFileType> analysisFileList;
+        analysisFileList = extract(getAnalysisSet(xmlStr));
+        return analysisFileList;
+    }
 
     private List<AnalysisFileType> extract(AnalysisSetType analysisSet) {
         List<AnalysisFileType> subAnalysisFileList = new ArrayList<>();
@@ -52,17 +59,10 @@ public class AnalysisFileTypeFromXml implements TypeFromXml<AnalysisFileType, St
         try {
             analysisSetType = ANALYSISSETDocument.Factory.parse(xmlStr).getANALYSISSET();
         } catch (XmlException e) {
-            logger.error("Unable to parse the XML file: {}",  xmlStr, e);
+            LOGGER.error("Unable to parse the XML file: {}",  xmlStr, e);
             throw e;
         }
         return analysisSetType;
-    }
-
-    @Override
-    public List<AnalysisFileType> extractFromXml(String xmlStr) throws XmlException {
-        List<AnalysisFileType> analysisFileList;
-        analysisFileList = extract(getAnalysisSet(xmlStr));
-        return analysisFileList;
     }
 
 }

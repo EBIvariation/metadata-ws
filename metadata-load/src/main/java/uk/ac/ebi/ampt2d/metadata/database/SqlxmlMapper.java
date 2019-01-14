@@ -27,7 +27,7 @@ import java.sql.SQLXML;
 
 public class SqlxmlMapper implements RowMapper<SQLXML> {
 
-    private static final Logger logger = LoggerFactory.getLogger(SqlxmlMapper.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SqlxmlMapper.class);
 
     private String column;
 
@@ -41,7 +41,7 @@ public class SqlxmlMapper implements RowMapper<SQLXML> {
         try {
             sqlxml = rs.getSQLXML(column);
         } catch (SQLException ex) {
-            logger.error("Column {} at row number {} could not be fetched", column, rowNum, ex);
+            LOGGER.error("Column {} at row number {} could not be fetched", column, rowNum, ex);
             throw ex;
         }
         return sqlxml;

@@ -33,20 +33,7 @@ import java.util.stream.Collectors;
 
 public class EnaObjectCollector {
 
-    AnalysisFileTypeFromXml analysisFileTypeFromXml = new AnalysisFileTypeFromXml();
-    private static final Logger logger = LoggerFactory.getLogger(EnaObjectCollector.class);
-
-    private List<AnalysisFileType> getAnalysisFileTypeList(SQLXML sqlxml) {
-        List<AnalysisFileType> analysisFileTypeList = new ArrayList<>();
-        try {
-            analysisFileTypeList = analysisFileTypeFromXml.extractFromXml(sqlxml.getString());
-        } catch (SQLException e) {
-            logger.error("Unable to convert SQLXML Object to String: {}", sqlxml.toString(), e);
-        } catch (XmlException e) {
-            logger.error("Unable to convert XML String to AnalysisSet: {}", sqlxml.toString(), e);
-        }
-        return analysisFileTypeList;
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(EnaObjectCollector.class);
 
     public List<AnalysisFileType> getEnaAnalysisFileTypeFromDb(JdbcTemplate jdbcTemplate) {
         List<SQLXML> sqlxmlList;
@@ -57,6 +44,19 @@ public class EnaObjectCollector {
                 .map(this::getAnalysisFileTypeList)
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
+    }
+
+    private List<AnalysisFileType> getAnalysisFileTypeList(SQLXML sqlxml) {
+        List<AnalysisFileType> analysisFileTypeList = new ArrayList<>();
+        AnalysisFileTypeFromXml analysisFileTypeFromXml = new AnalysisFileTypeFromXml();
+        try {
+            analysisFileTypeList = analysisFileTypeFromXml.extractFromXml(sqlxml.getString());
+        } catch (SQLException e) {
+            LOGGER.error("Unable to convert SQLXML Object to String: {}", sqlxml.toString(), e);
+        } catch (XmlException e) {
+            LOGGER.error("Unable to convert XML String to AnalysisSet: {}", sqlxml.toString(), e);
+        }
+        return analysisFileTypeList;
     }
 
 }
