@@ -494,7 +494,7 @@ public class MetadataApplicationTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException"))
                 .andExpect(jsonPath("message").value("Invalid type of reference sequences. " +
-                        "If the reference sequence URL list is more than one, all of them should be of gene type"));
+                        "When multiple reference sequence URLs are provided, all of them should point to gene sequences"));
     }
 
     @Test
@@ -523,7 +523,7 @@ public class MetadataApplicationTest {
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException"))
                 .andExpect(jsonPath("message").value("Invalid type of reference sequences. " +
-                        "If the reference sequence URL list is more than one, all of them should be of gene type"));
+                        "When multiple reference sequence URLs are provided, all of them should point to gene sequences"));
     }
 
     private String postTestAnalysis(String accession, List<String> referenceSequenceList, String studyUrl) throws Exception {

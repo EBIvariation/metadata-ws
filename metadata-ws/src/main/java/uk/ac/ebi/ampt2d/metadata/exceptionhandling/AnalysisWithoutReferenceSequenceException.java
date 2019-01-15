@@ -22,7 +22,7 @@ public class AnalysisWithoutReferenceSequenceException extends IllegalArgumentEx
     private static final long serialVersionUID = 5740339279937775231L;
 
     public AnalysisWithoutReferenceSequenceException() {
-        super("An analysis must have at least one reference sequence");
+        super("An analysis must be mapped against one or more reference sequences");
     }
 
     public AnalysisWithoutReferenceSequenceException(String message) {

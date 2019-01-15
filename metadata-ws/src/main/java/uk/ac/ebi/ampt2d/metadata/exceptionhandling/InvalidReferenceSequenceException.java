@@ -22,7 +22,7 @@ public class InvalidReferenceSequenceException extends IllegalArgumentException 
     private static final long serialVersionUID = 7071006298434627630L;
 
     public InvalidReferenceSequenceException() {
-        super("At least one of the reference sequence URL is invalid");
+        super("At least one of the reference sequence URLs is invalid");
     }
 
     public InvalidReferenceSequenceException(String message) {

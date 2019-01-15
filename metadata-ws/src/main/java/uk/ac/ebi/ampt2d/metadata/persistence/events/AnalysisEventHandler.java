@@ -47,12 +47,11 @@ public class AnalysisEventHandler {
             throw new AnalysisWithoutReferenceSequenceException();
         } else if (analysis.getReferenceSequences().contains(null)) {
             throw new InvalidReferenceSequenceException();
-        } else if (analysis.getReferenceSequences().size() >= 2) {
-            boolean invalidRefSeq = analysis.getReferenceSequences().stream().anyMatch(r -> r.getType().equals(ReferenceSequence.Type.ASSEMBLY) ||
-                    r.getType().equals(ReferenceSequence.Type.TRANSCRIPTOME));
+        } else if (analysis.getReferenceSequences().size() > 1) {
+            boolean invalidRefSeq = analysis.getReferenceSequences().stream().anyMatch(r -> !r.getType().equals(ReferenceSequence.Type.GENE));
             if (invalidRefSeq) {
                 throw new InvalidReferenceSequenceException("Invalid type of reference sequences. " +
-                        "If the reference sequence URL list is more than one, all of them should be of gene type");
+                        "When multiple reference sequence URLs are provided, all of them should point to gene sequences");
             }
         }
     }
