@@ -94,4 +94,8 @@ public class ReferenceSequence extends Auditable<Long> {
         return id;
     }
 
+    public Type getType() {
+        return type;
+    }
+
 }

@@ -102,10 +102,11 @@ public class Analysis extends Auditable<Long> {
     @ManyToOne(optional = false)
     private Study study;
 
-    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to an Reference Sequence")
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", example = "[url1, url2]",
+            notes = "URL(s) to the reference sequence(s): either a single URL to an assembly/transcriptome, or a comma-separated list of gene sequences")
     @JsonProperty
-    @ManyToOne(optional = false)
-    private ReferenceSequence referenceSequence;
+    @ManyToMany
+    private List<ReferenceSequence> referenceSequences;
 
     @ApiModelProperty(position = 7, required = true)
     @NotNull
@@ -143,5 +144,8 @@ public class Analysis extends Auditable<Long> {
         return accessionVersionId;
     }
 
+    public List<ReferenceSequence> getReferenceSequences() {
+        return referenceSequences;
+    }
 
 }
