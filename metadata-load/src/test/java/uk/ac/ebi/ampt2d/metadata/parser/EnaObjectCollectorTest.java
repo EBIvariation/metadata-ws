@@ -18,21 +18,50 @@
 package uk.ac.ebi.ampt2d.metadata.parser;
 
 import org.apache.xmlbeans.XmlException;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.ResourceUtils;
+import uk.ac.ebi.ampt2d.metadata.database.SqlxmlMapper;
+import uk.ac.ebi.ampt2d.metadata.enaobject.EnaObjectCollector;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.ResultSet;
+import java.sql.SQLXML;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
-public class AnalysisFileTypeFromXmlTest {
+@RunWith(MockitoJUnitRunner.class)
+public class EnaObjectCollectorTest {
+
+    @Mock
+    JdbcTemplate jdbcTemplate;
+
+    @Mock
+    ResultSet rs;
+
+    @Mock
+    SQLXML sqlxml;
+
+    @Before
+    public void initialization() throws Exception {
+        List<SQLXML> sqlxmlList = new ArrayList<>();
+        sqlxmlList.add(sqlxml);
+        when(rs.getSQLXML(anyString())).thenReturn(sqlxml);
+        when(jdbcTemplate.query(anyString(), any(SqlxmlMapper.class))).thenReturn(sqlxmlList);
+        when(sqlxml.getString()).thenReturn(getXmlFile("classpath:ERZ000011.xml"));
+    }
 
     private String getXmlFile(String fileName) throws IOException {
         File file = ResourceUtils.getFile(fileName);
@@ -40,14 +69,13 @@ public class AnalysisFileTypeFromXmlTest {
     }
 
     @Test
-    public void testAnalysisFileParser() throws Exception {
-        String xmlStr = getXmlFile("classpath:ERZ000011.xml");
-        AnalysisFileTypeFromXml analysisFileTypeFromSet = new AnalysisFileTypeFromXml();
-        List<AnalysisFileType> analysisFileList = analysisFileTypeFromSet.extractFromXml(xmlStr);
-        assertAnalysisFileList(analysisFileList);
+    public void testGetEnaAnalysisFileTypeFromDb() {
+        EnaObjectCollector enaObjectCollector = new EnaObjectCollector();
+        List<AnalysisFileType> analysisFileTypeList = enaObjectCollector.getEnaAnalysisFileTypeFromDb(jdbcTemplate);
+        assertAnalysisFileTypeList(analysisFileTypeList);
     }
 
-    private void assertAnalysisFileList(List<AnalysisFileType> analysisFileList) {
+    private void assertAnalysisFileTypeList(List<AnalysisFileType> analysisFileList) {
         assertEquals(analysisFileList.size(), 2);
         assertEquals(analysisFileList.get(0).getFilename(), "UK10K_SCOOP5013826.vcf.gz");
         assertEquals(analysisFileList.get(0).getFiletype(), AnalysisFileType.Filetype.Enum.forInt(AnalysisFileType.Filetype.INT_VCF));
@@ -58,7 +86,6 @@ public class AnalysisFileTypeFromXmlTest {
         assertEquals(analysisFileList.get(1).getChecksum(), "15191d68bdd5c1ad23c943c3da3730c7");
         assertEquals(analysisFileList.get(1).getChecksumMethod(), AnalysisFileType.ChecksumMethod.Enum.forString("MD5"));
     }
-
 
     @Test(expected = XmlException.class)
     public void testAnalysisFileParserWrongInput() throws Exception {

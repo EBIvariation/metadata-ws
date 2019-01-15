@@ -35,11 +35,11 @@ public class AnalysisFileTypeFromXml implements TypeFromXml<AnalysisFileType, St
     @Override
     public List<AnalysisFileType> extractFromXml(String xmlStr) throws XmlException {
         List<AnalysisFileType> analysisFileList;
-        analysisFileList = extract(getAnalysisSet(xmlStr));
+        analysisFileList = extractAnalysisFilesFromAnalysis(getAnalysisSet(xmlStr));
         return analysisFileList;
     }
 
-    private List<AnalysisFileType> extract(AnalysisSetType analysisSet) {
+    private List<AnalysisFileType> extractAnalysisFilesFromAnalysis(AnalysisSetType analysisSet) {
         List<AnalysisFileType> subAnalysisFileList = new ArrayList<>();
 
         AnalysisType[] analysesType = analysisSet.getANALYSISArray();
