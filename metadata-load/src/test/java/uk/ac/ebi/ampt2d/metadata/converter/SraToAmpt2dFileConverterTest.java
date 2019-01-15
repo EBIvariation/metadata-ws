@@ -36,7 +36,7 @@ public class SraToAmpt2dFileConverterTest {
     @Test
     public void testFileConverter() {
         initializeAnalysisFileType();
-        SraToAmpt2dConverter<AnalysisFileType,File> fileTypeConverter = new FileTypeConverter();
+        SraToAmpt2dConverter<AnalysisFileType, File> fileTypeConverter = new FileTypeConverter();
         File file = fileTypeConverter.convert(analysisFileType);
         assertAnalysisFileTypeEqualsFile(analysisFileType, file);
     }

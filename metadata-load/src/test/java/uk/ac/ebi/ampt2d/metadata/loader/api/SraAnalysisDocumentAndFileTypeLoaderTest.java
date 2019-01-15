@@ -70,7 +70,7 @@ public class SraAnalysisDocumentAndFileTypeLoaderTest {
 
     @Test
     public void testAnalysisLoad() {
-        Map<String,ANALYSISDocument> listOfAnalysisType =
+        Map<String, ANALYSISDocument> listOfAnalysisType =
                 sraObjectLoaderByAccession.getSraObjects(Arrays.asList(ANALYSIS_ACCESSION));
         assertEquals(1, listOfAnalysisType.size());
 
@@ -81,7 +81,7 @@ public class SraAnalysisDocumentAndFileTypeLoaderTest {
 
     @Test
     public void testInvalidAnalysisLoad() {
-        Map<String,ANALYSISDocument> listOfAnalysisType =
+        Map<String, ANALYSISDocument> listOfAnalysisType =
                 sraObjectLoaderByAccession.getSraObjects(Arrays.asList(ANALYSIS_INVALID_ACCESSION));
         assertEquals(0, listOfAnalysisType.size());
     }
