@@ -18,6 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.parser;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -26,6 +27,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.ac.ebi.ampt2d.metadata.category.OracleDb;
 import uk.ac.ebi.ampt2d.metadata.database.DatabaseConfiguration;
 import uk.ac.ebi.ampt2d.metadata.enaobject.EnaObjectCollector;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
@@ -44,9 +46,10 @@ public class EnaObjectCollectorDbTest {
     JdbcTemplate jdbcTemplate;
 
     @Test
+    @Category(OracleDb.class)
     public void testGetEnaAnalysisFileTypeFromDb() {
         /*
-         * This test retrieves all the Analysis Files from the DB pointed with credentials in application.properties.
+         * This test retrieves all the Analysis Files from DB.
          * As the DB content prediction is not possible only size is verified having at least one element.
          * Also before running the test SQL query limited only to few rows can be utilised to minimize time.
          * Ex: Change SQL_ANALYSIS in EnaDbService.java to

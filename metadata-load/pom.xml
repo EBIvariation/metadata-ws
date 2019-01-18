@@ -78,6 +78,16 @@
 
         <profile>
             <id>Travis</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludedGroups>uk.ac.ebi.ampt2d.metadata.category.OracleDb</excludedGroups>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 
