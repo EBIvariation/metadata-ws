@@ -20,7 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.enaobject;
 import org.apache.xmlbeans.XmlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ampt2d.metadata.parser.AnalysisFileTypeFromXml;
 import uk.ac.ebi.ampt2d.metadata.service.EnaDbService;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
@@ -35,9 +35,11 @@ public class EnaObjectCollector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EnaObjectCollector.class);
 
-    public List<AnalysisFileType> getEnaAnalysisFileTypeFromDb(JdbcTemplate jdbcTemplate) {
+    @Autowired
+    EnaDbService enaDbService;
+
+    public List<AnalysisFileType> getEnaAnalysisFileTypeFromDb() {
         List<SQLXML> sqlxmlList;
-        EnaDbService enaDbService = new EnaDbService(jdbcTemplate);
         sqlxmlList = enaDbService.getEnaAnalysisXml();
 
         return sqlxmlList.stream()

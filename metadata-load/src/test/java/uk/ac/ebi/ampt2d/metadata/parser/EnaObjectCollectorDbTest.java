@@ -21,15 +21,16 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.category.OracleDb;
 import uk.ac.ebi.ampt2d.metadata.database.DatabaseConfiguration;
 import uk.ac.ebi.ampt2d.metadata.enaobject.EnaObjectCollector;
+import uk.ac.ebi.ampt2d.metadata.service.EnaDbService;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
 import java.util.List;
@@ -38,26 +39,25 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:application.properties")
-@ContextConfiguration(classes = {DatabaseConfiguration.class})
+@ContextConfiguration(classes = {DatabaseConfiguration.class, EnaDbService.class, EnaObjectCollector.class})
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 public class EnaObjectCollectorDbTest {
 
+    @Value("${queryRows}")
+    private Integer queryRows;
+
     @Autowired
-    JdbcTemplate jdbcTemplate;
+    EnaObjectCollector enaObjectCollector;
 
     @Test
     @Category(OracleDb.class)
     public void testGetEnaAnalysisFileTypeFromDb() {
         /*
-         * This test retrieves all the Analysis Files from DB.
-         * As the DB content prediction is not possible only size is verified having at least one element.
-         * Also before running the test SQL query limited only to few rows can be utilised to minimize time.
-         * Ex: Change SQL_ANALYSIS in EnaDbService.java to
-         * private static final String SQL_ANALYSIS = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS WHERE ROWNUM <= 5";
+         * This test retrieves Analysis Files from DB.
+         * As the DB content prediction is not possible only size is verified.
          */
-        EnaObjectCollector enaObjectCollect = new EnaObjectCollector();
-        List<AnalysisFileType> analysisFileTypeList = enaObjectCollect.getEnaAnalysisFileTypeFromDb(jdbcTemplate);
-        assertTrue(analysisFileTypeList.size() > 0);
+        List<AnalysisFileType> analysisFileTypeList = enaObjectCollector.getEnaAnalysisFileTypeFromDb();
+        assertTrue(analysisFileTypeList.size() >= queryRows);
     }
 
 }

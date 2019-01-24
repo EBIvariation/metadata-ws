@@ -21,46 +21,54 @@ import org.apache.xmlbeans.XmlException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.ResourceUtils;
-import uk.ac.ebi.ampt2d.metadata.database.SqlxmlMapper;
 import uk.ac.ebi.ampt2d.metadata.enaobject.EnaObjectCollector;
+import uk.ac.ebi.ampt2d.metadata.service.EnaDbService;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.sql.ResultSet;
 import java.sql.SQLXML;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
+@TestPropertySource("classpath:application.properties")
+
 public class EnaObjectCollectorTest {
 
     @Mock
-    JdbcTemplate jdbcTemplate;
-
-    @Mock
-    ResultSet rs;
+    NamedParameterJdbcTemplate jdbcTemplate;
 
     @Mock
     SQLXML sqlxml;
+
+    @Mock
+    EnaDbService enaDbService;
+
+    @InjectMocks
+    EnaObjectCollector enaObjectCollector;
 
     @Before
     public void initialization() throws Exception {
         List<SQLXML> sqlxmlList = new ArrayList<>();
         sqlxmlList.add(sqlxml);
-        when(rs.getSQLXML(anyString())).thenReturn(sqlxml);
-        when(jdbcTemplate.query(anyString(), any(SqlxmlMapper.class))).thenReturn(sqlxmlList);
         when(sqlxml.getString()).thenReturn(getXmlFile("classpath:ERZ000011.xml"));
+        when(jdbcTemplate.queryForObject(anyString(), anyMap(), eq(Long.class))).thenReturn(Long.valueOf(5));
+        when(jdbcTemplate.queryForList(anyString(), anyMap(), eq(SQLXML.class))).thenReturn(sqlxmlList);
+        when(enaDbService.getEnaAnalysisXml()).thenReturn(sqlxmlList);
     }
 
     private String getXmlFile(String fileName) throws IOException {
@@ -70,8 +78,7 @@ public class EnaObjectCollectorTest {
 
     @Test
     public void testGetEnaAnalysisFileTypeFromDb() {
-        EnaObjectCollector enaObjectCollector = new EnaObjectCollector();
-        List<AnalysisFileType> analysisFileTypeList = enaObjectCollector.getEnaAnalysisFileTypeFromDb(jdbcTemplate);
+        List<AnalysisFileType> analysisFileTypeList = enaObjectCollector.getEnaAnalysisFileTypeFromDb();
         assertAnalysisFileTypeList(analysisFileTypeList);
     }
 

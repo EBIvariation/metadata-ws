@@ -17,27 +17,39 @@
  */
 package uk.ac.ebi.ampt2d.metadata.service;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import uk.ac.ebi.ampt2d.metadata.database.SqlxmlJdbcTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLXML;
 import java.util.List;
+import java.util.Map;
 
+@Service
 public class EnaDbService {
 
-    private static final String SQL_ANALYSIS = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS";
-    private static final String COLUMN_ANALYSIS_XML = "ANALYSIS_XML";
-    private JdbcTemplate jdbcTemplate;
+    private static final String SQL_ANALYSIS = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS WHERE ROWNUM <= :rowNum";
 
-    public EnaDbService(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    @Autowired
+    private NamedParameterJdbcTemplate jdbcTemplate;
+
+    @Value("${queryRows}")
+    private Integer queryRows;
 
     public List<SQLXML> getEnaAnalysisXml() {
         List<SQLXML> sqlxmlList;
-        SqlxmlJdbcTemplate sqlxmlJdbcTemplate = new SqlxmlJdbcTemplate(jdbcTemplate,
-                SQL_ANALYSIS, COLUMN_ANALYSIS_XML);
-        sqlxmlList = sqlxmlJdbcTemplate.getSqlxmlList();
+
+        Long totalRows = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ERA.ANALYSIS", (Map)null, Long.class);
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        if (queryRows > 0) {
+            parameters.addValue("rowNum", queryRows);
+        } else {
+            parameters.addValue("rowNum", totalRows);
+        }
+        sqlxmlList = jdbcTemplate.queryForList(SQL_ANALYSIS, parameters, SQLXML.class);
+
         return sqlxmlList;
     }
 }
