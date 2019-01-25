@@ -19,7 +19,6 @@ package uk.ac.ebi.ampt2d.metadata.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -29,27 +28,15 @@ import java.util.Map;
 
 @Service
 public class EnaDbService {
-
-    private static final String SQL_ANALYSIS = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS WHERE ROWNUM <= :rowNum";
-
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    @Value("${queryRows}")
-    private Integer queryRows;
+    @Value("${queryAnalysis}")
+    private String queryAnalysis;
 
     public List<SQLXML> getEnaAnalysisXml() {
         List<SQLXML> sqlxmlList;
-
-        Long totalRows = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ERA.ANALYSIS", (Map)null, Long.class);
-        MapSqlParameterSource parameters = new MapSqlParameterSource();
-        if (queryRows > 0) {
-            parameters.addValue("rowNum", queryRows);
-        } else {
-            parameters.addValue("rowNum", totalRows);
-        }
-        sqlxmlList = jdbcTemplate.queryForList(SQL_ANALYSIS, parameters, SQLXML.class);
-
+        sqlxmlList = jdbcTemplate.queryForList(queryAnalysis, (Map)null, SQLXML.class);
         return sqlxmlList;
     }
 }

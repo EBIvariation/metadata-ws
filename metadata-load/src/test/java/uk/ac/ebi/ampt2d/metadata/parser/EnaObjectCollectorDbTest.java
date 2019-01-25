@@ -21,7 +21,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
@@ -43,9 +42,6 @@ import static org.junit.Assert.assertTrue;
 @EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 public class EnaObjectCollectorDbTest {
 
-    @Value("${queryRows}")
-    private Integer queryRows;
-
     @Autowired
     EnaObjectCollector enaObjectCollector;
 
@@ -57,7 +53,7 @@ public class EnaObjectCollectorDbTest {
          * As the DB content prediction is not possible only size is verified.
          */
         List<AnalysisFileType> analysisFileTypeList = enaObjectCollector.getEnaAnalysisFileTypeFromDb();
-        assertTrue(analysisFileTypeList.size() >= queryRows);
+        assertTrue(analysisFileTypeList.size() > 0);
     }
 
 }
