@@ -46,7 +46,6 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 @TestPropertySource("classpath:application.properties")
-
 public class EnaObjectCollectorTest {
 
     @Mock
