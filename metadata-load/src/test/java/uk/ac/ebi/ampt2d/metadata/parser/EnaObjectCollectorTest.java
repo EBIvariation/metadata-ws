@@ -50,16 +50,16 @@ import static org.mockito.Mockito.when;
 public class EnaObjectCollectorTest {
 
     @Mock
-    NamedParameterJdbcTemplate jdbcTemplate;
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Mock
-    SQLXML sqlxml;
+    private SQLXML sqlxml;
 
     @Mock
-    EnaDbService enaDbService;
+    private EnaDbService enaDbService;
 
     @InjectMocks
-    EnaObjectCollector enaObjectCollector;
+    private EnaObjectCollector enaObjectCollector;
 
     @Before
     public void initialization() throws Exception {

@@ -43,7 +43,7 @@ import static org.junit.Assert.assertTrue;
 public class EnaObjectCollectorDbTest {
 
     @Autowired
-    EnaObjectCollector enaObjectCollector;
+    private EnaObjectCollector enaObjectCollector;
 
     @Test
     @Category(OracleDb.class)

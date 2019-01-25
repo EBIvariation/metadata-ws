@@ -31,12 +31,12 @@ public class EnaDbService {
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    @Value("${queryAnalysis}")
-    private String queryAnalysis;
+    @Value("${ena.analysis.query}")
+    private String enaAnalysisQuery;
 
     public List<SQLXML> getEnaAnalysisXml() {
         List<SQLXML> sqlxmlList;
-        sqlxmlList = jdbcTemplate.queryForList(queryAnalysis, (Map)null, SQLXML.class);
+        sqlxmlList = jdbcTemplate.queryForList(enaAnalysisQuery, (Map)null, SQLXML.class);
         return sqlxmlList;
     }
 }
