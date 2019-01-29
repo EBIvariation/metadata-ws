@@ -23,6 +23,7 @@ import uk.ac.ebi.ena.sra.xml.ANALYSISDocument;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,22 +44,22 @@ public class SraAnalysisDocumentLoader implements SraObjectLoaderByAccession<ANA
     }
 
     @Override
-    public Map<String, ANALYSISDocument> getSraObjects(List<String> accessionIds) {
-        return accessionIds.stream()
-                .map(accessionId -> parseAnalysisType(restTemplate.exchange(ENA_API_URL,
-                        HttpMethod.GET, null, String.class, accessionId).getBody(), accessionId))
-                .filter(analysisDocument -> analysisDocument != null)
+    public Map<String, ANALYSISDocument> getSraObjects(List<String> accessions) {
+        return accessions.stream()
+                .map(accession -> parseAnalysisType(restTemplate.exchange(ENA_API_URL,
+                        HttpMethod.GET, null, String.class, accession).getBody(), accession))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toMap(analysisDocument -> analysisDocument.getANALYSIS().getAccession(),
                         Function.identity()));
     }
 
-    private ANALYSISDocument parseAnalysisType(String xmlString, String accessionId) {
+    private ANALYSISDocument parseAnalysisType(String xmlString, String accession) {
         ANALYSISDocument analysisDocument = null;
         xmlString = removeRootTagsFromXmlString(xmlString);
         try {
             analysisDocument = ANALYSISDocument.Factory.parse(xmlString);
         } catch (Exception exception) {
-            SRA_ANALYSIS_LOGGER.log(Level.SEVERE, "Parse exception for accession " + accessionId);
+            SRA_ANALYSIS_LOGGER.log(Level.SEVERE, "Parse exception for accession " + accession);
             exception.printStackTrace();
         }
         return analysisDocument;

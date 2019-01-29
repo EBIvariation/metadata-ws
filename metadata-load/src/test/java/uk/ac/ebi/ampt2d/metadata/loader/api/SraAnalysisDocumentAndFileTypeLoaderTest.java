@@ -70,49 +70,49 @@ public class SraAnalysisDocumentAndFileTypeLoaderTest {
 
     @Test
     public void testAnalysisLoad() {
-        Map<String, ANALYSISDocument> listOfAnalysisType =
+        Map<String, ANALYSISDocument> accessionsToAnalyses =
                 sraObjectLoaderByAccession.getSraObjects(Arrays.asList(ANALYSIS_ACCESSION));
-        assertEquals(1, listOfAnalysisType.size());
+        assertEquals(1, accessionsToAnalyses.size());
 
-        ANALYSISDocument analysisDocument = listOfAnalysisType.get(ANALYSIS_ACCESSION);
+        ANALYSISDocument analysisDocument = accessionsToAnalyses.get(ANALYSIS_ACCESSION);
         assertEquals(ANALYSIS_ACCESSION, analysisDocument.getANALYSIS().getAccession());
         assertEquals("ERP107353", analysisDocument.getANALYSIS().getSTUDYREF().getAccession());
     }
 
     @Test
     public void testInvalidAnalysisLoad() {
-        Map<String, ANALYSISDocument> listOfAnalysisType =
+        Map<String, ANALYSISDocument> accessionsToAnalyses =
                 sraObjectLoaderByAccession.getSraObjects(Arrays.asList(ANALYSIS_INVALID_ACCESSION));
-        assertEquals(0, listOfAnalysisType.size());
+        assertEquals(0, accessionsToAnalyses.size());
     }
 
     @Test
     public void testAnalysisFileTypeLoad() {
-        Map<String, List<AnalysisFileType>> mapOfAnalysisToAnalysisFileTypes =
+        Map<String, List<AnalysisFileType>> analysisAccessionToFiles =
                 sraObjectLoaderFromAnalysisDocument.getSraObjectsFromAnalysisDocument(Arrays.asList(ANALYSIS_ACCESSION));
-        assertEquals(1, mapOfAnalysisToAnalysisFileTypes.size());
+        assertEquals(1, analysisAccessionToFiles.size());
 
-        List<AnalysisFileType> analysisFileTypes = mapOfAnalysisToAnalysisFileTypes.get(ANALYSIS_ACCESSION);
+        List<AnalysisFileType> analysisFiles = analysisAccessionToFiles.get(ANALYSIS_ACCESSION);
 
-        assertTrue(analysisFileTypes != null);
-        assertEquals(2, analysisFileTypes.size());
+        assertTrue(analysisFiles != null);
+        assertEquals(2, analysisFiles.size());
 
-        AnalysisFileType analysisFileType1 = analysisFileTypes.get(0);
-        assertEquals("ERZ496/ERZ496533/Bailey_ACAN_306.vcf.gz.tbi", analysisFileType1.getFilename());
-        assertEquals("59c8ff847a438c8e91288fda1610206d", analysisFileType1.getChecksum());
-        assertEquals(AnalysisFileType.Filetype.TABIX, analysisFileType1.getFiletype());
+        AnalysisFileType analysisFile1 = analysisFiles.get(0);
+        assertEquals("ERZ496/ERZ496533/Bailey_ACAN_306.vcf.gz.tbi", analysisFile1.getFilename());
+        assertEquals("59c8ff847a438c8e91288fda1610206d", analysisFile1.getChecksum());
+        assertEquals(AnalysisFileType.Filetype.TABIX, analysisFile1.getFiletype());
 
-        AnalysisFileType analysisFileType2 = analysisFileTypes.get(1);
-        assertEquals("ERZ496/ERZ496533/Bailey_ACAN_306.vcf.gz", analysisFileType2.getFilename());
-        assertEquals("e83207c712242079577aa07566e5e32d", analysisFileType2.getChecksum());
-        assertEquals(AnalysisFileType.Filetype.VCF, analysisFileType2.getFiletype());
+        AnalysisFileType analysisFile2 = analysisFiles.get(1);
+        assertEquals("ERZ496/ERZ496533/Bailey_ACAN_306.vcf.gz", analysisFile2.getFilename());
+        assertEquals("e83207c712242079577aa07566e5e32d", analysisFile2.getChecksum());
+        assertEquals(AnalysisFileType.Filetype.VCF, analysisFile2.getFiletype());
     }
 
     @Test
     public void testInvalidAnalysisLoadForFiles() {
-        Map<String, List<AnalysisFileType>> mapOfAnalysisToAnlaysisFileTypes =
+        Map<String, List<AnalysisFileType>> analysisAccessionToFiles =
                 sraObjectLoaderFromAnalysisDocument.getSraObjectsFromAnalysisDocument(Arrays.asList(ANALYSIS_INVALID_ACCESSION));
-        assertEquals(0, mapOfAnalysisToAnlaysisFileTypes.size());
+        assertEquals(0, analysisAccessionToFiles.size());
     }
 
 }

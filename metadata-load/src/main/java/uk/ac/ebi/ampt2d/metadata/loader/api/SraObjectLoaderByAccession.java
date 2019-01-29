@@ -25,7 +25,7 @@ public interface SraObjectLoaderByAccession<SRA_OBJECT> {
     String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
     String XML_ROOT_TAGS = "(</ROOT>|<ROOT.*display=xml\">)";
 
-    Map<String, SRA_OBJECT> getSraObjects(List<String> accessionIds);
+    Map<String, SRA_OBJECT> getSraObjects(List<String> accessions);
 
     default String removeRootTagsFromXmlString(String xmlString) {
         return (xmlString != null) ? xmlString.replaceAll(XML_ROOT_TAGS, "") : xmlString;

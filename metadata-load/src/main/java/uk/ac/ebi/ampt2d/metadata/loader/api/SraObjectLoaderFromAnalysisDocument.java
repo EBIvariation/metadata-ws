@@ -30,5 +30,5 @@ public abstract class SraObjectLoaderFromAnalysisDocument<SRA_OBJECT> {
         this.sraAnalysisDocumentLoader = sraAnalysisDocumentLoader;
     }
 
-    public abstract Map<String, List<SRA_OBJECT>> getSraObjectsFromAnalysisDocument(List<String> analysisAccessionIds);
+    public abstract Map<String, List<SRA_OBJECT>> getSraObjectsFromAnalysisDocument(List<String> analysisAccessions);
 }

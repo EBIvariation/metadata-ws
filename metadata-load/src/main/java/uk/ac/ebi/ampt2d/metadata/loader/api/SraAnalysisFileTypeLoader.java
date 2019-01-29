@@ -32,16 +32,16 @@ public class SraAnalysisFileTypeLoader extends SraObjectLoaderFromAnalysisDocume
     }
 
     @Override
-    public Map<String, List<AnalysisFileType>> getSraObjectsFromAnalysisDocument(List<String> analysisAccessionIds) {
-        Map<String, ANALYSISDocument> analysisDocumentMap =
-                sraAnalysisDocumentLoader.getSraObjects(analysisAccessionIds);
-        Map<String, List<AnalysisFileType>> analysisFiles = new HashMap<>();
-        for (String analysisAccessionKeys : analysisDocumentMap.keySet()) {
-            ANALYSISDocument analysisDocument = analysisDocumentMap.get(analysisAccessionKeys);
-            analysisFiles.put(analysisDocument.getANALYSIS().getAccession(),
+    public Map<String, List<AnalysisFileType>> getSraObjectsFromAnalysisDocument(List<String> analysisAccessions) {
+        Map<String, ANALYSISDocument> accessionsToAnalyses =
+                sraAnalysisDocumentLoader.getSraObjects(analysisAccessions);
+        Map<String, List<AnalysisFileType>> analysisAccessionsToFiles = new HashMap<>();
+        for (String accession : accessionsToAnalyses.keySet()) {
+            ANALYSISDocument analysisDocument = accessionsToAnalyses.get(accession);
+            analysisAccessionsToFiles.put(analysisDocument.getANALYSIS().getAccession(),
                     Arrays.asList(analysisDocument.getANALYSIS().getFILES().getFILEArray()));
         }
-        return analysisFiles;
+        return analysisAccessionsToFiles;
     }
 
 }
