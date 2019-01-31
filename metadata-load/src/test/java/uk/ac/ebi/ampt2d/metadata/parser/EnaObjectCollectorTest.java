@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -67,7 +68,7 @@ public class EnaObjectCollectorTest {
         when(sqlxml.getString()).thenReturn(getXmlFile("classpath:ERZ000011.xml"));
         when(jdbcTemplate.queryForObject(anyString(), anyMap(), eq(Long.class))).thenReturn(Long.valueOf(5));
         when(jdbcTemplate.queryForList(anyString(), anyMap(), eq(SQLXML.class))).thenReturn(sqlxmlList);
-        when(enaDbService.getEnaAnalysisXml()).thenReturn(sqlxmlList);
+        when(enaDbService.getEnaAnalysisXml(anyLong(), anyLong())).thenReturn(sqlxmlList);
     }
 
     private String getXmlFile(String fileName) throws IOException {
@@ -77,6 +78,7 @@ public class EnaObjectCollectorTest {
 
     @Test
     public void testGetEnaAnalysisFileTypeFromDb() {
+        enaObjectCollector.initialize();
         List<AnalysisFileType> analysisFileTypeList = enaObjectCollector.getEnaAnalysisFileTypeFromDb();
         assertAnalysisFileTypeList(analysisFileTypeList);
     }

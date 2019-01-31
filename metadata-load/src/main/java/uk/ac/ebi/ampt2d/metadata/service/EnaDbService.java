@@ -19,12 +19,12 @@ package uk.ac.ebi.ampt2d.metadata.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLXML;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class EnaDbService {
@@ -34,9 +34,12 @@ public class EnaDbService {
     @Value("${ena.analysis.query}")
     private String enaAnalysisQuery;
 
-    public List<SQLXML> getEnaAnalysisXml() {
+    public List<SQLXML> getEnaAnalysisXml(long rowFrom, long rowTo) {
         List<SQLXML> sqlxmlList;
-        sqlxmlList = jdbcTemplate.queryForList(enaAnalysisQuery, (Map)null, SQLXML.class);
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValue("rowFrom", rowFrom);
+        parameters.addValue("rowTo", rowTo);
+        sqlxmlList = jdbcTemplate.queryForList(enaAnalysisQuery, parameters, SQLXML.class);
         return sqlxmlList;
     }
 }
