@@ -83,15 +83,17 @@ public class EnaObjectCollectorTest {
     }
 
     private void assertAnalysisFileTypeList(List<AnalysisFileType> analysisFileList) {
-        assertEquals(analysisFileList.size(), 2);
-        assertEquals(analysisFileList.get(0).getFilename(), "UK10K_SCOOP5013826.vcf.gz");
-        assertEquals(analysisFileList.get(0).getFiletype(), AnalysisFileType.Filetype.Enum.forInt(AnalysisFileType.Filetype.INT_VCF));
-        assertEquals(analysisFileList.get(0).getChecksum(), "980aad09354c5bc984e23d2f74efdf3b");
-        assertEquals(analysisFileList.get(0).getChecksumMethod(), AnalysisFileType.ChecksumMethod.Enum.forString("MD5"));
-        assertEquals(analysisFileList.get(1).getFilename(), "ERZ000/ERZ000001/do131_Input_liver_none_mmuC57BL65_CRI01.sra.sorted.bam");
-        assertEquals(analysisFileList.get(1).getFiletype(), AnalysisFileType.Filetype.Enum.forInt(AnalysisFileType.Filetype.INT_BAM));
-        assertEquals(analysisFileList.get(1).getChecksum(), "15191d68bdd5c1ad23c943c3da3730c7");
-        assertEquals(analysisFileList.get(1).getChecksumMethod(), AnalysisFileType.ChecksumMethod.Enum.forString("MD5"));
+        assertEquals(2, analysisFileList.size());
+        AnalysisFileType analysisFileType = analysisFileList.get(0);
+        assertEquals("UK10K_SCOOP5013826.vcf.gz", analysisFileType.getFilename());
+        assertEquals(AnalysisFileType.Filetype.Enum.forInt(AnalysisFileType.Filetype.INT_VCF), analysisFileType.getFiletype());
+        assertEquals("980aad09354c5bc984e23d2f74efdf3b", analysisFileType.getChecksum());
+        assertEquals(AnalysisFileType.ChecksumMethod.Enum.forString("MD5"), analysisFileType.getChecksumMethod());
+        analysisFileType = analysisFileList.get(1);
+        assertEquals("ERZ000/ERZ000001/do131_Input_liver_none_mmuC57BL65_CRI01.sra.sorted.bam", analysisFileType.getFilename());
+        assertEquals(AnalysisFileType.Filetype.Enum.forInt(AnalysisFileType.Filetype.INT_BAM), analysisFileType.getFiletype());
+        assertEquals("15191d68bdd5c1ad23c943c3da3730c7", analysisFileType.getChecksum());
+        assertEquals(AnalysisFileType.ChecksumMethod.Enum.forString("MD5"), analysisFileType.getChecksumMethod());
     }
 
     @Test(expected = XmlException.class)

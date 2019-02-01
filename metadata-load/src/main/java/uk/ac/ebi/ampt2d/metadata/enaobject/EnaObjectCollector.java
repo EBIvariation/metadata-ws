@@ -36,16 +36,16 @@ public class EnaObjectCollector {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnaObjectCollector.class);
 
     @Autowired
-    EnaDbService enaDbService;
+    private EnaDbService enaDbService;
 
     public List<AnalysisFileType> getEnaAnalysisFileTypeFromDb(int pageNumber, int pageSize) {
-        if (pageNumber <= 0 || pageSize <= 0) {
-            throw new IllegalArgumentException("Invalid Page number and/or Page size");
+        if (pageNumber < 0 || pageSize <= 0) {
+            throw new IllegalArgumentException("Invalid page number and/or page size");
         }
 
         List<SQLXML> sqlxmlList;
         List<AnalysisFileType> analysisFileTypeList;
-        long rowFrom = ((pageNumber - 1) * pageSize) + 1;
+        long rowFrom = (pageNumber * pageSize) + 1;
         long rowTo = rowFrom + pageSize - 1;
 
         sqlxmlList = enaDbService.getEnaAnalysisXml(rowFrom, rowTo);
