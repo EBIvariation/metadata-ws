@@ -42,12 +42,10 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.25</version>
         </dependency>
     </dependencies>
 
@@ -83,7 +81,7 @@
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <excludedGroups>uk.ac.ebi.ampt2d.metadata.category.OracleDb</excludedGroups>
+                            <excludedGroups>uk.ac.ebi.ampt2d.metadata.configuration.categories.OracleDb</excludedGroups>
                         </configuration>
                     </plugin>
                 </plugins>

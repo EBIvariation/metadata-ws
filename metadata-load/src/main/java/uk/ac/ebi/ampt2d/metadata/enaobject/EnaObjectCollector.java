@@ -21,7 +21,6 @@ import org.apache.xmlbeans.XmlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import uk.ac.ebi.ampt2d.metadata.parser.AnalysisFileTypeFromXml;
 import uk.ac.ebi.ampt2d.metadata.service.EnaDbService;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
@@ -36,52 +35,25 @@ public class EnaObjectCollector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EnaObjectCollector.class);
 
-    @Value("${ena.analysis.query.pageFrom}")
-    private long pageFrom;
-
-    @Value("${ena.analysis.query.pageSize}")
-    private long pageSize;
-
-    @Value("${ena.analysis.query.totalPages}")
-    private long totalPages;
-
     @Autowired
     EnaDbService enaDbService;
 
-    public void initialize() {
-        pageFrom = pageSize = totalPages = 1;
-    }
+    public List<AnalysisFileType> getEnaAnalysisFileTypeFromDb(int pageNumber, int pageSize) {
+        if (pageNumber <= 0 || pageSize <= 0) {
+            throw new IllegalArgumentException("Invalid Page number and/or Page size");
+        }
 
-    public List<AnalysisFileType> getEnaAnalysisFileTypeFromDb() {
         List<SQLXML> sqlxmlList;
-        List<AnalysisFileType> subList;
-        List<AnalysisFileType> analysisFileTypeList = new ArrayList<>();
-        long rowFrom = ((pageFrom - 1) * pageSize) + 1;
+        List<AnalysisFileType> analysisFileTypeList;
+        long rowFrom = ((pageNumber - 1) * pageSize) + 1;
         long rowTo = rowFrom + pageSize - 1;
-        long count = 0;
 
-        // To get all records
-        if (totalPages < 0) {
-            totalPages = Long.MAX_VALUE;
-        }
+        sqlxmlList = enaDbService.getEnaAnalysisXml(rowFrom, rowTo);
+        analysisFileTypeList = sqlxmlList.stream()
+                .map(this::getAnalysisFileTypeList)
+                .flatMap(List::stream)
+                .collect(Collectors.toList());
 
-        while (count < totalPages) {
-            sqlxmlList = enaDbService.getEnaAnalysisXml(rowFrom, rowTo);
-            subList = sqlxmlList.stream()
-                    .map(this::getAnalysisFileTypeList)
-                    .flatMap(List::stream)
-                    .collect(Collectors.toList());
-            analysisFileTypeList.addAll(subList);
-
-            // No more records in DB
-            if (sqlxmlList.size() < pageSize) {
-                break;
-            }
-
-            count++;
-            rowFrom = rowTo + 1;
-            rowTo = rowFrom + pageSize - 1;
-        }
         return analysisFileTypeList;
     }
 

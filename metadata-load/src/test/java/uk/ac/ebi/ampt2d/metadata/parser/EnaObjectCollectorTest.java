@@ -78,8 +78,7 @@ public class EnaObjectCollectorTest {
 
     @Test
     public void testGetEnaAnalysisFileTypeFromDb() {
-        enaObjectCollector.initialize();
-        List<AnalysisFileType> analysisFileTypeList = enaObjectCollector.getEnaAnalysisFileTypeFromDb();
+        List<AnalysisFileType> analysisFileTypeList = enaObjectCollector.getEnaAnalysisFileTypeFromDb(1, 2);
         assertAnalysisFileTypeList(analysisFileTypeList);
     }
 
@@ -106,4 +105,14 @@ public class EnaObjectCollectorTest {
         analysisFileTypeFromSet.extractFromXml(xmlStr);
     }
 
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetEnaAnalysisFileTypeFromDbInvalidPageNumber() {
+        enaObjectCollector.getEnaAnalysisFileTypeFromDb(-1, 10);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetEnaAnalysisFileTypeFromDbInvalidPageSize() {
+        enaObjectCollector.getEnaAnalysisFileTypeFromDb(1, 0);
+    }
 }

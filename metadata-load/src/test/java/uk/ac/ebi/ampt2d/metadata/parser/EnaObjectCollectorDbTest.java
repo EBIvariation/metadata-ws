@@ -26,7 +26,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.ac.ebi.ampt2d.metadata.category.OracleDb;
+import uk.ac.ebi.ampt2d.metadata.configuration.categories.OracleDb;
 import uk.ac.ebi.ampt2d.metadata.database.DatabaseConfiguration;
 import uk.ac.ebi.ampt2d.metadata.enaobject.EnaObjectCollector;
 import uk.ac.ebi.ampt2d.metadata.service.EnaDbService;
@@ -52,8 +52,8 @@ public class EnaObjectCollectorDbTest {
          * This test retrieves Analysis Files from DB.
          * As the DB content prediction is not possible only size is verified.
          */
-        List<AnalysisFileType> analysisFileTypeList = enaObjectCollector.getEnaAnalysisFileTypeFromDb();
-        assertTrue(analysisFileTypeList.size() > 0);
+        List<AnalysisFileType> analysisFileTypeList = enaObjectCollector.getEnaAnalysisFileTypeFromDb(1, 10);
+        assertTrue(analysisFileTypeList.size() >= 10);
     }
 
 }

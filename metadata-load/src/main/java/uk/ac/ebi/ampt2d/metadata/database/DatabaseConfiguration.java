@@ -36,7 +36,7 @@ public class DatabaseConfiguration {
     }
 
     @Bean ("db_datasource")
-    @ConfigurationProperties("ena.datasource.db.hikari")
+    @ConfigurationProperties("ena.datasource.db.tomcat")
     public DataSource dbDataSource() {
         return dbDataSourceProperties().initializeDataSourceBuilder().build();
     }

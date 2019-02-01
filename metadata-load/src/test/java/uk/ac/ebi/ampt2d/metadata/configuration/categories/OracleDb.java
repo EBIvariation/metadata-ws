@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.category;
+package uk.ac.ebi.ampt2d.metadata.configuration.categories;
 
 public interface OracleDb {
 
