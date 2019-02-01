@@ -24,7 +24,8 @@ pipeline {
   stages {
     stage('Default Build pointing to Staging DB') {
       steps {
-        sh "mvn clean package -DskipTests -DbuildDirectory=staging/target -Dmetadata-dbUrl=${stagingPostgresDbUrl} \
+        sh "mvn clean package -DskipTests -pl metadata-ws -DbuildDirectory=staging/target \
+        -Dmetadata-dbUrl=${stagingPostgresDbUrl} \
         -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword} \
         -Dmetadata-ddlBehaviour=${ddlBehaviour}"
       }
@@ -37,11 +38,12 @@ pipeline {
       }
       steps {
         echo 'Build pointing to FallBack DB'
-        sh "mvn clean package -DskipTests -DbuildDirectory=fallback/target -Dmetadata-dbUrl=${fallBackPostgresDbUrl} \
+        sh "mvn clean package -DskipTests -pl metadata-ws -DbuildDirectory=fallback/target \
+        -Dmetadata-dbUrl=${fallBackPostgresDbUrl} \
          -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword}  \
         -Dmetadata-ddlBehaviour=validate"
         echo 'Build pointing to Production DB'
-        sh "mvn clean package -DskipTests -DbuildDirectory=production/target \
+        sh "mvn clean package -DskipTests -pl metadata-ws -DbuildDirectory=production/target \
         -Dmetadata-dbUrl=${productionPostgresDbUrl} -Dmetadata-dbUsername=${postgresDBUserName} \
         -Dmetadata-dbPassword=${postgresDBPassword} -Dmetadata-ddlBehaviour=validate"
       }
@@ -54,7 +56,7 @@ pipeline {
       }
       steps {
         echo 'Deploying to Staging'
-        sh "curl --upload-file staging/target/metadata-ws-*.war \
+        sh "curl --upload-file metadata-ws/staging/target/metadata-ws-*.war \
         'http://'${tomcatCredentials}'@'${stagingHost}':8080/manager/text/deploy?path=/dev/metadata&update=true' | \
         grep 'OK - Deployed application at context path '"
       }
@@ -67,14 +69,14 @@ pipeline {
       }
       steps {
         echo 'Deploying to Fallback'
-        sh "curl --upload-file fallback/target/metadata-ws-*.war \
+        sh "curl --upload-file metadata-ws/fallback/target/metadata-ws-*.war \
         'http://'${tomcatCredentials}'@'${fallbackHost}':8080/manager/text/deploy?path=/metadata&update=true' \
         | grep 'OK - Deployed application at context path '"
         echo 'Deploying to Production'
-        sh "curl --upload-file production/target/metadata-ws-*.war \
+        sh "curl --upload-file metadata-ws/production/target/metadata-ws-*.war \
         'http://'${tomcatCredentials}'@'${productionHost}':8080/manager/text/deploy?path=/metadata&update=true' \
         | grep 'OK - Deployed application at context path '"
-        archiveArtifacts artifacts: 'production/target/metadata-ws-*.war' , fingerprint: true
+        archiveArtifacts artifacts: 'metadata-ws/production/target/metadata-ws-*.war' , fingerprint: true
       }
     }
   }

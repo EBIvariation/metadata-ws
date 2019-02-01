@@ -60,7 +60,7 @@ public class File extends Auditable<Long> {
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
-    @Column(nullable = false)
+    @Column(nullable = false,unique = true)
     private String hash;
 
     @ApiModelProperty(position = 4, required = true)
