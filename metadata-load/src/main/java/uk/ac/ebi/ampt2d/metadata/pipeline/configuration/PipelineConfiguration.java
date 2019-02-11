@@ -24,13 +24,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.client.RestTemplate;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.pipeline.converter.FileTypeConverter;
 import uk.ac.ebi.ampt2d.metadata.pipeline.converter.SraToAmpt2dConverter;
+import uk.ac.ebi.ampt2d.metadata.pipeline.importer.SraObjectExtractorFromAnalysis;
+import uk.ac.ebi.ampt2d.metadata.pipeline.importer.SraObjectImporter;
 import uk.ac.ebi.ampt2d.metadata.pipeline.importer.api.SraAnalysisDocumentImportFromAPI;
 import uk.ac.ebi.ampt2d.metadata.pipeline.importer.api.SraAnalysisFileExtractFromAnalysisDocument;
-import uk.ac.ebi.ampt2d.metadata.pipeline.importer.SraObjectImporter;
-import uk.ac.ebi.ampt2d.metadata.pipeline.importer.SraObjectExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ena.sra.xml.ANALYSISDocument;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
@@ -44,8 +44,8 @@ public class PipelineConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(name = "import.source",havingValue = "API")
-    public SraObjectExtractorFromAnalysis<AnalysisFileType,ANALYSISDocument> sraObjectLoaderFromAnalysisDocument() {
+    @ConditionalOnProperty(name = "import.source", havingValue = "API")
+    public SraObjectExtractorFromAnalysis<AnalysisFileType, ANALYSISDocument> sraObjectLoaderFromAnalysisDocument() {
         return new SraAnalysisFileExtractFromAnalysisDocument(sraObjectLoaderByAccession());
     }
 

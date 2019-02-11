@@ -39,12 +39,14 @@ import uk.ac.ebi.ampt2d.metadata.pipeline.configuration.PipelineConfiguration;
 @EnableAutoConfiguration(exclude = {JpaRepositoriesAutoConfiguration.class})
 public class FilePersistenceServiceTest {
 
+    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 4;
+
     @Autowired
     private FileRepository fileRepository;
 
     private SpringApplication springApplication = new SpringApplication(PipelineMainApplication.class);
 
-    private String[] applicationArguments = new String[4];
+    private String[] applicationArguments = new String[NUMBER_OF_APPLICATION_ARGUMENTS];
 
     @Before
     public void beforeEachMethod() {

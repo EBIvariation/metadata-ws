@@ -29,8 +29,6 @@ import uk.ac.ebi.ampt2d.metadata.pipeline.converter.SraToAmpt2dConverter;
 import uk.ac.ebi.ampt2d.metadata.pipeline.importer.SraObjectExtractorFromAnalysis;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -98,16 +96,8 @@ public class FilePersistenceService implements ApplicationRunner {
         List<String> analysisAccessionsFilePath = arguments.getOptionValues(ANALYSIS_ACCESSION_FILE_PATH);
         List<String> analysisAccessions = new ArrayList<>();
         if (analysisAccessionsFilePath != null) {
-            try {
-                analysisAccessions = Arrays.asList(new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
-                        .getResource(analysisAccessionsFilePath.get(0)).toURI()))).split("\n"));
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw e;
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-                throw e;
-            }
+            analysisAccessions = Arrays.asList(new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
+                    .getResource(analysisAccessionsFilePath.get(0)).toURI()))).split("\n"));
         }
 
         return analysisAccessions;
