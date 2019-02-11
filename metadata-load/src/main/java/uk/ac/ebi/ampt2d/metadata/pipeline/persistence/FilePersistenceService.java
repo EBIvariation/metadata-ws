@@ -59,12 +59,12 @@ public class FilePersistenceService implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
         List<String> analysisAccessions = readAccessionsFromFile(arguments);
-        Map<String, List<AnalysisFileType>> analysisAccessionToFiles = getSraObjectsFromAnalysisDocument(analysisAccessions);
+        Map<String, List<AnalysisFileType>> analysisAccessionToFiles = getSraObjectsFromAnalysis(analysisAccessions);
         List<File> files = convertAnalysisFilesToMetadataFiles(analysisAccessionToFiles);
         persistFilesToDatabase(files);
     }
 
-    private Map<String, List<AnalysisFileType>> getSraObjectsFromAnalysisDocument(List<String> accessions) {
+    private Map<String, List<AnalysisFileType>> getSraObjectsFromAnalysis(List<String> accessions) {
         FILE_PERSIST_SERVICE_LOGGER.log(Level.INFO,
                 "Fetching files from analysis.AnalysisAccessionsCount: " + accessions.size());
         return sraObjectExtractorFromAnalysis.getSraObjectsFromAnalysis(accessions);
