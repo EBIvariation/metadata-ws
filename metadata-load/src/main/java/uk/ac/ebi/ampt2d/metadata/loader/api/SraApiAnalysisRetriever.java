@@ -17,18 +17,24 @@
  */
 package uk.ac.ebi.ampt2d.metadata.loader.api;
 
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestTemplate;
+import uk.ac.ebi.ampt2d.metadata.loader.SraRetrieverByAccession;
 import uk.ac.ebi.ena.sra.xml.ANALYSISDocument;
 
-import java.util.List;
-import java.util.Map;
+public class SraApiAnalysisRetriever implements SraRetrieverByAccession<ANALYSISDocument> {
 
-public abstract class SraObjectLoaderFromAnalysisDocument<SRA_OBJECT> {
+    private static final String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
 
-    protected SraObjectLoaderByAccession<ANALYSISDocument> sraAnalysisDocumentLoader;
+    private RestTemplate restTemplate;
 
-    public SraObjectLoaderFromAnalysisDocument(SraObjectLoaderByAccession sraAnalysisDocumentLoader) {
-        this.sraAnalysisDocumentLoader = sraAnalysisDocumentLoader;
+    public SraApiAnalysisRetriever(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
-    public abstract Map<String, List<SRA_OBJECT>> getSraObjectsFromAnalysisDocument(List<String> analysisAccessions);
+    @Override
+    public String getXml(String accession) {
+        return restTemplate.exchange(ENA_API_URL, HttpMethod.GET, null, String.class, accession).getBody();
+    }
+
 }

@@ -15,21 +15,21 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.converter;
+package uk.ac.ebi.ampt2d.metadata.loader.core.converter;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
+import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SraToAmpt2dFileConverterTest {
+public class FileConverterTest {
 
     @Mock
     private AnalysisFileType analysisFileType;
@@ -37,7 +37,7 @@ public class SraToAmpt2dFileConverterTest {
     @Test
     public void testFileConverter() {
         initializeAnalysisFileType();
-        File file = new FileTypeConverter().convert(analysisFileType);
+        File file = new FileConverter().convert(analysisFileType);
         assertAnalysisFileTypeEqualsFile(analysisFileType, file);
     }
 
