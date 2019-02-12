@@ -18,7 +18,6 @@
 package uk.ac.ebi.ampt2d.metadata.loader.core.xml;
 
 import org.apache.xmlbeans.XmlException;
-import uk.ac.ebi.ampt2d.metadata.loader.api.SraApiAnalysisRetriever;
 import uk.ac.ebi.ena.sra.xml.ANALYSISDocument;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
@@ -27,7 +26,7 @@ import java.util.logging.Logger;
 
 public class SraAnalysisXmlParser extends SraXmlParser<AnalysisType> {
 
-    private static final Logger LOGGER = Logger.getLogger(SraApiAnalysisRetriever.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SraAnalysisXmlParser.class.getName());
 
     @Override
     public AnalysisType parseXml(String xmlString, String accession) throws XmlException {
