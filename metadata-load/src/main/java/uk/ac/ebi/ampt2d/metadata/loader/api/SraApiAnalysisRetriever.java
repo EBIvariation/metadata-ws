@@ -17,17 +17,23 @@
  */
 package uk.ac.ebi.ampt2d.metadata.loader.api;
 
-import java.util.List;
-import java.util.Map;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestTemplate;
+import uk.ac.ebi.ampt2d.metadata.loader.SraRetrieverByAccession;
 
-public interface SraObjectLoaderByAccession<SRA_OBJECT> {
+public class SraApiAnalysisRetriever implements SraRetrieverByAccession {
 
-    String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
-    String XML_ROOT_TAGS = "(</ROOT>|<ROOT.*display=xml\">)";
+    private static final String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
 
-    Map<String, SRA_OBJECT> getSraObjects(List<String> accessions);
+    private RestTemplate restTemplate;
 
-    default String removeRootTagsFromXmlString(String xmlString) {
-        return (xmlString != null) ? xmlString.replaceAll(XML_ROOT_TAGS, "") : xmlString;
+    public SraApiAnalysisRetriever(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
+
+    @Override
+    public String getXml(String accession) {
+        return restTemplate.exchange(ENA_API_URL, HttpMethod.GET, null, String.class, accession).getBody();
+    }
+
 }

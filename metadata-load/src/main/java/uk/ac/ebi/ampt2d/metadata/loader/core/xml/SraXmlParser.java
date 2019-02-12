@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2018 EMBL - European Bioinformatics Institute
+ * Copyright 2019 EMBL - European Bioinformatics Institute
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,18 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.converter;
+package uk.ac.ebi.ampt2d.metadata.loader.core.xml;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import org.apache.xmlbeans.XmlException;
 
-public interface SraToAmpt2dConverter<SOURCE, DESTINATION> {
+public abstract class SraXmlParser<SRA_OBJECT> {
 
-    DESTINATION convert(SOURCE source);
+    String XML_ROOT_TAGS = "(</ROOT>|<ROOT.*display=xml\">)";
 
-    default List<DESTINATION> convertModels(List<SOURCE> sources) {
-        return sources.stream().map(source -> convert(source)).collect(Collectors.toList());
+    public abstract SRA_OBJECT parseXml(String xmlString, String accession) throws XmlException;
+
+    protected String removeRootTagsFromXmlString(String xmlString) {
+        return (xmlString != null) ? xmlString.replaceAll(XML_ROOT_TAGS, "") : xmlString;
     }
+
 }

@@ -15,20 +15,10 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader.api;
+package uk.ac.ebi.ampt2d.metadata.loader;
 
-import uk.ac.ebi.ena.sra.xml.ANALYSISDocument;
+public interface SraRetrieverByAccession {
 
-import java.util.List;
-import java.util.Map;
+    String getXml(String accession);
 
-public abstract class SraObjectLoaderFromAnalysisDocument<SRA_OBJECT> {
-
-    protected SraObjectLoaderByAccession<ANALYSISDocument> sraAnalysisDocumentLoader;
-
-    public SraObjectLoaderFromAnalysisDocument(SraObjectLoaderByAccession sraAnalysisDocumentLoader) {
-        this.sraAnalysisDocumentLoader = sraAnalysisDocumentLoader;
-    }
-
-    public abstract Map<String, List<SRA_OBJECT>> getSraObjectsFromAnalysisDocument(List<String> analysisAccessions);
 }
