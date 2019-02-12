@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
@@ -36,8 +37,7 @@ public class SraToAmpt2dFileConverterTest {
     @Test
     public void testFileConverter() {
         initializeAnalysisFileType();
-        SraToAmpt2dConverter<AnalysisFileType, File> fileTypeConverter = new FileTypeConverter();
-        File file = fileTypeConverter.convert(analysisFileType);
+        File file = new FileTypeConverter().convert(analysisFileType);
         assertAnalysisFileTypeEqualsFile(analysisFileType, file);
     }
 

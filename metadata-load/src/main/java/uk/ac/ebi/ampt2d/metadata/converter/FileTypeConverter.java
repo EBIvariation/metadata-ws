@@ -17,10 +17,11 @@
  */
 package uk.ac.ebi.ampt2d.metadata.converter;
 
+import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 
-public class FileTypeConverter implements SraToAmpt2dConverter<AnalysisFileType, File> {
+public class FileTypeConverter implements Converter<AnalysisFileType, File> {
 
     @Override
     public File convert(AnalysisFileType analysisFileType) {
