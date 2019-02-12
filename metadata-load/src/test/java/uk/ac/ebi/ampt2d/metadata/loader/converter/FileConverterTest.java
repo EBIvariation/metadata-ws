@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader.core.converter;
+package uk.ac.ebi.ampt2d.metadata.loader.converter;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +23,6 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
-import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
