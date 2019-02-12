@@ -17,13 +17,8 @@
  */
 package uk.ac.ebi.ampt2d.metadata.loader;
 
-import java.util.List;
-import java.util.Map;
-
-public interface SraRetrieverByAccession<SRA_OBJECT> {
+public interface SraRetrieverByAccession {
 
     String getXml(String accession);
-
-    //Map<String, SRA_OBJECT> getSraObjects(List<String> accessions);
 
 }
