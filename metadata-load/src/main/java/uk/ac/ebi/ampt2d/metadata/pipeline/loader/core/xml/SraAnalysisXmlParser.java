@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader.xml;
+package uk.ac.ebi.ampt2d.metadata.pipeline.loader.core.xml;
 
 import org.apache.xmlbeans.XmlException;
 import uk.ac.ebi.ena.sra.xml.ANALYSISDocument;
@@ -30,8 +30,7 @@ public class SraAnalysisXmlParser extends SraXmlParser<AnalysisType> {
 
     @Override
     public AnalysisType parseXml(String xmlString, String accession) throws XmlException {
-        xmlString = removeRootTagsFromXmlString(xmlString); // For API calls
-        xmlString = removeSetTagsFromXmlString(xmlString); // For database queries
+        xmlString = removeRootTagsFromXmlString(xmlString);
         try {
             return ANALYSISDocument.Factory.parse(xmlString).getANALYSIS();
         } catch (XmlException e) {

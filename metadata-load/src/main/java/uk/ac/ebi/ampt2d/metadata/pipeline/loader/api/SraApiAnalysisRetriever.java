@@ -15,11 +15,11 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader.api;
+package uk.ac.ebi.ampt2d.metadata.pipeline.loader.api;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
-import uk.ac.ebi.ampt2d.metadata.loader.SraRetrieverByAccession;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.SraRetrieverByAccession;
 
 public class SraApiAnalysisRetriever implements SraRetrieverByAccession {
 

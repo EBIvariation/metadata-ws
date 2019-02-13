@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader.converter;
+package uk.ac.ebi.ampt2d.metadata.pipeline.loader.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;

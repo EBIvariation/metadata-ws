@@ -15,14 +15,23 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.pipeline.importer;
 
+package uk.ac.ebi.ampt2d.metadata.pipeline.extractor;
+
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.converter.FileConverter;
+import uk.ac.ebi.ena.sra.xml.AnalysisType;
+
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
-public interface SraObjectImporter<SRA_OBJECT> {
+public class FileExtractorFromAnalysis {
 
-    Map<String, SRA_OBJECT> getSraObjects();
+    private FileConverter fileConverter = new FileConverter();
 
-    Map<String, SRA_OBJECT> getSraObjects(List<String> accessions);
+    public List<File> getFilesOfAnalysis(AnalysisType analysis) {
+        return Arrays.asList(analysis.getFILES().getFILEArray()).stream().map(analysisFileType -> fileConverter.convert
+                (analysisFileType)).collect(Collectors.toList());
+    }
 }

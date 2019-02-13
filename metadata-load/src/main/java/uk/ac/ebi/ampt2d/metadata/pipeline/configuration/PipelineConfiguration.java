@@ -24,15 +24,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.client.RestTemplate;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
-import uk.ac.ebi.ampt2d.metadata.pipeline.converter.FileTypeConverter;
-import uk.ac.ebi.ampt2d.metadata.pipeline.converter.SraToAmpt2dConverter;
-import uk.ac.ebi.ampt2d.metadata.pipeline.importer.SraObjectExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.pipeline.importer.SraObjectImporter;
-import uk.ac.ebi.ampt2d.metadata.pipeline.importer.api.SraAnalysisDocumentImportFromAPI;
-import uk.ac.ebi.ampt2d.metadata.pipeline.importer.api.SraAnalysisFileExtractFromAnalysisDocument;
-import uk.ac.ebi.ena.sra.xml.ANALYSISDocument;
-import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.SraRetrieverByAccession;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.api.SraApiAnalysisRetriever;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.core.xml.SraAnalysisXmlParser;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.core.xml.SraXmlParser;
+import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 @Configuration
 @EntityScan(basePackages = "uk.ac.ebi.ampt2d.metadata.persistence.entities")
@@ -45,17 +41,13 @@ public class PipelineConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "API")
-    public SraObjectExtractorFromAnalysis<AnalysisFileType, ANALYSISDocument> sraObjectLoaderFromAnalysisDocument() {
-        return new SraAnalysisFileExtractFromAnalysisDocument(sraObjectLoaderByAccession());
+    public SraRetrieverByAccession sraRetrieverByAccession() {
+        return new SraApiAnalysisRetriever(restTemplate());
     }
 
     @Bean
-    public SraObjectImporter<ANALYSISDocument> sraObjectLoaderByAccession() {
-        return new SraAnalysisDocumentImportFromAPI(restTemplate());
-    }
-
-    @Bean
-    public SraToAmpt2dConverter<AnalysisFileType, File> fileSraToAmpt2dConverter() {
-        return new FileTypeConverter();
+    @ConditionalOnProperty(name = "import.source", havingValue = "API")
+    public SraXmlParser<AnalysisType> sraXmlParser() {
+        return new SraAnalysisXmlParser();
     }
 }

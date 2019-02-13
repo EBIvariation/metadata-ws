@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader;
+package uk.ac.ebi.ampt2d.metadata.pipeline.loader;
 
 public interface SraRetrieverByAccession {
 
