@@ -28,6 +28,7 @@ import java.util.List;
 
 @Service
 public class EnaDbService {
+
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 

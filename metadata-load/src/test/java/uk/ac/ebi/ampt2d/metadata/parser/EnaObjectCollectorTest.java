@@ -46,7 +46,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-@TestPropertySource("classpath:application.properties")
 public class EnaObjectCollectorTest {
 
     @Mock
@@ -84,11 +83,13 @@ public class EnaObjectCollectorTest {
 
     private void assertAnalysisFileTypeList(List<AnalysisFileType> analysisFileList) {
         assertEquals(2, analysisFileList.size());
+
         AnalysisFileType analysisFileType = analysisFileList.get(0);
         assertEquals("UK10K_SCOOP5013826.vcf.gz", analysisFileType.getFilename());
         assertEquals(AnalysisFileType.Filetype.Enum.forInt(AnalysisFileType.Filetype.INT_VCF), analysisFileType.getFiletype());
         assertEquals("980aad09354c5bc984e23d2f74efdf3b", analysisFileType.getChecksum());
         assertEquals(AnalysisFileType.ChecksumMethod.Enum.forString("MD5"), analysisFileType.getChecksumMethod());
+
         analysisFileType = analysisFileList.get(1);
         assertEquals("ERZ000/ERZ000001/do131_Input_liver_none_mmuC57BL65_CRI01.sra.sorted.bam", analysisFileType.getFilename());
         assertEquals(AnalysisFileType.Filetype.Enum.forInt(AnalysisFileType.Filetype.INT_BAM), analysisFileType.getFiletype());

@@ -30,13 +30,13 @@ import javax.sql.DataSource;
 public class DatabaseConfiguration {
 
     @Bean ("db_datasource_properties")
-    @ConfigurationProperties("ena.datasource.db")
+    @ConfigurationProperties("ena.datasource")
     public DataSourceProperties dbDataSourceProperties() {
         return new DataSourceProperties();
     }
 
     @Bean ("db_datasource")
-    @ConfigurationProperties("ena.datasource.db.tomcat")
+    @ConfigurationProperties("ena.datasource.tomcat")
     public DataSource dbDataSource() {
         return dbDataSourceProperties().initializeDataSourceBuilder().build();
     }
