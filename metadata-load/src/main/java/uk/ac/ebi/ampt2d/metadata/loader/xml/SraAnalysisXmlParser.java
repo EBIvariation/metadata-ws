@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader.core.xml;
+package uk.ac.ebi.ampt2d.metadata.loader.xml;
 
 import org.apache.xmlbeans.XmlException;
 import uk.ac.ebi.ena.sra.xml.ANALYSISDocument;
@@ -28,15 +28,23 @@ public class SraAnalysisXmlParser extends SraXmlParser<AnalysisType> {
 
     private static final Logger LOGGER = Logger.getLogger(SraAnalysisXmlParser.class.getName());
 
+    private final String XML_SET_TAGS = "(<ANALYSIS_SET>|</ANALYSIS_SET>)";
+
     @Override
     public AnalysisType parseXml(String xmlString, String accession) throws XmlException {
-        xmlString = removeRootTagsFromXmlString(xmlString);
+        xmlString = removeRootTagsFromXmlString(xmlString); // For API calls
+        xmlString = removeSetTagsFromXmlString(xmlString); // For database queries
         try {
             return ANALYSISDocument.Factory.parse(xmlString).getANALYSIS();
         } catch (XmlException e) {
             LOGGER.log(Level.SEVERE, "An error occurred while parsing XML for accession " + accession);
             throw e;
         }
+    }
+
+    @Override
+    protected String removeSetTagsFromXmlString(String xmlString) {
+        return (xmlString != null) ? xmlString.replaceAll(XML_SET_TAGS, "") : xmlString;
     }
 
 }

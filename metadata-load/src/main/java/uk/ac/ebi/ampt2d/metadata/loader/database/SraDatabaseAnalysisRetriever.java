@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2018 EMBL - European Bioinformatics Institute
+ * Copyright 2019 EMBL - European Bioinformatics Institute
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,40 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.service;
+package uk.ac.ebi.ampt2d.metadata.loader.database;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
+import uk.ac.ebi.ampt2d.metadata.loader.SraRetrieverByAccession;
 
+import java.sql.SQLException;
 import java.sql.SQLXML;
-import java.util.List;
 
 @Service
-public class EnaDbService {
+public class SraDatabaseAnalysisRetriever implements SraRetrieverByAccession {
 
-    @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Value("${ena.analysis.query}")
     private String enaAnalysisQuery;
 
-    public List<SQLXML> getEnaAnalysisXml(long rowFrom, long rowTo) {
-        List<SQLXML> sqlxmlList;
+    @Autowired
+    public SraDatabaseAnalysisRetriever(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public String getXml(String accession) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
-        parameters.addValue("rowFrom", rowFrom);
-        parameters.addValue("rowTo", rowTo);
-        sqlxmlList = jdbcTemplate.queryForList(enaAnalysisQuery, parameters, SQLXML.class);
-        return sqlxmlList;
+        parameters.addValue("accession", accession);
+        SQLXML sqlxml = jdbcTemplate.queryForObject(enaAnalysisQuery, parameters, SQLXML.class);
+        try {
+            return sqlxml.getString();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -81,7 +81,7 @@
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <excludedGroups>uk.ac.ebi.ampt2d.metadata.configuration.categories.OracleDb</excludedGroups>
+                            <excludedGroups>uk.ac.ebi.ampt2d.metadata.loader.database.OracleDbCategory</excludedGroups>
                         </configuration>
                     </plugin>
                 </plugins>

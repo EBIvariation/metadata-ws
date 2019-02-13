@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2018 EMBL - European Bioinformatics Institute
+ * Copyright 2019 EMBL - European Bioinformatics Institute
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.parser;
+package uk.ac.ebi.ampt2d.metadata.loader.database;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -26,34 +26,33 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.ac.ebi.ampt2d.metadata.configuration.categories.OracleDb;
-import uk.ac.ebi.ampt2d.metadata.database.DatabaseConfiguration;
-import uk.ac.ebi.ampt2d.metadata.enaobject.EnaObjectCollector;
-import uk.ac.ebi.ampt2d.metadata.service.EnaDbService;
-import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
+import uk.ac.ebi.ampt2d.metadata.configuration.DatabaseConfiguration;
 
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource("classpath:application.properties")
-@ContextConfiguration(classes = {DatabaseConfiguration.class, EnaDbService.class, EnaObjectCollector.class})
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
-public class EnaObjectCollectorDbTest {
+@ContextConfiguration(classes = {DatabaseConfiguration.class})
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
+public class SraDatabaseAnalysisRetrieverTest {
 
     @Autowired
-    private EnaObjectCollector enaObjectCollector;
+    private SraDatabaseAnalysisRetriever sraRetriever;
 
     @Test
-    @Category(OracleDb.class)
-    public void testGetEnaAnalysisFileTypeFromDb() {
-        /*
-         * This test retrieves Analysis Files from DB.
-         * As the DB content prediction is not possible only size is verified.
-         */
-        List<AnalysisFileType> analysisFileTypeList = enaObjectCollector.getEnaAnalysisFileTypeFromDb(1, 10);
-        assertTrue(analysisFileTypeList.size() >= 10);
+    @Category(OracleDbCategory.class)
+    public void getXml() throws Exception {
+        String analysisAccession = "ERZ496533";
+        String analysisDocumentPath = "AnalysisDocumentDatabase.xml";
+
+        String xmlString = sraRetriever.getXml(analysisAccession);
+        String expectedXmlString = new String(Files.readAllBytes(
+                Paths.get(getClass().getClassLoader().getResource(analysisDocumentPath).toURI())));
+
+        assertEquals(expectedXmlString, xmlString);
     }
 
 }

@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2018 EMBL - European Bioinformatics Institute
+ * Copyright 2019 EMBL - European Bioinformatics Institute
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,20 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.parser;
+package uk.ac.ebi.ampt2d.metadata.loader.xml;
 
 import org.apache.xmlbeans.XmlException;
 
-import java.util.List;
+public abstract class SraXmlParser<SRA_OBJECT> {
 
-public interface TypeFromXml<ELEMENT, XML> {
+    private final String XML_ROOT_TAGS = "(</ROOT>|<ROOT.*display=xml\">)";
 
-    List<ELEMENT> extractFromXml(XML str) throws XmlException;
+    public abstract SRA_OBJECT parseXml(String xmlString, String accession) throws XmlException;
+
+    protected abstract String removeSetTagsFromXmlString(String xmlString);
+
+    protected String removeRootTagsFromXmlString(String xmlString) {
+        return (xmlString != null) ? xmlString.replaceAll(XML_ROOT_TAGS, "") : xmlString;
+    }
+
 }

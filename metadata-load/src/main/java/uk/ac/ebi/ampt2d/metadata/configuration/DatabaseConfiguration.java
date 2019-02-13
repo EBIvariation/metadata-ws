@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.database;
+package uk.ac.ebi.ampt2d.metadata.configuration;
 
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,19 +23,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import uk.ac.ebi.ampt2d.metadata.loader.database.SraDatabaseAnalysisRetriever;
 
 import javax.sql.DataSource;
 
 @Configuration
 public class DatabaseConfiguration {
 
-    @Bean ("db_datasource_properties")
+    @Bean("db_datasource_properties")
     @ConfigurationProperties("ena.datasource")
     public DataSourceProperties dbDataSourceProperties() {
         return new DataSourceProperties();
     }
 
-    @Bean ("db_datasource")
+    @Bean("db_datasource")
     @ConfigurationProperties("ena.datasource.tomcat")
     public DataSource dbDataSource() {
         return dbDataSourceProperties().initializeDataSourceBuilder().build();
@@ -47,8 +48,12 @@ public class DatabaseConfiguration {
     }
 
     @Bean("ena_jdbc_template")
-    public NamedParameterJdbcTemplate EnaJdbcTemplate() {
+    public NamedParameterJdbcTemplate enaJdbcTemplate() {
         return new NamedParameterJdbcTemplate(dbDataSource());
     }
 
+    @Bean
+    public SraDatabaseAnalysisRetriever sraRetriever() {
+        return new SraDatabaseAnalysisRetriever(enaJdbcTemplate());
+    }
 }
