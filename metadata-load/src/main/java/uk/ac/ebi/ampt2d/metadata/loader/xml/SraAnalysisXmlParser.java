@@ -28,8 +28,6 @@ public class SraAnalysisXmlParser extends SraXmlParser<AnalysisType> {
 
     private static final Logger LOGGER = Logger.getLogger(SraAnalysisXmlParser.class.getName());
 
-    private final String XML_SET_TAGS = "(<ANALYSIS_SET>|</ANALYSIS_SET>)";
-
     @Override
     public AnalysisType parseXml(String xmlString, String accession) throws XmlException {
         xmlString = removeRootTagsFromXmlString(xmlString); // For API calls
@@ -40,11 +38,6 @@ public class SraAnalysisXmlParser extends SraXmlParser<AnalysisType> {
             LOGGER.log(Level.SEVERE, "An error occurred while parsing XML for accession " + accession);
             throw e;
         }
-    }
-
-    @Override
-    protected String removeSetTagsFromXmlString(String xmlString) {
-        return (xmlString != null) ? xmlString.replaceAll(XML_SET_TAGS, "") : xmlString;
     }
 
 }

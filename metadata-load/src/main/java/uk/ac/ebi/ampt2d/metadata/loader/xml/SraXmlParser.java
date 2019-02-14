@@ -23,12 +23,16 @@ public abstract class SraXmlParser<SRA_OBJECT> {
 
     private final String XML_ROOT_TAGS = "(</ROOT>|<ROOT.*display=xml\">)";
 
-    public abstract SRA_OBJECT parseXml(String xmlString, String accession) throws XmlException;
+    private final String XML_SET_TAGS = "(<[A-Z]+_SET>|</[A-Z]+_SET>|<DATASETS>|</DATASETS>)";
 
-    protected abstract String removeSetTagsFromXmlString(String xmlString);
+    public abstract SRA_OBJECT parseXml(String xmlString, String accession) throws XmlException;
 
     protected String removeRootTagsFromXmlString(String xmlString) {
         return (xmlString != null) ? xmlString.replaceAll(XML_ROOT_TAGS, "") : xmlString;
+    }
+
+    protected String removeSetTagsFromXmlString(String xmlString) {
+        return (xmlString != null) ? xmlString.replaceAll(XML_SET_TAGS, "") : xmlString;
     }
 
 }
