@@ -53,7 +53,7 @@ public class DatabaseConfiguration {
     }
 
     @Bean
-    public SraDatabaseAnalysisRetriever sraRetriever() {
+    public SraDatabaseAnalysisRetriever sraDatabaseAnalysisRetriever() {
         return new SraDatabaseAnalysisRetriever(enaJdbcTemplate());
     }
 }

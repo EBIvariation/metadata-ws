@@ -21,13 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Service;
 import uk.ac.ebi.ampt2d.metadata.loader.SraRetrieverByAccession;
 
 import java.sql.SQLException;
 import java.sql.SQLXML;
 
-@Service
 public class SraDatabaseAnalysisRetriever implements SraRetrieverByAccession {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
