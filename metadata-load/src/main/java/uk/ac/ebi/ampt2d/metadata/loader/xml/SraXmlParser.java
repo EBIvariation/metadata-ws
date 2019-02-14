@@ -15,18 +15,24 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader.core.xml;
+package uk.ac.ebi.ampt2d.metadata.loader.xml;
 
 import org.apache.xmlbeans.XmlException;
 
 public abstract class SraXmlParser<SRA_OBJECT> {
 
-    String XML_ROOT_TAGS = "(</ROOT>|<ROOT.*display=xml\">)";
+    private final String XML_ROOT_TAGS = "(</ROOT>|<ROOT.*display=xml\">)";
+
+    private final String XML_SET_TAGS = "(<[A-Z]+_SET>|</[A-Z]+_SET>|<DATASETS>|</DATASETS>)";
 
     public abstract SRA_OBJECT parseXml(String xmlString, String accession) throws XmlException;
 
     protected String removeRootTagsFromXmlString(String xmlString) {
         return (xmlString != null) ? xmlString.replaceAll(XML_ROOT_TAGS, "") : xmlString;
+    }
+
+    protected String removeSetTagsFromXmlString(String xmlString) {
+        return (xmlString != null) ? xmlString.replaceAll(XML_SET_TAGS, "") : xmlString;
     }
 
 }
