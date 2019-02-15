@@ -23,28 +23,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
-import uk.ac.ebi.ampt2d.metadata.pipeline.PipelineMainApplication;
-import uk.ac.ebi.ampt2d.metadata.pipeline.configuration.PipelineConfiguration;
+import uk.ac.ebi.ampt2d.metadata.pipeline.MetadataPipelineMainApplication;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = PipelineConfiguration.class)
-@EnableAutoConfiguration(exclude = {JpaRepositoriesAutoConfiguration.class})
-public class FilePersistenceServiceTest {
+public class FilePersistenceServiceSourceAPITest {
 
-    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 4;
+    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 3;
 
-    @Autowired
     private FileRepository fileRepository;
 
-    private SpringApplication springApplication = new SpringApplication(PipelineMainApplication.class);
+    private SpringApplication springApplication = new SpringApplication(MetadataPipelineMainApplication.class);
 
     private String[] applicationArguments = new String[NUMBER_OF_APPLICATION_ARGUMENTS];
 
@@ -53,17 +45,17 @@ public class FilePersistenceServiceTest {
         applicationArguments[0] = "--analysisAccession.file.path=analysisAccessions.txt";
         applicationArguments[1] = "--import.object=files";
         applicationArguments[2] = "--import.source=API";
-        applicationArguments[3] = "--spring.jpa.hibernate.ddl-auto=create";
     }
 
     @Test
     public void testRun() throws Exception {
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
+        fileRepository = getFileRepository(configurableApplicationContext);
         Assert.assertEquals(4, fileRepository.count());
         configurableApplicationContext.close();
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test(expected = RuntimeException.class)
     public void testInvalidFilePath() throws Exception {
         applicationArguments[0] = "--analysisAccession.file.path=InvalidFilePath/analysisAccessions.txt";
         springApplication.run(applicationArguments);
@@ -73,6 +65,7 @@ public class FilePersistenceServiceTest {
     public void testWithNoFileProvided() throws Exception {
         applicationArguments[0] = "";
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
+        fileRepository = getFileRepository(configurableApplicationContext);
         Assert.assertEquals(0, fileRepository.count());
         configurableApplicationContext.close();
     }
@@ -87,19 +80,22 @@ public class FilePersistenceServiceTest {
     public void testWithInvalidAndValidAnalysisAccession() throws Exception {
         applicationArguments[0] = "--analysisAccession.file.path=InvalidAndValidAnalysisAccession.txt";
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
+        fileRepository = getFileRepository(configurableApplicationContext);
         Assert.assertEquals(2, fileRepository.count());
         configurableApplicationContext.close();
     }
 
     @Test
     public void testWithDuplicateFiles() throws Exception {
+        applicationArguments[0] = "--analysisAccession.file.path=duplicateAnalysisAccessions.txt";
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
-        Assert.assertEquals(4, fileRepository.count());
+        fileRepository = getFileRepository(configurableApplicationContext);
+        Assert.assertEquals(2, fileRepository.count());
         configurableApplicationContext.close();
-        applicationArguments[3] = "--spring.jpa.hibernate.ddl-auto=none";
-        configurableApplicationContext = springApplication.run(applicationArguments);
-        Assert.assertEquals(4, fileRepository.count());
-        configurableApplicationContext.close();
+    }
 
+    private FileRepository getFileRepository(ConfigurableApplicationContext configurableApplicationContext) {
+        return (FileRepository) configurableApplicationContext.getBeanFactory().getBean
+                ("fileRepository");
     }
 }

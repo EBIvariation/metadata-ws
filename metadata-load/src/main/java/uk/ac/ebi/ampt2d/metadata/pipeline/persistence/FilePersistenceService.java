@@ -18,17 +18,11 @@
 
 package uk.ac.ebi.ampt2d.metadata.pipeline.persistence;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Service;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
-import uk.ac.ebi.ampt2d.metadata.pipeline.extractor.FileExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.SraRetrieverByAccession;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.core.xml.SraXmlParser;
-import uk.ac.ebi.ena.sra.xml.AnalysisType;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor.FileExtractorFromAnalysis;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -38,27 +32,25 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@Service
-@ConditionalOnProperty(name = "import.object", havingValue = "files")
 public class FilePersistenceService implements ApplicationRunner {
 
     public static final String ANALYSIS_ACCESSION_FILE_PATH = "analysisAccession.file.path";
 
     private static final Logger FILE_PERSIST_SERVICE_LOGGER = Logger.getLogger(FilePersistenceService.class.getName());
 
-    @Autowired
+    private FileExtractorFromAnalysis fileExtractorFromAnalysis;
+
     private FileRepository fileRepository;
 
-    @Autowired
-    private SraRetrieverByAccession sraRetrieverByAccession;
-
-    @Autowired
-    private SraXmlParser<AnalysisType> sraXmlParser;
+    public FilePersistenceService(FileExtractorFromAnalysis fileExtractorFromAnalysis, FileRepository fileRepository) {
+        this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
+        this.fileRepository = fileRepository;
+    }
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
         List<String> analysisAccessions = readAccessionsFromFile(arguments);
-        List<File> files = extractFilesFromAnalysis(analysisAccessions);
+        List<File> files = fileExtractorFromAnalysis.extractFilesFromAnalysis(analysisAccessions);
         persistFilesToDatabase(files);
     }
 
@@ -66,27 +58,16 @@ public class FilePersistenceService implements ApplicationRunner {
         List<String> analysisAccessionsFilePath = arguments.getOptionValues(ANALYSIS_ACCESSION_FILE_PATH);
         List<String> analysisAccessions = new ArrayList<>();
         if (analysisAccessionsFilePath != null) {
-            analysisAccessions = Arrays.asList(new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
-                    .getResource(analysisAccessionsFilePath.get(0)).toURI()))).split("\n"));
+            try {
+                analysisAccessions = Arrays.asList(new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
+                        .getResource(analysisAccessionsFilePath.get(0)).toURI()))).split("\n"));
+            } catch (Exception e) {
+                FILE_PERSIST_SERVICE_LOGGER.log(Level.INFO, "Provided file path is invalid");
+                throw new RuntimeException("Provided file path is invalid/file does not exists");
+            }
         }
 
         return analysisAccessions;
-    }
-
-    private List<File> extractFilesFromAnalysis(List<String> analysisAccessions) {
-        FileExtractorFromAnalysis fileExtractorFromAnalysis = new FileExtractorFromAnalysis();
-        List<File> files = new ArrayList<>();
-        for (String analysisAccession : analysisAccessions) {
-            try {
-                String analysisXml = sraRetrieverByAccession.getXml(analysisAccession);
-                AnalysisType analysisType = sraXmlParser.parseXml(analysisXml, analysisAccession);
-                files.addAll(fileExtractorFromAnalysis.getFilesOfAnalysis(analysisType));
-            } catch (Exception exception) {
-                FILE_PERSIST_SERVICE_LOGGER.log(Level.INFO, "Encountered Exception for analysis "
-                        + analysisAccession + exception.getMessage());
-            }
-        }
-        return files;
     }
 
     private void persistFilesToDatabase(List<File> files) {
@@ -96,8 +77,10 @@ public class FilePersistenceService implements ApplicationRunner {
             try {
                 fileRepository.save(file);
                 savedFileCount++;
-            } catch (Exception e) {
-                FILE_PERSIST_SERVICE_LOGGER.log(Level.INFO, "Duplicate File" + file.getHash());
+            } catch (Exception exception) {
+                FILE_PERSIST_SERVICE_LOGGER.log(Level.INFO, "Encountered Exception while persisting file : " +
+                        file.getHash());
+                FILE_PERSIST_SERVICE_LOGGER.log(Level.INFO, exception.getMessage());
             }
         }
         FILE_PERSIST_SERVICE_LOGGER.log(Level.INFO, "Successfully Persisted Files count : " + savedFileCount);

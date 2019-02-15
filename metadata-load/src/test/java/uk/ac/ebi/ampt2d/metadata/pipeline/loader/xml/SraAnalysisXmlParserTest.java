@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.pipeline.loader.core.xml;
+package uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml;
 
 import org.apache.xmlbeans.XmlException;
 import org.junit.Before;
@@ -39,9 +39,9 @@ public class SraAnalysisXmlParserTest {
     }
 
     @Test
-    public void parseXml() throws XmlException, URISyntaxException, IOException {
+    public void parseXmlApi() throws XmlException, URISyntaxException, IOException {
         String analysisAccession = "ERZ496533";
-        String analysisDocumentPath = "AnalysisDocument.xml";
+        String analysisDocumentPath = "AnalysisDocumentApi.xml";
         String xmlString = new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(analysisDocumentPath).toURI())));
 
@@ -49,6 +49,20 @@ public class SraAnalysisXmlParserTest {
         assertEquals("DNA sequencing ACAN", analysis.getTITLE());
         assertEquals("GCA_000002305.1",
                             analysis.getANALYSISTYPE().getSEQUENCEVARIATION().getASSEMBLY().getSTANDARD().getAccession());
+        assertEquals(2, analysis.getFILES().sizeOfFILEArray());
+    }
+
+    @Test
+    public void parseXmlDatabase() throws XmlException, URISyntaxException, IOException {
+        String analysisAccession = "ERZ496533";
+        String analysisDocumentPath = "AnalysisDocumentDatabase.xml";
+        String xmlString = new String(Files.readAllBytes(
+                Paths.get(getClass().getClassLoader().getResource(analysisDocumentPath).toURI())));
+
+        AnalysisType analysis = xmlParser.parseXml(xmlString, analysisAccession);
+        assertEquals("DNA sequencing ACAN", analysis.getTITLE());
+        assertEquals("GCA_000002305.1",
+                     analysis.getANALYSISTYPE().getSEQUENCEVARIATION().getASSEMBLY().getSTANDARD().getAccession());
         assertEquals(2, analysis.getFILES().sizeOfFILEArray());
     }
 

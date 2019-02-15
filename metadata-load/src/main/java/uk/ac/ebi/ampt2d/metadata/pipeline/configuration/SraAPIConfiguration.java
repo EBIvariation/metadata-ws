@@ -19,35 +19,22 @@
 package uk.ac.ebi.ampt2d.metadata.pipeline.configuration;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.ampt2d.metadata.pipeline.loader.SraRetrieverByAccession;
 import uk.ac.ebi.ampt2d.metadata.pipeline.loader.api.SraApiAnalysisRetriever;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.core.xml.SraAnalysisXmlParser;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.core.xml.SraXmlParser;
-import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 @Configuration
-@EntityScan(basePackages = "uk.ac.ebi.ampt2d.metadata.persistence.entities")
-@EnableJpaRepositories(basePackages = "uk.ac.ebi.ampt2d.metadata.persistence.repositories")
-public class PipelineConfiguration {
+@ConditionalOnProperty(name = "import.source", havingValue = "API")
+public class SraAPIConfiguration {
 
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
 
     @Bean
-    @ConditionalOnProperty(name = "import.source", havingValue = "API")
-    public SraRetrieverByAccession sraRetrieverByAccession() {
+    public SraRetrieverByAccession sraRetrieverByAccessionFromAPI() {
         return new SraApiAnalysisRetriever(restTemplate());
-    }
-
-    @Bean
-    @ConditionalOnProperty(name = "import.source", havingValue = "API")
-    public SraXmlParser<AnalysisType> sraXmlParser() {
-        return new SraAnalysisXmlParser();
     }
 }

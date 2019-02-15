@@ -15,18 +15,17 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.pipeline.loader.core.xml;
 
-import org.apache.xmlbeans.XmlException;
+package uk.ac.ebi.ampt2d.metadata.pipeline;
 
-public abstract class SraXmlParser<SRA_OBJECT> {
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-    String XML_ROOT_TAGS = "(</ROOT>|<ROOT.*display=xml\">)";
+@SpringBootApplication
+public class MetadataPipelineMainApplication {
 
-    public abstract SRA_OBJECT parseXml(String xmlString, String accession) throws XmlException;
-
-    protected String removeRootTagsFromXmlString(String xmlString) {
-        return (xmlString != null) ? xmlString.replaceAll(XML_ROOT_TAGS, "") : xmlString;
+    public static void main(String[] args) throws Exception {
+        SpringApplication.run(MetadataPipelineMainApplication.class, args);
+        System.exit(0);
     }
-
 }

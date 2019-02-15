@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2019 EMBL - European Bioinformatics Institute
+ * Copyright 2018 EMBL - European Bioinformatics Institute
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,8 @@
  * limitations under the License.
  *
  */
+package uk.ac.ebi.ampt2d.metadata.pipeline.loader.database;
 
-package uk.ac.ebi.ampt2d.metadata.pipeline;
+public interface OracleDbCategory {
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class PipelineMainApplication {
-
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(PipelineMainApplication.class, args);
-        System.exit(0);
-    }
 }
