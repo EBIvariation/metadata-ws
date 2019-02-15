@@ -15,6 +15,12 @@
     <name>metadata</name>
     <url>http://github.com/EBIvariation/metadata-ws</url>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.10.RELEASE</version>
+    </parent>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -36,10 +42,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.10.RELEASE</version>
-    </parent>
 </project>
