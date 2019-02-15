@@ -78,7 +78,7 @@ public class FilePersistenceServiceSourceAPITest {
 
     @Test
     public void testWithInvalidAndValidAnalysisAccession() throws Exception {
-        applicationArguments[0] = "--analysisAccession.file.path=InvalidAndValidAnalysisAccession.txt";
+        applicationArguments[0] = "--analysisAccession.file.path=invalidAndValidAnalysisAccession.txt";
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
         fileRepository = getFileRepository(configurableApplicationContext);
         Assert.assertEquals(2, fileRepository.count());
