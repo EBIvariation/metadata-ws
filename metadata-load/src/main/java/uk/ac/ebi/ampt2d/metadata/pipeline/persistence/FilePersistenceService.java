@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 
 public class FilePersistenceService implements ApplicationRunner {
 
-    public static final String ANALYSIS_ACCESSION_FILE_PATH = "analysisAccession.file.path";
+    private static final String ANALYSIS_ACCESSION_FILE_PATH = "analysisAccession.file.path";
 
     private static final Logger FILE_PERSIST_SERVICE_LOGGER = Logger.getLogger(FilePersistenceService.class.getName());
 
