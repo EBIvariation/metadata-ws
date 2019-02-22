@@ -23,22 +23,23 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.pipeline.loader.SraRetrieverByAccession;
 import uk.ac.ebi.ampt2d.metadata.pipeline.loader.converter.FileConverter;
 import uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor.FileExtractorFromAnalysis;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraXmlParser;
-import uk.ac.ebi.ampt2d.metadata.pipeline.persistence.FilePersistenceService;
+import uk.ac.ebi.ampt2d.metadata.pipeline.persistence.AnalysisPersistenceApplicationRunner;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
+import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 @Configuration
-@ConditionalOnProperty(name = "import.object", havingValue = "files")
-public class FilePersistenceServiceConfiguration {
+@ConditionalOnProperty(name = "import.object", havingValue = "analysis")
+public class AnalysisPersistenceApplicationRunnerConfiguration {
 
     @Bean
-    public FilePersistenceService filePersistenceService(SraRetrieverByAccession sraRetrieverByAccession,
-                                                         SraXmlParser sraXmlParser, FileRepository fileRepository) {
-        return new FilePersistenceService(getFileExtractorFromAnalysis(sraRetrieverByAccession, sraXmlParser), fileRepository);
+    public AnalysisPersistenceApplicationRunner pipelineApplicationRunner(SraRetrieverByAccession sraRetrieverByAccession,
+                                                                          SraXmlParser sraXmlParser) {
+        return new AnalysisPersistenceApplicationRunner(getFileExtractorFromAnalysis(sraRetrieverByAccession, sraXmlParser));
     }
 
     @Bean
@@ -50,6 +51,11 @@ public class FilePersistenceServiceConfiguration {
     @Bean
     public Converter<AnalysisFileType, File> getConverter() {
         return new FileConverter();
+    }
+
+    @Bean
+    public SraXmlParser<AnalysisType> sraXmlParser() {
+        return new SraAnalysisXmlParser();
     }
 
 }

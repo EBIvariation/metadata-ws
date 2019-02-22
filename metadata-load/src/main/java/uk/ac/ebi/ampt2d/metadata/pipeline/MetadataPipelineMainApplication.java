@@ -20,12 +20,14 @@ package uk.ac.ebi.ampt2d.metadata.pipeline;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class MetadataPipelineMainApplication {
 
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(MetadataPipelineMainApplication.class, args);
-        System.exit(0);
+        ConfigurableApplicationContext configurableApplicationContext =
+                SpringApplication.run(MetadataPipelineMainApplication.class, args);
+        configurableApplicationContext.close();
     }
 }

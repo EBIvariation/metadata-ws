@@ -46,7 +46,7 @@ import javax.sql.DataSource;
 @EnableJpaRepositories(entityManagerFactoryRef = "metadataEntityManagerFactory",
         basePackages = "uk.ac.ebi.ampt2d.metadata.persistence.repositories",
         transactionManagerRef = "metadataTransactionManager")
-public class MetadataPipelineConfiguration {
+public class MetadataDatabaseConfiguration {
 
     @Autowired
     private JpaProperties jpaProperties;
@@ -75,10 +75,5 @@ public class MetadataPipelineConfiguration {
     public PlatformTransactionManager transactionManager(@Qualifier("metadataEntityManagerFactory")
                                                                  EntityManagerFactory entityManagerFactory) {
         return new JpaTransactionManager(entityManagerFactory);
-    }
-
-    @Bean
-    public SraXmlParser<AnalysisType> sraXmlParser() {
-        return new SraAnalysisXmlParser();
     }
 }

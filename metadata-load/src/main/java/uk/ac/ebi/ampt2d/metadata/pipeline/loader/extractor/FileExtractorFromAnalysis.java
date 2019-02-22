@@ -43,25 +43,22 @@ public class FileExtractorFromAnalysis {
     private SraXmlParser<AnalysisType> sraXmlParser;
 
     public FileExtractorFromAnalysis(SraRetrieverByAccession sraRetrieverByAccession, SraXmlParser<AnalysisType>
-            sraXmlParser, Converter<AnalysisFileType,
-            File> fileConverter) {
+            sraXmlParser, Converter<AnalysisFileType, File> fileConverter) {
         this.sraRetrieverByAccession = sraRetrieverByAccession;
         this.sraXmlParser = sraXmlParser;
         this.fileConverter = fileConverter;
     }
 
-    public List<File> extractFilesFromAnalysis(List<String> analysisAccessions) {
+    public List<File> extractFilesFromAnalysis(String analysisAccession) {
         List<File> files = new ArrayList<>();
-        for (String analysisAccession : analysisAccessions) {
-            try {
-                String analysisXml = sraRetrieverByAccession.getXml(analysisAccession);
-                AnalysisType analysisType = sraXmlParser.parseXml(analysisXml, analysisAccession);
-                files.addAll(getFilesOfAnalysis(analysisType));
-            } catch (Exception exception) {
-                FILE_EXTRACT_SERVICE_LOGGER.log(Level.INFO, "Encountered Exception for analysis "
-                        + analysisAccession);
-                FILE_EXTRACT_SERVICE_LOGGER.log(Level.INFO, exception.getMessage());
-            }
+        try {
+            String analysisXml = sraRetrieverByAccession.getXml(analysisAccession);
+            AnalysisType analysisType = sraXmlParser.parseXml(analysisXml, analysisAccession);
+            files.addAll(getFilesOfAnalysis(analysisType));
+        } catch (Exception exception) {
+            FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, "Encountered Exception for analysis "
+                    + analysisAccession);
+            FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, exception.getMessage());
         }
         return files;
     }
