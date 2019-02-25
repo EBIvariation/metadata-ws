@@ -59,8 +59,8 @@ public class AnalysisPersistenceApplicationRunner implements ApplicationRunner {
         List<String> analysisAccessions = new ArrayList<>();
         if (analysisAccessionsFilePath != null) {
             try {
-                analysisAccessions = Arrays.asList(new String(Files.readAllBytes(Paths.get(getClass().getClassLoader()
-                        .getResource(analysisAccessionsFilePath.get(0)).toURI()))).split("\n"));
+                analysisAccessions = Files.readAllLines(Paths.get(getClass().getClassLoader()
+                        .getResource(analysisAccessionsFilePath.get(0)).toURI()));
             } catch (Exception e) {
                 ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Provided file path is invalid");
                 throw new RuntimeException("Provided file path is invalid/file does not exists");

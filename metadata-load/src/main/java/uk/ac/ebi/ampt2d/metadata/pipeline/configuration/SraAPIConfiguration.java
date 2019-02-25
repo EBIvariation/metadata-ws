@@ -21,7 +21,6 @@ package uk.ac.ebi.ampt2d.metadata.pipeline.configuration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.ampt2d.metadata.pipeline.loader.SraRetrieverByAccession;
 import uk.ac.ebi.ampt2d.metadata.pipeline.loader.api.SraApiAnalysisRetriever;
 
@@ -29,12 +28,8 @@ import uk.ac.ebi.ampt2d.metadata.pipeline.loader.api.SraApiAnalysisRetriever;
 @ConditionalOnProperty(name = "import.source", havingValue = "API")
 public class SraAPIConfiguration {
 
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
     @Bean
     public SraRetrieverByAccession sraRetrieverByAccessionFromAPI() {
-        return new SraApiAnalysisRetriever(restTemplate());
+        return new SraApiAnalysisRetriever();
     }
 }

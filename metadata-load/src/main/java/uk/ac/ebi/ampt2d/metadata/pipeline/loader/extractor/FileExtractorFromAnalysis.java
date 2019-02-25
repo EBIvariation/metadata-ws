@@ -54,7 +54,7 @@ public class FileExtractorFromAnalysis {
         try {
             String analysisXml = sraRetrieverByAccession.getXml(analysisAccession);
             AnalysisType analysisType = sraXmlParser.parseXml(analysisXml, analysisAccession);
-            files.addAll(getFilesOfAnalysis(analysisType));
+            files = getFilesOfAnalysis(analysisType);
         } catch (Exception exception) {
             FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, "Encountered Exception for analysis "
                     + analysisAccession);

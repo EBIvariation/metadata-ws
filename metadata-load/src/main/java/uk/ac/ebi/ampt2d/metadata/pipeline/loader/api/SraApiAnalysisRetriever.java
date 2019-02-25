@@ -25,11 +25,7 @@ public class SraApiAnalysisRetriever implements SraRetrieverByAccession {
 
     private static final String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
 
-    private RestTemplate restTemplate;
-
-    public SraApiAnalysisRetriever(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
+    private RestTemplate restTemplate = new RestTemplate();
 
     @Override
     public String getXml(String accession) {
