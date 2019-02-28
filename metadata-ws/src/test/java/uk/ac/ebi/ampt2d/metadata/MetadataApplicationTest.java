@@ -19,6 +19,7 @@ package uk.ac.ebi.ampt2d.metadata;
 
 import org.json.JSONObject;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,6 @@ import java.util.List;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.nullValue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -63,6 +63,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureJsonTesters
@@ -119,18 +120,6 @@ public class MetadataApplicationTest {
         webResourceRepository.deleteAll();
     }
 
-    @Test
-    public void postReferenceSequence() throws Exception {
-        postReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.ASSEMBLY);
-
-        postReferenceSequence("GRCh38", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
-
-        postReferenceSequence("GRCh39", "p4",
-                Arrays.asList("GCA_000001407.3", "GCF_000001407.14"), ReferenceSequence.Type.TRANSCRIPTOME);
-    }
-
     private void postReferenceSequence(String name, String patch, List accessions, ReferenceSequence.Type type) throws Exception {
         String location = postTestReferenceSequence(name, patch, accessions, type);
 
@@ -153,29 +142,6 @@ public class MetadataApplicationTest {
         return mvcResult.getResponse().getHeader("Location");
     }
 
-    @Test
-    public void postTaxonomy() throws Exception {
-        String location = postTestTaxonomy();
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.taxonomyId").value(9606))
-                .andExpect(jsonPath("$.name").value("Homo sapiens"));
-    }
-
-    @Test
-    public void postTestTaxonomyWithIdLessThanOne() throws Exception {
-        List<String> ancestors = new ArrayList<>();
-        String jsonContent = "{ " +
-                "\"taxonomyId\": 0," +
-                "\"name\": \"Homo sapiens\"," +
-                "\"ancestors\": " + testListJson.write(ancestors).getJson() + "" +
-                "}";
-
-        mockMvc.perform(post("/taxonomies")
-                .content(jsonContent))
-                .andExpect(status().is4xxClientError());
-    }
-
     private String postTestTaxonomy() throws Exception {
         return postTestTaxonomy(9606, "Homo sapiens");
     }
@@ -196,15 +162,6 @@ public class MetadataApplicationTest {
                 .andExpect(status().isCreated()).andReturn();
 
         return mvcResult.getResponse().getHeader("Location");
-    }
-
-    @Test
-    public void postStudy() throws Exception {
-        String location = postTestStudy("EGAS0001", 1, "test_human_study");
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAS0001"));
     }
 
     private String postTestStudy(String accession, int version, String name) throws Exception {
@@ -241,290 +198,6 @@ public class MetadataApplicationTest {
         return mvcResult.getResponse().getHeader("Location");
     }
 
-    @Test
-    public void postAnalysis() throws Exception {
-        String referenceSequenceUrl = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
-
-        List<String> referenceSequenceList = new ArrayList<>();
-        referenceSequenceList.add(referenceSequenceUrl);
-        String location = postTestAnalysis("EGAA0001", referenceSequenceList, studyUrl, Analysis.Technology.GWAS,
-                Analysis.Type.CASE_CONTROL, "Illumina");
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
-    }
-
-    @Test
-    public void postAnalysisAndUpdate() throws Exception {
-        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
-        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
-        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
-
-        List<String> referenceSequenceList = new ArrayList<>();
-        referenceSequenceList.add(referenceSequenceUrl1);
-        referenceSequenceList.add(referenceSequenceUrl2);
-        String location = postTestAnalysis("EGAA0001", referenceSequenceList, studyUrl, Analysis.Technology.GWAS,
-                Analysis.Type.CASE_CONTROL, "Illumina");
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
-
-        mockMvc.perform(get(location+ "/" + "referenceSequences"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(2))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(referenceSequenceUrl1))
-                .andExpect(jsonPath("$..reference-sequences[1]..referenceSequence.href").value(referenceSequenceUrl2));
-
-        List<String> referenceSequencUrlListNew = new ArrayList<>();
-        String referenceSequenceUrl3 = postTestReferenceSequence("GRCh37", "p4",
-                Arrays.asList("GCA_000001407.4", "GCF_000001407.15"), ReferenceSequence.Type.GENE);
-        referenceSequencUrlListNew.add(referenceSequenceUrl3);
-
-        mockMvc.perform(patch(location)
-                .content("{ " +
-                        "\"referenceSequences\": " + testListJson.write(referenceSequencUrlListNew).getJson() + "" +
-                        "}"))
-                .andExpect(status().is2xxSuccessful());
-
-        mockMvc.perform(get(location+ "/" + "referenceSequences"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(referenceSequenceUrl3));
-    }
-
-    @Test
-    public void postAnalysisInvalidNoReferenceSequence() throws Exception {
-        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
-        mockMvc.perform(post("/analyses")
-                .content("{ " +
-                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAA0001" + "\",\"version\":  1 }," +
-                        "\"name\": \"test_human_analysis\"," +
-                        "\"description\": \"Nothing important\"," +
-                        "\"study\": \"" + studyUrl + "\"," +
-                        "\"technology\": \"" + Analysis.Technology.GWAS + "\"," +
-                        "\"type\": \"" + Analysis.Type.CASE_CONTROL + "\"," +
-                        "\"platform\": \"" + "Illumina" + "\"" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException"));
-    }
-
-    @Test
-    public void postAnalysisInvalidBlankReferenceSequence() throws Exception {
-        List<String> referenceSequenceList = new ArrayList<>();
-        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
-        mockMvc.perform(post("/analyses")
-                .content("{ " +
-                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAA0001" + "\",\"version\":  1 }," +
-                        "\"name\": \"test_human_analysis\"," +
-                        "\"description\": \"Nothing important\"," +
-                        "\"study\": \"" + studyUrl + "\"," +
-                        "\"referenceSequences\": " + testListJson.write(referenceSequenceList).getJson() + "," +
-                        "\"technology\": \"" + Analysis.Technology.GWAS + "\"," +
-                        "\"type\": \"" + Analysis.Type.CASE_CONTROL + "\"," +
-                        "\"platform\": \"" + "Illumina" + "\"" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException"));
-    }
-
-    @Test
-    public void deleteAnalysisReferenceSequence() throws Exception {
-        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
-        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
-        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
-
-        List<String> referenceSequenceList = new ArrayList<>();
-        referenceSequenceList.add(referenceSequenceUrl1);
-        referenceSequenceList.add(referenceSequenceUrl2);
-        String location = postTestAnalysis("EGAA0001", referenceSequenceList, studyUrl, Analysis.Technology.GWAS,
-                Analysis.Type.CASE_CONTROL, "Illumina");
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
-
-        String idStr = referenceSequenceUrl1.substring(referenceSequenceUrl1.lastIndexOf('/') + 1);
-        mockMvc.perform(delete(location + "/referenceSequences/" + idStr))
-                .andExpect(status().is2xxSuccessful());
-        idStr = referenceSequenceUrl2.substring(referenceSequenceUrl2.lastIndexOf('/') + 1);
-        mockMvc.perform(delete(location + "/referenceSequences/" + idStr))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException"));
-    }
-
-    @Test
-    public void postAnalysisAndUpdateWithoutReferenceSequence() throws Exception {
-        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
-        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
-        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
-
-        List<String> referenceSequenceList = new ArrayList<>();
-        referenceSequenceList.add(referenceSequenceUrl1);
-        referenceSequenceList.add(referenceSequenceUrl2);
-        String location = postTestAnalysis("EGAA0001", referenceSequenceList, studyUrl, Analysis.Technology.GWAS,
-                Analysis.Type.CASE_CONTROL, "Illumina");
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
-        mockMvc.perform(get(location+ "/" + "referenceSequences"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(2))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(referenceSequenceUrl1))
-                .andExpect(jsonPath("$..reference-sequences[1]..referenceSequence.href").value(referenceSequenceUrl2));
-
-        List<String> referenceSequencUrlListNew = new ArrayList<>();
-        mockMvc.perform(patch(location)
-                .content("{ " +
-                        "\"referenceSequences\": " + testListJson.write(referenceSequencUrlListNew).getJson() + "" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException"));
-    }
-
-    @Test
-    public void postAnalysisAndUpdateInvalidReferenceSequence() throws Exception {
-        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
-        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
-        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
-
-        List<String> referenceSequenceList = new ArrayList<>();
-        referenceSequenceList.add(referenceSequenceUrl1);
-        referenceSequenceList.add(referenceSequenceUrl2);
-        String location = postTestAnalysis("EGAA0001", referenceSequenceList, studyUrl, Analysis.Technology.GWAS,
-                Analysis.Type.CASE_CONTROL, "Illumina");
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
-        mockMvc.perform(get(location+ "/" + "referenceSequences"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(2))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(referenceSequenceUrl1))
-                .andExpect(jsonPath("$..reference-sequences[1]..referenceSequence.href").value(referenceSequenceUrl2));
-
-        List<String> referenceSequencUrlListNew = new ArrayList<>();
-        referenceSequencUrlListNew.add("http://nohost/referenceSequences/9998");
-        referenceSequencUrlListNew.add("http://nohost/referenceSequences/9999");
-        mockMvc.perform(patch(location)
-                .content("{ " +
-                        "\"referenceSequences\": " + testListJson.write(referenceSequencUrlListNew).getJson() + "" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException"));
-    }
-
-    @Test
-    public void postAnalysisAndUpdatePartialInvalidReferenceSequence() throws Exception {
-        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
-        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
-        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
-
-        List<String> referenceSequenceList = new ArrayList<>();
-        referenceSequenceList.add(referenceSequenceUrl1);
-        referenceSequenceList.add(referenceSequenceUrl2);
-        String location = postTestAnalysis("EGAA0001", referenceSequenceList, studyUrl, Analysis.Technology.GWAS,
-                Analysis.Type.CASE_CONTROL, "Illumina");
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAA0001"));
-        mockMvc.perform(get(location+ "/" + "referenceSequences"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(2))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(referenceSequenceUrl1))
-                .andExpect(jsonPath("$..reference-sequences[1]..referenceSequence.href").value(referenceSequenceUrl2));
-
-        List<String> referenceSequencUrlListNew = new ArrayList<>();
-        String referenceSequenceUrl3 = postTestReferenceSequence("GRCh37", "p4",
-                Arrays.asList("GCA_000001406.4", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
-        referenceSequencUrlListNew.add(referenceSequenceUrl3);
-        referenceSequencUrlListNew.add("http://nohost/referenceSequences/9999");
-        mockMvc.perform(patch(location)
-                .content("{ " +
-                        "\"referenceSequences\": " + testListJson.write(referenceSequencUrlListNew).getJson() + "" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException"));
-    }
-
-    @Test
-    public void postAnalysisInvalidReferenceSequenceType() throws Exception {
-        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.ASSEMBLY);
-        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.TRANSCRIPTOME);
-        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
-
-        List<String> referenceSequenceList = new ArrayList<>();
-        referenceSequenceList.add(referenceSequenceUrl1);
-        referenceSequenceList.add(referenceSequenceUrl2);
-
-        mockMvc.perform(post("/analyses")
-                .content("{ " +
-                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAA0001" + "\",\"version\":  1 }," +
-                        "\"name\": \"test_human_analysis\"," +
-                        "\"description\": \"Nothing important\"," +
-                        "\"study\": \"" + studyUrl + "\"," +
-                        "\"referenceSequences\": " + testListJson.write(referenceSequenceList).getJson() + "," +
-                        "\"technology\": \"" + Analysis.Technology.GWAS + "\"," +
-                        "\"type\": \"" + Analysis.Type.CASE_CONTROL + "\"," +
-                        "\"platform\": \"" + "Illumina" + "\"" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException"))
-                .andExpect(jsonPath("message").value("Invalid type of reference sequences. " +
-                        "When multiple reference sequence URLs are provided, all of them should point to gene sequences"));
-    }
-
-    @Test
-    public void postAnalysisMixedReferenceSequenceType() throws Exception {
-        String referenceSequenceUrl1 = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.ASSEMBLY);
-        String referenceSequenceUrl2 = postTestReferenceSequence("GRCh37", "p3",
-                Arrays.asList("GCA_000001406.3", "GCF_000001406.14"), ReferenceSequence.Type.GENE);
-        String studyUrl = postTestStudy("EGAS0001", 1, "test_human_study");
-
-        List<String> referenceSequenceList = new ArrayList<>();
-        referenceSequenceList.add(referenceSequenceUrl1);
-        referenceSequenceList.add(referenceSequenceUrl2);
-
-        mockMvc.perform(post("/analyses")
-                .content("{ " +
-                        "\"accessionVersionId\":{ \"accession\": \"" + "EGAA0001" + "\",\"version\":  1 }," +
-                        "\"name\": \"test_human_analysis\"," +
-                        "\"description\": \"Nothing important\"," +
-                        "\"study\": \"" + studyUrl + "\"," +
-                        "\"referenceSequences\": " + testListJson.write(referenceSequenceList).getJson() + "," +
-                        "\"technology\": \"" + Analysis.Technology.GWAS + "\"," +
-                        "\"type\": \"" + Analysis.Type.CASE_CONTROL + "\"," +
-                        "\"platform\": \"" + "Illumina" + "\"" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException"))
-                .andExpect(jsonPath("message").value("Invalid type of reference sequences. " +
-                        "When multiple reference sequence URLs are provided, all of them should point to gene sequences"));
-    }
 
     private String postTestAnalysis(String accession, List<String> referenceSequenceList, String studyUrl) throws Exception {
         return postTestAnalysis(accession, referenceSequenceList, studyUrl, Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina");
@@ -550,16 +223,6 @@ public class MetadataApplicationTest {
         return mvcResult.getResponse().getHeader("Location");
     }
 
-    @Test
-    public void postFile() throws Exception {
-        String location = postTestFile("EGAF0001", 1);
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAF0001"))
-                .andExpect(jsonPath("$.accessionVersionId.version").value(1));
-    }
-
     private String postTestFile(String accession, int version) throws Exception {
         File testFile = new File(new AccessionVersionId(accession, version), "asd123", "test_file",
                 100, File.Type.TSV);
@@ -569,216 +232,6 @@ public class MetadataApplicationTest {
                 .andExpect(status().isCreated()).andReturn();
 
         return mvcResult.getResponse().getHeader("Location");
-    }
-
-    @Test
-    public void postSample() throws Exception {
-        List<String> taxonomyUrlList = new ArrayList<String>();
-        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
-        taxonomyUrlList.add(taxonomyUrl1);
-        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
-        taxonomyUrlList.add(taxonomyUrl2);
-
-        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
-                .andExpect(jsonPath("$.name").value("testSample"))
-                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
-
-        mockMvc.perform(get(location+ "/" + "taxonomies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(2))
-                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
-                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
-    }
-
-    @Test
-    public void postSampleAndUpdate() throws Exception {
-        List<String> taxonomyUrlList = new ArrayList<String>();
-        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
-        taxonomyUrlList.add(taxonomyUrl1);
-        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
-        taxonomyUrlList.add(taxonomyUrl2);
-
-        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
-                .andExpect(jsonPath("$.name").value("testSample"))
-                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
-
-        mockMvc.perform(get(location+ "/" + "taxonomies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(2))
-                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
-                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
-
-        List<String> taxonomyUrlListNew = new ArrayList<String>();
-        String taxonomyUrl3 = postTestTaxonomy(3, "Species3");
-        taxonomyUrlListNew.add(taxonomyUrl3);
-
-        mockMvc.perform(patch(location)
-                .content("{ " +
-                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListNew).getJson() + "" +
-                        "}"))
-                .andExpect(status().is2xxSuccessful());
-
-        mockMvc.perform(get(location+ "/" + "taxonomies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(1))
-                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl3));
-    }
-
-    @Test
-    public void postSampleInvalidNoTaxonomies() throws Exception {
-        mockMvc.perform(post("/samples")
-                .content("{ " +
-                        "\"accessionVersionId\":{ \"accession\": \"" + "species1" + "\",\"version\": " + 1 + "}," +
-                        "\"name\": \"" + "test sample" + "\"" +
-                        "}"))
-        .andExpect(status().is4xxClientError())
-        .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException"));
-    }
-
-    @Test
-    public void postSampleInvalidBlankTaxonomies() throws Exception {
-        List<String> taxonomyUrlList = new ArrayList<>();
-        mockMvc.perform(post("/samples")
-                .content("{ " +
-                        "\"accessionVersionId\":{ \"accession\": \"" + "species1" + "\",\"version\": " + 1 + "}," +
-                        "\"name\": \"" + "test sample" + "\"," +
-                        "\"taxonomies\": " + testListJson.write(taxonomyUrlList).getJson() + "" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException"));
-    }
-
-    @Test
-    public void deleteSampleTaxonomies() throws Exception {
-        List<String> taxonomyUrlList = new ArrayList<String>();
-        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
-        taxonomyUrlList.add(taxonomyUrl1);
-        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
-        taxonomyUrlList.add(taxonomyUrl2);
-
-        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
-        mockMvc.perform(get(location))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$..sample.href").value(location));
-
-        String idStr = taxonomyUrl1.substring(taxonomyUrl1.lastIndexOf('/') + 1);
-        mockMvc.perform(delete(location + "/taxonomies/" + idStr))
-                .andExpect(status().is2xxSuccessful());
-        idStr = taxonomyUrl2.substring(taxonomyUrl2.lastIndexOf('/') + 1);
-        mockMvc.perform(delete(location + "/taxonomies/" + idStr))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException"));
-    }
-
-    @Test
-    public void postSampleAndUpdateWithoutTaxonomies() throws Exception {
-        List<String> taxonomyUrlList = new ArrayList<String>();
-        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
-        taxonomyUrlList.add(taxonomyUrl1);
-        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
-        taxonomyUrlList.add(taxonomyUrl2);
-
-        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
-                .andExpect(jsonPath("$.name").value("testSample"))
-                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
-
-        mockMvc.perform(get(location+ "/" + "taxonomies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(2))
-                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
-                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
-
-        List<String> taxonomyUrlListInvalid = new ArrayList<String>();
-        mockMvc.perform(patch(location)
-                .content("{ " +
-                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListInvalid).getJson() + "" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException"));
-    }
-
-    @Test
-    public void postSampleAndUpdateInvalidTaxonomies() throws Exception {
-        List<String> taxonomyUrlList = new ArrayList<String>();
-        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
-        taxonomyUrlList.add(taxonomyUrl1);
-        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
-        taxonomyUrlList.add(taxonomyUrl2);
-
-        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
-                .andExpect(jsonPath("$.name").value("testSample"))
-                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
-
-        mockMvc.perform(get(location+ "/" + "taxonomies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(2))
-                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
-                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
-
-        List<String> taxonomyUrlListInvalid = new ArrayList<String>();
-        taxonomyUrlListInvalid.add("http://nohost/taxonomies/9998");
-        taxonomyUrlListInvalid.add("http://nohost/taxonomies/9999");
-        mockMvc.perform(patch(location)
-                .content("{ " +
-                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListInvalid).getJson() + "" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidTaxonomyException"));
-    }
-
-    @Test
-    public void postSampleAndUpdatePartialInvalidTaxonomies() throws Exception {
-        List<String> taxonomyUrlList = new ArrayList<String>();
-        String taxonomyUrl1 = postTestTaxonomy(1, "Species1");
-        taxonomyUrlList.add(taxonomyUrl1);
-        String taxonomyUrl2 = postTestTaxonomy(2, "Species2");
-        taxonomyUrlList.add(taxonomyUrl2);
-
-        String location = postTestSample("EGAN0001", "testSample", taxonomyUrlList);
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accessionVersionId.accession").value("EGAN0001"))
-                .andExpect(jsonPath("$.name").value("testSample"))
-                .andExpect(jsonPath("$..taxonomies.href").value(location + "/" + "taxonomies"));
-
-        mockMvc.perform(get(location+ "/" + "taxonomies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..taxonomies").isArray())
-                .andExpect(jsonPath("$..taxonomies.length()").value(2))
-                .andExpect(jsonPath("$..taxonomies[0]..taxonomy.href").value(taxonomyUrl1))
-                .andExpect(jsonPath("$..taxonomies[1]..taxonomy.href").value(taxonomyUrl2));
-
-        List<String> taxonomyUrlListMixed = new ArrayList<String>();
-        taxonomyUrlListMixed.add(taxonomyUrl1);
-        taxonomyUrlListMixed.add("http://nohost/taxonomies/9999");
-        mockMvc.perform(patch(location)
-                .content("{ " +
-                        "\"taxonomies\": " + testListJson.write(taxonomyUrlListMixed).getJson() + "" +
-                        "}"))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("exception").value("uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidTaxonomyException"));
     }
 
     private String postTestSample(String accession, String name) throws Exception {
@@ -803,16 +256,6 @@ public class MetadataApplicationTest {
         return mvcResult.getResponse().getHeader("Location");
     }
 
-    @Test
-    public void postWebResource() throws Exception {
-        String location = postTestWebResource();
-
-        mockMvc.perform(get(location))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.type").value("CENTER_WEB"))
-                .andExpect(jsonPath("$.resourceUrl").value("http:\\www.ebi.ac.uk"));
-    }
-
     private String postTestWebResource() throws Exception {
         WebResource testWebResource = new WebResource(WebResource.Type.CENTER_WEB, "http:\\www.ebi.ac.uk");
 
@@ -821,47 +264,6 @@ public class MetadataApplicationTest {
                 .andExpect(status().isCreated()).andReturn();
 
         return mvcResult.getResponse().getHeader("Location");
-    }
-
-    @Test
-    public void validateWebResourceURL() throws Exception {
-        // Valid URLs
-        // HTTP protocol
-        String url = "http://api.plos.org/search?q=title:%22Drosophila%22%20and%20body:%22RNA%22&fl=id,abstract";
-        postWebResourceValidURL(url);
-
-        // HTTPS protocol
-        url = "https://localhost:8090/swagger-ui.html#/WebResource_Entity/saveWebResourceUsingPOST";
-        postWebResourceValidURL(url);
-
-        // FTP protocol
-        url = "ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.study.xsd";
-        postWebResourceValidURL(url);
-
-        // Complex URL
-        url = "http://MVSXX.COMPANY.COM:04445/CICSPLEXSM//JSMITH/VIEW/OURLOCTRAN?A_TRANID=P*&O_TRANID=NE";
-        postWebResourceValidURL(url);
-
-        // Invalid URLs
-        // Blank URL
-        url = "";
-        postWebResourceInvalidURL(url);
-
-        // Wrong protocol
-        url = "htttps://www.ebi.ac.uk";
-        postWebResourceInvalidURL(url);
-
-        // Without protocol
-        url = "www.google.com";
-        postWebResourceInvalidURL(url);
-
-        // Invalid characters
-        url = "http://www.space address.org";
-        postWebResourceInvalidURL(url);
-
-        // File resource
-        url = "//fileserver/code/src/main/app.java";
-        postWebResourceInvalidURL(url);
     }
 
     private void postWebResourceValidURL(String url) throws Exception {
@@ -885,208 +287,6 @@ public class MetadataApplicationTest {
                 .andExpect(status().is4xxClientError());
     }
 
-    @Test
-    public void findReferenceSequenceByName() throws Exception {
-        String grch37Url = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
-        String grch38Url = postTestReferenceSequence("GRCh38", "p2",
-                Arrays.asList("GCA_000001405.17", "GCF_000001405.28"));
-
-        mockMvc.perform(get("/reference-sequences/search?name=GRCh37"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch37Url))
-                .andExpect(jsonPath("$..reference-sequences[0].name").value("GRCh37"));
-
-        mockMvc.perform(get("/reference-sequences/search?name=GRCh38"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch38Url))
-                .andExpect(jsonPath("$..reference-sequences[0].name").value("GRCh38"));
-
-        mockMvc.perform(get("/reference-sequences/search?name=NCBI36"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
-
-        mockMvc.perform(get("/reference-sequences/search?name=GRCh37&patch=p2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch37Url))
-                .andExpect(jsonPath("$..reference-sequences[0].name").value("GRCh37"))
-                .andExpect(jsonPath("$..reference-sequences[0].patch").value("p2"));
-
-        mockMvc.perform(get("/reference-sequences/search?name=GRCh38&patch=p2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch38Url))
-                .andExpect(jsonPath("$..reference-sequences[0].name").value("GRCh38"))
-                .andExpect(jsonPath("$..reference-sequences[0].patch").value("p2"));
-
-        mockMvc.perform(get("/reference-sequences/search?name=NCBI36&patch=p2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
-
-        mockMvc.perform(get("/reference-sequences/search?name=GRCh37&patch=p3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
-
-        mockMvc.perform(get("/reference-sequences/search?name=GRCh38&patch=p3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
-
-        mockMvc.perform(get("/reference-sequences/search?accessions=GCA_000001405.3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch37Url))
-                .andExpect(jsonPath("$..reference-sequences[0].accessions").isArray())
-                .andExpect(jsonPath("$..reference-sequences[0].accessions[*]", hasItems("GCA_000001405.3")));
-
-        mockMvc.perform(get("/reference-sequences/search?accessions=GCF_000001405.28"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch38Url))
-                .andExpect(jsonPath("$..reference-sequences[0].accessions").isArray())
-                .andExpect(jsonPath("$..reference-sequences[0].accessions[*]", hasItems("GCF_000001405.28")));
-
-        mockMvc.perform(get("/reference-sequences/search?accessions=GCA_000001405.2"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
-
-        mockMvc.perform(get("/reference-sequences/search?name=GRCh37&patch=p2&accessions=GCA_000001405.3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch37Url))
-                .andExpect(jsonPath("$..reference-sequences[0].accessions").isArray())
-                .andExpect(jsonPath("$..reference-sequences[0].name").value("GRCh37"))
-                .andExpect(jsonPath("$..reference-sequences[0].patch").value("p2"))
-                .andExpect(jsonPath("$..reference-sequences[0].accessions[*]", hasItems("GCA_000001405.3")));
-
-        mockMvc.perform(get("/reference-sequences/search?name=GRCh37&patch=p3&accessions=GCA_000001405.3"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
-    }
-
-    @Test
-    public void findReferenceSequenceByType() throws Exception {
-        String grch37Url = postTestReferenceSequence("GRCh37", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.ASSEMBLY);
-        String grch38Url = postTestReferenceSequence("GRCh38", "p2",
-                Arrays.asList("GCA_000001405.17", "GCF_000001405.28"), ReferenceSequence.Type.ASSEMBLY);
-        String grch39Url = postTestReferenceSequence("GRCh39", "p2",
-                Arrays.asList("GCA_000001405.3", "GCF_000001405.14"), ReferenceSequence.Type.GENE);
-
-        mockMvc.perform(get("/reference-sequences/search?type=" + ReferenceSequence.Type.ASSEMBLY.toString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(2))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch37Url))
-                .andExpect(jsonPath("$..reference-sequences[1]..referenceSequence.href").value(grch38Url))
-                .andExpect(jsonPath("$..reference-sequences[0].type").value(ReferenceSequence.Type.ASSEMBLY.toString()))
-                .andExpect(jsonPath("$..reference-sequences[1].type").value(ReferenceSequence.Type.ASSEMBLY.toString()));
-
-        mockMvc.perform(get("/reference-sequences/search?type=" + ReferenceSequence.Type.GENE.toString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(1))
-                .andExpect(jsonPath("$..reference-sequences[0]..referenceSequence.href").value(grch39Url))
-                .andExpect(jsonPath("$..reference-sequences[0].type").value(ReferenceSequence.Type.GENE.toString()));
-
-        mockMvc.perform(get("/reference-sequences/search?type=" + ReferenceSequence.Type.TRANSCRIPTOME.toString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..reference-sequences").isArray())
-                .andExpect(jsonPath("$..reference-sequences.length()").value(0));
-    }
-
-    @Test
-    public void clientErrorWhenSearchReferenceSequenceWithInvalidType() throws Exception {
-        mockMvc.perform(get("/reference-sequences/search?type=UNKNOWN"))
-                .andExpect(status().is4xxClientError());
-    }
-
-    @Test
-    public void findAnalyses() throws Exception {
-        List<String> testAnalysisUrls = postTestAnalyses();
-        String testAnalysisOneUrl = testAnalysisUrls.get(0);
-        String testAnalysisTwoUrl = testAnalysisUrls.get(1);
-
-        mockMvc.perform(get("/analyses/search?type=CASE_CONTROL"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(1))
-                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisOneUrl));
-
-        mockMvc.perform(get("/analyses/search?type=TUMOR"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(1))
-                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisTwoUrl));
-
-        mockMvc.perform(get("/analyses/search?type=COLLECTION"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(0));
-
-        mockMvc.perform(get("/analyses/search?platform=PacBio"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(1))
-                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisTwoUrl));
-
-        mockMvc.perform(get("/analyses/search?platform=illumina"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(1))
-                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisOneUrl));
-
-        mockMvc.perform(get("/analyses/search?platform=nextSeq"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(0));
-
-        mockMvc.perform(get("/analyses/search?platform=pacbio&type=TUMOR"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(1));
-    }
-
-    @Test
-    public void findAnalysisByTechnology() throws Exception {
-        List<String> testAnalysisUrls = postTestAnalyses();
-
-        mockMvc.perform(get("/analyses/search?technology=UNKNOWN"))
-                .andExpect(status().is4xxClientError());
-
-        mockMvc.perform(get("/analyses/search?technology=CURATION"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(0));
-
-        mockMvc.perform(get("/analyses/search?technology=GWAS"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(1))
-                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisUrls.get(0)));
-
-        mockMvc.perform(get("/analyses/search?technology=ARRAY&type=TUMOR"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..analyses").isArray())
-                .andExpect(jsonPath("$..analyses.length()").value(1))
-                .andExpect(jsonPath("$..analyses[0]..analysis.href").value(testAnalysisUrls.get(1)));
-    }
-
     private List<String> postTestAnalyses() throws Exception {
         String humanReferenceSequenceUrl = postTestReferenceSequence("GRCh37", "p2",
                 Arrays.asList("GCA_000001405.3", "GCF_000001405.14"));
@@ -1098,12 +298,6 @@ public class MetadataApplicationTest {
                 Analysis.Technology.GWAS, Analysis.Type.CASE_CONTROL, "Illumina"),
                 postTestAnalysis("EGAA0002", referenceSequenceList, humanStudyUrl,
                         Analysis.Technology.ARRAY, Analysis.Type.TUMOR, "PacBio"));
-    }
-
-    @Test
-    public void clientErrorWhenSearchAnalysesWithInvalidType() throws Exception {
-        mockMvc.perform(get("/analyses/search?type=unknown"))
-                .andExpect(status().is4xxClientError());
     }
 
     @Test
