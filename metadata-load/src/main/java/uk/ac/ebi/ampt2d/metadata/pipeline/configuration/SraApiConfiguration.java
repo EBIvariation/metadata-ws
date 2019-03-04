@@ -26,7 +26,7 @@ import uk.ac.ebi.ampt2d.metadata.pipeline.loader.api.SraApiAnalysisRetriever;
 
 @Configuration
 @ConditionalOnProperty(name = "import.source", havingValue = "API")
-public class SraAPIConfiguration {
+public class SraApiConfiguration {
 
     @Bean
     public SraRetrieverByAccession sraRetrieverByAccessionFromAPI() {

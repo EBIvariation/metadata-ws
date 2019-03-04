@@ -48,7 +48,7 @@ public class AnalysisPersistenceApplicationRunner implements ApplicationRunner {
     public void run(ApplicationArguments arguments) throws Exception {
         List<String> analysisAccessions = readAccessionsFromFile(arguments);
         for (String analysisAccession : analysisAccessions) {
-            //TODO Analysis and dependents convertion to metadata model and storing in db
+            //TODO Analysis and dependents conversion to metadata model and storing in db
             List<File> files = fileExtractorFromAnalysis.extractFilesFromAnalysis(analysisAccession);
         }
 
