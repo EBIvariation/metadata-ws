@@ -30,9 +30,9 @@ public class RepositoryConfiguration {
         return new SampleEventHandler();
     }
 
-    @Bean
+    /*@Bean
     AnalysisEventHandler analysisEventHandler() {
         return new AnalysisEventHandler();
-    }
+    }*/  // The validation is not true for sra loading
 
 }
