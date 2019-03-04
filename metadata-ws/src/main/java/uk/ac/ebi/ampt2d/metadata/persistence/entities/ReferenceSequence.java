@@ -95,6 +95,14 @@ public class ReferenceSequence extends Auditable<Long> {
         return id;
     }
 
+    public ReferenceSequence(String name) {
+        this.name = name;
+    }
+
+    public List<String> getAccessions() {
+        return accessions;
+    }
+
     public Type getType() {
         return type;
     }

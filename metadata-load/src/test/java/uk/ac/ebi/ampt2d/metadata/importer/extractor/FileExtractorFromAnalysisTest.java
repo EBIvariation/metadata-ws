@@ -62,20 +62,22 @@ public class FileExtractorFromAnalysisTest {
 
     @Test
     public void testFileExtractorFromAnalysisApi() throws Exception {
-        String xmlString = new String(Files.readAllBytes(
-                Paths.get(getClass().getClassLoader().getResource(ANALYSIS_DOCUMENT_API_XML).toURI())));
-        analysisType = xmlParser.parseXml(xmlString, ANALYSIS_ACCESSION);
+        analysisType = getAnalysisType(ANALYSIS_DOCUMENT_API_XML);
         List<File> files = fileExtractorFromAnalysis.extractFilesFromAnalysis(analysisType);
         assertEquals(2, files.size());
     }
 
     @Test
     public void testFileExtractorFromAnalysisDatabase() throws Exception {
-        String xmlString = new String(Files.readAllBytes(
-                Paths.get(getClass().getClassLoader().getResource(ANALYSIS_DOCUMENT_DATABASE_XML).toURI())));
-        analysisType = xmlParser.parseXml(xmlString, ANALYSIS_ACCESSION);
+        analysisType = getAnalysisType(ANALYSIS_DOCUMENT_DATABASE_XML);
         List<File> files = fileExtractorFromAnalysis.extractFilesFromAnalysis(analysisType);
         assertEquals(2, files.size());
+    }
+
+    private AnalysisType getAnalysisType(String xml) throws Exception {
+        String xmlString = new String(Files.readAllBytes(
+                Paths.get(getClass().getClassLoader().getResource(xml).toURI())));
+        return xmlParser.parseXml(xmlString, ANALYSIS_ACCESSION);
     }
 
 }
