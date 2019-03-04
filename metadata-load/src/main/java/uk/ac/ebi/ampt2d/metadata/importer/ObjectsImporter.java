@@ -23,16 +23,13 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
-import java.util.List;
-import java.util.Set;
-
 public interface ObjectsImporter {
 
-    List<Study> importStudy(Set<String> accessions);
+    Study importStudy(String accession);
 
-    List<Analysis> importAnalysis(Set<String> accessions);
+    Analysis importAnalysis(String accession);
 
-    List<ReferenceSequence> importReferenceSequence(Set<String> accessions);
+    ReferenceSequence importReferenceSequence(String accession);
 
-    List<Sample> importSample(Set<String> accessions);
+    Sample importSample(String accession);
 }

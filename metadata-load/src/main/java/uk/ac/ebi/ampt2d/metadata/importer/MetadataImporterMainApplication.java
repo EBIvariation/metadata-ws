@@ -22,6 +22,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
@@ -54,12 +55,20 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(MetadataImporterMainApplication.class, args);
+
     }
 
     @Override
     public void run(ApplicationArguments applicationArguments) throws Exception {
         Set<String> accessions = readAccessionsFromFile(applicationArguments);
-        List<Study> studies = objectsImporter.importStudy(accessions);
+        Set<Study> studies = new HashSet<>();
+        for (String accession : accessions) {
+            if (objectsImporter instanceof SraObjectsImporterThroughDatabase) {
+                studies.add(objectsImporter.importAnalysis(accession).getStudy());
+            } else {
+                studies.add(objectsImporter.importStudy(accession));
+            }
+        }
         studyRepository.save(studies);
     }
 

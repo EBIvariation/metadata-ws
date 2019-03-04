@@ -19,18 +19,18 @@ package uk.ac.ebi.ampt2d.metadata.importer.database;
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
+import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 
 import java.sql.SQLException;
 import java.sql.SQLXML;
 
-public class SraObjectRetrieverThroughDatabase implements SraRetrieverByAccession {
+public class SraXmlRetrieverThroughDatabase implements SraXmlRetrieverByAccession {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     private String enaObjectQuery;
 
-    public SraObjectRetrieverThroughDatabase(NamedParameterJdbcTemplate jdbcTemplate, String enaObjectQuery) {
+    public SraXmlRetrieverThroughDatabase(NamedParameterJdbcTemplate jdbcTemplate, String enaObjectQuery) {
         this.jdbcTemplate = jdbcTemplate;
         this.enaObjectQuery = enaObjectQuery;
     }

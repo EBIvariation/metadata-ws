@@ -19,7 +19,6 @@
 package uk.ac.ebi.ampt2d.metadata.importer.converter;
 
 import org.springframework.core.convert.converter.Converter;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ena.sra.xml.AttributeType;
@@ -29,23 +28,17 @@ import java.time.LocalDate;
 
 public class StudyConverter implements Converter<StudyType, Study> {
 
-    private TaxonomyExtractor taxonomyExtractor;
-
-    public StudyConverter(TaxonomyExtractor taxonomyExtractor) {
-        this.taxonomyExtractor = taxonomyExtractor;
-    }
-
     @Override
     public Study convert(StudyType studyType) {
         StudyType.DESCRIPTOR studyDescriptor = studyType.getDESCRIPTOR();
         String studyAccession = studyType.getAccession();
-        String studyName = studyDescriptor.getSTUDYTITLE();
+        String studyName = studyDescriptor.getSTUDYTITLE().trim();
         String studyDescription = studyDescriptor.getSTUDYDESCRIPTION();
         studyDescription = (studyDescription == null) ? studyDescriptor.getSTUDYABSTRACT() : studyDescription;
         StudyType.STUDYATTRIBUTES studyattributes = studyType.getSTUDYATTRIBUTES();
         LocalDate studyReleaseDate = getReleaseDate(studyattributes);
         return new Study(new AccessionVersionId(studyAccession, 1), studyName,
-                studyDescription, studyType.getCenterName(), studyReleaseDate, taxonomyExtractor.getTaxonomy());
+                studyDescription, studyType.getCenterName(), studyReleaseDate);
     }
 
     private LocalDate getReleaseDate(StudyType.STUDYATTRIBUTES studyattributes) {

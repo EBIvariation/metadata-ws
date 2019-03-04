@@ -15,44 +15,48 @@
  * limitations under the License.
  *
  */
+
 package uk.ac.ebi.ampt2d.metadata.importer.database;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.ac.ebi.ampt2d.metadata.importer.configuration.SraDatabaseConfiguration;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
+import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=DB"})
-@ContextConfiguration(classes = {SraDatabaseConfiguration.class})
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
-public class SraObjectRetrieverThroughDatabaseTest {
+@ContextConfiguration(classes = {MetadataImporterMainApplication.class})
+public class SraObjectsImporterThroughDBTest {
 
     @Autowired
-    private SraObjectRetrieverThroughDatabase sraRetriever;
+    private ObjectsImporter sraObjectImporter;
 
     @Test
     @Category(OracleDbCategory.class)
-    public void getXml() throws Exception {
-        String studyAccession = "ERP000332";
-        String studyDocumentPath = "study/StudyDocumentDB.xml";
+    public void importStudy() throws Exception {
+        Study study = sraObjectImporter.importStudy("ERP000860");
+        assertNotNull(study);
+    }
 
-        String xmlString = sraRetriever.getXml(studyAccession);
-        String expectedXmlString = new String(Files.readAllBytes(
-                Paths.get(getClass().getClassLoader().getResource(studyDocumentPath).toURI())));
-
-        assertEquals(expectedXmlString, xmlString);
+    @Test
+    @Category(OracleDbCategory.class)
+    public void importAnalysisObject() throws Exception {
+        Analysis analysis = sraObjectImporter.importAnalysis("ERZ000011");
+        assertNotNull(analysis);
+        assertEquals("ERZ000011", analysis.getAccessionVersionId().getAccession());
+        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
+        assertEquals(1, analysis.getFiles().size());
+        assertEquals("ERP000860", analysis.getStudy().getAccessionVersionId().getAccession());
     }
 
 }

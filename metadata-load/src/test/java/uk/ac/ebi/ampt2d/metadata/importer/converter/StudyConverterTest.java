@@ -21,14 +21,13 @@ package uk.ac.ebi.ampt2d.metadata.importer.converter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.ac.ebi.ampt2d.metadata.importer.api.SraApiConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataDatabaseConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataImporterMainApplicationConfiguration;
-import uk.ac.ebi.ampt2d.metadata.importer.configuration.SraApiConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
@@ -55,12 +54,12 @@ public class StudyConverterTest {
 
     private SraXmlParser<StudyType> xmlParser;
 
-    @Autowired
     private StudyConverter studyConverter;
 
     @Before
     public void setUp() {
         xmlParser = new SraStudyXmlParser();
+        studyConverter = new StudyConverter();
     }
 
     @Test

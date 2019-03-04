@@ -46,4 +46,6 @@ public interface StudyRepository extends PagingAndSortingRepository<Study, Long>
     List<Study> findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc
             (@Param("accession") String accession);
 
+    void flush();
+
 }

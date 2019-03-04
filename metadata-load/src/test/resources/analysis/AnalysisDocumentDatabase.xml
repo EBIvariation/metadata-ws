@@ -1,31 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ANALYSIS_SET>
-    <ANALYSIS alias="DNA sequencing ACAN" center_name="University of Kentucky" broker_name="EBI" accession="ERZ496533">
+    <ANALYSIS alias="uk10k_scoop5013826.vcf.gz-vcf_analysis-sc-20120330" center_name="SC" broker_name="EGA" analysis_center="SC" accession="ERZ000011">
         <IDENTIFIERS>
-            <PRIMARY_ID>ERZ496533</PRIMARY_ID>
-            <SUBMITTER_ID namespace="University of Kentucky">DNA sequencing ACAN</SUBMITTER_ID>
+            <PRIMARY_ID>ERZ000011</PRIMARY_ID>
+            <SUBMITTER_ID namespace="SC">uk10k_scoop5013826.vcf.gz-vcf_analysis-sc-20120330</SUBMITTER_ID>
         </IDENTIFIERS>
-        <TITLE>DNA sequencing ACAN</TITLE>
-        <DESCRIPTION>Exon 7 was PCR amplified from dwarf and non-dwarf ponies then sequenced and compared</DESCRIPTION>
-        <STUDY_REF accession="ERP107353">
+        <TITLE>Variant calling of UK10K_SCOOP5013826</TITLE>
+        <DESCRIPTION>REL-2011-07-14_variant_calling_of_UK10K_OBESITY_SCOOP</DESCRIPTION>
+        <STUDY_REF refname="UK10K_exome_sequence__SCOOP_samples-sc-2011-08-18T14:40:03Z-1706" refcenter="SC" accession="ERP000860"/>
+        <SAMPLE_REF refname="UK10K_SCOOP5013826-sc-2011-08-18T15:01:15Z-1027679" refcenter="SC" label="UK10K_SCOOP5013826" accession="ERS049026">
             <IDENTIFIERS>
-                <PRIMARY_ID>ERP107353</PRIMARY_ID>
-                <SECONDARY_ID>PRJEB25439</SECONDARY_ID>
+                <PRIMARY_ID>ERS049026</PRIMARY_ID>
             </IDENTIFIERS>
-        </STUDY_REF>
+        </SAMPLE_REF>
         <ANALYSIS_TYPE>
             <SEQUENCE_VARIATION>
                 <ASSEMBLY>
-                    <STANDARD accession="GCA_000002305.1"/>
+                    <STANDARD refname="GRCh37"/>
                 </ASSEMBLY>
-                <EXPERIMENT_TYPE>Exome sequencing</EXPERIMENT_TYPE>
-                <PROGRAM>Vector NTI Advance 10.3</PROGRAM>
-                <PLATFORM>Sanger sequencing: ABI 310</PLATFORM>
             </SEQUENCE_VARIATION>
         </ANALYSIS_TYPE>
         <FILES>
-            <FILE checksum="59c8ff847a438c8e91288fda1610206d" checksum_method="MD5" filename="ERZ496/ERZ496533/Bailey_ACAN_306.vcf.gz.tbi" filetype="tabix"/>
-            <FILE checksum="e83207c712242079577aa07566e5e32d" checksum_method="MD5" filename="ERZ496/ERZ496533/Bailey_ACAN_306.vcf.gz" filetype="vcf"/>
+            <FILE filename="UK10K_SCOOP5013826.vcf.gz" filetype="vcf" checksum_method="MD5" checksum="980aad09354c5bc984e23d2f74efdf3b" unencrypted_checksum="641127f130e67cf39a65a5e245c9ecb"/>
         </FILES>
     </ANALYSIS>
 </ANALYSIS_SET>

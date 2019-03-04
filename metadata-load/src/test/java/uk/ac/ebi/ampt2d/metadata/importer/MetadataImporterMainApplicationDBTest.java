@@ -28,6 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.database.OracleDbCategory;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import static org.junit.Assert.assertEquals;
@@ -43,17 +44,22 @@ public class MetadataImporterMainApplicationDBTest {
     @Autowired
     private StudyRepository studyRepository;
 
+    @Autowired
+    private AnalysisRepository analysisRepository;
+
     @Before
     public void setUp() {
         studyRepository.deleteAll();
+        analysisRepository.deleteAll();
     }
 
     @Test
     @Category(OracleDbCategory.class)
     public void run() throws Exception {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
-                new String[]{"--accessions.file.path=study/EgaStudyAccessions.txt"}));
+                new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessions.txt"}));
         assertEquals(2, studyRepository.count());
+        assertEquals(11, analysisRepository.count());
     }
 
 }
