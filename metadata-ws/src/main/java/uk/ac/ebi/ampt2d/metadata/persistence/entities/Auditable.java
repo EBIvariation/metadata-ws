@@ -20,7 +20,9 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import io.swagger.annotations.ApiModelProperty;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.ZonedDateAttributeConverter;
 
+import javax.persistence.Convert;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import java.time.ZonedDateTime;
@@ -31,6 +33,7 @@ public abstract class Auditable<ID> {
 
     @ApiModelProperty(readOnly = true)
     @LastModifiedDate
+    @Convert(converter = ZonedDateAttributeConverter.class)
     private ZonedDateTime lastModifiedDate;
 
     public ZonedDateTime getLastModifiedDate() {

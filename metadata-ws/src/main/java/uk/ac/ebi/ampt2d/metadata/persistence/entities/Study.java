@@ -20,8 +20,10 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
+import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.LocalDateAttributeConverter;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -80,6 +82,7 @@ public class Study extends Auditable<Long> {
     @NotNull
     @JsonProperty
     @Column(nullable = false)
+    @Convert(converter = LocalDateAttributeConverter.class)
     private LocalDate releaseDate;
 
     @ApiModelProperty(position = 7, dataType = "java.lang.String", notes = "Url to a Taxonomy")
