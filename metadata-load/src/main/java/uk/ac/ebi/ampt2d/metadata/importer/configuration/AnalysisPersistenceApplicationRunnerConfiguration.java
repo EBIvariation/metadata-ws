@@ -16,20 +16,25 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.importer.configuration;
+package uk.ac.ebi.ampt2d.metadata.pipeline.configuration;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
-import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
-import uk.ac.ebi.ampt2d.metadata.importer.converter.FileConverter;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.importer.persistence.AnalysisPersistenceApplicationRunner;
-import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
-import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
-import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.SraRetrieverByAccession;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.converter.AnalysisConverter;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor.FileExtractorFromAnalysis;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor.ReferenceSequenceExtractorFromAnalysis;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor.StudyExtractor;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraAnalysisXmlParser;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraXmlParser;
+import uk.ac.ebi.ampt2d.metadata.pipeline.persistence.AnalysisPersistenceApplicationRunner;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 @Configuration
@@ -37,20 +42,24 @@ import uk.ac.ebi.ena.sra.xml.AnalysisType;
 public class AnalysisPersistenceApplicationRunnerConfiguration {
 
     @Bean
-    public AnalysisPersistenceApplicationRunner pipelineApplicationRunner(SraRetrieverByAccession sraRetrieverByAccession,
-                                                                          SraXmlParser sraXmlParser) {
-        return new AnalysisPersistenceApplicationRunner(getFileExtractorFromAnalysis(sraRetrieverByAccession, sraXmlParser));
+    public AnalysisPersistenceApplicationRunner pipelineApplicationRunner(
+            SraRetrieverByAccession sraRetrieverByAccession,
+            SraXmlParser sraXmlParser,
+            AnalysisRepository analysisRepository,
+            StudyRepository studyRepository,
+            ReferenceSequenceRepository referenceSequenceRepository,
+            FileRepository fileRepository) {
+        return new AnalysisPersistenceApplicationRunner(sraRetrieverByAccession, sraXmlParser, analysisRepository,
+                getAnalysisConverter(studyRepository, referenceSequenceRepository, fileRepository));
     }
 
     @Bean
-    public FileExtractorFromAnalysis getFileExtractorFromAnalysis(SraRetrieverByAccession sraRetrieverByAccession,
-                                                                  SraXmlParser sraXmlParser) {
-        return new FileExtractorFromAnalysis(sraRetrieverByAccession, sraXmlParser, getConverter());
-    }
-
-    @Bean
-    public Converter<AnalysisFileType, File> getConverter() {
-        return new FileConverter();
+    public Converter<AnalysisType, Analysis> getAnalysisConverter(StudyRepository studyRepository,
+                                                                ReferenceSequenceRepository referenceSequenceRepository,
+                                                                FileRepository fileRepository) {
+        return new AnalysisConverter(getStudyExtractor(studyRepository),
+                getReferenceSequnceExtractorFromAnalysis(referenceSequenceRepository),
+                getFileExtractorFromAnalysis(fileRepository));
     }
 
     @Bean
@@ -58,4 +67,19 @@ public class AnalysisPersistenceApplicationRunnerConfiguration {
         return new SraAnalysisXmlParser();
     }
 
+    @Bean
+    public StudyExtractor getStudyExtractor(StudyRepository studyRepository) {
+        return new StudyExtractor(studyRepository);
+    }
+
+    @Bean
+    public ReferenceSequenceExtractorFromAnalysis getReferenceSequnceExtractorFromAnalysis(
+            ReferenceSequenceRepository referenceSequenceRepository) {
+        return new ReferenceSequenceExtractorFromAnalysis(referenceSequenceRepository);
+    }
+
+    @Bean
+    public FileExtractorFromAnalysis getFileExtractorFromAnalysis(FileRepository fileRepository) {
+        return new FileExtractorFromAnalysis(fileRepository);
+    }
 }

@@ -16,12 +16,12 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.importer.extractor;
+package uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor;
 
 import org.springframework.core.convert.converter.Converter;
-import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
-import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.converter.FileConverter;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
@@ -38,26 +38,21 @@ public class FileExtractorFromAnalysis {
 
     private Converter<AnalysisFileType, File> fileConverter;
 
-    private SraRetrieverByAccession sraRetrieverByAccession;
+    private FileRepository fileRepository;
 
-    private SraXmlParser<AnalysisType> sraXmlParser;
-
-    public FileExtractorFromAnalysis(SraRetrieverByAccession sraRetrieverByAccession, SraXmlParser<AnalysisType>
-            sraXmlParser, Converter<AnalysisFileType, File> fileConverter) {
-        this.sraRetrieverByAccession = sraRetrieverByAccession;
-        this.sraXmlParser = sraXmlParser;
-        this.fileConverter = fileConverter;
+    public FileExtractorFromAnalysis(FileRepository fileRepository) {
+        this.fileRepository = fileRepository;
+        this.fileConverter = new FileConverter();
     }
 
-    public List<File> extractFilesFromAnalysis(String analysisAccession) {
+    public List<File> extractFilesFromAnalysis(AnalysisType analysisType) {
         List<File> files = new ArrayList<>();
         try {
-            String analysisXml = sraRetrieverByAccession.getXml(analysisAccession);
-            AnalysisType analysisType = sraXmlParser.parseXml(analysisXml, analysisAccession);
             files = getFilesOfAnalysis(analysisType);
+            fileRepository.save(files);
         } catch (Exception exception) {
-            FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, "Encountered Exception for analysis "
-                    + analysisAccession);
+            FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, "Encountered Exception for analysis files"
+                    + analysisType.getAccession());
             FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, exception.getMessage());
         }
         return files;

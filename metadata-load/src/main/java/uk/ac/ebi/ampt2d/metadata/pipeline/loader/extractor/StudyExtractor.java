@@ -16,16 +16,22 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.pipeline;
+package uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
-@SpringBootApplication
-public class MetadataPipelineMainApplication {
+public class StudyExtractor {
+    private static final Long STUDY_ID = new Long(1);
 
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(MetadataPipelineMainApplication.class, args);
+    private StudyRepository studyRepository;
 
+    public StudyExtractor(StudyRepository studyRepository) {
+        this.studyRepository = studyRepository;
     }
+
+    public Study getStudy() {
+        return studyRepository.findOne(STUDY_ID);
+    }
+
 }

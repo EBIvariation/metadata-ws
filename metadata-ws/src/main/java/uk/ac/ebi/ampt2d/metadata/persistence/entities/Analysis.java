@@ -31,6 +31,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
@@ -40,6 +41,7 @@ import java.util.List;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
+@SequenceGenerator(initialValue = 1, allocationSize = 1, name = "ANALYSIS_SEQ", sequenceName = "analysis_sequence")
 public class Analysis extends Auditable<Long> {
 
     public enum Type {
@@ -75,7 +77,7 @@ public class Analysis extends Auditable<Long> {
     @ApiModelProperty(position = 1, value = "Analysis auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ANALYSIS_SEQ")
     private long id;
 
     @ApiModelProperty(position = 2)
@@ -116,17 +118,13 @@ public class Analysis extends Auditable<Long> {
     private Technology technology;
 
     @ApiModelProperty(position = 8, required = true)
-    @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Type type;
 
     @ApiModelProperty(position = 9, required = true)
-    @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
-    @Column(nullable = false)
     private String platform;
 
     @ManyToMany
@@ -134,6 +132,19 @@ public class Analysis extends Auditable<Long> {
 
     @ManyToMany
     private List<File> files;
+
+    public Analysis() {
+    }
+
+    public Analysis(AccessionVersionId accessionVersionId, String name, String description, Study study, List<ReferenceSequence> referenceSequences, Technology technology, List<File> files) {
+        this.accessionVersionId = accessionVersionId;
+        this.name = name;
+        this.description = description;
+        this.study = study;
+        this.referenceSequences = referenceSequences;
+        this.technology = technology;
+        this.files = files;
+    }
 
     @Override
     public Long getId() {

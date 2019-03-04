@@ -28,6 +28,7 @@ import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -43,6 +44,7 @@ import javax.sql.DataSource;
 @EnableJpaRepositories(entityManagerFactoryRef = "metadataEntityManagerFactory",
         basePackages = "uk.ac.ebi.ampt2d.metadata.persistence.repositories",
         transactionManagerRef = "metadataTransactionManager")
+@EnableJpaAuditing
 public class MetadataDatabaseConfiguration {
 
     @Autowired
@@ -58,7 +60,7 @@ public class MetadataDatabaseConfiguration {
     @Bean(name = "metadataEntityManagerFactory")
     @ConfigurationProperties(prefix = "metadata")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder,
-                                                            @Qualifier("metadataDatasource") DataSource dataSource) {
+                                                                       @Qualifier("metadataDatasource") DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean =
                 builder.dataSource(dataSource)
                         .packages("uk.ac.ebi.ampt2d.metadata.persistence.entities")

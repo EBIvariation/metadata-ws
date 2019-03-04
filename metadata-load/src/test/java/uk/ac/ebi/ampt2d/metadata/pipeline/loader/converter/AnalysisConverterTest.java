@@ -16,16 +16,13 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.pipeline;
+package uk.ac.ebi.ampt2d.metadata.pipeline.loader.converter;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.junit.Test;
 
-@SpringBootApplication
-public class MetadataPipelineMainApplication {
-
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(MetadataPipelineMainApplication.class, args);
-
+public class AnalysisConverterTest {
+    @Test
+    public void convert() throws Exception {
     }
+
 }

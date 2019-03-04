@@ -15,19 +15,17 @@
  * limitations under the License.
  *
  */
+package uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor;
 
-package uk.ac.ebi.ampt2d.metadata.importer.extractor;
-
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
-import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
-import uk.ac.ebi.ampt2d.metadata.importer.converter.FileConverter;
-import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
-import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraAnalysisXmlParser;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraXmlParser;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 import java.nio.file.Files;
@@ -35,6 +33,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -46,41 +45,37 @@ public class FileExtractorFromAnalysisTest {
 
     private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "AnalysisDocumentDatabase.xml";
 
-    private static final String ANALYSIS_DOCUMENT_NOT_FOUND_XML = "AnalysisDocumentNotFound.xml";
+    private SraXmlParser<AnalysisType> xmlParser;
 
     @Mock
-    private SraRetrieverByAccession sraRetrieverByAccession;
+    private FileRepository fileRepository;
 
-    private SraXmlParser<AnalysisType> sraXmlParser = new SraAnalysisXmlParser();
+    private AnalysisType analysisType;
 
-    private FileConverter fileConverter = new FileConverter();
+    private FileExtractorFromAnalysis fileExtractorFromAnalysis = new FileExtractorFromAnalysis(fileRepository);
 
-    @InjectMocks
-    private FileExtractorFromAnalysis fileExtractorFromAnalysis = new FileExtractorFromAnalysis
-            (sraRetrieverByAccession, sraXmlParser, fileConverter);
+    @Before
+    public void setUp() {
+        xmlParser = new SraAnalysisXmlParser();
+        when(fileRepository.save(anyList())).thenReturn(null);
+    }
 
     @Test
     public void testFileExtractorFromAnalysisApi() throws Exception {
-        when(sraRetrieverByAccession.getXml(ANALYSIS_ACCESSION)).thenReturn(new String(Files.readAllBytes(
-                Paths.get(getClass().getClassLoader().getResource(ANALYSIS_DOCUMENT_API_XML).toURI()))));
-        List<File> files = fileExtractorFromAnalysis.extractFilesFromAnalysis(ANALYSIS_ACCESSION);
+        String xmlString = new String(Files.readAllBytes(
+                Paths.get(getClass().getClassLoader().getResource(ANALYSIS_DOCUMENT_API_XML).toURI())));
+        analysisType = xmlParser.parseXml(xmlString, ANALYSIS_ACCESSION);
+        List<File> files = fileExtractorFromAnalysis.extractFilesFromAnalysis(analysisType);
         assertEquals(2, files.size());
     }
 
     @Test
     public void testFileExtractorFromAnalysisDatabase() throws Exception {
-        when(sraRetrieverByAccession.getXml(ANALYSIS_ACCESSION)).thenReturn(new String(Files.readAllBytes(
-                Paths.get(getClass().getClassLoader().getResource(ANALYSIS_DOCUMENT_DATABASE_XML).toURI()))));
-        List<File> files = fileExtractorFromAnalysis.extractFilesFromAnalysis(ANALYSIS_ACCESSION);
+        String xmlString = new String(Files.readAllBytes(
+                Paths.get(getClass().getClassLoader().getResource(ANALYSIS_DOCUMENT_DATABASE_XML).toURI())));
+        analysisType = xmlParser.parseXml(xmlString, ANALYSIS_ACCESSION);
+        List<File> files = fileExtractorFromAnalysis.extractFilesFromAnalysis(analysisType);
         assertEquals(2, files.size());
-    }
-
-    @Test
-    public void testFileExtractorFromInvalidAnalysis() throws Exception {
-        when(sraRetrieverByAccession.getXml("INVALID_ACCESSION")).thenReturn(new String(Files.readAllBytes(
-                Paths.get(getClass().getClassLoader().getResource(ANALYSIS_DOCUMENT_NOT_FOUND_XML).toURI()))));
-        List<File> files = fileExtractorFromAnalysis.extractFilesFromAnalysis(ANALYSIS_ACCESSION);
-        assertEquals(0, files.size());
     }
 
 }

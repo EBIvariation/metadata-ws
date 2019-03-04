@@ -25,6 +25,8 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QReferenceSequence;
 
+import java.util.List;
+
 @RepositoryRestResource(collectionResourceRel = "reference-sequences", path = "reference-sequences")
 public interface ReferenceSequenceRepository extends PagingAndSortingRepository<ReferenceSequence, Long>,
         QueryDslPredicateExecutor<ReferenceSequence>, QuerydslBinderCustomizer<QReferenceSequence> {
@@ -36,4 +38,5 @@ public interface ReferenceSequenceRepository extends PagingAndSortingRepository<
                 .first((path, value) -> path.any().equalsIgnoreCase(value.iterator().next()));
     }
 
+    List<ReferenceSequence> findByNameAndPatch(String name,String patch);
 }

@@ -30,6 +30,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
@@ -40,11 +41,12 @@ import java.util.List;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
+@SequenceGenerator(initialValue=1, allocationSize=1 , name="STUDY_SEQ", sequenceName="study_sequence")
 public class Study extends Auditable<Long> {
 
     @ApiModelProperty(position = 1, value = "Study auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="STUDY_SEQ")
     @Id
     private long id;
 
@@ -108,6 +110,20 @@ public class Study extends Auditable<Long> {
 
     @ManyToMany
     private List<Publication> publications;
+
+    public Study() {
+    }
+
+    public Study(AccessionVersionId accessionVersionId, String name, String description, String center,
+                 LocalDate
+            releaseDate, Taxonomy taxonomy) {
+        this.accessionVersionId = accessionVersionId;
+        this.name = name;
+        this.description = description;
+        this.center = center;
+        this.releaseDate = releaseDate;
+        this.taxonomy = taxonomy;
+    }
 
     @Override
     public Long getId() {

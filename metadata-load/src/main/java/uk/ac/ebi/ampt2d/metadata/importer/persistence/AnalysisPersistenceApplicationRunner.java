@@ -16,20 +16,21 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.importer.persistence;
+package uk.ac.ebi.ampt2d.metadata.pipeline.persistence;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
+import org.springframework.core.convert.converter.Converter;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.SraRetrieverByAccession;
+import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraXmlParser;
+import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,42 +41,49 @@ public class AnalysisPersistenceApplicationRunner implements ApplicationRunner {
     private static final Logger ANALYSIS_PERSISTENCE_APPLICATION_LOGGER =
             Logger.getLogger(AnalysisPersistenceApplicationRunner.class.getName());
 
-    private FileExtractorFromAnalysis fileExtractorFromAnalysis;
+    private SraRetrieverByAccession analyisRetriever;
 
-    public AnalysisPersistenceApplicationRunner() {
-    }
+    private SraXmlParser sraXmlParser;
 
-    public AnalysisPersistenceApplicationRunner(FileExtractorFromAnalysis fileExtractorFromAnalysis) {
-        this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
+    private Converter<AnalysisType, Analysis> analysisConverter;
+
+    private AnalysisRepository analysisRepository;
+
+    public AnalysisPersistenceApplicationRunner(SraRetrieverByAccession analyisRetriever, SraXmlParser sraXmlParser,
+                                                AnalysisRepository analysisRepository,
+                                                Converter<AnalysisType, Analysis> analysisConverter) {
+        this.analyisRetriever = analyisRetriever;
+        this.sraXmlParser = sraXmlParser;
+        this.analysisRepository = analysisRepository;
+        this.analysisConverter = analysisConverter;
     }
 
     @Override
-    public void run(ApplicationArguments arguments) {
-        Set<String> analysisAccessions = readAccessionsFromFile(arguments);
-        for (String analysisAccession : analysisAccessions) {
-            //TODO Analysis and dependents conversion to metadata model and storing in db
-            List<File> files = fileExtractorFromAnalysis.extractFilesFromAnalysis(analysisAccession);
-        }
+    public void run(ApplicationArguments arguments) throws Exception {
+        List<String> analysisAccessions = readAccessionsFromFile(arguments);
 
+        List<Analysis> analyses = new ArrayList<>();
+
+        for (String analysisAccession : analysisAccessions) {
+            String xml = analyisRetriever.getXml(analysisAccession);
+            AnalysisType analysisType = (AnalysisType) sraXmlParser.parseXml(xml, analysisAccession);
+            Analysis analysis = analysisConverter.convert(analysisType);
+            analyses.add(analysis);
+        }
+        analysisRepository.save(analyses);
     }
 
-    private Set<String> readAccessionsFromFile(ApplicationArguments arguments) {
+    private List<String> readAccessionsFromFile(ApplicationArguments arguments) throws Exception {
         List<String> analysisAccessionsFilePath = arguments.getOptionValues(ANALYSIS_ACCESSION_FILE_PATH);
-        if (analysisAccessionsFilePath == null || analysisAccessionsFilePath.size() == 0) {
-            ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Please provide analysisAccession file path");
-            throw new RuntimeException("Please provide analysisAccession file path");
-        }
-        String accessionFilePath = analysisAccessionsFilePath.get(0);
-        Set<String> analysisAccessions;
-        try {
-            analysisAccessions = new HashSet<>(Files.readAllLines(Paths.get(getClass().getClassLoader()
-                    .getResource(accessionFilePath).toURI())));
-        } catch (NullPointerException | URISyntaxException exception) {
-            ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Provided file path is invalid");
-            throw new RuntimeException("Provided file path is invalid/file does not exists");
-        } catch (IOException exception) {
-            ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Provided file is not valid/corrupt");
-            throw new RuntimeException("Provided file is not valid/corrupt");
+        List<String> analysisAccessions = new ArrayList<>();
+        if (analysisAccessionsFilePath != null) {
+            try {
+                analysisAccessions = Files.readAllLines(Paths.get(getClass().getClassLoader()
+                        .getResource(analysisAccessionsFilePath.get(0)).toURI()));
+            } catch (Exception e) {
+                ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Provided file path is invalid");
+                throw new RuntimeException("Provided file path is invalid/file does not exists");
+            }
         }
 
         return analysisAccessions;

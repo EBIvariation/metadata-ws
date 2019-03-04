@@ -29,6 +29,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
@@ -38,6 +39,8 @@ import java.util.List;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name","patch"}))
+@SequenceGenerator(initialValue=1, allocationSize=1 , name="REFERENCE_SEQUENCE_SEQ",
+        sequenceName="reference_sequence_sequence")
 public class ReferenceSequence extends Auditable<Long> {
 
     public enum Type {
@@ -53,7 +56,7 @@ public class ReferenceSequence extends Auditable<Long> {
     @ApiModelProperty(position = 1, value = "Reference Sequence auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="REFERENCE_SEQUENCE_SEQ")
     private long id;
 
     @ApiModelProperty(position = 2, required = true)
