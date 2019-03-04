@@ -25,6 +25,7 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -74,7 +75,7 @@ public class ReferenceSequence extends Auditable<Long> {
     @ApiModelProperty(position = 4, required = true)
     @NotNull
     @JsonProperty
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> accessions = new ArrayList<String>();
 
     @ApiModelProperty(position = 5, required = true)
@@ -95,8 +96,8 @@ public class ReferenceSequence extends Auditable<Long> {
         return id;
     }
 
-    public ReferenceSequence(String name) {
-        this.name = name;
+    public String getName() {
+        return name;
     }
 
     public List<String> getAccessions() {

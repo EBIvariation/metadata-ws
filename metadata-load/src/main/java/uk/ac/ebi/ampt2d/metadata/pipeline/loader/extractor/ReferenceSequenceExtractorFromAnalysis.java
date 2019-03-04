@@ -59,9 +59,15 @@ public class ReferenceSequenceExtractorFromAnalysis {
         List<ReferenceSequence> referenceSequences;
         ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
         String referenceSequenceName = standard.getRefname();
-        String patch = "p1";
-        List<String> accessions = Arrays.asList(standard.getAccession());
+        String patch = "null";
+        String accession = standard.getAccession();
+        List<String> accessions = Arrays.asList(accession);
+
+        if (referenceSequenceName == null || referenceSequenceName == "") {
+            referenceSequenceName = accession;
+        }
         referenceSequences = referenceSequenceRepository.findByNameAndPatch(referenceSequenceName, patch);
+
         if (referenceSequences.size() > 0) {
             return referenceSequences;
         }

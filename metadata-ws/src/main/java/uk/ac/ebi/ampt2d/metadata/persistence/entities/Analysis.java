@@ -155,6 +155,18 @@ public class Analysis extends Auditable<Long> {
         return accessionVersionId;
     }
 
+    public Study getStudy() {
+        return study;
+    }
+
+    public Technology getTechnology() {
+        return technology;
+    }
+
+    public List<File> getFiles() {
+        return files;
+    }
+
     public List<ReferenceSequence> getReferenceSequences() {
         return referenceSequences;
     }

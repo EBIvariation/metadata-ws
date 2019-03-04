@@ -43,7 +43,7 @@ public class FileExtractorFromAnalysisTest {
 
     private static final String ANALYSIS_DOCUMENT_API_XML = "AnalysisDocumentApi.xml";
 
-    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "AnalysisDocumentDatabase.xml";
+    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "AnalysisDocumentDatabase1.xml";
 
     private SraXmlParser<AnalysisType> xmlParser;
 
@@ -52,12 +52,13 @@ public class FileExtractorFromAnalysisTest {
 
     private AnalysisType analysisType;
 
-    private FileExtractorFromAnalysis fileExtractorFromAnalysis = new FileExtractorFromAnalysis(fileRepository);
+    private FileExtractorFromAnalysis fileExtractorFromAnalysis;
 
     @Before
     public void setUp() {
         xmlParser = new SraAnalysisXmlParser();
         when(fileRepository.save(anyList())).thenReturn(null);
+        fileExtractorFromAnalysis = new FileExtractorFromAnalysis(fileRepository);
     }
 
     @Test
@@ -71,7 +72,7 @@ public class FileExtractorFromAnalysisTest {
     public void testFileExtractorFromAnalysisDatabase() throws Exception {
         analysisType = getAnalysisType(ANALYSIS_DOCUMENT_DATABASE_XML);
         List<File> files = fileExtractorFromAnalysis.extractFilesFromAnalysis(analysisType);
-        assertEquals(2, files.size());
+        assertEquals(1, files.size());
     }
 
     private AnalysisType getAnalysisType(String xml) throws Exception {

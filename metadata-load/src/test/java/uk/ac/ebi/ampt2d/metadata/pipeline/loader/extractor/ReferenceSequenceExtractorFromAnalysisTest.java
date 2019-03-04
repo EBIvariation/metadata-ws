@@ -50,7 +50,7 @@ public class ReferenceSequenceExtractorFromAnalysisTest {
 
     private static final String ANALYSIS_DOCUMENT_API_XML = "AnalysisDocumentApi.xml";
 
-    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "AnalysisDocumentDatabase.xml";
+    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "AnalysisDocumentDatabase1.xml";
 
     private SraXmlParser<AnalysisType> xmlParser;
 
@@ -69,21 +69,23 @@ public class ReferenceSequenceExtractorFromAnalysisTest {
     public void testReferenceSequenceExtractApi() throws Exception {
         List<ReferenceSequence> referenceSequences = referenceSequenceExtractorFromAnalysis
                 .getReferenceType(getAnalysisType(ANALYSIS_DOCUMENT_API_XML));
-        assertReferenceSequenceIsAsExpected(referenceSequences);
+
+        Assert.assertNotNull(referenceSequences);
+        Assert.assertEquals(1, referenceSequences.size());
+        Assert.assertEquals(1, referenceSequences.get(0).getAccessions().size());
+        Assert.assertEquals("GCA_000002305.1", referenceSequences.get(0).getAccessions().get(0));
+        Assert.assertEquals("GCA_000002305.1", referenceSequences.get(0).getName());
+        Assert.assertEquals(ASSEMBLY, referenceSequences.get(0).getType());
     }
 
     @Test
     public void testReferenceSequenceExtractDB() throws Exception {
         List<ReferenceSequence> referenceSequences = referenceSequenceExtractorFromAnalysis
                 .getReferenceType(getAnalysisType(ANALYSIS_DOCUMENT_DATABASE_XML));
-        assertReferenceSequenceIsAsExpected(referenceSequences);
-    }
 
-    public void assertReferenceSequenceIsAsExpected(List<ReferenceSequence> referenceSequences) {
         Assert.assertNotNull(referenceSequences);
         Assert.assertEquals(1, referenceSequences.size());
-        Assert.assertEquals(1, referenceSequences.get(0).getAccessions().size());
-        Assert.assertEquals("GCA_000002305.1", referenceSequences.get(0).getAccessions().get(0));
+        Assert.assertEquals("GRCh37", referenceSequences.get(0).getName());
         Assert.assertEquals(ASSEMBLY, referenceSequences.get(0).getType());
     }
 
