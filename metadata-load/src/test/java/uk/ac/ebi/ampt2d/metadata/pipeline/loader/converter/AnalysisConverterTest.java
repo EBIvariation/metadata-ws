@@ -30,7 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.pipeline.configuration.AnalysisPersistenceApplicationRunnerConfiguration;
 import uk.ac.ebi.ampt2d.metadata.pipeline.configuration.MetadataDatabaseConfiguration;
-import uk.ac.ebi.ampt2d.metadata.pipeline.configuration.SraAPIConfiguration;
+import uk.ac.ebi.ampt2d.metadata.pipeline.configuration.SraApiConfiguration;
 import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraXmlParser;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
@@ -43,7 +43,7 @@ import static uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence.T
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {AnalysisPersistenceApplicationRunnerConfiguration.class,
         MetadataDatabaseConfiguration.class,
-        SraAPIConfiguration.class})
+        SraApiConfiguration.class})
 @EnableAutoConfiguration
 @TestPropertySource(locations = "classpath:application.properties", properties = {"import.object=analysis",
         "import.source=API"})

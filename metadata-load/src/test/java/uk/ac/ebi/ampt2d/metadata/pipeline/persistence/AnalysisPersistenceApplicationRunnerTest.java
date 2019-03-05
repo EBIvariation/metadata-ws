@@ -70,19 +70,13 @@ public class AnalysisPersistenceApplicationRunnerTest {
     @Test(expected = RuntimeException.class)
     public void testWithInvalidAndValidAnalysisAccession() throws Exception {
         applicationArguments[0] = "--analysisAccession.file.path=invalidAndValidAnalysisAccession.txt";
-        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
-        AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
-                "analysisRepository");
-        Assert.assertEquals(1, analysisRepository.count());
+        springApplication.run(applicationArguments);
     }
 
     @Test(expected = RuntimeException.class)
     public void testWithDuplicateAnalysisAccession() throws Exception {
         applicationArguments[0] = "--analysisAccession.file.path=duplicateAnalysisAccession.txt";
-        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
-        AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
-                "analysisRepository");
-        Assert.assertEquals(1, analysisRepository.count());
+        springApplication.run(applicationArguments);
     }
 
     private Object getBean(ConfigurableApplicationContext configurableApplicationContext, String bean) {
