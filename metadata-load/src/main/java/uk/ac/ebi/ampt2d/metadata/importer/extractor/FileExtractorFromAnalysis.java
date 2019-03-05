@@ -16,12 +16,12 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor;
+package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.converter.FileConverter;
+import uk.ac.ebi.ampt2d.metadata.importer.converter.FileConverter;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 

@@ -16,7 +16,7 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.pipeline.loader.converter;
+package uk.ac.ebi.ampt2d.metadata.importer.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
@@ -24,9 +24,9 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor.FileExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor.ReferenceSequenceExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor.StudyExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.ReferenceSequenceExtractorFromAnalysis;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.StudyExtractor;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.AnalysisType.ANALYSISTYPE.SEQUENCEVARIATION;
 

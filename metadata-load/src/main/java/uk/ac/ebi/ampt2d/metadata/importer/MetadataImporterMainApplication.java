@@ -16,16 +16,16 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.pipeline;
+package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MetadataPipelineMainApplication {
+public class MetadataImporterMainApplication {
 
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(MetadataPipelineMainApplication.class, args);
+        SpringApplication.run(MetadataImporterMainApplication.class, args);
 
     }
 }

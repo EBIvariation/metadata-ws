@@ -16,7 +16,7 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.pipeline.configuration;
+package uk.ac.ebi.ampt2d.metadata.importer.configuration;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -27,14 +27,14 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.SraRetrieverByAccession;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.converter.AnalysisConverter;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor.FileExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor.ReferenceSequenceExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor.StudyExtractor;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraAnalysisXmlParser;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraXmlParser;
-import uk.ac.ebi.ampt2d.metadata.pipeline.persistence.AnalysisPersistenceApplicationRunner;
+import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
+import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.ReferenceSequenceExtractorFromAnalysis;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.StudyExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.persistence.AnalysisPersistenceApplicationRunner;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 @Configuration

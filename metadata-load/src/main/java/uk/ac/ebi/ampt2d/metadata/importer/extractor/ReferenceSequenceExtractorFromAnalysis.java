@@ -16,7 +16,7 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor;
+package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;

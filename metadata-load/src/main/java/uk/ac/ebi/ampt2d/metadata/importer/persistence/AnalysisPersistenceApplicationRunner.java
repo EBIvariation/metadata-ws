@@ -16,20 +16,21 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.pipeline.persistence;
+package uk.ac.ebi.ampt2d.metadata.importer.persistence;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.convert.converter.Converter;
+import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.SraRetrieverByAccession;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraXmlParser;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -62,28 +63,37 @@ public class AnalysisPersistenceApplicationRunner implements ApplicationRunner {
     public void run(ApplicationArguments arguments) throws Exception {
         List<String> analysisAccessions = readAccessionsFromFile(arguments);
 
-        List<Analysis> analyses = new ArrayList<>();
-
         for (String analysisAccession : analysisAccessions) {
-            String xml = analyisRetriever.getXml(analysisAccession);
-            AnalysisType analysisType = (AnalysisType) sraXmlParser.parseXml(xml, analysisAccession);
-            Analysis analysis = analysisConverter.convert(analysisType);
-            analyses.add(analysis);
+            try {
+                String xml = analyisRetriever.getXml(analysisAccession);
+                AnalysisType analysisType = (AnalysisType) sraXmlParser.parseXml(xml, analysisAccession);
+                Analysis analysis = analysisConverter.convert(analysisType);
+                analysisRepository.save(analysis);
+            } catch (Exception exception) {
+                ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Encountered Exception for analysis files"
+                        + analysisAccession);
+                ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, exception.getMessage());
+            }
         }
-        analysisRepository.save(analyses);
     }
 
-    private List<String> readAccessionsFromFile(ApplicationArguments arguments) throws Exception {
+    private List<String> readAccessionsFromFile(ApplicationArguments arguments) {
         List<String> analysisAccessionsFilePath = arguments.getOptionValues(ANALYSIS_ACCESSION_FILE_PATH);
-        List<String> analysisAccessions = new ArrayList<>();
-        if (analysisAccessionsFilePath != null) {
-            try {
-                analysisAccessions = Files.readAllLines(Paths.get(getClass().getClassLoader()
-                        .getResource(analysisAccessionsFilePath.get(0)).toURI()));
-            } catch (Exception e) {
-                ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Provided file path is invalid");
-                throw new RuntimeException("Provided file path is invalid/file does not exists");
-            }
+        if (analysisAccessionsFilePath == null || analysisAccessionsFilePath.size() == 0) {
+            ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Please provide analysisAccession file path");
+            throw new RuntimeException("Please provide analysisAccession file path");
+        }
+        String accessionFilePath = analysisAccessionsFilePath.get(0);
+        List<String> analysisAccessions;
+        try {
+            analysisAccessions = Files.readAllLines(Paths.get(getClass().getClassLoader()
+                    .getResource(accessionFilePath).toURI()));
+        } catch (NullPointerException | URISyntaxException exception) {
+            ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Provided file path is invalid");
+            throw new RuntimeException("Provided file path is invalid/file does not exists");
+        } catch (IOException exception) {
+            ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Provided file is not valid/corrupt");
+            throw new RuntimeException("Provided file is not valid/corrupt");
         }
 
         return analysisAccessions;

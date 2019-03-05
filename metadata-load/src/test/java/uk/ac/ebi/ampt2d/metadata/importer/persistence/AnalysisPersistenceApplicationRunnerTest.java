@@ -16,7 +16,7 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.pipeline.persistence;
+package uk.ac.ebi.ampt2d.metadata.importer.persistence;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,19 +24,17 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.xml.sax.SAXParseException;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
-import uk.ac.ebi.ampt2d.metadata.pipeline.MetadataPipelineMainApplication;
+import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 
 @RunWith(SpringRunner.class)
 public class AnalysisPersistenceApplicationRunnerTest {
     private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 3;
 
-    private SpringApplication springApplication = new SpringApplication(MetadataPipelineMainApplication.class);
+    private SpringApplication springApplication = new SpringApplication(MetadataImporterMainApplication.class);
 
     private String[] applicationArguments = new String[NUMBER_OF_APPLICATION_ARGUMENTS];
 

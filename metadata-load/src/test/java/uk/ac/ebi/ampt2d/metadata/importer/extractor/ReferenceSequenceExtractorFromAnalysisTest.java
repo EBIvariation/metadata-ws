@@ -16,7 +16,7 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.pipeline.loader.extractor;
+package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,9 +29,9 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
-import uk.ac.ebi.ampt2d.metadata.pipeline.configuration.MetadataDatabaseConfiguration;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraAnalysisXmlParser;
-import uk.ac.ebi.ampt2d.metadata.pipeline.loader.xml.SraXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataDatabaseConfiguration;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 import java.nio.file.Files;
