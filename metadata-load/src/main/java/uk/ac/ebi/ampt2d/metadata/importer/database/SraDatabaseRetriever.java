@@ -26,15 +26,15 @@ import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
 import java.sql.SQLException;
 import java.sql.SQLXML;
 
-public class SraDatabaseAnalysisRetriever implements SraRetrieverByAccession {
+public class SraDatabaseRetriever implements SraRetrieverByAccession {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    @Value("${ena.analysis.query}")
-    private String enaAnalysisQuery;
+    @Value("${ena.${import.object}.query}")
+    private String enaObjectQuery;
 
     @Autowired
-    public SraDatabaseAnalysisRetriever(NamedParameterJdbcTemplate jdbcTemplate) {
+    public SraDatabaseRetriever(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -42,7 +42,7 @@ public class SraDatabaseAnalysisRetriever implements SraRetrieverByAccession {
     public String getXml(String accession) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("accession", accession);
-        SQLXML sqlxml = jdbcTemplate.queryForObject(enaAnalysisQuery, parameters, SQLXML.class);
+        SQLXML sqlxml = jdbcTemplate.queryForObject(enaObjectQuery, parameters, SQLXML.class);
         try {
             return sqlxml.getString();
         } catch (SQLException e) {

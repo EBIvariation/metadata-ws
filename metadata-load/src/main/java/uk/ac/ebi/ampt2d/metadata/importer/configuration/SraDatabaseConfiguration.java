@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import uk.ac.ebi.ampt2d.metadata.importer.database.SraDatabaseAnalysisRetriever;
+import uk.ac.ebi.ampt2d.metadata.importer.database.SraDatabaseRetriever;
 
 import javax.sql.DataSource;
 
@@ -57,7 +57,7 @@ public class SraDatabaseConfiguration {
     }
 
     @Bean
-    public SraDatabaseAnalysisRetriever sraDatabaseAnalysisRetriever() {
-        return new SraDatabaseAnalysisRetriever(enaJdbcTemplate());
+    public SraDatabaseRetriever sraDatabaseAnalysisRetriever() {
+        return new SraDatabaseRetriever(enaJdbcTemplate());
     }
 }

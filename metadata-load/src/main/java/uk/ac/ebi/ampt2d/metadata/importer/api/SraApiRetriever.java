@@ -21,7 +21,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
 
-public class SraApiAnalysisRetriever implements SraRetrieverByAccession {
+public class SraApiRetriever implements SraRetrieverByAccession {
 
     private static final String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
 

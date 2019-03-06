@@ -34,13 +34,14 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
-@TestPropertySource(value = "classpath:application.properties",properties = "import.source=DB")
+@TestPropertySource(value = "classpath:application.properties", properties = {"import.source=DB",
+        "import.object=analysis"})
 @ContextConfiguration(classes = {SraDatabaseConfiguration.class})
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
-public class SraDatabaseAnalysisRetrieverTest {
+public class SraDatabaseRetrieverTest {
 
     @Autowired
-    private SraDatabaseAnalysisRetriever sraRetriever;
+    private SraDatabaseRetriever sraRetriever;
 
     @Test
     @Category(OracleDbCategory.class)
