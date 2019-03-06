@@ -40,7 +40,7 @@ public class SraAnalysisXmlParserTest {
 
     @Test
     public void parseXmlApi() throws XmlException, URISyntaxException, IOException {
-        AnalysisType analysis = getAnalysisType("ERZ496533", "AnalysisDocumentApi.xml");
+        AnalysisType analysis = getAnalysisType("ERZ496533", "analysis/AnalysisDocumentApi.xml");
         assertEquals("DNA sequencing ACAN", analysis.getTITLE());
         assertEquals("GCA_000002305.1",
                 analysis.getANALYSISTYPE().getSEQUENCEVARIATION().getASSEMBLY().getSTANDARD().getAccession());
@@ -49,7 +49,7 @@ public class SraAnalysisXmlParserTest {
 
     @Test
     public void parseXmlDatabase() throws XmlException, URISyntaxException, IOException {
-        AnalysisType analysis = getAnalysisType("ERZ496533", "AnalysisDocumentDatabase.xml");
+        AnalysisType analysis = getAnalysisType("ERZ496533", "analysis/AnalysisDocumentDatabase.xml");
         assertEquals("DNA sequencing ACAN", analysis.getTITLE());
         assertEquals("GCA_000002305.1",
                 analysis.getANALYSISTYPE().getSEQUENCEVARIATION().getASSEMBLY().getSTANDARD().getAccession());
@@ -58,7 +58,7 @@ public class SraAnalysisXmlParserTest {
 
     @Test(expected = XmlException.class)
     public void parseNotFoundXml() throws XmlException, URISyntaxException, IOException {
-        AnalysisType analysis = getAnalysisType("ERZ496533", "AnalysisDocumentNotFound.xml");
+        AnalysisType analysis = getAnalysisType("ERZ496533", "analysis/AnalysisDocumentNotFound.xml");
     }
 
     private AnalysisType getAnalysisType(String analysisAccession, String analysisDocumentPath)

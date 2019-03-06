@@ -41,9 +41,9 @@ public class FileExtractorFromAnalysisTest {
 
     private static final String ANALYSIS_ACCESSION = "ERZ496533";
 
-    private static final String ANALYSIS_DOCUMENT_API_XML = "AnalysisDocumentApi.xml";
+    private static final String ANALYSIS_DOCUMENT_API_XML = "analysis/AnalysisDocumentApi.xml";
 
-    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "EgaAnalysisDocumentDatabase.xml";
+    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "analysis/EgaAnalysisDocumentDatabase.xml";
 
     private SraXmlParser<AnalysisType> xmlParser;
 

@@ -46,7 +46,7 @@ public class SraDatabaseAnalysisRetrieverTest {
     @Category(OracleDbCategory.class)
     public void getXml() throws Exception {
         String analysisAccession = "ERZ496533";
-        String analysisDocumentPath = "AnalysisDocumentDatabase.xml";
+        String analysisDocumentPath = "analysis/AnalysisDocumentDatabase.xml";
 
         String xmlString = sraRetriever.getXml(analysisAccession);
         String expectedXmlString = new String(Files.readAllBytes(

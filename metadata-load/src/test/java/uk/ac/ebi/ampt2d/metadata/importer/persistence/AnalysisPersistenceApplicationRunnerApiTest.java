@@ -42,7 +42,7 @@ public class AnalysisPersistenceApplicationRunnerApiTest {
 
     @Before
     public void setUp() {
-        applicationArguments[0] = "--analysisAccession.file.path=analysisAccessions.txt";
+        applicationArguments[0] = "--analysisAccession.file.path=analysis/analysisAccessions.txt";
         applicationArguments[1] = "--import.object=analysis";
         applicationArguments[2] = "--import.source=API";
     }
@@ -75,7 +75,7 @@ public class AnalysisPersistenceApplicationRunnerApiTest {
 
     @Test
     public void testWithInvalidAndValidAnalysisAccession() throws Exception {
-        applicationArguments[0] = "--analysisAccession.file.path=invalidAndValidAnalysisAccession.txt";
+        applicationArguments[0] = "--analysisAccession.file.path=analysis/invalidAndValidAnalysisAccession.txt";
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
         AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
                 "analysisRepository");
@@ -90,7 +90,7 @@ public class AnalysisPersistenceApplicationRunnerApiTest {
 
     @Test
     public void testWithDuplicateAnalysisAccession() throws Exception {
-        applicationArguments[0] = "--analysisAccession.file.path=duplicateAnalysisAccession.txt";
+        applicationArguments[0] = "--analysisAccession.file.path=analysis/duplicateAnalysisAccession.txt";
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
         AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
                 "analysisRepository");
