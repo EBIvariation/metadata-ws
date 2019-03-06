@@ -43,12 +43,12 @@ import java.util.List;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
-@SequenceGenerator(initialValue=1, allocationSize=1 , name="STUDY_SEQ", sequenceName="study_sequence")
+@SequenceGenerator(initialValue = 1, allocationSize = 1, name = "STUDY_SEQ", sequenceName = "study_sequence")
 public class Study extends Auditable<Long> {
 
     @ApiModelProperty(position = 1, value = "Study auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="STUDY_SEQ")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "STUDY_SEQ")
     @Id
     private long id;
 
@@ -117,9 +117,18 @@ public class Study extends Auditable<Long> {
     public Study() {
     }
 
+    public Study(AccessionVersionId accessionVersionId, String name,
+                 String description, String center, Taxonomy taxonomy) {
+        this.accessionVersionId = accessionVersionId;
+        this.name = name;
+        this.description = description;
+        this.center = center;
+        this.taxonomy = taxonomy;
+    }
+
     public Study(AccessionVersionId accessionVersionId, String name, String description, String center,
                  LocalDate
-            releaseDate, Taxonomy taxonomy) {
+                         releaseDate, Taxonomy taxonomy) {
         this.accessionVersionId = accessionVersionId;
         this.name = name;
         this.description = description;

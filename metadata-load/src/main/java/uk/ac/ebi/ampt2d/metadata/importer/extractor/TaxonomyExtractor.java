@@ -33,5 +33,4 @@ public class TaxonomyExtractor {
     public Taxonomy getTaxonomy() {
         return taxonomy;
     }
-
 }
