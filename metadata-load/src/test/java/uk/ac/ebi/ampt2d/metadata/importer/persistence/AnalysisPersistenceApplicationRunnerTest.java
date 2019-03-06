@@ -65,16 +65,34 @@ public class AnalysisPersistenceApplicationRunnerTest {
         springApplication.run(applicationArguments);
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testWithInvalidAndValidAnalysisAccession() throws Exception {
         applicationArguments[0] = "--analysisAccession.file.path=invalidAndValidAnalysisAccession.txt";
-        springApplication.run(applicationArguments);
+        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
+        AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
+                "analysisRepository");
+        Assert.assertEquals(1, analysisRepository.count());
+        FileRepository fileRepository = (FileRepository) getBean(configurableApplicationContext,
+                "fileRepository");
+        Assert.assertEquals(2, fileRepository.count());
+        ReferenceSequenceRepository referenceSequenceRepository =
+                (ReferenceSequenceRepository) getBean(configurableApplicationContext, "referenceSequenceRepository");
+        Assert.assertEquals(1, referenceSequenceRepository.count());
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testWithDuplicateAnalysisAccession() throws Exception {
         applicationArguments[0] = "--analysisAccession.file.path=duplicateAnalysisAccession.txt";
-        springApplication.run(applicationArguments);
+        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
+        AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
+                "analysisRepository");
+        Assert.assertEquals(1, analysisRepository.count());
+        FileRepository fileRepository = (FileRepository) getBean(configurableApplicationContext,
+                "fileRepository");
+        Assert.assertEquals(2, fileRepository.count());
+        ReferenceSequenceRepository referenceSequenceRepository =
+                (ReferenceSequenceRepository) getBean(configurableApplicationContext, "referenceSequenceRepository");
+        Assert.assertEquals(0, referenceSequenceRepository.count());
     }
 
     private Object getBean(ConfigurableApplicationContext configurableApplicationContext, String bean) {

@@ -31,7 +31,9 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -61,7 +63,7 @@ public class AnalysisPersistenceApplicationRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
-        List<String> analysisAccessions = readAccessionsFromFile(arguments);
+        Set<String> analysisAccessions = readAccessionsFromFile(arguments);
 
         for (String analysisAccession : analysisAccessions) {
             try {
@@ -77,17 +79,17 @@ public class AnalysisPersistenceApplicationRunner implements ApplicationRunner {
         }
     }
 
-    private List<String> readAccessionsFromFile(ApplicationArguments arguments) {
+    private Set<String> readAccessionsFromFile(ApplicationArguments arguments) {
         List<String> analysisAccessionsFilePath = arguments.getOptionValues(ANALYSIS_ACCESSION_FILE_PATH);
         if (analysisAccessionsFilePath == null || analysisAccessionsFilePath.size() == 0) {
             ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Please provide analysisAccession file path");
             throw new RuntimeException("Please provide analysisAccession file path");
         }
         String accessionFilePath = analysisAccessionsFilePath.get(0);
-        List<String> analysisAccessions;
+        Set<String> analysisAccessions;
         try {
-            analysisAccessions = Files.readAllLines(Paths.get(getClass().getClassLoader()
-                    .getResource(accessionFilePath).toURI()));
+            analysisAccessions = new HashSet<>(Files.readAllLines(Paths.get(getClass().getClassLoader()
+                    .getResource(accessionFilePath).toURI())));
         } catch (NullPointerException | URISyntaxException exception) {
             ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Provided file path is invalid");
             throw new RuntimeException("Provided file path is invalid/file does not exists");
