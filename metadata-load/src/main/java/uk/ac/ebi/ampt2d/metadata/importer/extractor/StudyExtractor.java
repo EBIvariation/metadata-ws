@@ -24,14 +24,14 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 public class StudyExtractor {
     private static final Long STUDY_ID = new Long(1);
 
-    private StudyRepository studyRepository;
+    private static Study study;
 
     public StudyExtractor(StudyRepository studyRepository) {
-        this.studyRepository = studyRepository;
+        study = studyRepository.findOne(STUDY_ID);
     }
 
     public Study getStudy() {
-        return studyRepository.findOne(STUDY_ID);
+        return study;
     }
 
 }
