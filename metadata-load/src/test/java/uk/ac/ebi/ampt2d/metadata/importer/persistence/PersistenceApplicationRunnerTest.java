@@ -25,16 +25,15 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
+import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 @RunWith(SpringRunner.class)
-public class AnalysisPersistenceApplicationRunnerApiTest {
-    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 3;
+public class PersistenceApplicationRunnerTest {
+    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 4;
 
     private SpringApplication springApplication = new SpringApplication(MetadataImporterMainApplication.class);
 
@@ -42,13 +41,14 @@ public class AnalysisPersistenceApplicationRunnerApiTest {
 
     @Before
     public void setUp() {
-        applicationArguments[0] = "--analysisAccession.file.path=analysis/analysisAccessions.txt";
+        applicationArguments[0] = "--accessions.file.path=analysis/analysisAccessions.txt";
         applicationArguments[1] = "--import.object=analysis";
         applicationArguments[2] = "--import.source=API";
+        applicationArguments[3] = "--spring.datasource.data=classpath:analysis/data.sql";
     }
 
     @Test
-    public void testRunForApi() throws Exception {
+    public void testRun() throws Exception {
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
         AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
                 "analysisRepository");
@@ -59,23 +59,18 @@ public class AnalysisPersistenceApplicationRunnerApiTest {
         ReferenceSequenceRepository referenceSequenceRepository =
                 (ReferenceSequenceRepository) getBean(configurableApplicationContext, "referenceSequenceRepository");
         Assert.assertEquals(1, referenceSequenceRepository.count());
-        SampleRepository sampleRepository =
-                (SampleRepository) getBean(configurableApplicationContext, "sampleRepository");
-        Assert.assertEquals(2, sampleRepository.count());
-        StudyRepository studyRepository =
-                (StudyRepository) getBean(configurableApplicationContext, "studyRepository");
-        Assert.assertEquals(2, studyRepository.count());
     }
 
     @Test(expected = RuntimeException.class)
     public void testInvalidFilePath() throws Exception {
-        applicationArguments[0] = "--analysisAccession.file.path=InvalidFilePath/analysisAccessions.txt";
+        applicationArguments[0] = "--accessions.file.path=InvalidFilePath/analysisAccessions.txt";
         springApplication.run(applicationArguments);
     }
 
     @Test
     public void testWithInvalidAndValidAnalysisAccession() throws Exception {
-        applicationArguments[0] = "--analysisAccession.file.path=analysis/invalidAndValidAnalysisAccession.txt";
+        applicationArguments[0] = "--accessions.file.path=analysis/invalidAndValidAnalysisAccession.txt";
+
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
         AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
                 "analysisRepository");
@@ -90,7 +85,7 @@ public class AnalysisPersistenceApplicationRunnerApiTest {
 
     @Test
     public void testWithDuplicateAnalysisAccession() throws Exception {
-        applicationArguments[0] = "--analysisAccession.file.path=analysis/duplicateAnalysisAccession.txt";
+        applicationArguments[0] = "--accessions.file.path=analysis/duplicateAnalysisAccession.txt";
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
         AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
                 "analysisRepository");
@@ -101,6 +96,18 @@ public class AnalysisPersistenceApplicationRunnerApiTest {
         ReferenceSequenceRepository referenceSequenceRepository =
                 (ReferenceSequenceRepository) getBean(configurableApplicationContext, "referenceSequenceRepository");
         Assert.assertEquals(0, referenceSequenceRepository.count());
+    }
+
+    @Test
+    public void testRunStudy() throws Exception {
+        applicationArguments[0] = "--accessions.file.path=study/studyAccessions.txt";
+        applicationArguments[1] = "--import.object=study";
+        applicationArguments[3] = "--spring.datasource.data=classpath:study/data.sql";
+        applicationArguments[2] = "--import.source=DB";
+        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
+        StudyRepository studyRepository = (StudyRepository) getBean(configurableApplicationContext,
+                "studyRepository");
+        Assert.assertEquals(1, studyRepository.count());
     }
 
     private Object getBean(ConfigurableApplicationContext configurableApplicationContext, String bean) {
