@@ -70,7 +70,7 @@ public class AnalysisPersistenceApplicationRunner implements ApplicationRunner {
                 Analysis analysis = analysisConverter.convert(analysisType);
                 analysisRepository.save(analysis);
             } catch (Exception exception) {
-                ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Encountered Exception for analysis files"
+                ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Encountered Exception for analysis"
                         + analysisAccession);
                 ANALYSIS_PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, exception.getMessage());
             }
