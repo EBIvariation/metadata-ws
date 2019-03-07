@@ -35,7 +35,7 @@ import uk.ac.ebi.ena.sra.xml.StudyType;
 
 @Configuration
 @ConditionalOnProperty(name = "import.object", havingValue = "study")
-public class StudyPersistenceApplicationRunner {
+public class StudyPersistenceApplicationRunnerConfiguration {
 
     @Bean
     public PersistenceApplicationRunner<StudyType, Study> pipelineApplicationRunner(
