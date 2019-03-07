@@ -136,7 +136,9 @@ public class Analysis extends Auditable<Long> {
     public Analysis() {
     }
 
-    public Analysis(AccessionVersionId accessionVersionId, String name, String description, Study study, List<ReferenceSequence> referenceSequences, Technology technology, List<File> files) {
+    public Analysis(AccessionVersionId accessionVersionId, String name, String description,
+                    Study study, List<ReferenceSequence> referenceSequences, Technology technology,
+                    List<File> files,List<Sample> samples) {
         this.accessionVersionId = accessionVersionId;
         this.name = name;
         this.description = description;
@@ -144,6 +146,7 @@ public class Analysis extends Auditable<Long> {
         this.referenceSequences = referenceSequences;
         this.technology = technology;
         this.files = files;
+        this.samples=samples;
     }
 
     @Override

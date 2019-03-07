@@ -69,6 +69,12 @@ public class Sample extends Auditable<Long> {
     Sample() {
     }
 
+    public Sample(AccessionVersionId accessionVersionId, String name, List<Taxonomy> taxonomies) {
+        this.accessionVersionId = accessionVersionId;
+        this.name = name;
+        this.taxonomies = taxonomies;
+    }
+
     @Override
     public Long getId() {
         return id;

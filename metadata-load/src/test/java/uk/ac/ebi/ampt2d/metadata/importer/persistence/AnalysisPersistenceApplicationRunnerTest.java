@@ -29,6 +29,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 
 @RunWith(SpringRunner.class)
 public class AnalysisPersistenceApplicationRunnerTest {
@@ -57,6 +58,9 @@ public class AnalysisPersistenceApplicationRunnerTest {
         ReferenceSequenceRepository referenceSequenceRepository =
                 (ReferenceSequenceRepository) getBean(configurableApplicationContext, "referenceSequenceRepository");
         Assert.assertEquals(1, referenceSequenceRepository.count());
+        SampleRepository sampleRepository =
+                (SampleRepository) getBean(configurableApplicationContext, "sampleRepository");
+        Assert.assertEquals(1, sampleRepository.count());
     }
 
     @Test(expected = RuntimeException.class)

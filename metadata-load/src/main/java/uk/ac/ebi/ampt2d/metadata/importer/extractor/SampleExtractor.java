@@ -19,22 +19,21 @@
 package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 
-import java.time.LocalDate;
+import java.util.Arrays;
 
-public class StudyExtractor {
+public class SampleExtractor {
+    private static Sample sample;
 
-    private static Study study;
-
-    public StudyExtractor(StudyRepository studyRepository, TaxonomyExtractor taxonomyExtractor) {
-        study = studyRepository.save(new Study(new AccessionVersionId("ERP000326", 1), "R&amp;D",
-                "fc_coating_study", "SC", LocalDate.of(2015, 10, 2), taxonomyExtractor.getTaxonomy()));
+    public SampleExtractor(SampleRepository sampleRepository, TaxonomyExtractor taxonomyExtractor) {
+        sample = sampleRepository.save(new Sample(new AccessionVersionId("ERS000156", 1), "E-TABM-722:mmu5", Arrays
+                .asList(taxonomyExtractor.getTaxonomy())));
     }
 
-    public Study getStudy() {
-        return study;
+    public Sample getSample() {
+        return sample;
     }
 
 }

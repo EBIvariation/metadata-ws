@@ -16,15 +16,22 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.importer;
+package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 
-@SpringBootApplication
-public class MetadataImporterMainApplication {
+public class TaxonomyExtractor {
+    private static final Long TAXONOMY_ID = new Long(1);
 
-    public static void main(String[] args) throws Exception {
-        SpringApplication.run(MetadataImporterMainApplication.class, args);
+    private static Taxonomy taxonomy;
+
+    public TaxonomyExtractor(TaxonomyRepository taxonomyRepository) {
+        taxonomy = taxonomyRepository.findOne(TAXONOMY_ID);
     }
+
+    public Taxonomy getTaxonomy() {
+        return taxonomy;
+    }
+
 }

@@ -19,17 +19,20 @@
 package uk.ac.ebi.ampt2d.metadata.importer.converter;
 
 import org.springframework.core.convert.converter.Converter;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.ReferenceSequenceExtractorFromAnalysis;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.SampleExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.StudyExtractor;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.ReferenceSequenceExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.StudyExtractor;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.AnalysisType.ANALYSISTYPE.SEQUENCEVARIATION;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class AnalysisConverter implements Converter<AnalysisType, Analysis> {
@@ -40,19 +43,27 @@ public class AnalysisConverter implements Converter<AnalysisType, Analysis> {
 
     private StudyExtractor studyExtractor;
 
+    private SampleExtractor sampleExtractor;
+
     public AnalysisConverter(StudyExtractor studyExtractor,
                              ReferenceSequenceExtractorFromAnalysis referenceSequenceExtractorFromAnalysis,
-                             FileExtractorFromAnalysis fileExtractorFromAnalysis) {
+                             FileExtractorFromAnalysis fileExtractorFromAnalysis,
+                             SampleExtractor sampleExtractor) {
         this.studyExtractor = studyExtractor;
         this.referenceSequenceExtractorFromAnalysis = referenceSequenceExtractorFromAnalysis;
         this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
+        this.sampleExtractor = sampleExtractor;
     }
 
     @Override
     public Analysis convert(AnalysisType analysisType) {
         return new Analysis(new AccessionVersionId(analysisType.getAccession(), 1), analysisType.getTITLE(),
                 analysisType.getDESCRIPTION(), getStudy(), getReferenceType(analysisType),
-                getTechnology(analysisType), getfiles(analysisType));
+                getTechnology(analysisType), getfiles(analysisType), getSamples());
+    }
+
+    private List<Sample> getSamples() {
+        return Arrays.asList(sampleExtractor.getSample());
     }
 
     private Study getStudy() {

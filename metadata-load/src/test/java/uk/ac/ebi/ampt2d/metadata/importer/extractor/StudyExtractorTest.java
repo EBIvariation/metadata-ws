@@ -26,9 +26,10 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataDatabaseConfiguration;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
-import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataDatabaseConfiguration;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = MetadataDatabaseConfiguration.class)
@@ -39,11 +40,14 @@ public class StudyExtractorTest {
     @Autowired
     private StudyRepository studyRepository;
 
+    @Autowired
+    private TaxonomyRepository taxonomyRepository;
+
     private StudyExtractor studyExtractor;
 
     @Test
     public void testStudyExtract() {
-        studyExtractor = new StudyExtractor(studyRepository);
+        studyExtractor = new StudyExtractor(studyRepository, new TaxonomyExtractor(taxonomyRepository));
         Study study = studyExtractor.getStudy();
         Assert.assertNotNull(study);
         Assert.assertEquals(1, study.getId().longValue());

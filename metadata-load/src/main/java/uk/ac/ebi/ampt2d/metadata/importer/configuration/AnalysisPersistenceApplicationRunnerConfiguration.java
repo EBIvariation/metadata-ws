@@ -22,19 +22,23 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.ReferenceSequenceExtractorFromAnalysis;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.SampleExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.StudyExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.persistence.AnalysisPersistenceApplicationRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
-import uk.ac.ebi.ampt2d.metadata.importer.persistence.AnalysisPersistenceApplicationRunner;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 @Configuration
@@ -48,18 +52,34 @@ public class AnalysisPersistenceApplicationRunnerConfiguration {
             AnalysisRepository analysisRepository,
             StudyRepository studyRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
-            FileRepository fileRepository) {
+            FileRepository fileRepository,
+            SampleRepository sampleRepository,
+            TaxonomyRepository taxonomyRepository) {
         return new AnalysisPersistenceApplicationRunner(sraRetrieverByAccession, sraXmlParser, analysisRepository,
-                getAnalysisConverter(studyRepository, referenceSequenceRepository, fileRepository));
+                getAnalysisConverter(studyRepository, referenceSequenceRepository, fileRepository, sampleRepository,
+                        taxonomyRepository));
     }
 
     @Bean
     public Converter<AnalysisType, Analysis> getAnalysisConverter(StudyRepository studyRepository,
-                                                                ReferenceSequenceRepository referenceSequenceRepository,
-                                                                FileRepository fileRepository) {
-        return new AnalysisConverter(getStudyExtractor(studyRepository),
+                                                                  ReferenceSequenceRepository referenceSequenceRepository,
+                                                                  FileRepository fileRepository,
+                                                                  SampleRepository sampleRepository,
+                                                                  TaxonomyRepository taxonomyRepository) {
+        return new AnalysisConverter(getStudyExtractor(studyRepository, taxonomyRepository),
                 getReferenceSequnceExtractorFromAnalysis(referenceSequenceRepository),
-                getFileExtractorFromAnalysis(fileRepository));
+                getFileExtractorFromAnalysis(fileRepository),
+                getSampleExtractor(sampleRepository, taxonomyRepository));
+    }
+
+    @Bean
+    public SampleExtractor getSampleExtractor(SampleRepository sampleRepository, TaxonomyRepository taxonomyRepository) {
+        return new SampleExtractor(sampleRepository, taxonomyExtractor(taxonomyRepository));
+    }
+
+    @Bean
+    public TaxonomyExtractor taxonomyExtractor(TaxonomyRepository taxonomyRepository) {
+        return new TaxonomyExtractor(taxonomyRepository);
     }
 
     @Bean
@@ -68,8 +88,8 @@ public class AnalysisPersistenceApplicationRunnerConfiguration {
     }
 
     @Bean
-    public StudyExtractor getStudyExtractor(StudyRepository studyRepository) {
-        return new StudyExtractor(studyRepository);
+    public StudyExtractor getStudyExtractor(StudyRepository studyRepository, TaxonomyRepository taxonomyRepository) {
+        return new StudyExtractor(studyRepository, taxonomyExtractor(taxonomyRepository));
     }
 
     @Bean
