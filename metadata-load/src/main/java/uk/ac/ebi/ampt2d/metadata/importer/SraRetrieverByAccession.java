@@ -15,17 +15,10 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader.converter;
+package uk.ac.ebi.ampt2d.metadata.importer;
 
-import org.springframework.core.convert.converter.Converter;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
-import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
+public interface SraRetrieverByAccession {
 
-public class FileConverter implements Converter<AnalysisFileType, File> {
+    String getXml(String accession);
 
-    @Override
-    public File convert(AnalysisFileType analysisFileType) {
-        return new File(analysisFileType.getChecksum(), analysisFileType.getFilename(),
-                analysisFileType.getFiletype().toString().toUpperCase());
-    }
 }

@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader.database;
+package uk.ac.ebi.ampt2d.metadata.importer.database;
 
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -26,7 +26,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.ac.ebi.ampt2d.metadata.configuration.DatabaseConfiguration;
+import uk.ac.ebi.ampt2d.metadata.importer.configuration.SraDatabaseConfiguration;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -34,8 +34,8 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
-@TestPropertySource("classpath:application.properties")
-@ContextConfiguration(classes = {DatabaseConfiguration.class})
+@TestPropertySource(value = "classpath:application.properties",properties = "import.source=DB")
+@ContextConfiguration(classes = {SraDatabaseConfiguration.class})
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 public class SraDatabaseAnalysisRetrieverTest {
 

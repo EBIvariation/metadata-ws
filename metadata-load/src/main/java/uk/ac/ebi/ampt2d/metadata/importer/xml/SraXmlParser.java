@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader.xml;
+package uk.ac.ebi.ampt2d.metadata.importer.xml;
 
 import org.apache.xmlbeans.XmlException;
 

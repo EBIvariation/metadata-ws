@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2018 EMBL - European Bioinformatics Institute
+ * Copyright 2019 EMBL - European Bioinformatics Institute
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,39 +15,43 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.configuration;
+package uk.ac.ebi.ampt2d.metadata.importer.configuration;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import uk.ac.ebi.ampt2d.metadata.loader.database.SraDatabaseAnalysisRetriever;
+import uk.ac.ebi.ampt2d.metadata.importer.database.SraDatabaseAnalysisRetriever;
 
 import javax.sql.DataSource;
 
 @Configuration
-public class DatabaseConfiguration {
+@ConditionalOnProperty(name = "import.source", havingValue = "DB")
+public class SraDatabaseConfiguration {
 
-    @Bean("db_datasource_properties")
+    @Bean("enaDatasourceProperties")
     @ConfigurationProperties("ena.datasource")
+    @Primary
     public DataSourceProperties dbDataSourceProperties() {
         return new DataSourceProperties();
     }
 
-    @Bean("db_datasource")
+    @Bean("enaDatasource")
     @ConfigurationProperties("ena.datasource.tomcat")
     public DataSource dbDataSource() {
         return dbDataSourceProperties().initializeDataSourceBuilder().build();
     }
 
-    @Bean("db_transaction_manager")
+    @Bean("enaDatasourceTransactionManager")
     public DataSourceTransactionManager dbTransactionManager() {
         return new DataSourceTransactionManager(dbDataSource());
     }
 
-    @Bean("ena_jdbc_template")
+    @Bean("enaJdbcTemplate")
     public NamedParameterJdbcTemplate enaJdbcTemplate() {
         return new NamedParameterJdbcTemplate(dbDataSource());
     }

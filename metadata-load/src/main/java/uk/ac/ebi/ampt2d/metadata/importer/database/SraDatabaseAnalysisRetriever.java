@@ -15,13 +15,13 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader.database;
+package uk.ac.ebi.ampt2d.metadata.importer.database;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import uk.ac.ebi.ampt2d.metadata.loader.SraRetrieverByAccession;
+import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
 
 import java.sql.SQLException;
 import java.sql.SQLXML;

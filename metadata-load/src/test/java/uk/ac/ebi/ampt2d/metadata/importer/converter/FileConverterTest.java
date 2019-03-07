@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader.converter;
+package uk.ac.ebi.ampt2d.metadata.importer.converter;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

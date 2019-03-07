@@ -15,10 +15,21 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.loader;
+package uk.ac.ebi.ampt2d.metadata.importer.api;
 
-public interface SraRetrieverByAccession {
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestTemplate;
+import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
 
-    String getXml(String accession);
+public class SraApiAnalysisRetriever implements SraRetrieverByAccession {
+
+    private static final String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
+
+    private RestTemplate restTemplate = new RestTemplate();
+
+    @Override
+    public String getXml(String accession) {
+        return restTemplate.exchange(ENA_API_URL, HttpMethod.GET, null, String.class, accession).getBody();
+    }
 
 }
