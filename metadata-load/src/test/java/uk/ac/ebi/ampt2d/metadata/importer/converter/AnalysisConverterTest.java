@@ -87,7 +87,7 @@ public class AnalysisConverterTest {
 
         Assert.assertNotNull(analysis);
         Assert.assertEquals("ERZ000011", analysis.getAccessionVersionId().getAccession());
-        Assert.assertEquals(Analysis.Technology.GWAS, analysis.getTechnology());
+        Assert.assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
         Assert.assertEquals(1, analysis.getReferenceSequences().size());
         Assert.assertEquals(ASSEMBLY, analysis.getReferenceSequences().get(0).getType());
         Assert.assertEquals("ERP000326", analysis.getStudy().getAccessionVersionId().getAccession());

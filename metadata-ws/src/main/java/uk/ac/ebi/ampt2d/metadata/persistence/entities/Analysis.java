@@ -70,7 +70,9 @@ public class Analysis extends Auditable<Long> {
 
         ARRAY,
 
-        CURATION
+        CURATION ,
+
+        UNSPECIFIED
 
     }
 
@@ -123,8 +125,10 @@ public class Analysis extends Auditable<Long> {
     private Type type;
 
     @ApiModelProperty(position = 9, required = true)
+    @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
+    @Column(nullable = false)
     private String platform;
 
     @ManyToMany
@@ -138,13 +142,14 @@ public class Analysis extends Auditable<Long> {
 
     public Analysis(AccessionVersionId accessionVersionId, String name, String description,
                     Study study, List<ReferenceSequence> referenceSequences, Technology technology,
-                    List<File> files,List<Sample> samples) {
+                    String platform, List<File> files, List<Sample> samples) {
         this.accessionVersionId = accessionVersionId;
         this.name = name;
         this.description = description;
         this.study = study;
         this.referenceSequences = referenceSequences;
         this.technology = technology;
+        this.platform = platform;
         this.files = files;
         this.samples=samples;
     }

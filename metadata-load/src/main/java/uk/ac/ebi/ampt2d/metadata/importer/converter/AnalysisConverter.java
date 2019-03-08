@@ -59,7 +59,16 @@ public class AnalysisConverter implements Converter<AnalysisType, Analysis> {
     public Analysis convert(AnalysisType analysisType) {
         return new Analysis(new AccessionVersionId(analysisType.getAccession(), 1), analysisType.getTITLE(),
                 analysisType.getDESCRIPTION(), getStudy(), getReferenceType(analysisType),
-                getTechnology(analysisType), getfiles(analysisType), getSamples());
+                getTechnology(analysisType), getPlatform(analysisType), getfiles(analysisType), getSamples());
+    }
+
+    private String getPlatform(AnalysisType analysisType) {
+        SEQUENCEVARIATION sequencevariation = analysisType.getANALYSISTYPE().getSEQUENCEVARIATION();
+        String platform = "UNSPECIFIED";
+        if (sequencevariation != null && sequencevariation.getPLATFORM() != null) {
+            platform = sequencevariation.getPLATFORM();
+        }
+        return platform;
     }
 
     private List<Sample> getSamples() {
@@ -94,6 +103,6 @@ public class AnalysisConverter implements Converter<AnalysisType, Analysis> {
                     return Analysis.Technology.GWAS;
             }
         }
-        return Analysis.Technology.GWAS;
+        return Analysis.Technology.UNSPECIFIED;
     }
 }
