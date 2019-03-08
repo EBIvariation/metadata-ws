@@ -33,7 +33,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 @RunWith(SpringRunner.class)
 public class PersistenceApplicationRunnerTest {
-    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 4;
+    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 3;
 
     private SpringApplication springApplication = new SpringApplication(MetadataImporterMainApplication.class);
 
@@ -44,7 +44,6 @@ public class PersistenceApplicationRunnerTest {
         applicationArguments[0] = "--accessions.file.path=analysis/analysisAccessions.txt";
         applicationArguments[1] = "--import.object=analysis";
         applicationArguments[2] = "--import.source=API";
-        applicationArguments[3] = "--spring.datasource.data=classpath:analysis/data.sql";
     }
 
     @Test
@@ -102,8 +101,7 @@ public class PersistenceApplicationRunnerTest {
     public void testRunStudy() throws Exception {
         applicationArguments[0] = "--accessions.file.path=study/studyAccessions.txt";
         applicationArguments[1] = "--import.object=study";
-        applicationArguments[3] = "--spring.datasource.data=classpath:study/data.sql";
-        applicationArguments[2] = "--import.source=DB";
+        applicationArguments[2] = "--import.source=API";
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
         StudyRepository studyRepository = (StudyRepository) getBean(configurableApplicationContext,
                 "studyRepository");
