@@ -56,24 +56,24 @@ public class AnalysisPersistenceApplicationRunnerConfiguration {
             SampleRepository sampleRepository,
             TaxonomyRepository taxonomyRepository) {
         return new AnalysisPersistenceApplicationRunner(sraRetrieverByAccession, sraXmlParser, analysisRepository,
-                getAnalysisConverter(studyRepository, referenceSequenceRepository, fileRepository, sampleRepository,
+                analysisConverter(studyRepository, referenceSequenceRepository, fileRepository, sampleRepository,
                         taxonomyRepository));
     }
 
     @Bean
-    public Converter<AnalysisType, Analysis> getAnalysisConverter(StudyRepository studyRepository,
-                                                                  ReferenceSequenceRepository referenceSequenceRepository,
-                                                                  FileRepository fileRepository,
-                                                                  SampleRepository sampleRepository,
-                                                                  TaxonomyRepository taxonomyRepository) {
-        return new AnalysisConverter(getStudyExtractor(studyRepository, taxonomyRepository),
-                getReferenceSequnceExtractorFromAnalysis(referenceSequenceRepository),
-                getFileExtractorFromAnalysis(fileRepository),
-                getSampleExtractor(sampleRepository, taxonomyRepository));
+    public Converter<AnalysisType, Analysis> analysisConverter(StudyRepository studyRepository,
+                                                               ReferenceSequenceRepository referenceSequenceRepository,
+                                                               FileRepository fileRepository,
+                                                               SampleRepository sampleRepository,
+                                                               TaxonomyRepository taxonomyRepository) {
+        return new AnalysisConverter(studyExtractor(studyRepository, taxonomyRepository),
+                referenceSequenceExtractorFromAnalysis(referenceSequenceRepository),
+                fileExtractorFromAnalysis(fileRepository),
+                sampleExtractor(sampleRepository, taxonomyRepository));
     }
 
     @Bean
-    public SampleExtractor getSampleExtractor(SampleRepository sampleRepository, TaxonomyRepository taxonomyRepository) {
+    public SampleExtractor sampleExtractor(SampleRepository sampleRepository, TaxonomyRepository taxonomyRepository) {
         return new SampleExtractor(sampleRepository, taxonomyExtractor(taxonomyRepository));
     }
 
@@ -88,18 +88,18 @@ public class AnalysisPersistenceApplicationRunnerConfiguration {
     }
 
     @Bean
-    public StudyExtractor getStudyExtractor(StudyRepository studyRepository, TaxonomyRepository taxonomyRepository) {
+    public StudyExtractor studyExtractor(StudyRepository studyRepository, TaxonomyRepository taxonomyRepository) {
         return new StudyExtractor(studyRepository, taxonomyExtractor(taxonomyRepository));
     }
 
     @Bean
-    public ReferenceSequenceExtractorFromAnalysis getReferenceSequnceExtractorFromAnalysis(
+    public ReferenceSequenceExtractorFromAnalysis referenceSequenceExtractorFromAnalysis(
             ReferenceSequenceRepository referenceSequenceRepository) {
         return new ReferenceSequenceExtractorFromAnalysis(referenceSequenceRepository);
     }
 
     @Bean
-    public FileExtractorFromAnalysis getFileExtractorFromAnalysis(FileRepository fileRepository) {
+    public FileExtractorFromAnalysis fileExtractorFromAnalysis(FileRepository fileRepository) {
         return new FileExtractorFromAnalysis(fileRepository);
     }
 }
