@@ -19,6 +19,7 @@
 package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
@@ -26,14 +27,23 @@ import java.time.LocalDate;
 
 public class StudyExtractor {
 
-    private static Study study;
+    private StudyRepository studyRepository;
+
+    private TaxonomyExtractor taxonomyExtractor;
 
     public StudyExtractor(StudyRepository studyRepository, TaxonomyExtractor taxonomyExtractor) {
-        study = studyRepository.save(new Study(new AccessionVersionId("ERP000326", 1), "R&amp;D",
-                "fc_coating_study", "SC", LocalDate.of(2015, 10, 2), taxonomyExtractor.getTaxonomy()));
+        this.studyRepository = studyRepository;
+        this.taxonomyExtractor = taxonomyExtractor;
     }
 
-    public Study getStudy() {
+    public Study getStudy(String accession) {
+        QStudy qStudy = QStudy.study;
+        Study study = studyRepository.findOne(qStudy.accessionVersionId.accession.equalsIgnoreCase(accession).and
+                (qStudy.accessionVersionId.version.eq(1)));
+        if (study == null) {
+            study = studyRepository.save(new Study(new AccessionVersionId(accession, 1), "UK10K_OBESITY_SCOOP",
+                    "SCOOP Desription", "SC", LocalDate.of(2015, 10, 2), taxonomyExtractor.getTaxonomy()));
+        }
         return study;
     }
 

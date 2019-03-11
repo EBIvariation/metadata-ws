@@ -37,6 +37,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 @TestPropertySource(locations = "classpath:application.properties")
 public class StudyExtractorTest {
 
+    public static final String STUDY_ACCESSION = "ERP000326";
+
     @Autowired
     private StudyRepository studyRepository;
 
@@ -48,9 +50,9 @@ public class StudyExtractorTest {
     @Test
     public void testStudyExtract() {
         studyExtractor = new StudyExtractor(studyRepository, new TaxonomyExtractor(taxonomyRepository));
-        Study study = studyExtractor.getStudy();
+        Study study = studyExtractor.getStudy(STUDY_ACCESSION);
         Assert.assertNotNull(study);
         Assert.assertEquals(1, study.getId().longValue());
-        Assert.assertEquals("ERP000326", study.getAccessionVersionId().getAccession());
+        Assert.assertEquals(STUDY_ACCESSION, study.getAccessionVersionId().getAccession());
     }
 }

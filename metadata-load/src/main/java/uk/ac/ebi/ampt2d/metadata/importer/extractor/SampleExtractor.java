@@ -19,20 +19,31 @@
 package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QSample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 
 import java.util.Arrays;
 
 public class SampleExtractor {
-    private static Sample sample;
+    private SampleRepository sampleRepository;
+
+    private TaxonomyExtractor taxonomyExtractor;
 
     public SampleExtractor(SampleRepository sampleRepository, TaxonomyExtractor taxonomyExtractor) {
-        sample = sampleRepository.save(new Sample(new AccessionVersionId("ERS000156", 1), "E-TABM-722:mmu5", Arrays
-                .asList(taxonomyExtractor.getTaxonomy())));
+        this.sampleRepository = sampleRepository;
+        this.taxonomyExtractor = taxonomyExtractor;
     }
 
-    public Sample getSample() {
+    public Sample getSample(String accession) {
+        QSample qSample = QSample.sample;
+        Sample sample = sampleRepository.findOne(qSample.accessionVersionId.accession.equalsIgnoreCase(accession).and
+                (qSample.accessionVersionId.version.eq(1)));
+        if (sample == null) {
+            sample = sampleRepository.save(new Sample(new AccessionVersionId(accession, 1),
+                    "UK10K_SCOOP5013826-sc-2011-08-18T15:01:15Z-1027679",
+                    Arrays.asList(taxonomyExtractor.getTaxonomy())));
+        }
         return sample;
     }
 

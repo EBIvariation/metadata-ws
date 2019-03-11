@@ -27,12 +27,12 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.AnalysisPersistenceApplicationRunnerConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataDatabaseConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.SraApiConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 import java.nio.file.Files;
@@ -53,7 +53,7 @@ public class AnalysisConverterTest {
 
     private static final String ANALYSIS_DOCUMENT_API_XML = "AnalysisDocumentApi.xml";
 
-    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "AnalysisDocumentDatabase1.xml";
+    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "EgaAnalysisDocumentDatabase.xml.xml";
 
     private SraXmlParser<AnalysisType> xmlParser;
 
@@ -75,7 +75,7 @@ public class AnalysisConverterTest {
         Assert.assertEquals(Analysis.Technology.EXOME_SEQUENCING, analysis.getTechnology());
         Assert.assertEquals(1, analysis.getReferenceSequences().size());
         Assert.assertEquals(ASSEMBLY, analysis.getReferenceSequences().get(0).getType());
-        Assert.assertEquals("ERP000326", analysis.getStudy().getAccessionVersionId().getAccession());
+        Assert.assertEquals("ERP107353", analysis.getStudy().getAccessionVersionId().getAccession());
         Assert.assertEquals(2, analysis.getFiles().size());
 
     }
@@ -90,7 +90,7 @@ public class AnalysisConverterTest {
         Assert.assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
         Assert.assertEquals(1, analysis.getReferenceSequences().size());
         Assert.assertEquals(ASSEMBLY, analysis.getReferenceSequences().get(0).getType());
-        Assert.assertEquals("ERP000326", analysis.getStudy().getAccessionVersionId().getAccession());
+        Assert.assertEquals("ERP000860", analysis.getStudy().getAccessionVersionId().getAccession());
         Assert.assertEquals(1, analysis.getFiles().size());
 
     }

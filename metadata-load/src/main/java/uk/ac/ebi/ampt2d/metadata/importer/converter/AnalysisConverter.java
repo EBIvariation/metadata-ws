@@ -34,6 +34,7 @@ import uk.ac.ebi.ena.sra.xml.AnalysisType.ANALYSISTYPE.SEQUENCEVARIATION;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AnalysisConverter implements Converter<AnalysisType, Analysis> {
 
@@ -58,8 +59,9 @@ public class AnalysisConverter implements Converter<AnalysisType, Analysis> {
     @Override
     public Analysis convert(AnalysisType analysisType) {
         return new Analysis(new AccessionVersionId(analysisType.getAccession(), 1), analysisType.getTITLE(),
-                analysisType.getDESCRIPTION(), getStudy(), getReferenceType(analysisType),
-                getTechnology(analysisType), getPlatform(analysisType), getfiles(analysisType), getSamples());
+                analysisType.getDESCRIPTION(), getStudy(analysisType), getReferenceType(analysisType),
+                getTechnology(analysisType), getPlatform(analysisType), getfiles(analysisType),
+                getSamples(analysisType));
     }
 
     private String getPlatform(AnalysisType analysisType) {
@@ -71,12 +73,16 @@ public class AnalysisConverter implements Converter<AnalysisType, Analysis> {
         return platform;
     }
 
-    private List<Sample> getSamples() {
-        return Arrays.asList(sampleExtractor.getSample());
+    private List<Sample> getSamples(AnalysisType analysisType) {
+        AnalysisType.SAMPLEREF[] samplerefArray = analysisType.getSAMPLEREFArray();
+        return Arrays.asList(samplerefArray).stream()
+                .map(sampleref -> sampleExtractor.getSample(sampleref.getAccession()))
+                .collect(Collectors.toList());
     }
 
-    private Study getStudy() {
-        return studyExtractor.getStudy();
+    private Study getStudy(AnalysisType analysisType) {
+        String studyAccession = analysisType.getSTUDYREF().getAccession();
+        return studyExtractor.getStudy(studyAccession);
     }
 
     private List<File> getfiles(AnalysisType analysisType) {

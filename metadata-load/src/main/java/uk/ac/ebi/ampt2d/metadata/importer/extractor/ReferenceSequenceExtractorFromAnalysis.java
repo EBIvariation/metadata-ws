@@ -18,6 +18,8 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
@@ -30,6 +32,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ReferenceSequenceExtractorFromAnalysis {
+
+    private static QReferenceSequence qReferenceSequence = QReferenceSequence.referenceSequence;
 
     private ReferenceSequenceRepository referenceSequenceRepository;
 
@@ -56,23 +60,26 @@ public class ReferenceSequenceExtractorFromAnalysis {
     }
 
     private List<ReferenceSequence> getReferenceSequences(ReferenceAssemblyType referenceAssemblyType) {
-        List<ReferenceSequence> referenceSequences;
         ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
         String referenceSequenceName = standard.getRefname();
-        String patch = "null";
+        String patch = "UNSPECIFIED";
         String accession = standard.getAccession();
         List<String> accessions = Arrays.asList(accession);
 
-        if (referenceSequenceName == null || referenceSequenceName == "") {
+        //Other than EGA Assembly Xml others doesn't have name on the analysis xml(need to fetch assembly xml)
+        if (referenceSequenceName == null) {
             referenceSequenceName = accession;
         }
-        referenceSequences = referenceSequenceRepository.findByNameAndPatch(referenceSequenceName, patch);
 
-        if (referenceSequences.size() > 0) {
-            return referenceSequences;
+        BooleanExpression predicate = qReferenceSequence.name.equalsIgnoreCase(referenceSequenceName).and
+                (qReferenceSequence.patch.equalsIgnoreCase(patch));
+
+        ReferenceSequence referenceSequence = referenceSequenceRepository.findOne(predicate);
+
+        if (referenceSequence != null) {
+            return Arrays.asList(referenceSequence);
         }
-        referenceSequences.add(referenceSequenceRepository.save(new ReferenceSequence(referenceSequenceName, patch,
+        return Arrays.asList(referenceSequenceRepository.save(new ReferenceSequence(referenceSequenceName, patch,
                 accessions, ReferenceSequence.Type.ASSEMBLY)));
-        return referenceSequences;
     }
 }
