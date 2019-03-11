@@ -24,6 +24,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
+import java.time.LocalDate;
+
 public class StudyConverter implements Converter<StudyType, Study> {
 
     private TaxonomyExtractor taxonomyExtractor;
@@ -34,7 +36,12 @@ public class StudyConverter implements Converter<StudyType, Study> {
 
     @Override
     public Study convert(StudyType studyType) {
-        return new Study(new AccessionVersionId(studyType.getAccession(), 1), studyType.getDESCRIPTOR().getSTUDYTITLE(),
-                studyType.getDESCRIPTOR().getSTUDYDESCRIPTION(), studyType.getCenterName(), taxonomyExtractor.getTaxonomy());
+        StudyType.DESCRIPTOR studyDescriptor = studyType.getDESCRIPTOR();
+        String studyName = studyDescriptor.getSTUDYTITLE();
+        String studyDescription = studyDescriptor.getSTUDYDESCRIPTION();
+        String studyAbstract = studyDescriptor.getSTUDYABSTRACT();
+        return new Study(new AccessionVersionId(studyType.getAccession(), 1), studyName,
+                (studyDescription != null) ? studyDescription : studyAbstract, studyType.getCenterName(),
+                LocalDate.of(9999, 12, 31), taxonomyExtractor.getTaxonomy());
     }
 }

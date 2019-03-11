@@ -79,7 +79,9 @@ public class Study extends Auditable<Long> {
     private String center;
 
     @ApiModelProperty(position = 6, required = true, example = "2018-01-01")
+    @NotNull
     @JsonProperty
+    @Column(nullable = false)
     @Convert(converter = LocalDateAttributeConverter.class)
     private LocalDate releaseDate;
 
@@ -115,18 +117,9 @@ public class Study extends Auditable<Long> {
     public Study() {
     }
 
-    public Study(AccessionVersionId accessionVersionId, String name,
-                 String description, String center, Taxonomy taxonomy) {
-        this.accessionVersionId = accessionVersionId;
-        this.name = name;
-        this.description = description;
-        this.center = center;
-        this.taxonomy = taxonomy;
-    }
-
     public Study(AccessionVersionId accessionVersionId, String name, String description, String center,
                  LocalDate
-                         releaseDate, Taxonomy taxonomy) {
+            releaseDate, Taxonomy taxonomy) {
         this.accessionVersionId = accessionVersionId;
         this.name = name;
         this.description = description;

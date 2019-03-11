@@ -35,7 +35,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 @RunWith(SpringRunner.class)
-public class AnalysisPersistenceApplicationRunnerDbTest {
+public class PersistenceApplicationRunnerDbTest {
     private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 3;
 
     private SpringApplication springApplication = new SpringApplication(MetadataImporterMainApplication.class);
@@ -44,14 +44,14 @@ public class AnalysisPersistenceApplicationRunnerDbTest {
 
     @Before
     public void setUp() {
-        applicationArguments[0] = "--analysisAccession.file.path=EgaAnalysisAccessions.txt";
-        applicationArguments[1] = "--import.object=analysis";
-        applicationArguments[2] = "--import.source=DB";
+        applicationArguments[0] = "--import.source=DB";
     }
 
     @Test
     @Category(OracleDbCategory.class)
     public void testRunForDBEgaAnalysis() throws Exception {
+        applicationArguments[1] = "--accessions.file.path=analysis/egaAnalysisAccessions.txt";
+        applicationArguments[2] = "--import.object=analysis";
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
         AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
                 "analysisRepository");
@@ -68,6 +68,17 @@ public class AnalysisPersistenceApplicationRunnerDbTest {
         StudyRepository studyRepository =
                 (StudyRepository) getBean(configurableApplicationContext, "studyRepository");
         Assert.assertEquals(1, studyRepository.count()); // Both Analysis share same study
+    }
+
+    @Test
+    @Category(OracleDbCategory.class)
+    public void testRunForDBEgaStudies() throws Exception {
+        applicationArguments[1] = "--accessions.file.path=study/egaStudyAccessions.txt";
+        applicationArguments[2] = "--import.object=study";
+        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
+        StudyRepository studyRepository =
+                (StudyRepository) getBean(configurableApplicationContext, "studyRepository");
+        Assert.assertEquals(2, studyRepository.count());
     }
 
     private Object getBean(ConfigurableApplicationContext configurableApplicationContext, String bean) {

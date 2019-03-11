@@ -29,10 +29,11 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 @RunWith(SpringRunner.class)
-public class PersistenceApplicationRunnerTest {
+public class PersistenceApplicationRunnerApiTest {
     private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 3;
 
     private SpringApplication springApplication = new SpringApplication(MetadataImporterMainApplication.class);
@@ -58,6 +59,12 @@ public class PersistenceApplicationRunnerTest {
         ReferenceSequenceRepository referenceSequenceRepository =
                 (ReferenceSequenceRepository) getBean(configurableApplicationContext, "referenceSequenceRepository");
         Assert.assertEquals(1, referenceSequenceRepository.count());
+        SampleRepository sampleRepository =
+                (SampleRepository) getBean(configurableApplicationContext, "sampleRepository");
+        Assert.assertEquals(2, sampleRepository.count());
+        StudyRepository studyRepository =
+                (StudyRepository) getBean(configurableApplicationContext, "studyRepository");
+        Assert.assertEquals(2, studyRepository.count());
     }
 
     @Test(expected = RuntimeException.class)
@@ -101,11 +108,10 @@ public class PersistenceApplicationRunnerTest {
     public void testRunStudy() throws Exception {
         applicationArguments[0] = "--accessions.file.path=study/studyAccessions.txt";
         applicationArguments[1] = "--import.object=study";
-        applicationArguments[2] = "--import.source=API";
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
         StudyRepository studyRepository = (StudyRepository) getBean(configurableApplicationContext,
                 "studyRepository");
-        Assert.assertEquals(1, studyRepository.count());
+        Assert.assertEquals(2, studyRepository.count());
     }
 
     private Object getBean(ConfigurableApplicationContext configurableApplicationContext, String bean) {
