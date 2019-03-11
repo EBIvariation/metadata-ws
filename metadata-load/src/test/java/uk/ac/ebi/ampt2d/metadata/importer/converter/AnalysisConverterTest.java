@@ -53,7 +53,7 @@ public class AnalysisConverterTest {
 
     private static final String ANALYSIS_DOCUMENT_API_XML = "AnalysisDocumentApi.xml";
 
-    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "EgaAnalysisDocumentDatabase.xml.xml";
+    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "EgaAnalysisDocumentDatabase.xml";
 
     private SraXmlParser<AnalysisType> xmlParser;
 

@@ -35,4 +35,5 @@ public interface ReferenceSequenceRepository extends PagingAndSortingRepository<
         bindings.bind(referenceSequence.accessions)
                 .first((path, value) -> path.any().equalsIgnoreCase(value.iterator().next()));
     }
+
 }

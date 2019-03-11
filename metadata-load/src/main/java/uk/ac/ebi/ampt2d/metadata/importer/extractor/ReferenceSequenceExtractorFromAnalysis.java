@@ -66,7 +66,7 @@ public class ReferenceSequenceExtractorFromAnalysis {
         String accession = standard.getAccession();
         List<String> accessions = Arrays.asList(accession);
 
-        //Other than EGA Assembly Xml others doesn't have name on the analysis xml(need to fetch assembly xml)
+        //Other than EGA others doesn't have name on the analysis xml(need to fetch assembly xml)
         if (referenceSequenceName == null) {
             referenceSequenceName = accession;
         }
