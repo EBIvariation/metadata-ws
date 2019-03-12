@@ -42,12 +42,13 @@ public class StudyPersistenceApplicationRunnerConfiguration {
             SraRetrieverByAccession sraRetrieverByAccession, SraXmlParser<StudyType> sraXmlParser,
             StudyRepository studyRepository, TaxonomyRepository taxonomyRepository) {
         return new PersistenceApplicationRunner(sraRetrieverByAccession, sraXmlParser, studyRepository,
-                getStudyConverter(taxonomyRepository));
+                getStudyConverter(studyRepository, taxonomyRepository));
     }
 
     @Bean
-    public Converter<StudyType, Study> getStudyConverter(TaxonomyRepository taxonomyRepository) {
-        return new StudyConverter(getTaxonomyExtractor(taxonomyRepository));
+    public Converter<StudyType, Study> getStudyConverter(StudyRepository studyRepository,
+                                                         TaxonomyRepository taxonomyRepository) {
+        return new StudyConverter(studyRepository, getTaxonomyExtractor(taxonomyRepository));
     }
 
     @Bean

@@ -21,27 +21,47 @@ package uk.ac.ebi.ampt2d.metadata.importer.converter;
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.time.LocalDate;
 
 public class StudyConverter implements Converter<StudyType, Study> {
 
+    private static QStudy qStudy = QStudy.study;
+
     private TaxonomyExtractor taxonomyExtractor;
 
-    public StudyConverter(TaxonomyExtractor taxonomyExtractor) {
+    private StudyRepository studyRepository;
+
+    public StudyConverter(StudyRepository studyRepository, TaxonomyExtractor taxonomyExtractor) {
+        this.studyRepository = studyRepository;
         this.taxonomyExtractor = taxonomyExtractor;
     }
 
     @Override
     public Study convert(StudyType studyType) {
         StudyType.DESCRIPTOR studyDescriptor = studyType.getDESCRIPTOR();
+        String studyAccession = studyType.getAccession();
         String studyName = studyDescriptor.getSTUDYTITLE();
         String studyDescription = studyDescriptor.getSTUDYDESCRIPTION();
-        String studyAbstract = studyDescriptor.getSTUDYABSTRACT();
-        return new Study(new AccessionVersionId(studyType.getAccession(), 1), studyName,
-                (studyDescription != null) ? studyDescription : studyAbstract, studyType.getCenterName(),
-                LocalDate.of(9999, 12, 31), taxonomyExtractor.getTaxonomy());
+        studyDescription = (studyDescription == null) ? studyDescriptor.getSTUDYABSTRACT() : studyDescription;
+        Study study = findStudy(studyAccession);
+        if (study == null) {
+            return new Study(new AccessionVersionId(studyType.getAccession(), 1), studyName,
+                    studyDescription, studyType.getCenterName(),
+                    LocalDate.of(9999, 12, 31), taxonomyExtractor.getTaxonomy());
+        }
+        study.setName(studyName);
+        study.setDescription(studyDescription);
+        study.setReleaseDate(LocalDate.of(9999, 12, 31));
+        return study;
+    }
+
+    private Study findStudy(String studyAccession) {
+        return studyRepository.findOne(qStudy.accessionVersionId.accession.equalsIgnoreCase(studyAccession).and
+                (qStudy.accessionVersionId.version.eq(1)));
     }
 }

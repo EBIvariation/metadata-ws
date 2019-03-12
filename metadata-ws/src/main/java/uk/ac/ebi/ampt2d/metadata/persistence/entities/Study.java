@@ -149,4 +149,23 @@ public class Study extends Auditable<Long> {
         return childStudies;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCenter(String center) {
+        this.center = center;
+    }
+
+    public void setReleaseDate(LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public void setTaxonomy(Taxonomy taxonomy) {
+        this.taxonomy = taxonomy;
+    }
 }
