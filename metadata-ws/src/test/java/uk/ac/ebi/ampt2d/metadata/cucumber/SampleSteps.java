@@ -26,7 +26,7 @@ public class SampleSteps {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @When("user create a test sample with (.*) for taxonomy$")
+    @When("user create a test sample with (.*) for taxonomy")
     public void createTestSample(String testTaxonomyKeys) throws Exception {
         List<String> testTaxonomyList = null;
         if (!testTaxonomyKeys.equals("NONE")) {
@@ -35,13 +35,25 @@ public class SampleSteps {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         }
-        CommonStates.setResultActions(postTestSample(testTaxonomyList));
+        CommonStates.setResultActions(postTestSample("EGAS0001", "test_human_sample", testTaxonomyList));
     }
 
-    private ResultActions postTestSample(List<String> testTaxonomyList) throws Exception {
+    @When("user create a test parameterized sample with (.*) for accession, (.*) for name and (.*) for taxonomy")
+    public void createTestSampleParameterized(String accession, String name, String testTaxonomyKeys) throws Exception {
+        List<String> testTaxonomyList = null;
+        if (!testTaxonomyKeys.equals("NONE")) {
+            testTaxonomyList = Arrays.stream(testTaxonomyKeys.split(","))
+                    .map(key -> CommonStates.getUrl(key))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        }
+        CommonStates.setResultActions(postTestSample(accession, name, testTaxonomyList));
+    }
+
+    private ResultActions postTestSample(String accession, String name, List<String> testTaxonomyList) throws Exception {
         String jsonContent = "{ " +
-                "\"accessionVersionId\":{ \"accession\": \"EGAS0001\",\"version\": 1}," +
-                "\"name\": \"test_human_sample\"";
+                "\"accessionVersionId\":{ \"accession\": \"" + accession + "\",\"version\": " + 1 + "}," +
+                "\"name\": \"" + name + "\"";
         if (testTaxonomyList != null) {
             jsonContent = jsonContent +
                     ",\"taxonomies\": " + objectMapper.writeValueAsString(testTaxonomyList);

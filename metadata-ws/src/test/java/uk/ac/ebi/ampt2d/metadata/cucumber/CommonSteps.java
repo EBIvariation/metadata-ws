@@ -21,6 +21,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -108,6 +110,28 @@ public class CommonSteps {
                 .content(jsonData.getBytes())));
     }
 
+    @When("^user request POST with (.*) for Uri (.*) for stringData (.*) for linkedObjectKey and (.*) for linkedObjectClassName")
+    public void performPostOnResourceUriWithStringDataAndLink(String urlKey, String stringData, String linkedObjectUrlKeys, String linkedObjectClassName) throws Exception {
+        List<String> newUrls = null;
+        if (linkedObjectUrlKeys.isEmpty()) {
+            newUrls = new ArrayList<>();
+        } else if (!linkedObjectUrlKeys.equals("NONE")) {
+            newUrls = Arrays.stream(linkedObjectUrlKeys.split(","))
+                    .map(key -> CommonStates.getUrl(key))
+                    .collect(Collectors.toList());
+        }
+
+        String jsonContent = "{"
+                + stringData
+                + ", "
+                + "\"" + linkedObjectClassName + "\":" + objectMapper.writeValueAsString(newUrls)
+                + "}";
+
+        CommonStates.setResultActions(mockMvc.perform(post(urlKey)
+                        .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent.getBytes())));
+    }
+
     @When("^user request PATCH (.*) with list (.*) for (.*)")
     public void performPatchOnResourceWithLinkedObject(String urlKey, String linkedObjectUrlKeys,
                                                        String linkedObjectClassName) throws Exception {
@@ -142,6 +166,45 @@ public class CommonSteps {
     @When("^user request search for the (.*) with the parameters: (.*)$")
     public void performSearchOnResourcesWithParameters(String className, String parameters) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search?"+parameters)));
+    }
+
+    @When("^user request elaborate search for the (.*) base (.*) and with the parameters: (.*)$")
+    public void performSearchOnResourcesWithBaseAndParameters(String className, String base, String parameters) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+parameters)));
+    }
+
+    @When("^user request exhaustive search for the (.*) base (.*) and with the parameters: (.*) and (.*)$")
+    public void performSearchOnResourcesWithBaseAndParametersAndDay(String className, String base, String parameters, int day) throws Exception {
+        if (day > 0) {
+            CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+parameters+LocalDate.now().plusDays(day))));
+        } else {
+            CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+parameters+LocalDate.now().minusDays(Math.abs(day)))));
+        }
+    }
+
+    @When("^user request exhaustive search with dates for the (.*) base (.*) and with the parameters: (.*) and (.*)$")
+    public void performSearchOnResourcesWithBaseAndParametersAndDays(String className, String base, String parameters, int day) throws Exception {
+        if (day > 0) {
+            CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+parameters+LocalDate.now().plusDays(day)+"&to="+parameters+LocalDate.now().plusDays(day))));
+        } else {
+            CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+parameters+LocalDate.now().minusDays(Math.abs(day))+"&to="+LocalDate.now().minusDays(Math.abs(day)))));
+        }
+    }
+
+    @When("^user request search for the (.*) with base (.*) and name (.*) value (.*)$")
+    public void performSearchOnResourcesWithParameters(String className, String base, String name, String value) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base).param(name, value)));
+    }
+
+    @When("^user request elaborate find for the (.*) bases (.*) and with the parameters: (.*)$")
+    public void performFindOnResourcesWithBaseAndParameters(String className, String bases, String parameters) throws Exception {
+        String[] params = parameters.split("&");
+        String[] base = bases.split(",");
+        String query = base[0] + "." + params[0];
+        for (int i = 1; i < params.length; i++) {
+            query += "&" + base[i] + "." + params[i];
+        }
+        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "?" + query)));
     }
 
     @And("^set the URL to (.*)$")
@@ -190,6 +253,12 @@ public class CommonSteps {
                 .andExpect(jsonPath("$.."+className+".length()").value(size));
     }
 
+    @Then("^the result should contain object (.*) with items (.*)$")
+    public void checkResponseVaryingListSize(String className, int size) throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$.."+className).isArray())
+                .andExpect(jsonPath("$.."+className+".length()").value(size));
+    }
+
     @Then("^the result should contain (.*) with value (.*)$")
     public void checkResponseJsonFieldValue(String field, String value) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(value));
@@ -200,6 +269,30 @@ public class CommonSteps {
             throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$.."+className+"["+index+"].."+field+".href")
                 .value(CommonStates.getUrl(valueKey)));
+    }
+
+    @And("^the href of the class (.*) should be (.*)$")
+    public void checkResponseLinkedObjectHref(String className, String valueKey)
+            throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$.."+className+".href")
+                .value(CommonStates.getUrl(valueKey)));
+    }
+
+    @And("^the href list of the (.*) of (.*) (\\d*) should be (.*)$")
+    public void checkResponseLinkedObjectHrefList(String field, String className, int index, String valueKey)
+            throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$.."+className+"["+index+"].."+field+".href")
+                .value(CommonStates.getUrl(valueKey)));
+    }
+
+    @And("^the href list of the (.*) of (.*) (.*) contained in (.*)$")
+    public void checkResponseLinkedObjectHrefListLoop(String field, String className, int lenght, String valueKey)
+            throws Exception {
+        String[] urlList = valueKey.split(",");
+        for (int index = 0; index < lenght; index++) {
+            CommonStates.getResultActions().andExpect(jsonPath("$.."+className+"["+index+"].."+field+".href")
+                    .value(CommonStates.getUrl(urlList[index])));
+        }
     }
 
     @And("^the (.*) field of (.*) (\\d*) should be (.*)$")
