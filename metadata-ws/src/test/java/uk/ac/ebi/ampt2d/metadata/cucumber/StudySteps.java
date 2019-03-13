@@ -22,24 +22,33 @@ public class StudySteps {
 
     @When("user create a test study with (.*) for taxonomy$")
     public void createTestStudy(String testTaxonomyKey) throws Exception {
-        CommonStates.setResultActions(postTestStudy("EGAS0001", 1, "test_human_study", LocalDate.now(), testTaxonomyKey));
+        CommonStates.setResultActions(postTestStudy("EGAS0001", 1, "test_human_study", false, LocalDate.now(), testTaxonomyKey));
     }
 
     @When("user create a test parameterized study with (.*) for accession, (.*) for version, (.*) for name and (.*) for taxonomy$")
     public void createTestStudyParameterized(String accession, int version, String name, String testTaxonomyKey) throws Exception {
-        CommonStates.setResultActions(postTestStudy(accession, version, name, LocalDate.now(), testTaxonomyKey));
+        CommonStates.setResultActions(postTestStudy(accession, version, name, false, LocalDate.now(), testTaxonomyKey));
     }
 
     @When("user create a test parameterized study with (.*) for accession, (.*) for version, (.*) for name (.*) for releaseDay and (.*) for taxonomy$")
     public void createTestStudyParameterized(String accession, int version, String name, int releaseDay, String testTaxonomyKey) throws Exception {
         if (releaseDay > 0) {
-            CommonStates.setResultActions(postTestStudy(accession, version, name, LocalDate.now().plusDays(releaseDay), testTaxonomyKey));
+            CommonStates.setResultActions(postTestStudy(accession, version, name, false, LocalDate.now().plusDays(releaseDay), testTaxonomyKey));
         } else {
-            CommonStates.setResultActions(postTestStudy(accession, version, name, LocalDate.now().minusDays(Math.abs(releaseDay)), testTaxonomyKey));
+            CommonStates.setResultActions(postTestStudy(accession, version, name, false, LocalDate.now().minusDays(Math.abs(releaseDay)), testTaxonomyKey));
         }
     }
 
-    private ResultActions postTestStudy(String accession, int version, String name, LocalDate releaseDate, String testTaxonomyKey) throws Exception {
+    @When("user create a test parameterized study with (.*) for accession, (.*) for version, (.*) for name, (.*) for deprecated, (.*) for releaseDay and (.*) for taxonomy$")
+    public void createTestStudyParameterizedMore(String accession, int version, String name, boolean deprecated, int releaseDay, String testTaxonomyKey) throws Exception {
+        if (releaseDay > 0) {
+            CommonStates.setResultActions(postTestStudy(accession, version, name, deprecated, LocalDate.now().plusDays(releaseDay), testTaxonomyKey));
+        } else {
+            CommonStates.setResultActions(postTestStudy(accession, version, name, deprecated, LocalDate.now().minusDays(Math.abs(releaseDay)), testTaxonomyKey));
+        }
+    }
+
+    private ResultActions postTestStudy(String accession, int version, String name, boolean deprecated, LocalDate releaseDate, String testTaxonomyKey) throws Exception {
         String jsonContent = "{" +
                 "      \"accessionVersionId\": {" +
                 "       \"accession\": \"" + accession +  "\"," +
@@ -48,7 +57,7 @@ public class StudySteps {
                 "      \"name\": \"" + name + "\"," +
                 "      \"description\": \"Nothing important\"," +
                 "      \"center\": \"EBI\"," +
-                "      \"deprecated\": false," +
+                "      \"deprecated\": \"" + deprecated + "\"," +
                 "      \"releaseDate\": \"" + releaseDate + "\"," +
                 "      \"taxonomy\": \"" + CommonStates.getUrl(testTaxonomyKey) + "\"" +
                 "    }";

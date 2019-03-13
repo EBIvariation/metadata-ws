@@ -207,6 +207,20 @@ public class CommonSteps {
         CommonStates.setResultActions(mockMvc.perform(get("/" + className + "?" + query)));
     }
 
+    @When("^user request GET for the (.*) with optional param (.*)")
+    public void performGetOnResources(String className, String param) throws Exception {
+        if (param.equals("NONE")) {
+            CommonStates.setResultActions(mockMvc.perform(get("/" + className)));
+        } else {
+            CommonStates.setResultActions(mockMvc.perform(get("/" + className+param)));
+        }
+    }
+
+    @When("^user request search for the (.*) with param (.*)")
+    public void performSearchOnResources(String className, String param) throws Exception {
+            CommonStates.setResultActions(mockMvc.perform(get("/" + className+"/search/"+param)));
+    }
+
     @And("^set the URL to (.*)$")
     public void setUrlTo(String resourceUriKey) {
         CommonStates.setUrl(resourceUriKey, CommonStates.getResultActions()
@@ -251,6 +265,11 @@ public class CommonSteps {
     public void checkResponseListSize(int size, String className) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$.."+className).isArray())
                 .andExpect(jsonPath("$.."+className+".length()").value(size));
+    }
+
+    @And("^the result should have (\\d*) (.*)$")
+    public void checkResponseObjectSize(int size, String object) throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$."+object).value(size));
     }
 
     @Then("^the result should contain object (.*) with items (.*)$")
