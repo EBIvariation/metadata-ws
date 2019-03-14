@@ -355,65 +355,6 @@ public class MetadataApplicationTest {
     }
 
     @Test
-    public void testAccessionValidation() throws Exception {
-        String taxonomyUrl = postTestTaxonomy();
-        postTestStudy("EGAS0001", 1, "test_study", taxonomyUrl);
-        mockMvc.perform(get("/studies?accessionVersionId=EGAS0001")).andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$" + ".message")
-                        .value("Please provide an ID in the form accession.version"));
-        mockMvc.perform(get("/studies?accessionVersionId=EGAS0001.S1")).andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.message")
-                        .value("Please provide an ID in the form accession.version"));
-        mockMvc.perform(get("/studies?accessionVersionId=EGAS0001.1")).andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies[0].accessionVersionId.accession").value("EGAS0001"));
-        mockMvc.perform(get("/studies?accessionVersionId=EGAS0001.2")).andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-    }
-
-    @Test
-    public void testSearchByAccessionVersionId() throws Exception {
-        String taxonomyUrl = postTestTaxonomy();
-        postTestStudy("EGAS0001", 1, "test_study", taxonomyUrl);
-        postTestFile("EGAF0001", 1);
-        postTestSample("EGAN0001", "Sample1");
-        mockMvc.perform(get("/studies?accessionVersionId=EGAS0001.1")).andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies[0].accessionVersionId.accession").value("EGAS0001"));
-        mockMvc.perform(get("/files?accessionVersionId=EGAF0001.1")).andExpect(status().isOk())
-                .andExpect(jsonPath("$..files[0].accessionVersionId.accession").value("EGAF0001"));
-        mockMvc.perform(get("/samples?accessionVersionId=EGAN0001.1")).andExpect(status().isOk())
-                .andExpect(jsonPath("$..samples[0].accessionVersionId.accession").value("EGAN0001"));
-    }
-
-    @Test
-    public void deprecateStudy() throws Exception {
-        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
-        String studyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, false);
-
-        mockMvc.perform(get(studyUrl))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..study.href").value(studyUrl));
-
-        mockMvc.perform(patch(studyUrl)
-                .content("{\"deprecated\": \"true\"}"))
-                .andExpect(status().is2xxSuccessful());
-
-        mockMvc.perform(get(studyUrl))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void getStudyDoesNotIncludeDeprecatedField() throws Exception {
-        String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
-        String studyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, false);
-
-        mockMvc.perform(get(studyUrl))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..study.href").value(studyUrl))
-                .andExpect(jsonPath("$.description").exists())
-                .andExpect(jsonPath("$.deprecated").doesNotExist());
-    }
-
-    @Test
     public void deprecatedStudyCouldBeUndeprecated() throws Exception {
         String humanTaxonomyUrl = postTestTaxonomy(9606, "Homo sapiens");
         String humanStudyUrl = postTestStudy("1kg", 1, "1kg pilot", humanTaxonomyUrl, false);
@@ -606,54 +547,6 @@ public class MetadataApplicationTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(""))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    public void findLinkedStudies() throws Exception {
-        String testTaxonomy = postTestTaxonomy(9606, "Homo sapiens");
-        String testStudy1 = postTestStudy("testhuman", 1, "test human study", testTaxonomy);
-        String testStudy2 = postTestStudy("testhuman", 2, "test human study", testTaxonomy);
-        String testStudy3 = postTestStudy("testhuman", 3, "test human study", testTaxonomy);
-        String testStudy4 = postTestStudy("testhuman", 4, "test human study", testTaxonomy);
-
-        mockMvc.perform(patch(testStudy1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"childStudies\":" +
-                        testListJson.write(Arrays.asList(testStudy2, testStudy3)).getJson() +
-                        "}"))
-                .andExpect(status().is2xxSuccessful());
-        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(2))
-                .andExpect(jsonPath("$..studies[*]..study.href", hasItems(testStudy2, testStudy3)));
-        mockMvc.perform(get(testStudy2 + "/linkedStudies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(2))
-                .andExpect(jsonPath("$..studies[*]..study.href", hasItems(testStudy1, testStudy3)));
-        mockMvc.perform(get(testStudy3 + "/linkedStudies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(2))
-                .andExpect(jsonPath("$..studies[*]..study.href", hasItems(testStudy1, testStudy2)));
-        mockMvc.perform(get(testStudy4 + "/linkedStudies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
-
-        String nonexistent = testStudy1.replace("testhuman", "testmouse");
-        mockMvc.perform(patch(testStudy1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{ \"childStudies\":" +
-                        testListJson.write(Arrays.asList(nonexistent)).getJson() +
-                        "}"))
-                .andExpect(status().is2xxSuccessful());
-
-        mockMvc.perform(get(testStudy1 + "/linkedStudies"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$..studies").isArray())
-                .andExpect(jsonPath("$..studies.length()").value(0));
     }
 
     @Test

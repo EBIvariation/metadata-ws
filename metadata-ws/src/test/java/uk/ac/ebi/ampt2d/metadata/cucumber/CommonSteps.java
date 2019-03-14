@@ -149,6 +149,29 @@ public class CommonSteps {
                 .content(jsonContent)));
     }
 
+    @When("^user requests PATCH with replacement (.*) with list (.*) for (.*) and params (.*) (.*)")
+    public void performPatchOnResourceWithLinkedObjectReplace(String urlKey, String linkedObjectUrlKeys,
+                                                       String linkedObjectClassName, String org, String target) throws Exception {
+        List<String> newUrls = null;
+        if (!linkedObjectUrlKeys.equals("NONE")) {
+            newUrls = Arrays.stream(linkedObjectUrlKeys.split(","))
+                    .map(key -> CommonStates.getUrl(key))
+                    .collect(Collectors.toList());
+        }
+        String jsonContent = "{"
+                + "\"" + linkedObjectClassName + "\":" + objectMapper.writeValueAsString(newUrls)
+                + "}";
+
+        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
+                .content(jsonContent.replace(org, target))));
+    }
+
+    @When("^user request PATCH (.*) with content (.*)")
+    public void performPatchOnResourceWithContent(String urlKey, String content) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
+                .content(content)));
+    }
+
     @When("^user request DELETE for the (.*) of (.*) of the (.*)")
     public void performDeleteOnResourceWithLinkedObject(String className, String linkedObjectUrlKey,
                                                         String resourceUrlKey) throws Exception {
@@ -196,13 +219,13 @@ public class CommonSteps {
         CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base).param(name, value)));
     }
 
-    @When("^user request elaborate find for the (.*) bases (.*) and with the parameters: (.*)$")
-    public void performFindOnResourcesWithBaseAndParameters(String className, String bases, String parameters) throws Exception {
+    @When("^user request elaborate find for the (.*) bases (.*) with the parameters: (.*) and (.*)$")
+    public void performFindOnResourcesWithBaseAndParameters(String className, String bases, String parameters, String separator) throws Exception {
         String[] params = parameters.split("&");
         String[] base = bases.split(",");
-        String query = base[0] + "." + params[0];
+        String query = base[0] + separator + params[0];
         for (int i = 1; i < params.length; i++) {
-            query += "&" + base[i] + "." + params[i];
+            query += "&" + base[i] + separator + params[i];
         }
         CommonStates.setResultActions(mockMvc.perform(get("/" + className + "?" + query)));
     }
@@ -283,6 +306,11 @@ public class CommonSteps {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(value));
     }
 
+    @Then("^the result should not contain (.*)$")
+    public void checkResponseJsonNoField(String field) throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$."+field).doesNotExist());
+    }
+
     @And("^the href of the (.*) of (.*) (\\d*) should be (.*)$")
     public void checkResponseLinkedObjectHref(String field, String className, int index, String valueKey)
             throws Exception {
@@ -314,6 +342,14 @@ public class CommonSteps {
         }
     }
 
+    @And("^the href list of the (.*) of (.*) has items (.*) and (.*)$")
+    public void checkResponseLinkedObjectHrefList1(String field, String className, String fieldValue1, String fieldValue2)
+            throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$.."+className+"[*].."+field+".href",
+                hasItems(CommonStates.getUrl(fieldValue1), CommonStates.getUrl(fieldValue2))));
+
+    }
+
     @And("^the (.*) field of (.*) (\\d*) should be (.*)$")
     public void checkResponseLinkedObjectFieldValue(String field, String className, int index, String fieldValue)
             throws Exception {
@@ -328,4 +364,5 @@ public class CommonSteps {
                 .andExpect(jsonPath("$.."+className+"["+index+"]."+field).isArray())
                 .andExpect(jsonPath("$.."+className+"["+index+"]."+field+"[*]", hasItems(fieldValue)));
     }
+
 }

@@ -143,27 +143,27 @@ Feature: study object
     When user create a test analysis with EGAA0002 for accession, TEST_REFERENCE_SEQUENCE_2 for reference sequence, TEST_STUDY2 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     And the response code should be 201
 
-    When user request elaborate find for the studies bases <bases> and with the parameters: <param>
+    When user request elaborate find for the studies bases <bases> with the parameters: <param> and <sep>
     And the response code should be 200
     And the result should contain object studies with items <N>
     And the href list of the study of studies <N> contained in <url>
 
     Examples:
-      | bases | param | N | url |
-      | analyses.referenceSequences | name=GRCh37 | 1 | TEST_STUDY1 |
-      | analyses.referenceSequences | name=GRCh38 | 1 | TEST_STUDY2 |
-      | analyses.referenceSequences | name=NCBI36 | 0 |  |
-      | analyses.referenceSequences,analyses.referenceSequences | name=GRCh37&patch=p2 | 1 | TEST_STUDY1 |
-      | analyses.referenceSequences,analyses.referenceSequences | name=GRCh38&patch=p2 | 1 | TEST_STUDY2 |
-      | analyses.referenceSequences,analyses.referenceSequences | name=GRCh37&patch=p3 | 0 |  |
-      | analyses.referenceSequences,analyses.referenceSequences | name=NCBI36&patch=p2 | 0 |  |
-      | analyses | type=CASE_CONTROL | 2 | TEST_STUDY1,TEST_STUDY2 |
-      | analyses | type=TUMOR | 0 |  |
-      | analyses | type=COLLECTION | 0 |  |
-      | analyses.referenceSequences,analyses | name=GRCh38&type=CASE_CONTROL | 1 | TEST_STUDY2 |
-      | analyses.referenceSequences,analyses | name=GRCh38&type=TUMOR | 0 |  |
-      | analyses.referenceSequences,analyses | name=GRCh38&type=COLLECTION | 0 |  |
-      | analyses.referenceSequences,analyses | name=NCBI36&type=CASE_CONTROL | 0 |  |
+      | bases | param | N | url | sep |
+      | analyses.referenceSequences | name=GRCh37 | 1 | TEST_STUDY1 | . |
+      | analyses.referenceSequences | name=GRCh38 | 1 | TEST_STUDY2 | . |
+      | analyses.referenceSequences | name=NCBI36 | 0 |  | . |
+      | analyses.referenceSequences,analyses.referenceSequences | name=GRCh37&patch=p2 | 1 | TEST_STUDY1 | . |
+      | analyses.referenceSequences,analyses.referenceSequences | name=GRCh38&patch=p2 | 1 | TEST_STUDY2 | . |
+      | analyses.referenceSequences,analyses.referenceSequences | name=GRCh37&patch=p3 | 0 |  | . |
+      | analyses.referenceSequences,analyses.referenceSequences | name=NCBI36&patch=p2 | 0 |  | . |
+      | analyses | type=CASE_CONTROL | 2 | TEST_STUDY1,TEST_STUDY2 | . |
+      | analyses | type=TUMOR | 0 |  | . |
+      | analyses | type=COLLECTION | 0 |  | . |
+      | analyses.referenceSequences,analyses | name=GRCh38&type=CASE_CONTROL | 1 | TEST_STUDY2 | . |
+      | analyses.referenceSequences,analyses | name=GRCh38&type=TUMOR | 0 |  | . |
+      | analyses.referenceSequences,analyses | name=GRCh38&type=COLLECTION | 0 |  | . |
+      | analyses.referenceSequences,analyses | name=NCBI36&type=CASE_CONTROL | 0 |  | . |
 
 
   Scenario: search various studies by name value pair for accession
@@ -359,7 +359,7 @@ Feature: study object
     When user create a test parameterized study with 1kg for accession, 2 for version, 1kg phase 1 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY2
 
-    When user request search for the studies with optional param NONE
+    When user request GET for the studies with optional param NONE
     And the result should contain 1 studies
     And the href of the study of studies 0 should be TEST_STUDY2
 
@@ -440,6 +440,144 @@ Feature: study object
 
     When user request GET for analyses of TEST_STUDY1
     And the response code should be 404
+
+
+  Scenario: search studies on various deprecated fields
+    When user request POST /taxonomies with json data:
+    """
+    {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    And set the URL to TEST_TAXONOMY
+    When user create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    And set the URL to TEST_STUDY1
+
+    When user request GET with value of TEST_STUDY1
+    And the response code should be 200
+    And the href of the class study should be TEST_STUDY1
+    And the result should contain description with value Nothing important
+    And the result should not contain deprecated
+
+    When user request PATCH TEST_STUDY1 with content {"deprecated": "true"}
+    And the response code should be 2xx
+
+    When user request GET with value of TEST_STUDY1
+    And the response code should be 4xx
+
+
+  Scenario Outline: validate study for accession
+    When user request POST /taxonomies with json data:
+    """
+    {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    And set the URL to TEST_TAXONOMY
+    When user create a test parameterized study with EGAS0001 for accession, 1 for version, test_study for name and TEST_TAXONOMY for taxonomy
+    When user request POST /files with json data:
+    """
+    {
+      "accessionVersionId": {
+        "accession": "EGAF0001",
+        "version": 1
+        },
+      "hash": "asd123",
+      "name": "file1",
+      "size": 100,
+      "type": "TSV"
+    }
+    """
+    And set the URL to TEST_FILE
+    When user request POST /taxonomies with json data:
+    """
+    {
+      "taxonomyId": 1,
+      "name": "Species1"
+    }
+    """
+    And set the URL to TEST_TAXONOMY1
+    When user request POST /taxonomies with json data:
+    """
+    {
+      "taxonomyId": 2,
+      "name": "Species2"
+    }
+    """
+    And set the URL to TEST_TAXONOMY2
+    When user create a test parameterized sample with EGAN0001 for accession, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
+    And the response code should be 201
+    And set the URL to TEST_SAMPLE
+
+    When user request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001.2 and =
+    And the response code should be 200
+    And the result should contain object studies with items 0
+
+    When user request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001 and =
+    And the response code should be 4xx
+    And the result should contain message with value Please provide an ID in the form accession.version
+
+    When user request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001.S1 and =
+    And the response code should be 4xx
+    And the result should contain message with value Please provide an ID in the form accession.version
+
+    When user request elaborate find for the <object> bases <bases> with the parameters: <param> and <sep>
+    And the response code should be 200
+    And the result should contain object <object> with items 1
+    And the <bases>.accession field of <object> 0 should be <value>
+
+    Examples:
+      | object | bases | param | sep | value |
+      | studies | accessionVersionId | EGAS0001.1 | = | EGAS0001 |
+      | files | accessionVersionId | EGAF0001.1 | = | EGAF0001 |
+      | samples | accessionVersionId | EGAN0001.1 | = | EGAN0001 |
+
+
+  Scenario Outline: find linked studies
+    When user request POST /taxonomies with json data:
+    """
+    {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    And set the URL to TEST_TAXONOMY
+    When user create a test parameterized study with testhuman for accession, 1 for version, test human study for name and TEST_TAXONOMY for taxonomy
+    And set the URL to TEST_STUDY1
+    When user create a test parameterized study with testhuman for accession, 2 for version, test human study for name and TEST_TAXONOMY for taxonomy
+    And set the URL to TEST_STUDY2
+    When user create a test parameterized study with testhuman for accession, 3 for version, test human study for name and TEST_TAXONOMY for taxonomy
+    And set the URL to TEST_STUDY3
+    When user create a test parameterized study with testhuman for accession, 4 for version, test human study for name and TEST_TAXONOMY for taxonomy
+    And set the URL to TEST_STUDY4
+
+    When user request PATCH TEST_STUDY1 with list TEST_STUDY2,TEST_STUDY3 for childStudies
+    And the response code should be 2xx
+
+    When user request GET for <linkedclass> of <url>
+    And the response code should be 200
+    And the result should contain object studies with items <N>
+    And the href list of the study of studies has items <item1> and <item2>
+
+    When user request GET for linkedStudies of TEST_STUDY4
+    And the response code should be 200
+    And the result should contain object studies with items 0
+
+    When user requests PATCH with replacement TEST_STUDY1 with list TEST_STUDY1 for childStudies and params testhuman testmouse
+    And the response code should be 2xx
+
+    When user request GET for linkedStudies of TEST_STUDY1
+    And the response code should be 200
+    And the result should contain object studies with items 0
+
+    Examples:
+  | linkedclass | url | N | item1 | item2 |
+  | linkedStudies | TEST_STUDY1 | 2 | TEST_STUDY2 | TEST_STUDY3 |
+  | linkedStudies | TEST_STUDY2 | 2 | TEST_STUDY1 | TEST_STUDY3 |
+  | linkedStudies | TEST_STUDY3 | 2 | TEST_STUDY1 | TEST_STUDY2 |
+
 
 
 
