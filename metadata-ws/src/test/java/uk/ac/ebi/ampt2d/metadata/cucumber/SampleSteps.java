@@ -35,7 +35,7 @@ public class SampleSteps {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         }
-        CommonStates.setResultActions(postTestSample("EGAS0001", "test_human_sample", testTaxonomyList));
+        CommonStates.setResultActions(postTestSample("EGAS0001", "test_human_sample", testTaxonomyList, 1));
     }
 
     @When("user create a test parameterized sample with (.*) for accession, (.*) for name and (.*) for taxonomy")
@@ -47,12 +47,43 @@ public class SampleSteps {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
         }
-        CommonStates.setResultActions(postTestSample(accession, name, testTaxonomyList));
+        CommonStates.setResultActions(postTestSample(accession, name, testTaxonomyList, 1));
     }
 
-    private ResultActions postTestSample(String accession, String name, List<String> testTaxonomyList) throws Exception {
+    @When("user create a test versioned sample with (.*) for accession, (\\d*) for version, (.*) for name and (.*) for taxonomy")
+    public void createTestSampleParameterized(String accession, int version, String name, String testTaxonomyKeys) throws Exception {
+        List<String> testTaxonomyList = null;
+        if (!testTaxonomyKeys.equals("NONE")) {
+            testTaxonomyList = Arrays.stream(testTaxonomyKeys.split(","))
+                    .map(key -> CommonStates.getUrl(key))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        }
+        CommonStates.setResultActions(postTestSample(accession, name, testTaxonomyList, version));
+    }
+
+    @When("user create a test sample no or null accession (.*), (.*) for name and (.*) for taxonomy")
+    public void createTestSampleParameterizedNoAccession(boolean accession, String name, String testTaxonomyKeys) throws Exception {
+        List<String> testTaxonomyList = null;
+        if (!testTaxonomyKeys.equals("NONE")) {
+            testTaxonomyList = Arrays.stream(testTaxonomyKeys.split(","))
+                    .map(key -> CommonStates.getUrl(key))
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+        }
+
+        if (accession == false) {
+            // no accession
+            CommonStates.setResultActions(postTestSampleNoOrNullAccession(false, name, testTaxonomyList));
+        } else {
+            // null accession
+            CommonStates.setResultActions(postTestSampleNoOrNullAccession(true, name, testTaxonomyList));
+        }
+    }
+
+    private ResultActions postTestSample(String accession, String name, List<String> testTaxonomyList, int version) throws Exception {
         String jsonContent = "{ " +
-                "\"accessionVersionId\":{ \"accession\": \"" + accession + "\",\"version\": " + 1 + "}," +
+                "\"accessionVersionId\":{ \"accession\": \"" + accession + "\",\"version\": " + version + "}," +
                 "\"name\": \"" + name + "\"";
         if (testTaxonomyList != null) {
             jsonContent = jsonContent +
@@ -64,4 +95,23 @@ public class SampleSteps {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent));
     }
+
+
+    private ResultActions postTestSampleNoOrNullAccession(boolean accession, String name, List<String> testTaxonomyList) throws Exception {
+        String jsonContent = "{ " +
+                "\"name\": \"" + name + "\"";
+        if (accession == true) {
+            jsonContent = jsonContent +  ", \"accessionVersionId\":{ \"accession\":" + null + ",\"version\": " + 1 + "}" ;
+        }
+        if (testTaxonomyList != null) {
+            jsonContent = jsonContent +
+                    ", \"taxonomies\": " + objectMapper.writeValueAsString(testTaxonomyList);
+        }
+        jsonContent = jsonContent + "}";
+
+        return mockMvc.perform(post("/samples")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent));
+    }
+
 }

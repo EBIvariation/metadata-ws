@@ -298,3 +298,50 @@ Feature: sample object
       | taxonomies.name=NonExisting |
       | taxonomies.taxonomyId=0 |
 
+
+  Scenario: verify various accession version with samples
+    Given user request POST /taxonomies with json data:
+    """
+    {
+      "taxonomyId": 207598,
+      "name": "Homininae"
+    }
+    """
+    And set the URL to TEST_TAXONOMY1
+    Given user request POST /taxonomies with json data:
+    """
+    {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    And set the URL to TEST_TAXONOMY2
+
+    When user create a test sample no or null accession false, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
+    And the response code should be 201
+    And set the URL to TEST_SAMPLE
+    When user request GET with value of TEST_SAMPLE
+    Then the response code should be 200
+    And the result should have id as number
+    And the result should have accessionVersionId as null
+
+    When user create a test sample no or null accession true, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
+    And the response code should be 4xx
+    And the result should contain errors[0].property with value accessionVersionId.accession
+    And the result should contain errors[0].message with value may not be null
+
+    When user create a test parameterized sample with  for accession, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
+    And the response code should be 4xx
+    And the result should contain errors[0].property with value accessionVersionId.accession
+    And the result should contain errors[0].message with value size must be between 1 and 255
+
+    When user create a test versioned sample with EGAN0001 for accession, 0 for version, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
+    And the response code should be 4xx
+    And the result should contain errors[0].property with value accessionVersionId.version
+    And the result should contain errors[0].message with value must be greater than or equal to 1
+
+
+
+
+
+

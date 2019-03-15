@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -172,6 +173,43 @@ public class CommonSteps {
                 .content(content)));
     }
 
+    @When("^user request patched PATCH (.*) with content (.*)")
+    public void performPatchedPatchOnResourceWithContent(String urlKey, String content) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content)));
+    }
+
+    @When("^user request patched PATCH (.*) with day (.*)")
+    public void performPatchedPatchOnResourceWithDay(String urlKey, int day) throws Exception {
+        String content = "{ \"releaseDate\" : \"";
+        if (day == 0) {
+            content +=LocalDate.now();
+        } else {
+            content +=LocalDate.now().plusDays(1);
+        }
+        content +=  "\" }";
+
+        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content)));
+    }
+
+    @When("^user request URL PATCH (.*) with day (.*)")
+    public void performUrlPatchOnResourceWithDay(String urlKey, int day) throws Exception {
+        String content = "{ \"releaseDate\" : \"";
+        if (day == 0) {
+            content +=LocalDate.now();
+        } else {
+            content +=LocalDate.now().plusDays(1);
+        }
+        content +=  "\" }";
+
+        CommonStates.setResultActions(mockMvc.perform(patch(urlKey + "/patch")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content)));
+    }
+
     @When("^user request DELETE for the (.*) of (.*) of the (.*)")
     public void performDeleteOnResourceWithLinkedObject(String className, String linkedObjectUrlKey,
                                                         String resourceUrlKey) throws Exception {
@@ -304,6 +342,37 @@ public class CommonSteps {
     @Then("^the result should contain (.*) with value (.*)$")
     public void checkResponseJsonFieldValue(String field, String value) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(value));
+    }
+
+    @Then("^the result should have (.*) as number$")
+    public void checkResponseJsonFieldValueNumber(String field) throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$."+field).isNumber());
+    }
+
+    @Then("^the result should have (.*) as null$")
+    public void checkResponseJsonFieldValueNull(String field) throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(nullValue()));
+    }
+
+    @Then("^the result should have (.*) as false$")
+    public void checkResponseJsonFieldValueFalse(String field) throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(false));
+    }
+
+    @Then("^the result should have (.*) as (.*) day$")
+    public void checkResponseJsonFieldValueDay(String field, int day) throws Exception {
+        LocalDate releaseDay;
+        if (day == 0) {
+            releaseDay = LocalDate.now();
+        } else {
+            releaseDay = LocalDate.now().plusDays(1);
+        }
+        CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(releaseDay.toString()));
+    }
+
+    @Then("^the result should have (.*) existing$")
+    public void checkResponseJsonFieldValueExist(String field) throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$."+field).exists());
     }
 
     @Then("^the result should not contain (.*)$")
