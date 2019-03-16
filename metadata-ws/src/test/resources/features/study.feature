@@ -695,4 +695,3 @@ Feature: study object
 
     When user request PATCH TEST_STUDY with content {""}
     And the response code should be 400
-    

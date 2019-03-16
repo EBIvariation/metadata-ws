@@ -3,8 +3,10 @@ package uk.ac.ebi.ampt2d.metadata.cucumber;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
+import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import org.json.JSONObject;
 import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,8 +33,10 @@ import java.util.stream.Collectors;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -70,6 +75,8 @@ public class CommonSteps {
 
     @Autowired
     private WebResourceRepository webResourceRepository;
+
+    private ZonedDateTime time1, time2;
 
     @Before
     public void cleanDatabases() {
@@ -315,6 +322,20 @@ public class CommonSteps {
                 CommonStates.getResultActions().andReturn().getResponse().getHeaderValue(headerName));
     }
 
+    @Then("^the (.*) header should be present with actual value (.*)$")
+    public void checkHeaderPresenceWithDirectValue(String headerName, String headerValue) {
+        assertEquals("Header not present with value: " + headerName + "=" + headerValue,
+                headerValue,
+                CommonStates.getResultActions().andReturn().getResponse().getHeaderValue(headerName));
+    }
+
+    @Then("^the (.*) header should contain (.*)$")
+    public void checkHeaderContainsValue(String headerName, String headerValue) {
+        String header = CommonStates.getResultActions().andReturn().getResponse().getHeaderValue(headerName).toString();
+        assertTrue("Header not present with value: " + headerName + "=" + headerValue,
+                header.contains(headerValue));
+    }
+
     /* check http response body */
 
     @Then("^the result json should be:$")
@@ -375,6 +396,11 @@ public class CommonSteps {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).exists());
     }
 
+    @Then("^the result should have (.*) non empty$")
+    public void checkResponseJsonFieldValueNotEmpty(String field) throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$."+field).isNotEmpty());
+    }
+
     @Then("^the result should not contain (.*)$")
     public void checkResponseJsonNoField(String field) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).doesNotExist());
@@ -432,6 +458,34 @@ public class CommonSteps {
         CommonStates.getResultActions()
                 .andExpect(jsonPath("$.."+className+"["+index+"]."+field).isArray())
                 .andExpect(jsonPath("$.."+className+"["+index+"]."+field+"[*]", hasItems(fieldValue)));
+    }
+
+    @When("^user request OPTIONS with header (.*) value (.*)$")
+    public void performOptionsWithData(String headerList, String valueList) throws Exception {
+        String[] header = headerList.split(",");
+        String[] value = valueList.split(",");
+
+        CommonStates.setResultActions(mockMvc.perform(options("/")
+                .header(header[0], value[0])
+                .header(header[1], value[1])));
+    }
+
+    @When("^user request set time1")
+    public void setTime1() {
+        time1 = ZonedDateTime.now();
+    }
+
+    @When("^user request set time2")
+    public void setTime2() {
+        time2 = ZonedDateTime.now();
+    }
+
+    @Then("^the lastModifiedDate should be within times$")
+    public void checkLastModifiedDate() throws Exception{
+        JSONObject jsonObject = new JSONObject(CommonStates.getResultActions().andReturn().getResponse().getContentAsString());
+        ZonedDateTime lastModifiedDate = ZonedDateTime.parse(jsonObject.getString("lastModifiedDate"));
+        assert lastModifiedDate.isAfter(time1);
+        assert lastModifiedDate.isBefore(time2);
     }
 
 }
