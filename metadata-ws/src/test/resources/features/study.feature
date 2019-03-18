@@ -28,11 +28,11 @@ Feature: study object
     When user request POST with /taxonomies for Uri "taxonomyId": 9598, "name": "Pan troglodytes" for stringData TEST_TAXONOMY_1,TEST_TAXONOMY_3 for linkedObjectKey and ancestors for linkedObjectClassName
     And set the URL to TEST_TAXONOMY_5
 
-    When user create a test parameterized study with testhuman for accession, 1 for version, test human study for name and TEST_TAXONOMY_2 for taxonomy
+    When user create a test parameterized study with testhuman for accession, 1 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY_2 for taxonomy
     And set the URL to TEST_STUDY1
-    When user create a test parameterized study with testbonobo for accession, 1 for version, test bonobo study for name and TEST_TAXONOMY_4 for taxonomy
+    When user create a test parameterized study with testbonobo for accession, 1 for version, test bonobo study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY_4 for taxonomy
     And set the URL to TEST_STUDY2
-    When user create a test parameterized study with testchimpanzee for accession, 1 for version, test chimpanzee study for name and TEST_TAXONOMY_5 for taxonomy
+    When user create a test parameterized study with testchimpanzee for accession, 1 for version, test chimpanzee study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY_5 for taxonomy
     And set the URL to TEST_STUDY3
 
     When user request elaborate search for the studies base <base> and with the parameters: <query>
@@ -61,11 +61,11 @@ Feature: study object
     }
     """
     And set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with releasedYesterday for accession, 1 for version, nothing important for name -1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with releasedYesterday for accession, 1 for version, nothing important for name, false for deprecated, -1 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY1
-    When user create a test parameterized study with releasedToday for accession, 1 for version, nothing important for name 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with releasedToday for accession, 1 for version, nothing important for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY2
-    When user create a test parameterized study with releasedTomorrow for accession, 1 for version, nothing important for name 1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with releasedTomorrow for accession, 1 for version, nothing important for name, false for deprecated, 1 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY3
 
     When user request exhaustive search for the studies base <base> and with the parameters: <query> and <day>
@@ -88,11 +88,11 @@ Feature: study object
     }
     """
     And set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with releasedYesterday for accession, 1 for version, nothing important for name -1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with releasedYesterday for accession, 1 for version, nothing important for name, false for deprecated, -1 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY1
-    When user create a test parameterized study with releasedToday for accession, 1 for version, nothing important for name 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with releasedToday for accession, 1 for version, nothing important for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY2
-    When user create a test parameterized study with releasedTomorrow for accession, 1 for version, nothing important for name 1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with releasedTomorrow for accession, 1 for version, nothing important for name, false for deprecated, 1 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY3
 
     When user request exhaustive search with dates for the studies base <base> and with the parameters: <query> and <day>
@@ -134,9 +134,9 @@ Feature: study object
     }
     """
     And set the URL to TEST_REFERENCE_SEQUENCE_2
-    When user create a test parameterized study with EGAS0001 for accession, 1 for version, test human study for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with EGAS0001 for accession, 1 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY1
-    When user create a test parameterized study with EGAS0001 for accession, 2 for version, test human study for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with EGAS0001 for accession, 2 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY2
     When user create a test analysis with EGAA0001 for accession, TEST_REFERENCE_SEQUENCE_1 for reference sequence, TEST_STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     And the response code should be 201
@@ -175,18 +175,18 @@ Feature: study object
     }
     """
     And set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with EGAS0001 for accession, 1 for version, test human study based on GRCh37 for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with EGAS0001 for accession, 1 for version, test human study based on GRCh37 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY1
-    When user create a test parameterized study with EGAS0001 for accession, 2 for version, test human study based on GRCh37 for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with EGAS0001 for accession, 2 for version, test human study based on GRCh37 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY2
-    When user create a test parameterized study with EGAS0002 for accession, 3 for version, test human study based on GRCh38 for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with EGAS0002 for accession, 3 for version, test human study based on GRCh38 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY3
 
     When user request search for the studies with base accession and name accession value EGAS0001
     And the response code should be 200
     And the href of the class study should be TEST_STUDY2
     And the result should have accessionVersionId.accession with value EGAS0001
-    And the result should have 2 accessionVersionId.version
+    And the result should have accessionVersionId.version with value 2
 
     When user request search for the studies with base accession and name accession value EGAS0002
     And the response code should be 200
@@ -207,11 +207,11 @@ Feature: study object
     }
     """
     And set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with EGAS0001 for accession, 1 for version, test human study based on GRCh37 for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with EGAS0001 for accession, 1 for version, test human study based on GRCh37 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY1
-    When user create a test parameterized study with EGAS0001 for accession, 2 for version, test human study based on GRCh37 for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with EGAS0001 for accession, 2 for version, test human study based on GRCh37 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY2
-    When user create a test parameterized study with EGAS0002 for accession, 1 for version, test human study based on GRCh38 for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with EGAS0002 for accession, 1 for version, test human study based on GRCh38 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY3
 
     When user request search for the studies with base accession and name accession value EGAS0001
@@ -245,22 +245,22 @@ Feature: study object
     }
     """
     And set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with EGAS0001 for accession, 1 for version, test human B for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with EGAS0001 for accession, 1 for version, test human B for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY2
-    When user create a test parameterized study with EGAS0002 for accession, 1 for version, test human A for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with EGAS0002 for accession, 1 for version, test human A for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY1
 
     When user request GET for the studies with optional param NONE
     And the response code should be 200
     And the result should contain 2 studies
-    And the result should have 20 page.size
-    And the result should have 2 page.totalElements
-    And the result should have 1 page.totalPages
+    And the result should have page.size with value 20
+    And the result should have page.totalElements with value 2
+    And the result should have page.totalPages with value 1
 
     When user request GET for the studies with query param <param>
     And the response code should be 200
     And the result should contain 1 studies
-    And the href of the study of studies 0 should be <url>
+    And the href list of the study of studies 1 contained in <url>
 
     When user request GET for the studies with query param page=1
     And the response code should be 200
@@ -292,26 +292,25 @@ Feature: study object
     """
     And the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_1
-    When user create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name -1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name, false for deprecated, -1 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY1
-    When user create a test parameterized study with 1kg for accession, 2 for version, 1kg phase 1 for name 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with 1kg for accession, 2 for version, 1kg phase 1 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY2
-    When user create a test parameterized study with 1kg for accession, 3 for version, 1kg phase 3 for name 1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with 1kg for accession, 3 for version, 1kg phase 3 for name, false for deprecated, 1 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY3
     When user create a test analysis with analysisReleasedYesterday for accession, TEST_REFERENCE_SEQUENCE_1 for reference sequence, TEST_STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     And set the URL to TEST_ANALYSIS
 
     When user request GET for the studies with optional param NONE
     And the result should contain 2 studies
-    And the href of the study of studies 0 should be TEST_STUDY1
-    And the href of the study of studies 1 should be TEST_STUDY2
+    And the href list of the study of studies 2 contained in TEST_STUDY1,TEST_STUDY2
 
     When user request GET with value of TEST_STUDY1
     And the response code should be 200
 
     When user request GET for analyses of TEST_STUDY1
     And the result should contain 1 analyses
-    And the href of the analysis of analyses 0 should be TEST_ANALYSIS
+    And the href list of the analysis of analyses 1 contained in TEST_ANALYSIS
 
     When user request GET for analyses of TEST_STUDY2
     And the response code should be 200
@@ -320,8 +319,7 @@ Feature: study object
     When user request search for the studies with the parameters: taxonomy.taxonomyId=9606
     And the response code should be 200
     And the result should contain 2 studies
-    And the href of the study of studies 0 should be TEST_STUDY1
-    And the href of the study of studies 1 should be TEST_STUDY2
+    And the href list of the study of studies 2 contained in TEST_STUDY1,TEST_STUDY2
 
     When user request elaborate search for the studies base accession and with the parameters: accession=1kg
     And the response code should be 200
@@ -332,7 +330,7 @@ Feature: study object
     When user request exhaustive search for the studies base release-date and with the parameters: from= and 0
     And the response code should be 200
     And the result should contain 1 studies
-    And the href of the study of studies 0 should be TEST_STUDY2
+    And the href list of the study of studies 1 contained in TEST_STUDY2
 
     When user request elaborate search for the studies base <base> and with the parameters: <query>
     And the response code should be 200
@@ -362,7 +360,7 @@ Feature: study object
 
     When user request GET for the studies with optional param NONE
     And the result should contain 1 studies
-    And the href of the study of studies 0 should be TEST_STUDY2
+    And the href list of the study of studies 1 contained in TEST_STUDY2
 
     When user request GET with value of TEST_STUDY2
     And the response code should be 200
@@ -461,7 +459,7 @@ Feature: study object
     And the result should have description with value Nothing important
     And the result should not contain deprecated
 
-    When user request PATCH TEST_STUDY1 with content {"deprecated": "true"}
+    When user request PATCH TEST_STUDY1 with content {"deprecated": "true"} and patch false
     And the response code should be 2xx
 
     When user request GET with value of TEST_STUDY1
@@ -477,7 +475,7 @@ Feature: study object
     }
     """
     And set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with EGAS0001 for accession, 1 for version, test_study for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with EGAS0001 for accession, 1 for version, test_study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     When user request POST /files with json data:
     """
     {
@@ -545,13 +543,13 @@ Feature: study object
     }
     """
     And set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with testhuman for accession, 1 for version, test human study for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with testhuman for accession, 1 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY1
-    When user create a test parameterized study with testhuman for accession, 2 for version, test human study for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with testhuman for accession, 2 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY2
-    When user create a test parameterized study with testhuman for accession, 3 for version, test human study for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with testhuman for accession, 3 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY3
-    When user create a test parameterized study with testhuman for accession, 4 for version, test human study for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with testhuman for accession, 4 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY4
 
     When user request PATCH TEST_STUDY1 with list TEST_STUDY2,TEST_STUDY3 for childStudies
@@ -589,21 +587,21 @@ Feature: study object
     }
     """
     And set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY
 
     When user request GET with value of TEST_STUDY
     And the response code should be 200
     And the href of the class study should be TEST_STUDY
 
-    When user request patched PATCH TEST_STUDY with content {"deprecated": "true"}
+    When user request PATCH TEST_STUDY with content {"deprecated": "true"} and patch true
     And the response code should be 2xx
     And the href of the class study should be TEST_STUDY
 
     When user request GET with value of TEST_STUDY
     And the response code should be 4xx
 
-    When user request patched PATCH TEST_STUDY with content {"deprecated": "false"}
+    When user request PATCH TEST_STUDY with content {"deprecated": "false"} and patch true
     And the response code should be 2xx
     And the href of the class study should be TEST_STUDY
 
@@ -620,7 +618,7 @@ Feature: study object
     }
     """
     And set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY
 
     When user request GET with value of TEST_STUDY
@@ -631,13 +629,13 @@ Feature: study object
     And the response code should be 200
     And the result should contain 0 studies
 
-    When user request PATCH TEST_STUDY with content {"browsable": "true"}
+    When user request PATCH TEST_STUDY with content {"browsable": "true"} and patch false
     And the response code should be 2xx
 
     When user request search for the studies with the parameters: browsable=true
     And the response code should be 200
     And the result should contain 1 studies
-    And the href list of the study of studies 0 contained in TEST_STUDY
+    And the href list of the study of studies 1 contained in TEST_STUDY
 
 
   Scenario: verify study release date could be changed
@@ -649,14 +647,14 @@ Feature: study object
     }
     """
     And set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with 1kg for accession, 3 for version, 1kg phase 3 for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with 1kg for accession, 3 for version, 1kg phase 3 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY
 
     When user request GET with value of TEST_STUDY
     And the response code should be 200
     And the result should have releaseDate existing
 
-    When user request patched PATCH TEST_STUDY with day 1
+    When user request PATCH TEST_STUDY with day 1 and URL false
     And the response code should be 200
     And the result should have releaseDate existing
     And the result should have releaseDate as 1 day
@@ -664,7 +662,7 @@ Feature: study object
     When user request GET with value of TEST_STUDY
     And the response code should be 404
 
-    When user request patched PATCH TEST_STUDY with day 0
+    When user request PATCH TEST_STUDY with day 0 and URL false
     And the response code should be 200
     And the result should have releaseDate existing
     And the result should have releaseDate as 0 day
@@ -676,7 +674,7 @@ Feature: study object
 
 
   Scenario: verify non-existing study with patch
-    When user request URL PATCH studies/unexist.1 with day 0
+    When user request PATCH studies/unexist.1 with day 0 and URL true
     And the response code should be 4xx
 
   Scenario: patch study with invalid request
@@ -688,11 +686,11 @@ Feature: study object
     }
     """
     And set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with 1kg for accession, 3 for version, 1kg phase 3 for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with 1kg for accession, 3 for version, 1kg phase 3 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY
 
-    When user request PATCH TEST_STUDY with content {"releaseDate": 2001}
+    When user request PATCH TEST_STUDY with content {"releaseDate": 2001} and patch false
     And the response code should be 400
 
-    When user request PATCH TEST_STUDY with content {""}
+    When user request PATCH TEST_STUDY with content {""} and patch false
     And the response code should be 400

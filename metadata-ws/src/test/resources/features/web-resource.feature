@@ -80,7 +80,7 @@ Feature: Web resource object
     }
     """
     And set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with testhuman for accession, 1 for version, test human stud for name and TEST_TAXONOMY for taxonomy
+    When user create a test parameterized study with testhuman for accession, 1 for version, test human stud for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY
     When user create a test analysis with testhuman for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     And set the URL to TEST_ANALYSIS
@@ -133,7 +133,7 @@ Feature: Web resource object
     And the lastModifiedDate should be within times
 
     Given user request set time1
-    When user request PATCH <url> with content <content>
+    When user request PATCH <url> with content <content> and patch false
     And the response code should be 2xx
     When user request set time2
 

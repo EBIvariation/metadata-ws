@@ -158,7 +158,7 @@ public class CommonSteps {
 
     @When("^user requests PATCH with replacement (.*) with list (.*) for (.*) and params (.*) (.*)")
     public void performPatchOnResourceWithLinkedObjectReplace(String urlKey, String linkedObjectUrlKeys,
-                                                       String linkedObjectClassName, String org, String target) throws Exception {
+                                                       String linkedObjectClassName, String origin, String target) throws Exception {
         List<String> newUrls = null;
         if (!linkedObjectUrlKeys.equals("NONE")) {
             newUrls = Arrays.stream(linkedObjectUrlKeys.split(","))
@@ -170,24 +170,23 @@ public class CommonSteps {
                 + "}";
 
         CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
-                .content(jsonContent.replace(org, target))));
+                .content(jsonContent.replace(origin, target))));
     }
 
-    @When("^user request PATCH (.*) with content (.*)")
-    public void performPatchOnResourceWithContent(String urlKey, String content) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
-                .content(content)));
+    @When("^user request PATCH (.*) with content (.*) and patch (.*)")
+    public void performPatchOnResourceWithContent(String urlKey, String content, boolean patch) throws Exception {
+        if (patch == false) {
+            CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
+                    .content(content)));
+        } else {
+            CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(content)));
+        }
     }
 
-    @When("^user request patched PATCH (.*) with content (.*)")
-    public void performPatchedPatchOnResourceWithContent(String urlKey, String content) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content)));
-    }
-
-    @When("^user request patched PATCH (.*) with day (.*)")
-    public void performPatchedPatchOnResourceWithDay(String urlKey, int day) throws Exception {
+    @When("^user request PATCH (.*) with day (.*) and URL (.*)")
+    public void performPatchedPatchOnResourceWithDay(String urlKey, int day, boolean url) throws Exception {
         String content = "{ \"releaseDate\" : \"";
         if (day == 0) {
             content +=LocalDate.now();
@@ -196,24 +195,15 @@ public class CommonSteps {
         }
         content +=  "\" }";
 
-        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content)));
-    }
-
-    @When("^user request URL PATCH (.*) with day (.*)")
-    public void performUrlPatchOnResourceWithDay(String urlKey, int day) throws Exception {
-        String content = "{ \"releaseDate\" : \"";
-        if (day == 0) {
-            content +=LocalDate.now();
+        if (url == false) {
+            CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(content)));
         } else {
-            content +=LocalDate.now().plusDays(1);
+            CommonStates.setResultActions(mockMvc.perform(patch(urlKey + "/patch")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(content)));
         }
-        content +=  "\" }";
-
-        CommonStates.setResultActions(mockMvc.perform(patch(urlKey + "/patch")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content)));
     }
 
     @When("^user request DELETE for the (.*) of (.*) of the (.*)")
@@ -353,11 +343,6 @@ public class CommonSteps {
                 .andExpect(jsonPath("$.."+className+".length()").value(size));
     }
 
-    @And("^the result should have (\\d*) (.*)$")
-    public void checkResponseObjectSize(int size, String object) throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$."+object).value(size));
-    }
-
     @Then("^the result should have (.*) with value (.*)$")
     public void checkResponseJsonFieldValue(String field, String value) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(value));
@@ -415,13 +400,6 @@ public class CommonSteps {
     public void checkResponseLinkedObjectHref(String className, String valueKey)
             throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$.."+className+".href")
-                .value(CommonStates.getUrl(valueKey)));
-    }
-
-    @And("^the href list of the (.*) of (.*) (\\d*) should be (.*)$")
-    public void checkResponseLinkedObjectHrefList(String field, String className, int index, String valueKey)
-            throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$.."+className+"["+index+"].."+field+".href")
                 .value(CommonStates.getUrl(valueKey)));
     }
 

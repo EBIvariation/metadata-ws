@@ -35,7 +35,7 @@ public class AnalysisSteps {
     }
 
     @When("user create a test analysis with (.*) for accession, (.*) for reference sequence, (.*) for study, (.*) for technology, (.*) for type and (.*) for platform")
-    public void createTestAnalysis2(String accession, String referenceSequenceUrlKey, String studyUrlKey,
+    public void createTestAnalysisParam(String accession, String referenceSequenceUrlKey, String studyUrlKey,
                                     Analysis.Technology technology, Analysis.Type type, String platform)
         throws Exception {
 

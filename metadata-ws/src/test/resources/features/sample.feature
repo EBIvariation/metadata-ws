@@ -19,7 +19,7 @@ Feature: sample object
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
     Then the result should contain 1 taxonomies
-    Then the href of the taxonomy of taxonomies 0 should be TEST_TAXONOMY
+    Then the href list of the taxonomy of taxonomies 1 contained in TEST_TAXONOMY
 
 
   Scenario: update a sample successfully
@@ -41,7 +41,7 @@ Feature: sample object
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
     Then the result should contain 1 taxonomies
-    Then the href of the taxonomy of taxonomies 0 should be TEST_TAXONOMY_1
+    Then the href list of the taxonomy of taxonomies 0 contained in TEST_TAXONOMY_1
 
     Given user request POST /taxonomies with json data:
     """
@@ -56,7 +56,7 @@ Feature: sample object
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
     Then the result should contain 1 taxonomies
-    Then the href of the taxonomy of taxonomies 0 should be TEST_TAXONOMY_2
+    Then the href list of the taxonomy of taxonomies 0 contained in  TEST_TAXONOMY_2
 
 
   Scenario Outline: post a test sample with invalid taxonomy list should fail
@@ -96,8 +96,7 @@ Feature: sample object
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
     Then the result should contain 2 taxonomies
-    Then the href of the taxonomy of taxonomies 0 should be TEST_TAXONOMY_1
-    Then the href of the taxonomy of taxonomies 1 should be TEST_TAXONOMY_2
+    Then the href list of the taxonomy of taxonomies 2 contained in TEST_TAXONOMY_1,TEST_TAXONOMY_2
 
     When user request DELETE for the taxonomies of TEST_TAXONOMY_1 of the TEST_SAMPLE
     And the response code should be 2xx
@@ -126,7 +125,7 @@ Feature: sample object
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
     Then the result should contain 1 taxonomies
-    Then the href of the taxonomy of taxonomies 0 should be TEST_TAXONOMY
+    Then the href list of the taxonomy of taxonomies 0 contained in  TEST_TAXONOMY
 
     When user request PATCH TEST_SAMPLE with list <list> for taxonomies
     And the response code should be 4xx
@@ -185,15 +184,14 @@ Feature: sample object
     When user request search for the samples with the parameters: <query>
     And the response code should be 200
     And the result should contain 2 samples
-    And the href of the sample of samples 0 should be <url1>
-    And the href of the sample of samples 1 should be <url2>
+    And the href list of the sample of samples 1 contained in <url>
 
     Examples:
-      | query | url1 | url2 |
-      | taxonomies.name=Homininae | TEST_SAMPLE1 | TEST_SAMPLE3 |
-      | taxonomies.name=Pan paniscus | TEST_SAMPLE2 | TEST_SAMPLE3 |
-      | taxonomies.taxonomyId=207598 | TEST_SAMPLE1 | TEST_SAMPLE3 |
-      | taxonomies.taxonomyId=9597 | TEST_SAMPLE2 | TEST_SAMPLE3 |
+      | query | url |
+      | taxonomies.name=Homininae | TEST_SAMPLE1,TEST_SAMPLE3 |
+      | taxonomies.name=Pan paniscus | TEST_SAMPLE2,TEST_SAMPLE3 |
+      | taxonomies.taxonomyId=207598 | TEST_SAMPLE1,TEST_SAMPLE3 |
+      | taxonomies.taxonomyId=9597 | TEST_SAMPLE2,TEST_SAMPLE3 |
 
 
   Scenario Outline: find one sample by taxonomy
@@ -239,7 +237,7 @@ Feature: sample object
     When user request search for the samples with the parameters: <query>
     And the response code should be 200
     And the result should contain 1 samples
-    And the href of the sample of samples 0 should be <url1>
+    And the href list of the sample of samples 0 contained in  <url1>
 
     Examples:
       | query | url1 |
