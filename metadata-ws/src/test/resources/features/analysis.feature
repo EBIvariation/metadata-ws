@@ -26,7 +26,7 @@ Feature: analysis object
     And set the URL to TEST_ANALYSIS
     When user request GET with value of TEST_ANALYSIS
     Then the response code should be 200
-    Then the result should contain accessionVersionId.accession with value EGAA0001
+    Then the result should have accessionVersionId.accession with value EGAA0001
 
   Scenario: update an analysis successfully
     When user request POST /reference-sequences with json data:
@@ -55,7 +55,7 @@ Feature: analysis object
     And set the URL to TEST_ANALYSIS
     When user request GET with value of TEST_ANALYSIS
     Then the response code should be 200
-    Then the result should contain accessionVersionId.accession with value EGAA0001
+    Then the result should have accessionVersionId.accession with value EGAA0001
     When user request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     Then the result should contain 1 reference-sequences
@@ -75,7 +75,7 @@ Feature: analysis object
     And the response code should be 2xx
     When user request GET with value of TEST_ANALYSIS
     Then the response code should be 200
-    Then the result should contain accessionVersionId.accession with value EGAA0001
+    Then the result should have accessionVersionId.accession with value EGAA0001
     When user request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     Then the result should contain 1 reference-sequences
@@ -108,7 +108,7 @@ Feature: analysis object
     And set the URL to TEST_ANALYSIS
     When user request GET with value of TEST_ANALYSIS
     Then the response code should be 200
-    Then the result should contain accessionVersionId.accession with value EGAA0001
+    Then the result should have accessionVersionId.accession with value EGAA0001
     When user request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     Then the result should contain 1 reference-sequences
@@ -116,7 +116,7 @@ Feature: analysis object
 
     When user request PATCH TEST_ANALYSIS with list <list> for referenceSequences
     And the response code should be 4xx
-    And the result should contain exception with value <exception>
+    And the result should have exception with value <exception>
 
     Examples:
      | list | exception |
@@ -137,7 +137,7 @@ Feature: analysis object
     And set the URL to TEST_STUDY
     When user create a test analysis with TEST_STUDY for study and <list> for reference sequence
     And the response code should be 4xx
-    And the result should contain exception with value <exception>
+    And the result should have exception with value <exception>
 
     Examples:
       | list | exception |
@@ -180,7 +180,7 @@ Feature: analysis object
     And set the URL to TEST_ANALYSIS
     When user request GET with value of TEST_ANALYSIS
     Then the response code should be 200
-    Then the result should contain accessionVersionId.accession with value EGAA0001
+    Then the result should have accessionVersionId.accession with value EGAA0001
     When user request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     Then the result should contain 2 reference-sequences
@@ -192,7 +192,7 @@ Feature: analysis object
 
     When user request DELETE for the referenceSequences of TEST_REFERENCE_SEQUENCE_2 of the TEST_ANALYSIS
     And the response code should be 4xx
-    And the result should contain exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException
+    And the result should have exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException
 
 
   Scenario: register an analysis with multiple gene reference sequences successfully
@@ -231,7 +231,7 @@ Feature: analysis object
     And set the URL to TEST_ANALYSIS
     When user request GET with value of TEST_ANALYSIS
     Then the response code should be 200
-    Then the result should contain accessionVersionId.accession with value EGAA0001
+    Then the result should have accessionVersionId.accession with value EGAA0001
     When user request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     Then the result should contain 2 reference-sequences
@@ -264,8 +264,8 @@ Feature: analysis object
     And set the URL to TEST_STUDY
     When user create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2 for reference sequence
     And the response code should be 4xx
-    And the result should contain exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException
-    And the result should contain message with value Invalid type of reference sequences. When multiple reference sequence URLs are provided, all of them should point to gene sequences
+    And the result should have exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException
+    And the result should have message with value Invalid type of reference sequences. When multiple reference sequence URLs are provided, all of them should point to gene sequences
 
     Examples:
       | test_reference_sequence_1_json | test_reference_sequence_2_json |

@@ -38,19 +38,7 @@ public class SampleSteps {
         CommonStates.setResultActions(postTestSample("EGAS0001", "test_human_sample", testTaxonomyList, 1));
     }
 
-    @When("user create a test parameterized sample with (.*) for accession, (.*) for name and (.*) for taxonomy")
-    public void createTestSampleParameterized(String accession, String name, String testTaxonomyKeys) throws Exception {
-        List<String> testTaxonomyList = null;
-        if (!testTaxonomyKeys.equals("NONE")) {
-            testTaxonomyList = Arrays.stream(testTaxonomyKeys.split(","))
-                    .map(key -> CommonStates.getUrl(key))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-        }
-        CommonStates.setResultActions(postTestSample(accession, name, testTaxonomyList, 1));
-    }
-
-    @When("user create a test versioned sample with (.*) for accession, (\\d*) for version, (.*) for name and (.*) for taxonomy")
+    @When("user create a test parameterized sample with (.*) for accession, (.*) for version, (.*) for name and (.*) for taxonomy")
     public void createTestSampleParameterized(String accession, int version, String name, String testTaxonomyKeys) throws Exception {
         List<String> testTaxonomyList = null;
         if (!testTaxonomyKeys.equals("NONE")) {

@@ -13,7 +13,7 @@ Feature: study object
     And set the URL to TEST_STUDY
     When user request GET with value of TEST_STUDY
     Then the response code should be 200
-    Then the result should contain accessionVersionId.accession with value EGAS0001
+    Then the result should have accessionVersionId.accession with value EGAS0001
 
 
   Scenario Outline: search various study by taxonomy name and id
@@ -37,7 +37,7 @@ Feature: study object
 
     When user request elaborate search for the studies base <base> and with the parameters: <query>
     And the response code should be 200
-    And the result should contain object studies with items <N>
+    And the result should contain <N> studies
     And the href list of the study of studies <N> contained in <url>
 
     Examples:
@@ -70,7 +70,7 @@ Feature: study object
 
     When user request exhaustive search for the studies base <base> and with the parameters: <query> and <day>
     And the response code should be 200
-    And the result should contain object studies with items <N>
+    And the result should contain <N> studies
     And the href list of the study of studies <N> contained in <url>
 
     Examples:
@@ -97,7 +97,7 @@ Feature: study object
 
     When user request exhaustive search with dates for the studies base <base> and with the parameters: <query> and <day>
     And the response code should be 200
-    And the result should contain object studies with items <N>
+    And the result should contain <N> studies
     And the href list of the study of studies <N> contained in <url>
 
     Examples:
@@ -145,7 +145,7 @@ Feature: study object
 
     When user request elaborate find for the studies bases <bases> with the parameters: <param> and <sep>
     And the response code should be 200
-    And the result should contain object studies with items <N>
+    And the result should contain <N> studies
     And the href list of the study of studies <N> contained in <url>
 
     Examples:
@@ -185,14 +185,14 @@ Feature: study object
     When user request search for the studies with base accession and name accession value EGAS0001
     And the response code should be 200
     And the href of the class study should be TEST_STUDY2
-    And the result should contain accessionVersionId.accession with value EGAS0001
-    And the result should contain accessionVersionId.version with value 2
+    And the result should have accessionVersionId.accession with value EGAS0001
+    And the result should have 2 accessionVersionId.version
 
     When user request search for the studies with base accession and name accession value EGAS0002
     And the response code should be 200
     And the href of the class study should be TEST_STUDY3
-    And the result should contain accessionVersionId.accession with value EGAS0002
-    And the result should contain accessionVersionId.version with value 3
+    And the result should have accessionVersionId.accession with value EGAS0002
+    And the result should have accessionVersionId.version with value 3
 
     When user request search for the studies with base accession and name accession value EGAS0003
     And the response code should be 404
@@ -217,17 +217,17 @@ Feature: study object
     When user request search for the studies with base accession and name accession value EGAS0001
     And the response code should be 200
     And the href of the class study should be TEST_STUDY2
-    And the result should contain accessionVersionId.accession with value EGAS0001
-    And the result should contain accessionVersionId.version with value 2
+    And the result should have accessionVersionId.accession with value EGAS0001
+    And the result should have accessionVersionId.version with value 2
 
     When user request search for the studies with base text and name searchTerm value grCh37
     And the response code should be 200
-    And the result should contain object studies with items 2
-    And the result should contain .studies[0].accessionVersionId.accession with value EGAS0001
+    And the result should contain 2 studies
+    And the accessionVersionId.accession field of studies 0 should be EGAS0001
 
     When user request search for the <class> with base <base> and name <name> value <value>
     And the response code should be 200
-    And the result should contain object <class> with items <items>
+    And the result should contain <items> <class>
 
     Examples:
       | class | base  | name | value | items |
@@ -236,7 +236,7 @@ Feature: study object
       | studies | text | searchTerm | grCh39 | 0 |
 
 
-  Scenario: search various studies by paging and sorting
+  Scenario Outline: search various studies by paging and sorting
     When user request POST /taxonomies with json data:
     """
     {
@@ -257,19 +257,20 @@ Feature: study object
     And the result should have 2 page.totalElements
     And the result should have 1 page.totalPages
 
-    When user request GET for the studies with optional param ?size=1
+    When user request GET for the studies with query param <param>
     And the response code should be 200
     And the result should contain 1 studies
-    And the href of the study of studies 0 should be TEST_STUDY2
+    And the href of the study of studies 0 should be <url>
 
-    When user request GET for the studies with optional param ?size=1&sort=name
-    And the response code should be 200
-    And the result should contain 1 studies
-    And the href of the study of studies 0 should be TEST_STUDY1
-
-    When user request GET for the studies with optional param ?page=1
+    When user request GET for the studies with query param page=1
     And the response code should be 200
     And the result should contain 0 studies
+
+    Examples:
+    | param | url |
+    | size=1 | TEST_STUDY2 |
+    | size=1&sort=name | TEST_STUDY1 |
+
 
   Scenario Outline: search various public studies
     When user request POST /taxonomies with json data:
@@ -314,7 +315,7 @@ Feature: study object
 
     When user request GET for analyses of TEST_STUDY2
     And the response code should be 200
-    And the result should contain object analyses with items 0
+    And the result should contain 0 analyses
 
     When user request search for the studies with the parameters: taxonomy.taxonomyId=9606
     And the response code should be 200
@@ -324,8 +325,8 @@ Feature: study object
 
     When user request elaborate search for the studies base accession and with the parameters: accession=1kg
     And the response code should be 200
-    And the result should contain accessionVersionId.accession with value 1kg
-    And the result should contain accessionVersionId.version with value 2
+    And the result should have accessionVersionId.accession with value 1kg
+    And the result should have accessionVersionId.version with value 2
     And the href of the class study should be TEST_STUDY2
 
     When user request exhaustive search for the studies base release-date and with the parameters: from= and 0
@@ -335,7 +336,7 @@ Feature: study object
 
     When user request elaborate search for the studies base <base> and with the parameters: <query>
     And the response code should be 200
-    And the result should contain object studies with items <N>
+    And the result should contain <N> studies
     And the href list of the study of studies <N> contained in <url>
 
   Examples:
@@ -377,13 +378,13 @@ Feature: study object
 
     When user request elaborate search for the studies base accession and with the parameters: accession=1kg
     And the response code should be 200
-    And the result should contain accessionVersionId.accession with value 1kg
-    And the result should contain accessionVersionId.version with value 2
+    And the result should have accessionVersionId.accession with value 1kg
+    And the result should have accessionVersionId.version with value 2
     And the href of the class study should be TEST_STUDY2
 
     When user request elaborate search for the studies base <base> and with the parameters: <query>
     And the response code should be 200
-    And the result should contain object studies with items <N>
+    And the result should contain <N> studies
     And the href list of the study of studies <N> contained in <url>
 
     Examples:
@@ -415,12 +416,12 @@ Feature: study object
   Scenario: search studies invalid dates
     When user request search for the studies with param release-date
     And the response code should be 4xx
-    And the result should contain exception with value java.lang.IllegalArgumentException
-    And the result should contain message with value Either from or to needs to be non-null
+    And the result should have exception with value java.lang.IllegalArgumentException
+    And the result should have message with value Either from or to needs to be non-null
 
     When user request elaborate search for the studies base release-date and with the parameters: from=wrong-format-date
-    And the result should contain exception with value java.lang.IllegalArgumentException
-    And the result should contain message with value Please provide a date in the form yyyy-mm-dd
+    And the result should have exception with value java.lang.IllegalArgumentException
+    And the result should have message with value Please provide a date in the form yyyy-mm-dd
 
 
   Scenario: search various deprecated studies
@@ -457,7 +458,7 @@ Feature: study object
     When user request GET with value of TEST_STUDY1
     And the response code should be 200
     And the href of the class study should be TEST_STUDY1
-    And the result should contain description with value Nothing important
+    And the result should have description with value Nothing important
     And the result should not contain deprecated
 
     When user request PATCH TEST_STUDY1 with content {"deprecated": "true"}
@@ -507,25 +508,25 @@ Feature: study object
     }
     """
     And set the URL to TEST_TAXONOMY2
-    When user create a test parameterized sample with EGAN0001 for accession, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
+    When user create a test parameterized sample with EGAN0001 for accession, 1 for version, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
     And the response code should be 201
     And set the URL to TEST_SAMPLE
 
     When user request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001.2 and =
     And the response code should be 200
-    And the result should contain object studies with items 0
+    And the result should contain 0 studies
 
     When user request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001 and =
     And the response code should be 4xx
-    And the result should contain message with value Please provide an ID in the form accession.version
+    And the result should have message with value Please provide an ID in the form accession.version
 
     When user request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001.S1 and =
     And the response code should be 4xx
-    And the result should contain message with value Please provide an ID in the form accession.version
+    And the result should have message with value Please provide an ID in the form accession.version
 
     When user request elaborate find for the <object> bases <bases> with the parameters: <param> and <sep>
     And the response code should be 200
-    And the result should contain object <object> with items 1
+    And the result should contain 1 <object>
     And the <bases>.accession field of <object> 0 should be <value>
 
     Examples:
@@ -558,19 +559,19 @@ Feature: study object
 
     When user request GET for <linkedclass> of <url>
     And the response code should be 200
-    And the result should contain object studies with items <N>
+    And the result should contain <N> studies
     And the href list of the study of studies has items <item1> and <item2>
 
     When user request GET for linkedStudies of TEST_STUDY4
     And the response code should be 200
-    And the result should contain object studies with items 0
+    And the result should contain 0 studies
 
     When user requests PATCH with replacement TEST_STUDY1 with list TEST_STUDY1 for childStudies and params testhuman testmouse
     And the response code should be 2xx
 
     When user request GET for linkedStudies of TEST_STUDY1
     And the response code should be 200
-    And the result should contain object studies with items 0
+    And the result should contain 0 studies
 
     Examples:
   | linkedclass | url | N | item1 | item2 |
@@ -628,14 +629,14 @@ Feature: study object
 
     When user request search for the studies with the parameters: browsable=true
     And the response code should be 200
-    And the result should contain object studies with items 0
+    And the result should contain 0 studies
 
     When user request PATCH TEST_STUDY with content {"browsable": "true"}
     And the response code should be 2xx
 
     When user request search for the studies with the parameters: browsable=true
     And the response code should be 200
-    And the result should contain object studies with items 1
+    And the result should contain 1 studies
     And the href list of the study of studies 0 contained in TEST_STUDY
 
 

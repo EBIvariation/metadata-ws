@@ -14,8 +14,8 @@ Feature: sample object
     And set the URL to TEST_SAMPLE
     When user request GET with value of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should contain accessionVersionId.accession with value EGAS0001
-    Then the result should contain name with value test_human_sample
+    Then the result should have accessionVersionId.accession with value EGAS0001
+    Then the result should have name with value test_human_sample
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
     Then the result should contain 1 taxonomies
@@ -36,8 +36,8 @@ Feature: sample object
     And set the URL to TEST_SAMPLE
     When user request GET with value of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should contain accessionVersionId.accession with value EGAS0001
-    Then the result should contain name with value test_human_sample
+    Then the result should have accessionVersionId.accession with value EGAS0001
+    Then the result should have name with value test_human_sample
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
     Then the result should contain 1 taxonomies
@@ -62,7 +62,7 @@ Feature: sample object
   Scenario Outline: post a test sample with invalid taxonomy list should fail
     When user create a test sample with <list> for taxonomy
     And the response code should be 4xx
-    And the result should contain exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException
+    And the result should have exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException
 
     Examples:
       | list |
@@ -91,8 +91,8 @@ Feature: sample object
     And set the URL to TEST_SAMPLE
     When user request GET with value of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should contain accessionVersionId.accession with value EGAS0001
-    Then the result should contain name with value test_human_sample
+    Then the result should have accessionVersionId.accession with value EGAS0001
+    Then the result should have name with value test_human_sample
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
     Then the result should contain 2 taxonomies
@@ -104,7 +104,7 @@ Feature: sample object
 
     When user request DELETE for the taxonomies of TEST_TAXONOMY_2 of the TEST_SAMPLE
     And the response code should be 4xx
-    And the result should contain exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException
+    And the result should have exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException
 
 
   Scenario Outline: update a sample with invalid taxonomies should fail
@@ -121,8 +121,8 @@ Feature: sample object
     And set the URL to TEST_SAMPLE
     When user request GET with value of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should contain accessionVersionId.accession with value EGAS0001
-    Then the result should contain name with value test_human_sample
+    Then the result should have accessionVersionId.accession with value EGAS0001
+    Then the result should have name with value test_human_sample
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
     Then the result should contain 1 taxonomies
@@ -130,7 +130,7 @@ Feature: sample object
 
     When user request PATCH TEST_SAMPLE with list <list> for taxonomies
     And the response code should be 4xx
-    And the result should contain exception with value <exception>
+    And the result should have exception with value <exception>
 
     Examples:
       | list | exception |
@@ -156,7 +156,7 @@ Feature: sample object
     }
     """
     And set the URL to TEST_TAXONOMY_2
-    When user create a test parameterized sample with Species1 for accession, Species collection1 for name and TEST_TAXONOMY_1,TEST_TAXONOMY_2 for taxonomy
+    When user create a test parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TEST_TAXONOMY_1,TEST_TAXONOMY_2 for taxonomy
     And the response code should be 201
     And set the URL to TEST_SAMPLE1
     Given user request POST /taxonomies with json data:
@@ -175,10 +175,10 @@ Feature: sample object
     }
     """
     And set the URL to TEST_TAXONOMY_4
-    When user create a test parameterized sample with Species2 for accession, Species collection2 for name and TEST_TAXONOMY_3,TEST_TAXONOMY_4 for taxonomy
+    When user create a test parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TEST_TAXONOMY_3,TEST_TAXONOMY_4 for taxonomy
     And the response code should be 201
     And set the URL to TEST_SAMPLE2
-    When user create a test parameterized sample with Species3 for accession, Species collection3 for name and TEST_TAXONOMY_1,TEST_TAXONOMY_3 for taxonomy
+    When user create a test parameterized sample with Species3 for accession, 1 for version, Species collection3 for name and TEST_TAXONOMY_1,TEST_TAXONOMY_3 for taxonomy
     And the response code should be 201
     And set the URL to TEST_SAMPLE3
 
@@ -213,7 +213,7 @@ Feature: sample object
     }
     """
     And set the URL to TEST_TAXONOMY_2
-    When user create a test parameterized sample with Species1 for accession, Species collection1 for name and TEST_TAXONOMY_1,TEST_TAXONOMY_2 for taxonomy
+    When user create a test parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TEST_TAXONOMY_1,TEST_TAXONOMY_2 for taxonomy
     And the response code should be 201
     And set the URL to TEST_SAMPLE1
     Given user request POST /taxonomies with json data:
@@ -232,7 +232,7 @@ Feature: sample object
     }
     """
     And set the URL to TEST_TAXONOMY_4
-    When user create a test parameterized sample with Species2 for accession, Species collection2 for name and TEST_TAXONOMY_3,TEST_TAXONOMY_4 for taxonomy
+    When user create a test parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TEST_TAXONOMY_3,TEST_TAXONOMY_4 for taxonomy
     And the response code should be 201
     And set the URL to TEST_SAMPLE2
 
@@ -266,7 +266,7 @@ Feature: sample object
     }
     """
     And set the URL to TEST_TAXONOMY_2
-    When user create a test parameterized sample with Species1 for accession, Species collection1 for name and TEST_TAXONOMY_1,TEST_TAXONOMY_2 for taxonomy
+    When user create a test parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TEST_TAXONOMY_1,TEST_TAXONOMY_2 for taxonomy
     And the response code should be 201
     And set the URL to TEST_SAMPLE1
     Given user request POST /taxonomies with json data:
@@ -285,7 +285,7 @@ Feature: sample object
     }
     """
     And set the URL to TEST_TAXONOMY_4
-    When user create a test parameterized sample with Species2 for accession, Species collection2 for name and TEST_TAXONOMY_3,TEST_TAXONOMY_4 for taxonomy
+    When user create a test parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TEST_TAXONOMY_3,TEST_TAXONOMY_4 for taxonomy
     And the response code should be 201
     And set the URL to TEST_SAMPLE2
 
@@ -299,7 +299,7 @@ Feature: sample object
       | taxonomies.taxonomyId=0 |
 
 
-  Scenario: verify various accession version with samples
+  Scenario Outline: verify various accession version with samples
     Given user request POST /taxonomies with json data:
     """
     {
@@ -327,21 +327,16 @@ Feature: sample object
 
     When user create a test sample no or null accession true, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
     And the response code should be 4xx
-    And the result should contain errors[0].property with value accessionVersionId.accession
-    And the result should contain errors[0].message with value may not be null
+    And the property field of errors 0 should be accessionVersionId.accession
+    And the message field of errors 0 should be may not be null
 
-    When user create a test parameterized sample with  for accession, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
+    When user create a test parameterized sample with <accession> for accession, <version> for version, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
     And the response code should be 4xx
-    And the result should contain errors[0].property with value accessionVersionId.accession
-    And the result should contain errors[0].message with value size must be between 1 and 255
-
-    When user create a test versioned sample with EGAN0001 for accession, 0 for version, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
-    And the response code should be 4xx
-    And the result should contain errors[0].property with value accessionVersionId.version
-    And the result should contain errors[0].message with value must be greater than or equal to 1
+    And the property field of errors 0 should be <property>
+    And the message field of errors 0 should be <message>
 
 
-
-
-
-
+    Examples:
+    | accession | version | property | message |
+    |  | 1 | accessionVersionId.accession | size must be between 1 and 255 |
+    | EGAN0001 | 0 |accessionVersionId.version | must be greater than or equal to 1 |

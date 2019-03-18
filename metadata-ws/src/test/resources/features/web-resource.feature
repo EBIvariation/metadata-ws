@@ -13,8 +13,8 @@ Feature: Web resource object
 
     When user request GET with value of TEST_WEB_RESOURCE
     Then the response code should be 200
-    Then the result should contain type with value CENTER_WEB
-    Then the result should contain resourceUrl with value http://www.ebi.ac.uk
+    Then the result should have type with value CENTER_WEB
+    Then the result should have resourceUrl with value http://www.ebi.ac.uk
 
   Scenario Outline: register a web resource with valid URL should succeed
     When user request POST /webResources with json data:
@@ -114,7 +114,7 @@ Feature: Web resource object
     }
     """
     And set the URL to TEST_TAXONOMY2
-    When user create a test parameterized sample with testhuman for accession, test human sample for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
+    When user create a test parameterized sample with testhuman for accession, 1 for version, test human sample for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
     And set the URL to TEST_SAMPLE
     When user request POST /webResources with json data:
     """

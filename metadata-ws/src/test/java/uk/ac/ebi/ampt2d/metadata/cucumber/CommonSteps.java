@@ -3,7 +3,6 @@ package uk.ac.ebi.ampt2d.metadata.cucumber;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
-import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.json.JSONObject;
@@ -284,6 +283,11 @@ public class CommonSteps {
         }
     }
 
+    @When("^user request GET for the (.*) with query param (.*)")
+    public void performGetOnResourcesQuery(String className, String param) throws Exception {
+            CommonStates.setResultActions(mockMvc.perform(get("/" + className + "?" + param)));
+    }
+
     @When("^user request search for the (.*) with param (.*)")
     public void performSearchOnResources(String className, String param) throws Exception {
             CommonStates.setResultActions(mockMvc.perform(get("/" + className+"/search/"+param)));
@@ -343,7 +347,7 @@ public class CommonSteps {
         CommonStates.getResultActions().andExpect(content().json(jsonString));
     }
 
-    @Then("^the result should contain (\\d*) (.*)$")
+    @Then("^the result should contain (.*) (.*)$")
     public void checkResponseListSize(int size, String className) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$.."+className).isArray())
                 .andExpect(jsonPath("$.."+className+".length()").value(size));
@@ -354,13 +358,7 @@ public class CommonSteps {
         CommonStates.getResultActions().andExpect(jsonPath("$."+object).value(size));
     }
 
-    @Then("^the result should contain object (.*) with items (.*)$")
-    public void checkResponseVaryingListSize(String className, int size) throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$.."+className).isArray())
-                .andExpect(jsonPath("$.."+className+".length()").value(size));
-    }
-
-    @Then("^the result should contain (.*) with value (.*)$")
+    @Then("^the result should have (.*) with value (.*)$")
     public void checkResponseJsonFieldValue(String field, String value) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(value));
     }
