@@ -59,7 +59,7 @@ Feature: analysis object
     When user request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     Then the result should contain 1 reference-sequences
-    And the href list of the referenceSequence of reference-sequences 1 contained in TEST_REFERENCE_SEQUENCE_1
+    And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_1
 
     When user request POST /reference-sequences with json data:
     """
@@ -79,7 +79,7 @@ Feature: analysis object
     When user request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     Then the result should contain 1 reference-sequences
-    And the href list of the referenceSequence of reference-sequences 1 contained in TEST_REFERENCE_SEQUENCE_2
+    And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_2
 
   Scenario Outline: update an analysis with invalid reference sequences list should fail
     When user request POST /reference-sequences with json data:
@@ -112,7 +112,7 @@ Feature: analysis object
     When user request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     Then the result should contain 1 reference-sequences
-    And the href list of the referenceSequence of reference-sequences 1 contained in TEST_REFERENCE_SEQUENCE_1
+    And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_1
 
     When user request PATCH TEST_ANALYSIS with list <list> for referenceSequences
     And the response code should be 4xx
@@ -184,7 +184,7 @@ Feature: analysis object
     When user request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     Then the result should contain 2 reference-sequences
-    And the href list of the referenceSequence of reference-sequences 2 contained in TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2
+    And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2
 
     When user request DELETE for the referenceSequences of TEST_REFERENCE_SEQUENCE_1 of the TEST_ANALYSIS
     And the response code should be 2xx
@@ -234,7 +234,7 @@ Feature: analysis object
     When user request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     Then the result should contain 2 reference-sequences
-    And the href list of the referenceSequence of reference-sequences 2 contained in TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2
+    And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2
 
 
   Scenario Outline: register an analysis with multiple non-gene reference sequences should fail
@@ -303,7 +303,7 @@ Feature: analysis object
      When user request search for the analyses with the parameters: <query>
      And the response code should be 200
      And the result should contain 1 analyses
-     And the href list of the analysis of analyses 1 contained in <analysis_url>
+     And the href of the analysis of analyses has items <analysis_url>
 
      Examples:
       | query | analysis_url |

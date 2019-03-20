@@ -38,18 +38,18 @@ Feature: study object
     When user request elaborate search for the studies base <base> and with the parameters: <query>
     And the response code should be 200
     And the result should contain <N> studies
-    And the href list of the study of studies <N> contained in <url>
+    And the href of the study of studies has items <url>
 
     Examples:
       | base | query | N | url |
       | taxonomy-id | id=9606 | 1 | TEST_STUDY1 |
       | taxonomy-id | id=9596 | 2 | TEST_STUDY2,TEST_STUDY3 |
       | taxonomy-id | id=207598 | 3 | TEST_STUDY1,TEST_STUDY2,TEST_STUDY3 |
-      | taxonomy-id | id=0 | 0 |  |
+      | taxonomy-id | id=0 | 0 | NONE |
       | taxonomy-name | name=Homo sapiens | 1 | TEST_STUDY1 |
       | taxonomy-name | name=Pan | 2 | TEST_STUDY2,TEST_STUDY3 |
       | taxonomy-name | name=Homininae | 3 | TEST_STUDY1,TEST_STUDY2,TEST_STUDY3 |
-      | taxonomy-name | name=None | 0 |  |
+      | taxonomy-name | name=None | 0 | NONE |
 
 
   Scenario Outline: search various studies by release date
@@ -71,7 +71,7 @@ Feature: study object
     When user request exhaustive search for the studies base <base> and with the parameters: <query> and <day>
     And the response code should be 200
     And the result should contain <N> studies
-    And the href list of the study of studies <N> contained in <url>
+    And the href of the study of studies has items <url>
 
     Examples:
       | base | day | query | N | url |
@@ -98,7 +98,7 @@ Feature: study object
     When user request exhaustive search with dates for the studies base <base> and with the parameters: <query> and <day>
     And the response code should be 200
     And the result should contain <N> studies
-    And the href list of the study of studies <N> contained in <url>
+    And the href of the study of studies has items <url>
 
     Examples:
       | base | day | query | N | url |
@@ -146,24 +146,24 @@ Feature: study object
     When user request elaborate find for the studies bases <bases> with the parameters: <param> and <sep>
     And the response code should be 200
     And the result should contain <N> studies
-    And the href list of the study of studies <N> contained in <url>
+    And the href of the study of studies has items <url>
 
     Examples:
       | bases | param | N | url | sep |
       | analyses.referenceSequences | name=GRCh37 | 1 | TEST_STUDY1 | . |
       | analyses.referenceSequences | name=GRCh38 | 1 | TEST_STUDY2 | . |
-      | analyses.referenceSequences | name=NCBI36 | 0 |  | . |
+      | analyses.referenceSequences | name=NCBI36 | 0 | NONE | . |
       | analyses.referenceSequences,analyses.referenceSequences | name=GRCh37&patch=p2 | 1 | TEST_STUDY1 | . |
       | analyses.referenceSequences,analyses.referenceSequences | name=GRCh38&patch=p2 | 1 | TEST_STUDY2 | . |
-      | analyses.referenceSequences,analyses.referenceSequences | name=GRCh37&patch=p3 | 0 |  | . |
-      | analyses.referenceSequences,analyses.referenceSequences | name=NCBI36&patch=p2 | 0 |  | . |
+      | analyses.referenceSequences,analyses.referenceSequences | name=GRCh37&patch=p3 | 0 | NONE | . |
+      | analyses.referenceSequences,analyses.referenceSequences | name=NCBI36&patch=p2 | 0 | NONE | . |
       | analyses | type=CASE_CONTROL | 2 | TEST_STUDY1,TEST_STUDY2 | . |
-      | analyses | type=TUMOR | 0 |  | . |
-      | analyses | type=COLLECTION | 0 |  | . |
+      | analyses | type=TUMOR | 0 | NONE | . |
+      | analyses | type=COLLECTION | 0 | NONE | . |
       | analyses.referenceSequences,analyses | name=GRCh38&type=CASE_CONTROL | 1 | TEST_STUDY2 | . |
-      | analyses.referenceSequences,analyses | name=GRCh38&type=TUMOR | 0 |  | . |
-      | analyses.referenceSequences,analyses | name=GRCh38&type=COLLECTION | 0 |  | . |
-      | analyses.referenceSequences,analyses | name=NCBI36&type=CASE_CONTROL | 0 |  | . |
+      | analyses.referenceSequences,analyses | name=GRCh38&type=TUMOR | 0 | NONE | . |
+      | analyses.referenceSequences,analyses | name=GRCh38&type=COLLECTION | 0 | NONE | . |
+      | analyses.referenceSequences,analyses | name=NCBI36&type=CASE_CONTROL | 0 | NONE | . |
 
 
   Scenario: search various studies by name value pair for accession
@@ -260,7 +260,7 @@ Feature: study object
     When user request GET for the studies with query param <param>
     And the response code should be 200
     And the result should contain 1 studies
-    And the href list of the study of studies 1 contained in <url>
+    And the href of the study of studies has items <url>
 
     When user request GET for the studies with query param page=1
     And the response code should be 200
@@ -303,14 +303,14 @@ Feature: study object
 
     When user request GET for the studies with optional param NONE
     And the result should contain 2 studies
-    And the href list of the study of studies 2 contained in TEST_STUDY1,TEST_STUDY2
+    And the href of the study of studies has items TEST_STUDY1,TEST_STUDY2
 
     When user request GET with value of TEST_STUDY1
     And the response code should be 200
 
     When user request GET for analyses of TEST_STUDY1
     And the result should contain 1 analyses
-    And the href list of the analysis of analyses 1 contained in TEST_ANALYSIS
+    And the href of the analysis of analyses has items TEST_ANALYSIS
 
     When user request GET for analyses of TEST_STUDY2
     And the response code should be 200
@@ -319,7 +319,7 @@ Feature: study object
     When user request search for the studies with the parameters: taxonomy.taxonomyId=9606
     And the response code should be 200
     And the result should contain 2 studies
-    And the href list of the study of studies 2 contained in TEST_STUDY1,TEST_STUDY2
+    And the href of the study of studies has items TEST_STUDY1,TEST_STUDY2
 
     When user request elaborate search for the studies base accession and with the parameters: accession=1kg
     And the response code should be 200
@@ -330,12 +330,12 @@ Feature: study object
     When user request exhaustive search for the studies base release-date and with the parameters: from= and 0
     And the response code should be 200
     And the result should contain 1 studies
-    And the href list of the study of studies 1 contained in TEST_STUDY2
+    And the href of the study of studies has items TEST_STUDY2
 
     When user request elaborate search for the studies base <base> and with the parameters: <query>
     And the response code should be 200
     And the result should contain <N> studies
-    And the href list of the study of studies <N> contained in <url>
+    And the href of the study of studies has items <url>
 
   Examples:
     | base | query | N | url |
@@ -360,7 +360,7 @@ Feature: study object
 
     When user request GET for the studies with optional param NONE
     And the result should contain 1 studies
-    And the href list of the study of studies 1 contained in TEST_STUDY2
+    And the href of the study of studies has items TEST_STUDY2
 
     When user request GET with value of TEST_STUDY2
     And the response code should be 200
@@ -372,7 +372,7 @@ Feature: study object
     When user request search for the studies with the parameters: taxonomy.taxonomyId=9606
     And the response code should be 200
     And the result should contain 1 studies
-    And the href of the study of studies 0 should be TEST_STUDY2
+    And the href of the study of studies has items TEST_STUDY2
 
     When user request elaborate search for the studies base accession and with the parameters: accession=1kg
     And the response code should be 200
@@ -383,7 +383,7 @@ Feature: study object
     When user request elaborate search for the studies base <base> and with the parameters: <query>
     And the response code should be 200
     And the result should contain <N> studies
-    And the href list of the study of studies <N> contained in <url>
+    And the href of the study of studies has items <url>
 
     Examples:
       | base | query | N | url |
@@ -555,10 +555,10 @@ Feature: study object
     When user request PATCH TEST_STUDY1 with list TEST_STUDY2,TEST_STUDY3 for childStudies
     And the response code should be 2xx
 
-    When user request GET for <linkedclass> of <url>
+    When user request GET for linkedStudies of <url>
     And the response code should be 200
     And the result should contain <N> studies
-    And the href list of the study of studies has items <item1> and <item2>
+    And the href of the study of studies has items <linkedStudies>
 
     When user request GET for linkedStudies of TEST_STUDY4
     And the response code should be 200
@@ -572,10 +572,10 @@ Feature: study object
     And the result should contain 0 studies
 
     Examples:
-  | linkedclass | url | N | item1 | item2 |
-  | linkedStudies | TEST_STUDY1 | 2 | TEST_STUDY2 | TEST_STUDY3 |
-  | linkedStudies | TEST_STUDY2 | 2 | TEST_STUDY1 | TEST_STUDY3 |
-  | linkedStudies | TEST_STUDY3 | 2 | TEST_STUDY1 | TEST_STUDY2 |
+  | url | N | linkedStudies |
+  | TEST_STUDY1 | 2 | TEST_STUDY2,TEST_STUDY3 |
+  | TEST_STUDY2 | 2 | TEST_STUDY1,TEST_STUDY3 |
+  | TEST_STUDY3 | 2 | TEST_STUDY1,TEST_STUDY2 |
 
 
   Scenario: deprecate to undeprecate studies
@@ -635,7 +635,7 @@ Feature: study object
     When user request search for the studies with the parameters: browsable=true
     And the response code should be 200
     And the result should contain 1 studies
-    And the href list of the study of studies 1 contained in TEST_STUDY
+    And the href of the study of studies has items TEST_STUDY
 
 
   Scenario: verify study release date could be changed

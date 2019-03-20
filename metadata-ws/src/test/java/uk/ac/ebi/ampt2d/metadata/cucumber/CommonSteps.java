@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
@@ -389,13 +390,6 @@ public class CommonSteps {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).doesNotExist());
     }
 
-    @And("^the href of the (.*) of (.*) (\\d*) should be (.*)$")
-    public void checkResponseLinkedObjectHref(String field, String className, int index, String valueKey)
-            throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$.."+className+"["+index+"].."+field+".href")
-                .value(CommonStates.getUrl(valueKey)));
-    }
-
     @And("^the href of the class (.*) should be (.*)$")
     public void checkResponseLinkedObjectHref(String className, String valueKey)
             throws Exception {
@@ -403,22 +397,18 @@ public class CommonSteps {
                 .value(CommonStates.getUrl(valueKey)));
     }
 
-    @And("^the href list of the (.*) of (.*) (.*) contained in (.*)$")
-    public void checkResponseLinkedObjectHrefListLoop(String field, String className, int lenght, String valueKey)
+    @And("^the href of the (.*) of (.*) has items (.*)$")
+    public void checkResponseLinkedObjectHref(String field, String className, String urlKeys)
             throws Exception {
-        String[] urlList = valueKey.split(",");
-        for (int index = 0; index < lenght; index++) {
-            CommonStates.getResultActions().andExpect(jsonPath("$.."+className+"["+index+"].."+field+".href")
-                    .value(CommonStates.getUrl(urlList[index])));
+        String[] urls = {};
+        if (!urlKeys.equals("NONE")) {
+            urls = Arrays.stream(urlKeys.split(","))
+                    .map(key -> CommonStates.getUrl(key))
+                    .toArray(String[]::new);
         }
-    }
 
-    @And("^the href list of the (.*) of (.*) has items (.*) and (.*)$")
-    public void checkResponseLinkedObjectHrefList1(String field, String className, String fieldValue1, String fieldValue2)
-            throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$.."+className+"[*].."+field+".href",
-                hasItems(CommonStates.getUrl(fieldValue1), CommonStates.getUrl(fieldValue2))));
-
+                containsInAnyOrder(urls)));
     }
 
     @And("^the (.*) field of (.*) (\\d*) should be (.*)$")
