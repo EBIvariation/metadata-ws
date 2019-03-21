@@ -28,24 +28,22 @@ public class AnalysisSteps {
 
     @When("user create a test analysis with (.*) for study and (.*) for reference sequence")
     public void createTestAnalysis(String studyUrlKey, String referenceSequenceUrlKey) throws Exception {
-
-        CommonStates.setResultActions(postTestAnalysis("EGAA0001", referenceSequenceUrlKey,
-                CommonStates.getUrl(studyUrlKey), Analysis.Technology.EXOME_SEQUENCING,
-                Analysis.Type.CASE_CONTROL, "Illumina"));
+        createTestAnalysisParam("EGAA0001", referenceSequenceUrlKey, studyUrlKey, Analysis.Technology.EXOME_SEQUENCING,
+                Analysis.Type.CASE_CONTROL, "Illumina");
     }
 
     @When("user create a test analysis with (.*) for accession, (.*) for reference sequence, (.*) for study, (.*) for technology, (.*) for type and (.*) for platform")
     public void createTestAnalysisParam(String accession, String referenceSequenceUrlKey, String studyUrlKey,
-                                    Analysis.Technology technology, Analysis.Type type, String platform)
-        throws Exception {
+                                        Analysis.Technology technology, Analysis.Type type, String platform)
+            throws Exception {
 
         CommonStates.setResultActions(
-                postTestAnalysis(accession, referenceSequenceUrlKey, CommonStates.getUrl(studyUrlKey),
+                postTestAnalysis(accession, referenceSequenceUrlKey, studyUrlKey,
                         technology, type, platform)
         );
     }
 
-    private ResultActions postTestAnalysis(String accession, String referenceSequenceUrlKey, String studyUrl,
+    private ResultActions postTestAnalysis(String accession, String referenceSequenceUrlKey, String studyUrlKey,
                                            Analysis.Technology technology, Analysis.Type type, String platform)
             throws Exception {
 
@@ -61,7 +59,7 @@ public class AnalysisSteps {
                 "\"accessionVersionId\":{ \"accession\": \"" + accession + "\",\"version\":  1 }," +
                 "\"name\": \"test_human_analysis\"," +
                 "\"description\": \"Nothing important\"," +
-                "\"study\": \"" + studyUrl + "\",";
+                "\"study\": \"" + CommonStates.getUrl(studyUrlKey) + "\",";
         if (referenceSequenceUrlList != null) {
             jsonContent = jsonContent +
                     "\"referenceSequences\": " + objectMapper.writeValueAsString(referenceSequenceUrlList) + ",";
@@ -71,7 +69,6 @@ public class AnalysisSteps {
                 "\"type\": \"" + type + "\"," +
                 "\"platform\": \"" + platform + "\"" +
                 "}";
-        System.out.println(jsonContent);
         return mockMvc.perform(post("/analyses")
                 .content(jsonContent));
     }

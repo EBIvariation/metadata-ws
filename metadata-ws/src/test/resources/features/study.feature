@@ -68,7 +68,7 @@ Feature: study object
     When user create a test parameterized study with releasedTomorrow for accession, 1 for version, nothing important for name, false for deprecated, 1 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY3
 
-    When user request exhaustive search for the studies base <base> and with the parameters: <query> and <day>
+    When user request elaborate search with day for the studies base <base> and with the parameters: <query> and <day>
     And the response code should be 200
     And the result should contain <N> studies
     And the href of the study of studies has items <url>
@@ -250,19 +250,19 @@ Feature: study object
     When user create a test parameterized study with EGAS0002 for accession, 1 for version, test human A for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY1
 
-    When user request GET for the studies with optional param NONE
+    When user request GET for the studies
     And the response code should be 200
     And the result should contain 2 studies
     And the result should have page.size with value 20
     And the result should have page.totalElements with value 2
     And the result should have page.totalPages with value 1
 
-    When user request GET for the studies with query param <param>
+    When user request GET for studies with query param <param>
     And the response code should be 200
     And the result should contain 1 studies
     And the href of the study of studies has items <url>
 
-    When user request GET for the studies with query param page=1
+    When user request GET for studies with query param page=1
     And the response code should be 200
     And the result should contain 0 studies
 
@@ -301,7 +301,7 @@ Feature: study object
     When user create a test analysis with analysisReleasedYesterday for accession, TEST_REFERENCE_SEQUENCE_1 for reference sequence, TEST_STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     And set the URL to TEST_ANALYSIS
 
-    When user request GET for the studies with optional param NONE
+    When user request GET for the studies
     And the result should contain 2 studies
     And the href of the study of studies has items TEST_STUDY1,TEST_STUDY2
 
@@ -327,7 +327,7 @@ Feature: study object
     And the result should have accessionVersionId.version with value 2
     And the href of the class study should be TEST_STUDY2
 
-    When user request exhaustive search for the studies base release-date and with the parameters: from= and 0
+    When user request elaborate search with date range for the studies base release-date and with the parameters: 0
     And the response code should be 200
     And the result should contain 1 studies
     And the href of the study of studies has items TEST_STUDY2
@@ -358,7 +358,7 @@ Feature: study object
     When user create a test parameterized study with 1kg for accession, 2 for version, 1kg phase 1 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY2
 
-    When user request GET for the studies with optional param NONE
+    When user request GET for the studies
     And the result should contain 1 studies
     And the href of the study of studies has items TEST_STUDY2
 
@@ -459,7 +459,7 @@ Feature: study object
     And the result should have description with value Nothing important
     And the result should not contain deprecated
 
-    When user request PATCH TEST_STUDY1 with content {"deprecated": "true"} and patch false
+    When user request PATCH TEST_STUDY1 with content {"deprecated": "true"}
     And the response code should be 2xx
 
     When user request GET with value of TEST_STUDY1
@@ -564,7 +564,7 @@ Feature: study object
     And the response code should be 200
     And the result should contain 0 studies
 
-    When user requests PATCH with replacement TEST_STUDY1 with list TEST_STUDY1 for childStudies and params testhuman testmouse
+    When user request PATCH TEST_STUDY1 with list STUDY_NON_EXISTING for childStudies
     And the response code should be 2xx
 
     When user request GET for linkedStudies of TEST_STUDY1
@@ -594,14 +594,14 @@ Feature: study object
     And the response code should be 200
     And the href of the class study should be TEST_STUDY
 
-    When user request PATCH TEST_STUDY with content {"deprecated": "true"} and patch true
+    When user request PATCH TEST_STUDY with patch and content {"deprecated": "true"}
     And the response code should be 2xx
     And the href of the class study should be TEST_STUDY
 
     When user request GET with value of TEST_STUDY
     And the response code should be 4xx
 
-    When user request PATCH TEST_STUDY with content {"deprecated": "false"} and patch true
+    When user request PATCH TEST_STUDY with patch and content {"deprecated": "false"}
     And the response code should be 2xx
     And the href of the class study should be TEST_STUDY
 
@@ -629,7 +629,7 @@ Feature: study object
     And the response code should be 200
     And the result should contain 0 studies
 
-    When user request PATCH TEST_STUDY with content {"browsable": "true"} and patch false
+    When user request PATCH TEST_STUDY with content {"browsable": "true"}
     And the response code should be 2xx
 
     When user request search for the studies with the parameters: browsable=true
@@ -654,27 +654,27 @@ Feature: study object
     And the response code should be 200
     And the result should have releaseDate existing
 
-    When user request PATCH TEST_STUDY with day 1 and URL false
+    When user request PATCH TEST_STUDY with patch and day 1
     And the response code should be 200
     And the result should have releaseDate existing
-    And the result should have releaseDate as 1 day
+    And the difference between releaseDate and today should be 1 day
 
     When user request GET with value of TEST_STUDY
     And the response code should be 404
 
-    When user request PATCH TEST_STUDY with day 0 and URL false
+    When user request PATCH TEST_STUDY with patch and day 0
     And the response code should be 200
     And the result should have releaseDate existing
-    And the result should have releaseDate as 0 day
+    And the difference between releaseDate and today should be 0 day
 
     When user request GET with value of TEST_STUDY
     And the response code should be 200
     And the result should have releaseDate existing
-    And the result should have releaseDate as 0 day
+    And the difference between releaseDate and today should be 0 day
 
 
   Scenario: verify non-existing study with patch
-    When user request PATCH studies/unexist.1 with day 0 and URL true
+    When user request PATCH STUDY_NON_EXISTING with patch and day 0
     And the response code should be 4xx
 
   Scenario: patch study with invalid request
@@ -689,8 +689,8 @@ Feature: study object
     When user create a test parameterized study with 1kg for accession, 3 for version, 1kg phase 3 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY
 
-    When user request PATCH TEST_STUDY with content {"releaseDate": 2001} and patch false
+    When user request PATCH TEST_STUDY with content {"releaseDate": 2001}
     And the response code should be 400
 
-    When user request PATCH TEST_STUDY with content {""} and patch false
+    When user request PATCH TEST_STUDY with content {""}
     And the response code should be 400

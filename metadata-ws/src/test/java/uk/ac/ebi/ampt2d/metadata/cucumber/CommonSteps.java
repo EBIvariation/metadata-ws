@@ -24,7 +24,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,6 +41,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.ampt2d.metadata.cucumber.CommonStates.STUDY_NON_EXISTING_URL;
 
 @Ignore
 @RunWith(SpringRunner.class)
@@ -76,8 +76,6 @@ public class CommonSteps {
     @Autowired
     private WebResourceRepository webResourceRepository;
 
-    private ZonedDateTime time1, time2;
-
     @Before
     public void cleanDatabases() {
         analysisRepository.deleteAll();
@@ -92,6 +90,11 @@ public class CommonSteps {
     @Before
     public void cleanStates() {
         CommonStates.clear();
+    }
+
+    @Before
+    public void setNonExitstingUrls() {
+        CommonStates.setUrl("STUDY_NON_EXISTING", STUDY_NON_EXISTING_URL);
     }
 
     /* perform http request */
@@ -118,28 +121,6 @@ public class CommonSteps {
                 .content(jsonData.getBytes())));
     }
 
-    @When("^user request POST with (.*) for Uri (.*) for stringData (.*) for linkedObjectKey and (.*) for linkedObjectClassName")
-    public void performPostOnResourceUriWithStringDataAndLink(String urlKey, String stringData, String linkedObjectUrlKeys, String linkedObjectClassName) throws Exception {
-        List<String> newUrls = null;
-        if (linkedObjectUrlKeys.isEmpty()) {
-            newUrls = new ArrayList<>();
-        } else if (!linkedObjectUrlKeys.equals("NONE")) {
-            newUrls = Arrays.stream(linkedObjectUrlKeys.split(","))
-                    .map(key -> CommonStates.getUrl(key))
-                    .collect(Collectors.toList());
-        }
-
-        String jsonContent = "{"
-                + stringData
-                + ", "
-                + "\"" + linkedObjectClassName + "\":" + objectMapper.writeValueAsString(newUrls)
-                + "}";
-
-        CommonStates.setResultActions(mockMvc.perform(post(urlKey)
-                        .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonContent.getBytes())));
-    }
-
     @When("^user request PATCH (.*) with list (.*) for (.*)")
     public void performPatchOnResourceWithLinkedObject(String urlKey, String linkedObjectUrlKeys,
                                                        String linkedObjectClassName) throws Exception {
@@ -157,54 +138,10 @@ public class CommonSteps {
                 .content(jsonContent)));
     }
 
-    @When("^user requests PATCH with replacement (.*) with list (.*) for (.*) and params (.*) (.*)")
-    public void performPatchOnResourceWithLinkedObjectReplace(String urlKey, String linkedObjectUrlKeys,
-                                                       String linkedObjectClassName, String origin, String target) throws Exception {
-        List<String> newUrls = null;
-        if (!linkedObjectUrlKeys.equals("NONE")) {
-            newUrls = Arrays.stream(linkedObjectUrlKeys.split(","))
-                    .map(key -> CommonStates.getUrl(key))
-                    .collect(Collectors.toList());
-        }
-        String jsonContent = "{"
-                + "\"" + linkedObjectClassName + "\":" + objectMapper.writeValueAsString(newUrls)
-                + "}";
-
-        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
-                .content(jsonContent.replace(origin, target))));
-    }
-
-    @When("^user request PATCH (.*) with content (.*) and patch (.*)")
-    public void performPatchOnResourceWithContent(String urlKey, String content, boolean patch) throws Exception {
-        if (patch == false) {
+    @When("^user request PATCH (.*) with content (.*)")
+    public void performPatchOnResourceWithContent(String urlKey, String content) throws Exception {
             CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
                     .content(content)));
-        } else {
-            CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(content)));
-        }
-    }
-
-    @When("^user request PATCH (.*) with day (.*) and URL (.*)")
-    public void performPatchedPatchOnResourceWithDay(String urlKey, int day, boolean url) throws Exception {
-        String content = "{ \"releaseDate\" : \"";
-        if (day == 0) {
-            content +=LocalDate.now();
-        } else {
-            content +=LocalDate.now().plusDays(1);
-        }
-        content +=  "\" }";
-
-        if (url == false) {
-            CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(content)));
-        } else {
-            CommonStates.setResultActions(mockMvc.perform(patch(urlKey + "/patch")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(content)));
-        }
     }
 
     @When("^user request DELETE for the (.*) of (.*) of the (.*)")
@@ -226,34 +163,6 @@ public class CommonSteps {
         CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search?"+parameters)));
     }
 
-    @When("^user request elaborate search for the (.*) base (.*) and with the parameters: (.*)$")
-    public void performSearchOnResourcesWithBaseAndParameters(String className, String base, String parameters) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+parameters)));
-    }
-
-    @When("^user request exhaustive search for the (.*) base (.*) and with the parameters: (.*) and (.*)$")
-    public void performSearchOnResourcesWithBaseAndParametersAndDay(String className, String base, String parameters, int day) throws Exception {
-        if (day > 0) {
-            CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+parameters+LocalDate.now().plusDays(day))));
-        } else {
-            CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+parameters+LocalDate.now().minusDays(Math.abs(day)))));
-        }
-    }
-
-    @When("^user request exhaustive search with dates for the (.*) base (.*) and with the parameters: (.*) and (.*)$")
-    public void performSearchOnResourcesWithBaseAndParametersAndDays(String className, String base, String parameters, int day) throws Exception {
-        if (day > 0) {
-            CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+parameters+LocalDate.now().plusDays(day)+"&to="+parameters+LocalDate.now().plusDays(day))));
-        } else {
-            CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+parameters+LocalDate.now().minusDays(Math.abs(day))+"&to="+LocalDate.now().minusDays(Math.abs(day)))));
-        }
-    }
-
-    @When("^user request search for the (.*) with base (.*) and name (.*) value (.*)$")
-    public void performSearchOnResourcesWithParameters(String className, String base, String name, String value) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base).param(name, value)));
-    }
-
     @When("^user request elaborate find for the (.*) bases (.*) with the parameters: (.*) and (.*)$")
     public void performFindOnResourcesWithBaseAndParameters(String className, String bases, String parameters, String separator) throws Exception {
         String[] params = parameters.split("&");
@@ -263,25 +172,6 @@ public class CommonSteps {
             query += "&" + base[i] + separator + params[i];
         }
         CommonStates.setResultActions(mockMvc.perform(get("/" + className + "?" + query)));
-    }
-
-    @When("^user request GET for the (.*) with optional param (.*)")
-    public void performGetOnResources(String className, String param) throws Exception {
-        if (param.equals("NONE")) {
-            CommonStates.setResultActions(mockMvc.perform(get("/" + className)));
-        } else {
-            CommonStates.setResultActions(mockMvc.perform(get("/" + className+param)));
-        }
-    }
-
-    @When("^user request GET for the (.*) with query param (.*)")
-    public void performGetOnResourcesQuery(String className, String param) throws Exception {
-            CommonStates.setResultActions(mockMvc.perform(get("/" + className + "?" + param)));
-    }
-
-    @When("^user request search for the (.*) with param (.*)")
-    public void performSearchOnResources(String className, String param) throws Exception {
-            CommonStates.setResultActions(mockMvc.perform(get("/" + className+"/search/"+param)));
     }
 
     @And("^set the URL to (.*)$")
@@ -338,7 +228,7 @@ public class CommonSteps {
         CommonStates.getResultActions().andExpect(content().json(jsonString));
     }
 
-    @Then("^the result should contain (.*) (.*)$")
+    @Then("^the result should contain (\\d*) (.*)$")
     public void checkResponseListSize(int size, String className) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$.."+className).isArray())
                 .andExpect(jsonPath("$.."+className+".length()").value(size));
@@ -364,14 +254,10 @@ public class CommonSteps {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(false));
     }
 
-    @Then("^the result should have (.*) as (.*) day$")
+    @Then("^the difference between (.*) and today should be (\\d*) day$")
     public void checkResponseJsonFieldValueDay(String field, int day) throws Exception {
         LocalDate releaseDay;
-        if (day == 0) {
-            releaseDay = LocalDate.now();
-        } else {
-            releaseDay = LocalDate.now().plusDays(1);
-        }
+        releaseDay = LocalDate.now().plusDays(day);
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(releaseDay.toString()));
     }
 
@@ -438,20 +324,20 @@ public class CommonSteps {
 
     @When("^user request set time1")
     public void setTime1() {
-        time1 = ZonedDateTime.now();
+        CommonStates.setTime1();
     }
 
     @When("^user request set time2")
     public void setTime2() {
-        time2 = ZonedDateTime.now();
+        CommonStates.setTime2();
     }
 
     @Then("^the lastModifiedDate should be within times$")
     public void checkLastModifiedDate() throws Exception{
         JSONObject jsonObject = new JSONObject(CommonStates.getResultActions().andReturn().getResponse().getContentAsString());
         ZonedDateTime lastModifiedDate = ZonedDateTime.parse(jsonObject.getString("lastModifiedDate"));
-        assert lastModifiedDate.isAfter(time1);
-        assert lastModifiedDate.isBefore(time2);
+        assert lastModifiedDate.isAfter(CommonStates.getTime1());
+        assert lastModifiedDate.isBefore(CommonStates.getTime2());
     }
 
 }

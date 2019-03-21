@@ -133,7 +133,7 @@ Feature: Web resource object
     And the lastModifiedDate should be within times
 
     Given user request set time1
-    When user request PATCH <url> with content <content> and patch false
+    When user request PATCH <url> with content <content>
     And the response code should be 2xx
     When user request set time2
 
