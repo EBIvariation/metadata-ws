@@ -25,6 +25,7 @@ import org.junit.runner.RunWith;
 @CucumberOptions(
         features = {
                 "src/test/resources/features/analysis.feature",
+                "src/test/resources/features/common.feature",
                 "src/test/resources/features/file.feature",
                 "src/test/resources/features/reference-sequence.feature",
                 "src/test/resources/features/sample.feature",
