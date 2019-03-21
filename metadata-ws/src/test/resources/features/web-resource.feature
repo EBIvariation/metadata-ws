@@ -8,13 +8,13 @@ Feature: Web resource object
       "resourceUrl": "http://www.ebi.ac.uk"
     }
     """
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_WEB_RESOURCE
 
     When user request GET with value of TEST_WEB_RESOURCE
     Then the response code should be 200
-    Then the result should have type with value CENTER_WEB
-    Then the result should have resourceUrl with value http://www.ebi.ac.uk
+    And the result should have type with value CENTER_WEB
+    And the result should have resourceUrl with value http://www.ebi.ac.uk
 
   Scenario Outline: register a web resource with valid URL should succeed
     When user request POST /webResources with json data:
@@ -61,7 +61,7 @@ Feature: Web resource object
     Then the Allow header should contain GET
 
   Scenario Outline: verify metadata objects are auditable
-    When user request set time1
+    When user request set start time
     When user request POST /reference-sequences with json data:
     """
     {
@@ -124,7 +124,7 @@ Feature: Web resource object
     }
     """
     And set the URL to TEST_WEB_RESOURCE
-    When user request set time2
+    When user request set end time
 
     When user request GET with value of <url>
     And the response code should be 200
@@ -132,10 +132,10 @@ Feature: Web resource object
     And the result should have lastModifiedDate non empty
     And the lastModifiedDate should be within times
 
-    Given user request set time1
+    Given user request set start time
     When user request PATCH <url> with content <content>
     And the response code should be 2xx
-    When user request set time2
+    When user request set end time
 
     When user request GET with value of <url>
     And the response code should be 200

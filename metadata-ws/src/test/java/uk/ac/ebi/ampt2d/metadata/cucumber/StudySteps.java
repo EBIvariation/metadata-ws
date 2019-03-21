@@ -1,6 +1,24 @@
+/*
+ *
+ * Copyright 2019 EMBL - European Bioinformatics Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package uk.ac.ebi.ampt2d.metadata.cucumber;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,15 +28,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.ac.ebi.ampt2d.metadata.cucumber.CommonSteps.STUDY_NON_EXISTING_URL;
 
 @Ignore
 @AutoConfigureMockMvc
@@ -30,6 +45,10 @@ public class StudySteps {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Given("^there is a non-exising study$")
+    public void there_is_a_non_exising_study() throws Exception {
+        CommonStates.setUrl("STUDY_NON_EXISTING", STUDY_NON_EXISTING_URL);
+    }
 
     @When("user create a test study with (.*) for taxonomy$")
     public void createTestStudy(String testTaxonomyKey) throws Exception {
@@ -41,36 +60,14 @@ public class StudySteps {
         CommonStates.setResultActions(postTestStudy(accession, version, name, deprecated, LocalDate.now().plusDays(releaseDay), testTaxonomyKey));
     }
 
-    @When("^user request GET for the (.*)")
-    public void performGetOnResources(String className) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/" + className)));
+    @When("^user request GET for studies")
+    public void performGetOnResources() throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/studies")));
     }
 
-    @When("^user request GET for (.*) with query param (.*)")
-    public void performGetOnResourcesQuery(String className, String param) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "?" + param)));
-    }
-
-    @When("^user request POST with (.*) for Uri (.*) for stringData (.*) for linkedObjectKey and (.*) for linkedObjectClassName")
-    public void performPostOnResourceUriWithStringDataAndLink(String urlKey, String stringData, String linkedObjectUrlKeys, String linkedObjectClassName) throws Exception {
-        List<String> newUrls = null;
-        if (linkedObjectUrlKeys.isEmpty()) {
-            newUrls = new ArrayList<>();
-        } else if (!linkedObjectUrlKeys.equals("NONE")) {
-            newUrls = Arrays.stream(linkedObjectUrlKeys.split(","))
-                    .map(key -> CommonStates.getUrl(key))
-                    .collect(Collectors.toList());
-        }
-
-        String jsonContent = "{"
-                + stringData
-                + ", "
-                + "\"" + linkedObjectClassName + "\":" + objectMapper.writeValueAsString(newUrls)
-                + "}";
-
-        CommonStates.setResultActions(mockMvc.perform(post(urlKey)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonContent.getBytes())));
+    @When("^user request GET for the studies with query param (.*)")
+    public void performGetOnResourcesQuery(String param) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/studies" + "?" + param)));
     }
 
     @When("^user request PATCH (.*) with patch and content (.*)")

@@ -1,3 +1,20 @@
+/*
+ *
+ * Copyright 2019 EMBL - European Bioinformatics Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package uk.ac.ebi.ampt2d.metadata.cucumber;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -41,13 +58,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.ac.ebi.ampt2d.metadata.cucumber.CommonStates.STUDY_NON_EXISTING_URL;
 
 @Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class CommonSteps {
+
+    public static final String STUDY_NON_EXISTING_URL = "https://nohost//studies/999";
 
     @Autowired
     private MockMvc mockMvc;
@@ -90,11 +108,6 @@ public class CommonSteps {
     @Before
     public void cleanStates() {
         CommonStates.clear();
-    }
-
-    @Before
-    public void setNonExitstingUrls() {
-        CommonStates.setUrl("STUDY_NON_EXISTING", STUDY_NON_EXISTING_URL);
     }
 
     /* perform http request */
@@ -255,10 +268,9 @@ public class CommonSteps {
     }
 
     @Then("^the difference between (.*) and today should be (\\d*) day$")
-    public void checkResponseJsonFieldValueDay(String field, int day) throws Exception {
-        LocalDate releaseDay;
-        releaseDay = LocalDate.now().plusDays(day);
-        CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(releaseDay.toString()));
+    public void checkResponseJsonFieldValueDay(String field, int diff) throws Exception {
+        LocalDate days = LocalDate.now().plusDays(diff);
+        CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(days.toString()));
     }
 
     @Then("^the result should have (.*) existing$")
@@ -322,22 +334,22 @@ public class CommonSteps {
                 .header(header[1], value[1])));
     }
 
-    @When("^user request set time1")
-    public void setTime1() {
-        CommonStates.setTime1();
+    @When("^user request set start time")
+    public void setStartTime() {
+        CommonStates.setTime("START_TIME", ZonedDateTime.now());
     }
 
-    @When("^user request set time2")
-    public void setTime2() {
-        CommonStates.setTime2();
+    @When("^user request set end time")
+    public void setEndTime() {
+        CommonStates.setTime("END_TIME", ZonedDateTime.now());
     }
 
     @Then("^the lastModifiedDate should be within times$")
     public void checkLastModifiedDate() throws Exception{
         JSONObject jsonObject = new JSONObject(CommonStates.getResultActions().andReturn().getResponse().getContentAsString());
         ZonedDateTime lastModifiedDate = ZonedDateTime.parse(jsonObject.getString("lastModifiedDate"));
-        assert lastModifiedDate.isAfter(CommonStates.getTime1());
-        assert lastModifiedDate.isBefore(CommonStates.getTime2());
+        assert lastModifiedDate.isAfter(CommonStates.getTime("START_TIME"));
+        assert lastModifiedDate.isBefore(CommonStates.getTime("END_TIME"));
     }
 
 }

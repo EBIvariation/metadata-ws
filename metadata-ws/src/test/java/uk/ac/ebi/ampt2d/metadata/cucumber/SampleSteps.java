@@ -1,3 +1,20 @@
+/*
+ *
+ * Copyright 2019 EMBL - European Bioinformatics Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package uk.ac.ebi.ampt2d.metadata.cucumber;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,38 +45,18 @@ public class SampleSteps {
 
     @When("user create a test sample with (.*) for taxonomy")
     public void createTestSample(String testTaxonomyKeys) throws Exception {
-        List<String> testTaxonomyList = null;
-        if (!testTaxonomyKeys.equals("NONE")) {
-            testTaxonomyList = Arrays.stream(testTaxonomyKeys.split(","))
-                    .map(key -> CommonStates.getUrl(key))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-        }
-        CommonStates.setResultActions(postTestSample("EGAS0001", "test_human_sample", testTaxonomyList, 1));
+        createTestSampleParameterized("EGAS0001", 1, "test_human_sample", testTaxonomyKeys);
     }
 
     @When("user create a test parameterized sample with (.*) for accession, (.*) for version, (.*) for name and (.*) for taxonomy")
     public void createTestSampleParameterized(String accession, int version, String name, String testTaxonomyKeys) throws Exception {
-        List<String> testTaxonomyList = null;
-        if (!testTaxonomyKeys.equals("NONE")) {
-            testTaxonomyList = Arrays.stream(testTaxonomyKeys.split(","))
-                    .map(key -> CommonStates.getUrl(key))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-        }
+        List<String> testTaxonomyList = CommonStates.getUrls(testTaxonomyKeys);
         CommonStates.setResultActions(postTestSample(accession, name, testTaxonomyList, version));
     }
 
     @When("user create a test sample no or null accession (.*), (.*) for name and (.*) for taxonomy")
     public void createTestSampleParameterizedNoAccession(boolean accession, String name, String testTaxonomyKeys) throws Exception {
-        List<String> testTaxonomyList = null;
-        if (!testTaxonomyKeys.equals("NONE")) {
-            testTaxonomyList = Arrays.stream(testTaxonomyKeys.split(","))
-                    .map(key -> CommonStates.getUrl(key))
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
-        }
-
+        List<String> testTaxonomyList = CommonStates.getUrls(testTaxonomyKeys);
         if (accession == false) {
             // no accession
             CommonStates.setResultActions(postTestSampleNoOrNullAccession(false, name, testTaxonomyList));

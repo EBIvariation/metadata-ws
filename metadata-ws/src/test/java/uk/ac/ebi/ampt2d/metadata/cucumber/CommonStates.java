@@ -1,20 +1,37 @@
+/*
+ *
+ * Copyright 2019 EMBL - European Bioinformatics Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package uk.ac.ebi.ampt2d.metadata.cucumber;
 
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class CommonStates {
 
     private static Map<String, String> urlMap = new HashMap<>();
 
     private static ResultActions resultActions;
-
-    private static ZonedDateTime time1, time2;
-
-    public static String STUDY_NON_EXISTING_URL = "https://nohost//studies/999";
 
     public static void clear() {
         urlMap.clear();
@@ -37,19 +54,22 @@ public class CommonStates {
         CommonStates.resultActions = resultActions;
     }
 
-    public static void setTime1() {
-        time1 = ZonedDateTime.now();
+    public static void setTime(String key, ZonedDateTime value) {
+        urlMap.put(key, value.toString());
     }
 
-    public static ZonedDateTime getTime1() {
-        return time1;
+    public static ZonedDateTime getTime(String key) {
+        return ZonedDateTime.parse(urlMap.get(key));
     }
 
-    public static void setTime2() {
-        time2 = ZonedDateTime.now();
-    }
+    public static List<String> getUrls(String commaDelimitedKeys) {
+        if (commaDelimitedKeys == "NONE") {
+            return null;
+        }
 
-    public static ZonedDateTime getTime2() {
-        return time2;
+        return Arrays.stream(commaDelimitedKeys.split(","))
+                .map(key -> getUrl(key))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 }

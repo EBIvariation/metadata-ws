@@ -17,15 +17,15 @@ Feature: study object
 
 
   Scenario Outline: search various study by taxonomy name and id
-    When user request POST with /taxonomies for Uri "taxonomyId": 207598, "name": "Homininae" for stringData  for linkedObjectKey and ancestors for linkedObjectClassName
+    When user request POST taxonomies 207598 for id, Homininae for name and NONE for ancestors
     And set the URL to TEST_TAXONOMY_1
-    When user request POST with /taxonomies for Uri "taxonomyId": 9606, "name": "Homo Sapiens" for stringData TEST_TAXONOMY_1 for linkedObjectKey and ancestors for linkedObjectClassName
+    When user request POST taxonomies 9606 for id, Homo Sapiens for name and TEST_TAXONOMY_1 for ancestors
     And set the URL to TEST_TAXONOMY_2
-    When user request POST with /taxonomies for Uri "taxonomyId": 9596, "name": "Pan" for stringData TEST_TAXONOMY_1 for linkedObjectKey and ancestors for linkedObjectClassName
+    When user request POST taxonomies 9596 for id, Pan for name and TEST_TAXONOMY_1 for ancestors
     And set the URL to TEST_TAXONOMY_3
-    When user request POST with /taxonomies for Uri "taxonomyId": 9597, "name": "Pan paniscus" for stringData TEST_TAXONOMY_1,TEST_TAXONOMY_3 for linkedObjectKey and ancestors for linkedObjectClassName
+    When user request POST taxonomies 9597 for id, Pan paniscus for name and TEST_TAXONOMY_1,TEST_TAXONOMY_3 for ancestors
     And set the URL to TEST_TAXONOMY_4
-    When user request POST with /taxonomies for Uri "taxonomyId": 9598, "name": "Pan troglodytes" for stringData TEST_TAXONOMY_1,TEST_TAXONOMY_3 for linkedObjectKey and ancestors for linkedObjectClassName
+    When user request POST taxonomies 9598 for id, Pan troglodytes for name and TEST_TAXONOMY_1,TEST_TAXONOMY_3 for ancestors
     And set the URL to TEST_TAXONOMY_5
 
     When user create a test parameterized study with testhuman for accession, 1 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY_2 for taxonomy
@@ -250,19 +250,19 @@ Feature: study object
     When user create a test parameterized study with EGAS0002 for accession, 1 for version, test human A for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY1
 
-    When user request GET for the studies
+    When user request GET for studies
     And the response code should be 200
     And the result should contain 2 studies
     And the result should have page.size with value 20
     And the result should have page.totalElements with value 2
     And the result should have page.totalPages with value 1
 
-    When user request GET for studies with query param <param>
+    When user request GET for the studies with query param <param>
     And the response code should be 200
     And the result should contain 1 studies
     And the href of the study of studies has items <url>
 
-    When user request GET for studies with query param page=1
+    When user request GET for the studies with query param page=1
     And the response code should be 200
     And the result should contain 0 studies
 
@@ -301,7 +301,7 @@ Feature: study object
     When user create a test analysis with analysisReleasedYesterday for accession, TEST_REFERENCE_SEQUENCE_1 for reference sequence, TEST_STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     And set the URL to TEST_ANALYSIS
 
-    When user request GET for the studies
+    When user request GET for studies
     And the result should contain 2 studies
     And the href of the study of studies has items TEST_STUDY1,TEST_STUDY2
 
@@ -358,7 +358,7 @@ Feature: study object
     When user create a test parameterized study with 1kg for accession, 2 for version, 1kg phase 1 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     And set the URL to TEST_STUDY2
 
-    When user request GET for the studies
+    When user request GET for studies
     And the result should contain 1 studies
     And the href of the study of studies has items TEST_STUDY2
 
@@ -535,6 +535,7 @@ Feature: study object
 
 
   Scenario Outline: find linked studies
+    Given there is a non-exising study
     When user request POST /taxonomies with json data:
     """
     {
@@ -674,6 +675,7 @@ Feature: study object
 
 
   Scenario: verify non-existing study with patch
+    Given there is a non-exising study
     When user request PATCH STUDY_NON_EXISTING with patch and day 0
     And the response code should be 4xx
 
