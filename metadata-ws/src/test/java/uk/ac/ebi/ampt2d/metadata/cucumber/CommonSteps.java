@@ -65,8 +65,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class CommonSteps {
 
-    public static final String STUDY_NON_EXISTING_URL = "https://nohost//studies/999";
-
     @Autowired
     private MockMvc mockMvc;
 

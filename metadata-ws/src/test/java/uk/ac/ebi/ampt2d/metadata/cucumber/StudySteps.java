@@ -33,7 +33,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.ac.ebi.ampt2d.metadata.cucumber.CommonSteps.STUDY_NON_EXISTING_URL;
 
 @Ignore
 @AutoConfigureMockMvc
@@ -46,8 +45,8 @@ public class StudySteps {
     private ObjectMapper objectMapper;
 
     @Given("^there is a non-exising study$")
-    public void there_is_a_non_exising_study() throws Exception {
-        CommonStates.setUrl("STUDY_NON_EXISTING", STUDY_NON_EXISTING_URL);
+    public void setNonExisingStudy() throws Exception {
+        CommonStates.setUrl("STUDY_NON_EXISTING", "https://nohost//studies/999");
     }
 
     @When("user create a test study with (.*) for taxonomy$")
