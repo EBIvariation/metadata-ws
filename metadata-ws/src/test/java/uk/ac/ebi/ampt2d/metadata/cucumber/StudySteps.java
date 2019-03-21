@@ -33,7 +33,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.ac.ebi.ampt2d.metadata.cucumber.CommonSteps.STUDY_NON_EXISTING_URL;
 
 @Ignore
 @AutoConfigureMockMvc
@@ -46,8 +45,8 @@ public class StudySteps {
     private ObjectMapper objectMapper;
 
     @Given("^there is a non-exising study$")
-    public void there_is_a_non_exising_study() throws Exception {
-        CommonStates.setUrl("STUDY_NON_EXISTING", STUDY_NON_EXISTING_URL);
+    public void setNonExisingStudy() throws Exception {
+        CommonStates.setUrl("STUDY_NON_EXISTING", "https://nohost//studies/999");
     }
 
     @When("user create a test study with (.*) for taxonomy$")
@@ -88,29 +87,29 @@ public class StudySteps {
                 .content(content)));
     }
 
-    @When("^user request elaborate search for the (.*) base (.*) and with the parameters: (.*)$")
-    public void performSearchOnResourcesWithBaseAndParameters(String className, String base, String parameters) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+parameters)));
+    @When("^user request elaborate search for the studies base (.*) and with the parameters: (.*)$")
+    public void performSearchOnResourcesWithBaseAndParameters(String base, String parameters) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base+"?"+parameters)));
     }
 
-    @When("^user request elaborate search with day for the (.*) base (.*) and with the parameters: (.*) and (\\d*)$")
-    public void performSearchOnResourcesWithBaseAndParametersAndDay(String className, String base, String parameters, int day) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+parameters+LocalDate.now().plusDays(day))));
+    @When("^user request elaborate search with day for the studies base (.*) and with the parameters: (.*) and (\\d*)$")
+    public void performSearchOnResourcesWithBaseAndParametersAndDay(String base, String parameters, int day) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base+"?"+parameters+LocalDate.now().plusDays(day))));
     }
 
-    @When("^user request elaborate search with date range for the (.*) base (.*) and with the parameters: (\\d*)$")
-    public void performSearchOnResourcesWithBaseAndParametersAndDayRange(String className, String base, int day) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base+"?"+"from="+LocalDate.now().plusDays(day)+"&to="+LocalDate.now().plusDays(day))));
+    @When("^user request elaborate search with date range for the studies base (.*) and with the parameters: (\\d*)$")
+    public void performSearchOnResourcesWithBaseAndParametersAndDayRange(String base, int day) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base+"?"+"from="+LocalDate.now().plusDays(day)+"&to="+LocalDate.now().plusDays(day))));
     }
 
-    @When("^user request search for the (.*) with base (.*) and name (.*) value (.*)$")
-    public void performSearchOnResourcesWithParameters(String className, String base, String name, String value) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search/"+base).param(name, value)));
+    @When("^user request search for the studies with base (.*) and name (.*) value (.*)$")
+    public void performSearchOnResourcesWithParameters(String base, String name, String value) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base).param(name, value)));
     }
 
-    @When("^user request search for the (.*) with param (.*)")
-    public void performSearchOnResources(String className, String param) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/" + className+"/search/"+param)));
+    @When("^user request search for studies with (.*)")
+    public void performSearchOnResources(String param) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+param)));
     }
 
     private ResultActions postTestStudy(String accession, int version, String name, boolean deprecated, LocalDate releaseDate, String testTaxonomyKey) throws Exception {

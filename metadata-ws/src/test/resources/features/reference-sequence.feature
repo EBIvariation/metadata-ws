@@ -10,12 +10,12 @@ Feature: reference sequence
       "type": "ASSEMBLY"
     }
     """
-    And set the URL to TEST_REFERENCE_SEQUENCE
-    Then the response code should be 201
-    Then the Location header should be present with value of TEST_REFERENCE_SEQUENCE
+    Then set the URL to TEST_REFERENCE_SEQUENCE
+    And the response code should be 201
+    And the Location header should be present with value of TEST_REFERENCE_SEQUENCE
     When user request GET with value of TEST_REFERENCE_SEQUENCE
     Then the response code should be 200
-    Then the result json should be:
+    And the result json should be:
     """
     {
       "name": "GRCh37",
@@ -38,7 +38,7 @@ Feature: reference sequence
       "type": "ASSEMBLY"
     }
     """
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_1
     When user request POST /reference-sequences with json data:
     """
@@ -49,7 +49,7 @@ Feature: reference sequence
       "type": "ASSEMBLY"
     }
     """
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_2
     When user request search for the reference-sequences with the parameters: <query>
     Then the response code should be 200
@@ -77,7 +77,7 @@ Feature: reference sequence
       "type": "ASSEMBLY"
     }
     """
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_1
     When user request POST /reference-sequences with json data:
     """
@@ -88,7 +88,7 @@ Feature: reference sequence
       "type": "ASSEMBLY"
     }
     """
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_2
     When user request search for the reference-sequences with the parameters: <query>
     Then the response code should be 200
@@ -113,7 +113,7 @@ Feature: reference sequence
       "type": "GENE"
     }
     """
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_1
     When user request POST /reference-sequences with json data:
     """
@@ -124,7 +124,7 @@ Feature: reference sequence
       "type": "ASSEMBLY"
     }
     """
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_2
     When user request search for the reference-sequences with the parameters: <query>
     Then the response code should be 200
@@ -147,7 +147,7 @@ Feature: reference sequence
       "type": "ASSEMBLY"
     }
     """
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_1
     When user request POST /reference-sequences with json data:
     """
@@ -158,7 +158,7 @@ Feature: reference sequence
       "type": "ASSEMBLY"
     }
     """
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_2
 
     When user request search for the reference-sequences with the parameters: <query>
@@ -178,4 +178,4 @@ Feature: reference sequence
 
   Scenario: find reference sequence by invalid type should fail
     When user request search for the reference-sequences with the parameters: type=UNKNOWN
-    And the response code should be 4xx
+    Then the response code should be 4xx

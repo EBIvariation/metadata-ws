@@ -14,12 +14,12 @@ Feature: file object
       "type": "TSV"
     }
     """
-    And set the URL to TEST_FILE
-    Then the response code should be 201
-    Then the Location header should be present with value of TEST_FILE
+    Then set the URL to TEST_FILE
+    And the response code should be 201
+    And the Location header should be present with value of TEST_FILE
     When user request GET with value of TEST_FILE
     Then the response code should be 200
-    Then the result json should be:
+    And the result json should be:
     """
     {
       "accessionVersionId": {

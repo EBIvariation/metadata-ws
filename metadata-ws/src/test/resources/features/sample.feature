@@ -1,67 +1,67 @@
 Feature: sample object
 
   Scenario: register a sample successfully
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens"
     }
     """
-    And set the URL to TEST_TAXONOMY
+    Then set the URL to TEST_TAXONOMY
     When user create a test sample with TEST_TAXONOMY for taxonomy
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_SAMPLE
     When user request GET with value of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should have accessionVersionId.accession with value EGAS0001
-    Then the result should have name with value test_human_sample
+    And the result should have accessionVersionId.accession with value EGAS0001
+    And the result should have name with value test_human_sample
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should contain 1 taxonomies
-    Then the href of the taxonomy of taxonomies has items TEST_TAXONOMY
+    And the result should contain 1 taxonomies
+    And the href of the taxonomy of taxonomies has items TEST_TAXONOMY
 
 
   Scenario: update a sample successfully
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 10090,
       "name": "Mus Musculus"
     }
     """
-    And set the URL to TEST_TAXONOMY_1
+    Then set the URL to TEST_TAXONOMY_1
     When user create a test sample with TEST_TAXONOMY_1 for taxonomy
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_SAMPLE
     When user request GET with value of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should have accessionVersionId.accession with value EGAS0001
-    Then the result should have name with value test_human_sample
+    And the result should have accessionVersionId.accession with value EGAS0001
+    And the result should have name with value test_human_sample
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should contain 1 taxonomies
-    Then the href of the taxonomy of taxonomies has items TEST_TAXONOMY_1
+    And the result should contain 1 taxonomies
+    And the href of the taxonomy of taxonomies has items TEST_TAXONOMY_1
 
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens"
     }
     """
-    And set the URL to TEST_TAXONOMY_2
+    Then set the URL to TEST_TAXONOMY_2
     When user request PATCH TEST_SAMPLE with list TEST_TAXONOMY_2 for taxonomies
-    And the response code should be 2xx
+    Then the response code should be 2xx
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should contain 1 taxonomies
-    Then the href of the taxonomy of taxonomies has items TEST_TAXONOMY_2
+    And the result should contain 1 taxonomies
+    And the href of the taxonomy of taxonomies has items TEST_TAXONOMY_2
 
 
   Scenario Outline: post a test sample with invalid taxonomy list should fail
     When user create a test sample with <list> for taxonomy
-    And the response code should be 4xx
+    Then the response code should be 4xx
     And the result should have exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException
 
     Examples:
@@ -70,65 +70,65 @@ Feature: sample object
       | BLANK |
 
   Scenario: delete all of a sample's taxonomies should fail
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 10090,
       "name": "Mus Musculus"
     }
     """
-    And set the URL to TEST_TAXONOMY_1
-    Given user request POST /taxonomies with json data:
+    Then set the URL to TEST_TAXONOMY_1
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens"
     }
     """
-    And set the URL to TEST_TAXONOMY_2
+    Then set the URL to TEST_TAXONOMY_2
     When user create a test sample with TEST_TAXONOMY_1,TEST_TAXONOMY_2 for taxonomy
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_SAMPLE
     When user request GET with value of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should have accessionVersionId.accession with value EGAS0001
-    Then the result should have name with value test_human_sample
+    And the result should have accessionVersionId.accession with value EGAS0001
+    And the result should have name with value test_human_sample
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should contain 2 taxonomies
-    Then the href of the taxonomy of taxonomies has items TEST_TAXONOMY_1,TEST_TAXONOMY_2
+    And the result should contain 2 taxonomies
+    And the href of the taxonomy of taxonomies has items TEST_TAXONOMY_1,TEST_TAXONOMY_2
 
     When user request DELETE for the taxonomies of TEST_TAXONOMY_1 of the TEST_SAMPLE
-    And the response code should be 2xx
+    Then the response code should be 2xx
 
     When user request DELETE for the taxonomies of TEST_TAXONOMY_2 of the TEST_SAMPLE
-    And the response code should be 4xx
+    Then the response code should be 4xx
     And the result should have exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException
 
 
   Scenario Outline: update a sample with invalid taxonomies should fail
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 10090,
       "name": "Mus Musculus"
     }
     """
-    And set the URL to TEST_TAXONOMY
+    Then set the URL to TEST_TAXONOMY
     When user create a test sample with TEST_TAXONOMY for taxonomy
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_SAMPLE
     When user request GET with value of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should have accessionVersionId.accession with value EGAS0001
-    Then the result should have name with value test_human_sample
+    And the result should have accessionVersionId.accession with value EGAS0001
+    And the result should have name with value test_human_sample
     When user request GET for taxonomies of TEST_SAMPLE
     Then the response code should be 200
-    Then the result should contain 1 taxonomies
-    Then the href of the taxonomy of taxonomies has items TEST_TAXONOMY
+    And the result should contain 1 taxonomies
+    And the href of the taxonomy of taxonomies has items TEST_TAXONOMY
 
     When user request PATCH TEST_SAMPLE with list <list> for taxonomies
-    And the response code should be 4xx
+    Then the response code should be 4xx
     And the result should have exception with value <exception>
 
     Examples:
@@ -139,50 +139,50 @@ Feature: sample object
 
 
   Scenario Outline: find two samples by taxonomy
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 207598,
       "name": "Homininae"
     }
     """
-    And set the URL to TEST_TAXONOMY_1
-    Given user request POST /taxonomies with json data:
+    Then set the URL to TEST_TAXONOMY_1
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens"
     }
     """
-    And set the URL to TEST_TAXONOMY_2
+    Then set the URL to TEST_TAXONOMY_2
     When user create a test parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TEST_TAXONOMY_1,TEST_TAXONOMY_2 for taxonomy
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_SAMPLE1
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9597,
       "name": "Pan paniscus"
     }
     """
-    And set the URL to TEST_TAXONOMY_3
-    Given user request POST /taxonomies with json data:
+    Then set the URL to TEST_TAXONOMY_3
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9598,
       "name": "Pan troglodytes"
     }
     """
-    And set the URL to TEST_TAXONOMY_4
+    Then set the URL to TEST_TAXONOMY_4
     When user create a test parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TEST_TAXONOMY_3,TEST_TAXONOMY_4 for taxonomy
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_SAMPLE2
     When user create a test parameterized sample with Species3 for accession, 1 for version, Species collection3 for name and TEST_TAXONOMY_1,TEST_TAXONOMY_3 for taxonomy
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_SAMPLE3
 
     When user request search for the samples with the parameters: <query>
-    And the response code should be 200
+    Then the response code should be 200
     And the result should contain 2 samples
     And the href of the sample of samples has items <url>
 
@@ -195,47 +195,47 @@ Feature: sample object
 
 
   Scenario Outline: find one sample by taxonomy
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 207598,
       "name": "Homininae"
     }
     """
-    And set the URL to TEST_TAXONOMY_1
-    Given user request POST /taxonomies with json data:
+    Then set the URL to TEST_TAXONOMY_1
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens"
     }
     """
-    And set the URL to TEST_TAXONOMY_2
+    Then set the URL to TEST_TAXONOMY_2
     When user create a test parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TEST_TAXONOMY_1,TEST_TAXONOMY_2 for taxonomy
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_SAMPLE1
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9597,
       "name": "Pan paniscus"
     }
     """
-    And set the URL to TEST_TAXONOMY_3
-    Given user request POST /taxonomies with json data:
+    Then set the URL to TEST_TAXONOMY_3
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9598,
       "name": "Pan troglodytes"
     }
     """
-    And set the URL to TEST_TAXONOMY_4
+    Then set the URL to TEST_TAXONOMY_4
     When user create a test parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TEST_TAXONOMY_3,TEST_TAXONOMY_4 for taxonomy
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_SAMPLE2
 
     When user request search for the samples with the parameters: <query>
-    And the response code should be 200
+    Then the response code should be 200
     And the result should contain 1 samples
     And the href of the sample of samples has items <url>
 
@@ -248,43 +248,43 @@ Feature: sample object
 
 
   Scenario Outline: find no sample by non-existing taxonomy
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 207598,
       "name": "Homininae"
     }
     """
-    And set the URL to TEST_TAXONOMY_1
-    Given user request POST /taxonomies with json data:
+    Then set the URL to TEST_TAXONOMY_1
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens"
     }
     """
-    And set the URL to TEST_TAXONOMY_2
+    Then set the URL to TEST_TAXONOMY_2
     When user create a test parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TEST_TAXONOMY_1,TEST_TAXONOMY_2 for taxonomy
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_SAMPLE1
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9597,
       "name": "Pan paniscus"
     }
     """
-    And set the URL to TEST_TAXONOMY_3
-    Given user request POST /taxonomies with json data:
+    Then set the URL to TEST_TAXONOMY_3
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9598,
       "name": "Pan troglodytes"
     }
     """
-    And set the URL to TEST_TAXONOMY_4
+    Then set the URL to TEST_TAXONOMY_4
     When user create a test parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TEST_TAXONOMY_3,TEST_TAXONOMY_4 for taxonomy
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_SAMPLE2
 
     When user request search for the samples with the parameters: <query>
@@ -298,7 +298,7 @@ Feature: sample object
 
 
   Scenario Outline: verify various accession version with samples
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 207598,
@@ -306,17 +306,17 @@ Feature: sample object
     }
     """
     And set the URL to TEST_TAXONOMY1
-    Given user request POST /taxonomies with json data:
+    When user request POST /taxonomies with json data:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens"
     }
     """
-    And set the URL to TEST_TAXONOMY2
+    Then set the URL to TEST_TAXONOMY2
 
     When user create a test sample no or null accession false, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
-    And the response code should be 201
+    Then the response code should be 201
     And set the URL to TEST_SAMPLE
     When user request GET with value of TEST_SAMPLE
     Then the response code should be 200
@@ -324,12 +324,12 @@ Feature: sample object
     And the result should have accessionVersionId as null
 
     When user create a test sample no or null accession true, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
-    And the response code should be 4xx
+    Then the response code should be 4xx
     And the property field of errors 0 should be accessionVersionId.accession
     And the message field of errors 0 should be may not be null
 
     When user create a test parameterized sample with <accession> for accession, <version> for version, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
-    And the response code should be 4xx
+    Then the response code should be 4xx
     And the property field of errors 0 should be <property>
     And the message field of errors 0 should be <message>
 
