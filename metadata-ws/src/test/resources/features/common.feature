@@ -7,7 +7,7 @@ Feature: Common object
     And the Allow header should contain GET
 
   Scenario Outline: verify metadata objects are auditable
-    Given user request set start time
+    Given current time as START_TIME1
     When user request POST /reference-sequences with json data:
     """
       {
@@ -70,24 +70,24 @@ Feature: Common object
       }
       """
     Then set the URL to TEST_WEB_RESOURCE
-    And user request set end time
 
+    Given current time as END_TIME1
     When user request GET with value of <url>
     Then the response code should be 200
     And the href of the class <class> should be <url>
     And the result should have lastModifiedDate non empty
-    And the lastModifiedDate should be within times
+    And the lastModifiedDate should be after START_TIME1 and before END_TIME1
 
-    Given user request set start time
+    Given current time as START_TIME2
     When user request PATCH <url> with content <content> and patch false
     Then the response code should be 2xx
-    And user request set end time
 
+    Given current time as END_TIME2
     When user request GET with value of <url>
     Then the response code should be 200
     And the href of the class <class> should be <url>
     And the result should have lastModifiedDate non empty
-    And the lastModifiedDate should be within times
+    And the lastModifiedDate should be after START_TIME2 and before END_TIME2
 
     Examples:
       | url | class | content |

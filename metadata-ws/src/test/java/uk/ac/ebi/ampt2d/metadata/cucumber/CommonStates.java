@@ -31,6 +31,8 @@ public class CommonStates {
 
     private static Map<String, String> urlMap = new HashMap<>();
 
+    private static Map<String, ZonedDateTime> timeMap = new HashMap<>();
+
     private static ResultActions resultActions;
 
     public static void clear() {
@@ -55,11 +57,11 @@ public class CommonStates {
     }
 
     public static void setTime(String key, ZonedDateTime value) {
-        urlMap.put(key, value.toString());
+        timeMap.put(key, value);
     }
 
     public static ZonedDateTime getTime(String key) {
-        return ZonedDateTime.parse(urlMap.get(key));
+        return timeMap.get(key);
     }
 
     public static List<String> getUrls(String commaDelimitedKeys) {

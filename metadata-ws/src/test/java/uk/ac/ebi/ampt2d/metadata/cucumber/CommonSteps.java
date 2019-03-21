@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.cucumber;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
+import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.json.JSONObject;
@@ -332,22 +333,17 @@ public class CommonSteps {
                 .header(header[1], value[1])));
     }
 
-    @When("^user request set start time")
-    public void setStartTime() {
-        CommonStates.setTime("START_TIME", ZonedDateTime.now());
+    @Given("^current time as (.*)$")
+    public void setTime(String timeKey) {
+        CommonStates.setTime(timeKey, ZonedDateTime.now());
     }
 
-    @When("^user request set end time")
-    public void setEndTime() {
-        CommonStates.setTime("END_TIME", ZonedDateTime.now());
-    }
-
-    @Then("^the lastModifiedDate should be within times$")
-    public void checkLastModifiedDate() throws Exception{
+    @Then("^the (.*) should be after (.*) and before (.*)$")
+    public void checkDateTimeBetween(String dateTime, String afterKey, String beforeKey) throws Exception{
         JSONObject jsonObject = new JSONObject(CommonStates.getResultActions().andReturn().getResponse().getContentAsString());
-        ZonedDateTime lastModifiedDate = ZonedDateTime.parse(jsonObject.getString("lastModifiedDate"));
-        assert lastModifiedDate.isAfter(CommonStates.getTime("START_TIME"));
-        assert lastModifiedDate.isBefore(CommonStates.getTime("END_TIME"));
+        ZonedDateTime lastModifiedDate = ZonedDateTime.parse(jsonObject.getString(dateTime));
+        assert lastModifiedDate.isAfter(CommonStates.getTime(afterKey));
+        assert lastModifiedDate.isBefore(CommonStates.getTime(beforeKey));
     }
 
 }
