@@ -32,6 +32,7 @@ import org.junit.runner.RunWith;
                 "src/test/resources/features/taxonomy.feature",
                 "src/test/resources/features/web-resource.feature"
         },
+        strict = true,
         plugin = {
                 "pretty",
                 "html:target/cucumber"
