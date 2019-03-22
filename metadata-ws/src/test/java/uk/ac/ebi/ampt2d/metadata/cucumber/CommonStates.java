@@ -37,6 +37,7 @@ public class CommonStates {
 
     public static void clear() {
         urlMap.clear();
+        timeMap.clear();
         resultActions = null;
     }
 
