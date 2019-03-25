@@ -1,7 +1,7 @@
 Feature: Miscellaneous functions
 
   Scenario: verify cross origin resource sharing
-    When user request OPTIONS with headers Access-Control-Request-Method and Origin with values GET and http://www.evil-url.com
+    When user request OPTIONS / with GET for Access-Control-Request-Method header and http://www.evil-url.com for Origin header
     Then the response code should be 200
     Given there is an URL http://www.evil-url.com with key EVIL_URL
     And the Access-Control-Allow-Origin header should be present with value of EVIL_URL

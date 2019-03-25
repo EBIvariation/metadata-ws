@@ -36,8 +36,8 @@ public class TaxonomySteps {
     private ObjectMapper objectMapper;
 
     @When("^user request POST taxonomies (\\d*) for id, (.*) for name and (.*) for ancestors")
-    public void performPostOnResourceUriWithStringDataAndLink(long id, String name, String linkedObjectUrlKeys) throws Exception {
-        List<String> newUrls = CommonStates.getUrls(linkedObjectUrlKeys);
+    public void performPostOnTaxonomies(long id, String name, String ancestorKeys) throws Exception {
+        List<String> newUrls = CommonStates.getUrls(ancestorKeys);
         String jsonContent = "{ " +
                 "\"taxonomyId\": " + id + "," +
                 "\"name\": \"" + name + "\"," +

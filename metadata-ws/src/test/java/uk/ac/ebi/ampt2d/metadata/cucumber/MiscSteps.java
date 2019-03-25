@@ -30,13 +30,13 @@ public class MiscSteps {
     @Autowired
     private MockMvc mockMvc;
 
-    @When("^user request OPTIONS with headers Access-Control-Request-Method and Origin with values GET and http://www.evil-url.com$")
+    @When("^user request OPTIONS / with GET for Access-Control-Request-Method header and http://www.evil-url.com for Origin header$")
     public void performOptionsWithData() throws Exception {
         CommonStates.setResultActions(mockMvc.perform(options("/")
                 .header("Access-Control-Request-Method", "GET")
                 .header("Origin", "http://www.evil-url.com")));
     }
-    
+
     @Then("^the (.*) header should contain (.*)$")
     public void checkHeaderContainsValue(String headerName, String headerValue) {
         String header = CommonStates.getResultActions().andReturn().getResponse().getHeaderValue(headerName).toString();
