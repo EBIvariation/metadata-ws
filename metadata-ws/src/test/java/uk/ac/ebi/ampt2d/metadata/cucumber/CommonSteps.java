@@ -219,20 +219,6 @@ public class CommonSteps {
                 CommonStates.getResultActions().andReturn().getResponse().getHeaderValue(headerName));
     }
 
-    @Then("^the (.*) header should be present with actual value (.*)$")
-    public void checkHeaderPresenceWithDirectValue(String headerName, String headerValue) {
-        assertEquals("Header not present with value: " + headerName + "=" + headerValue,
-                headerValue,
-                CommonStates.getResultActions().andReturn().getResponse().getHeaderValue(headerName));
-    }
-
-    @Then("^the (.*) header should contain (.*)$")
-    public void checkHeaderContainsValue(String headerName, String headerValue) {
-        String header = CommonStates.getResultActions().andReturn().getResponse().getHeaderValue(headerName).toString();
-        assertTrue("Header not present with value: " + headerName + "=" + headerValue,
-                header.contains(headerValue));
-    }
-
     /* check http response body */
 
     @Then("^the result json should be:$")
@@ -321,16 +307,6 @@ public class CommonSteps {
         CommonStates.getResultActions()
                 .andExpect(jsonPath("$.."+className+"["+index+"]."+field).isArray())
                 .andExpect(jsonPath("$.."+className+"["+index+"]."+field+"[*]", hasItems(fieldValue)));
-    }
-
-    @When("^user request OPTIONS with header (.*) value (.*)$")
-    public void performOptionsWithData(String headerList, String valueList) throws Exception {
-        String[] header = headerList.split(",");
-        String[] value = valueList.split(",");
-
-        CommonStates.setResultActions(mockMvc.perform(options("/")
-                .header(header[0], value[0])
-                .header(header[1], value[1])));
     }
 
     @Given("^current time as (.*)$")

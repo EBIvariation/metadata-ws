@@ -250,7 +250,7 @@ Feature: study object
     When user create a test parameterized study with EGAS0002 for accession, 1 for version, test human A for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     Then set the URL to TEST_STUDY1
 
-    When user request GET for studies
+    When user request GET /studies
     Then the response code should be 200
     And the result should contain 2 studies
     And the result should have page.size with value 20
@@ -301,7 +301,7 @@ Feature: study object
     When user create a test analysis with analysisReleasedYesterday for accession, TEST_REFERENCE_SEQUENCE_1 for reference sequence, TEST_STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     Then set the URL to TEST_ANALYSIS
 
-    When user request GET for studies
+    When user request GET /studies
     Then the result should contain 2 studies
     And the href of the study of studies has items TEST_STUDY1,TEST_STUDY2
 
@@ -358,7 +358,7 @@ Feature: study object
     When user create a test parameterized study with 1kg for accession, 2 for version, 1kg phase 1 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     Then set the URL to TEST_STUDY2
 
-    When user request GET for studies
+    When user request GET /studies
     Then the result should contain 1 studies
     And the href of the study of studies has items TEST_STUDY2
 
@@ -535,7 +535,7 @@ Feature: study object
 
 
   Scenario Outline: find linked studies
-    Given there is a non-exising study
+    Given there is an URL https://nohost//studies/999 with key STUDY_NON_EXISTING
     When user request POST /taxonomies with json data:
     """
     {
@@ -675,7 +675,7 @@ Feature: study object
 
 
   Scenario: verify non-existing study with patch
-    Given there is a non-exising study
+    Given there is an URL https://nohost//studies/999 with key STUDY_NON_EXISTING
     When user request PATCH STUDY_NON_EXISTING with patch and day 0
     Then the response code should be 4xx
 

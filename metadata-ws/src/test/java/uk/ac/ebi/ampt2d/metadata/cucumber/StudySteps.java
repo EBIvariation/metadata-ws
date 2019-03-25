@@ -17,7 +17,6 @@
  */
 package uk.ac.ebi.ampt2d.metadata.cucumber;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
 import org.junit.Ignore;
@@ -41,12 +40,9 @@ public class StudySteps {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Given("^there is a non-exising study$")
-    public void setNonExisingStudy() throws Exception {
-        CommonStates.setUrl("STUDY_NON_EXISTING", "https://nohost//studies/999");
+    @Given("^there is an URL (.*) with key (.*)$")
+    public void setUrlWithKey(String url, String key) throws Exception {
+        CommonStates.setUrl(key, url);
     }
 
     @When("user create a test study with (.*) for taxonomy$")
@@ -57,11 +53,6 @@ public class StudySteps {
     @When("user create a test parameterized study with (.*) for accession, (.*) for version, (.*) for name, (.*) for deprecated, (.*) for releaseDay and (.*) for taxonomy$")
     public void createTestStudyParameterizedMore(String accession, int version, String name, boolean deprecated, int releaseDay, String testTaxonomyKey) throws Exception {
         CommonStates.setResultActions(postTestStudy(accession, version, name, deprecated, LocalDate.now().plusDays(releaseDay), testTaxonomyKey));
-    }
-
-    @When("^user request GET for studies")
-    public void performGetOnResources() throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/studies")));
     }
 
     @When("^user request GET for the studies with query param (.*)")

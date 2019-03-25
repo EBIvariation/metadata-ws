@@ -1,9 +1,10 @@
-Feature: Common object
+Feature: Miscellaneous functions
 
-  Scenario: perform options
-    When user request OPTIONS with header Access-Control-Request-Method,Origin value GET,http://www.evil-url.com
+  Scenario: verify cross origin resource sharing
+    When user request OPTIONS with headers Access-Control-Request-Method and Origin with values GET and http://www.evil-url.com
     Then the response code should be 200
-    And the Access-Control-Allow-Origin header should be present with actual value http://www.evil-url.com
+    Given there is an URL http://www.evil-url.com with key EVIL_URL
+    And the Access-Control-Allow-Origin header should be present with value of EVIL_URL
     And the Allow header should contain GET
 
   Scenario Outline: verify metadata objects are auditable
