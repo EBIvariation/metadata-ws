@@ -49,7 +49,7 @@ public class StudySteps {
         CommonStates.setResultActions(postTestStudy(accession, version, name, deprecated, LocalDate.now().plusDays(releaseDay), testTaxonomyKey));
     }
 
-    @When("^user request GET for the studies with query param (.*)")
+    @When("^user request GET for the studies with query parameter (.*)")
     public void performGetOnResourcesQuery(String param) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/studies" + "?" + param)));
     }

@@ -257,12 +257,12 @@ Feature: study object
     And the result should have page.totalElements with value 2
     And the result should have page.totalPages with value 1
 
-    When user request GET for the studies with query param <param>
+    When user request GET for the studies with query parameter <param>
     Then the response code should be 200
     And the result should contain 1 studies
     And the href of the study of studies has items <url>
 
-    When user request GET for the studies with query param page=1
+    When user request GET for the studies with query parameter page=1
     Then the response code should be 200
     And the result should contain 0 studies
 
