@@ -17,7 +17,6 @@
  */
 package uk.ac.ebi.ampt2d.metadata.cucumber;
 
-import cucumber.api.java.en.Given;
 import cucumber.api.java.en.When;
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +38,6 @@ public class StudySteps {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Given("^there is an URL (.*) with key (.*)$")
-    public void setUrlWithKey(String url, String key) throws Exception {
-        CommonStates.setUrl(key, url);
-    }
 
     @When("user create a test study with (.*) for taxonomy$")
     public void createTestStudy(String testTaxonomyKey) throws Exception {

@@ -50,10 +50,8 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -320,6 +318,11 @@ public class CommonSteps {
         ZonedDateTime lastModifiedDate = ZonedDateTime.parse(jsonObject.getString(dateTime));
         assert lastModifiedDate.isAfter(CommonStates.getTime(afterKey));
         assert lastModifiedDate.isBefore(CommonStates.getTime(beforeKey));
+    }
+
+    @Given("^there is an URL (.*) with key (.*)$")
+    public void setUrlWithKey(String url, String key) {
+        CommonStates.setUrl(key, url);
     }
 
 }
