@@ -35,7 +35,7 @@ public class TaxonomySteps {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @When("^user request POST taxonomies (\\d*) for id, (.*) for name and (.*) for ancestors")
+    @When("^I request POST taxonomies (\\d*) for id, (.*) for name and (.*) for ancestors")
     public void performPostOnTaxonomies(long id, String name, String ancestorKeys) throws Exception {
         List<String> newUrls = CommonStates.getUrls(ancestorKeys);
         String jsonContent = "{ " +

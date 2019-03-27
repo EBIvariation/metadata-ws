@@ -1,7 +1,7 @@
 Feature: Web resource object
 
   Scenario: register a web resource successfully
-    When user request POST /webResources with json data:
+    When I request POST /webResources with JSON payload:
     """
     {
       "type": "CENTER_WEB",
@@ -11,13 +11,13 @@ Feature: Web resource object
     Then the response code should be 201
     And set the URL to TEST_WEB_RESOURCE
 
-    When user request GET with value of TEST_WEB_RESOURCE
+    When I request GET with value of TEST_WEB_RESOURCE
     Then the response code should be 200
     And the result should have type with value CENTER_WEB
     And the result should have resourceUrl with value http://www.ebi.ac.uk
 
   Scenario Outline: register a web resource with valid URL should succeed
-    When user request POST /webResources with json data:
+    When I request POST /webResources with JSON payload:
     """
     {
       "type": "CENTER_WEB",
@@ -35,7 +35,7 @@ Feature: Web resource object
 
 
   Scenario Outline: register a web resource with invalid URL should fail
-    When user request POST /webResources with json data:
+    When I request POST /webResources with JSON payload:
     """
     {
       "type": "CENTER_WEB",

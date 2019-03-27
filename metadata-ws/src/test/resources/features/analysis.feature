@@ -1,7 +1,7 @@
 Feature: analysis object
 
   Scenario: register an analysis successfully
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh37",
@@ -11,7 +11,7 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_REFERENCE_SEQUENCE
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -19,17 +19,17 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When user create a test study with TEST_TAXONOMY for taxonomy
+    When I create a test study with TEST_TAXONOMY for taxonomy
     Then set the URL to TEST_STUDY
-    When user create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE for reference sequence
+    When I create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE for reference sequence
     Then the response code should be 201
     And set the URL to TEST_ANALYSIS
-    When user request GET with value of TEST_ANALYSIS
+    When I request GET with value of TEST_ANALYSIS
     Then the response code should be 200
     And the result should have accessionVersionId.accession with value EGAA0001
 
   Scenario: update an analysis successfully
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh37",
@@ -39,7 +39,7 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_REFERENCE_SEQUENCE_1
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -47,21 +47,21 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When user create a test study with TEST_TAXONOMY for taxonomy
+    When I create a test study with TEST_TAXONOMY for taxonomy
     Then set the URL to TEST_STUDY
 
-    When user create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE_1 for reference sequence
+    When I create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE_1 for reference sequence
     Then the response code should be 201
     And set the URL to TEST_ANALYSIS
-    When user request GET with value of TEST_ANALYSIS
+    When I request GET with value of TEST_ANALYSIS
     Then the response code should be 200
     And the result should have accessionVersionId.accession with value EGAA0001
-    When user request GET for referenceSequences of TEST_ANALYSIS
+    When I request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     And the result should contain 1 reference-sequences
     And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_1
 
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh37",
@@ -71,18 +71,18 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_REFERENCE_SEQUENCE_2
-    When user request PATCH TEST_ANALYSIS with list TEST_REFERENCE_SEQUENCE_2 for referenceSequences
+    When I request PATCH TEST_ANALYSIS with list TEST_REFERENCE_SEQUENCE_2 for referenceSequences
     Then the response code should be 2xx
-    When user request GET with value of TEST_ANALYSIS
+    When I request GET with value of TEST_ANALYSIS
     Then the response code should be 200
     And the result should have accessionVersionId.accession with value EGAA0001
-    When user request GET for referenceSequences of TEST_ANALYSIS
+    When I request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     And the result should contain 1 reference-sequences
     And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_2
 
   Scenario Outline: update an analysis with invalid reference sequences list should fail
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh37",
@@ -92,7 +92,7 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_REFERENCE_SEQUENCE_1
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -100,21 +100,21 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When user create a test study with TEST_TAXONOMY for taxonomy
+    When I create a test study with TEST_TAXONOMY for taxonomy
     Then set the URL to TEST_STUDY
 
-    When user create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE_1 for reference sequence
+    When I create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE_1 for reference sequence
     Then the response code should be 201
     And set the URL to TEST_ANALYSIS
-    When user request GET with value of TEST_ANALYSIS
+    When I request GET with value of TEST_ANALYSIS
     Then the response code should be 200
     And the result should have accessionVersionId.accession with value EGAA0001
-    When user request GET for referenceSequences of TEST_ANALYSIS
+    When I request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     And the result should contain 1 reference-sequences
     And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_1
 
-    When user request PATCH TEST_ANALYSIS with list <list> for referenceSequences
+    When I request PATCH TEST_ANALYSIS with list <list> for referenceSequences
     Then the response code should be 4xx
     And the result should have exception with value <exception>
 
@@ -125,7 +125,7 @@ Feature: analysis object
      | TEST_REFERENCE_SEQUENCE_1,EMPTY | uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException |
 
   Scenario Outline: register an analysis with invalid reference sequence should fail
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -133,9 +133,9 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When user create a test study with TEST_TAXONOMY for taxonomy
+    When I create a test study with TEST_TAXONOMY for taxonomy
     Then set the URL to TEST_STUDY
-    When user create a test analysis with TEST_STUDY for study and <list> for reference sequence
+    When I create a test analysis with TEST_STUDY for study and <list> for reference sequence
     Then the response code should be 4xx
     And the result should have exception with value <exception>
 
@@ -145,7 +145,7 @@ Feature: analysis object
       | EMPTY | uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException |
 
   Scenario: delete all of an analysis's reference sequences should fail
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "BRCA1",
@@ -155,7 +155,7 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_REFERENCE_SEQUENCE_1
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "BRCA2",
@@ -165,7 +165,7 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_REFERENCE_SEQUENCE_2
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -173,29 +173,29 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When user create a test study with TEST_TAXONOMY for taxonomy
+    When I create a test study with TEST_TAXONOMY for taxonomy
     Then set the URL to TEST_STUDY
-    When user create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2 for reference sequence
+    When I create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2 for reference sequence
     Then the response code should be 201
     And set the URL to TEST_ANALYSIS
-    When user request GET with value of TEST_ANALYSIS
+    When I request GET with value of TEST_ANALYSIS
     Then the response code should be 200
     And the result should have accessionVersionId.accession with value EGAA0001
-    When user request GET for referenceSequences of TEST_ANALYSIS
+    When I request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     And the result should contain 2 reference-sequences
     And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2
 
-    When user request DELETE for the referenceSequences of TEST_REFERENCE_SEQUENCE_1 of the TEST_ANALYSIS
+    When I request DELETE for the referenceSequences of TEST_REFERENCE_SEQUENCE_1 of the TEST_ANALYSIS
     Then the response code should be 2xx
 
-    When user request DELETE for the referenceSequences of TEST_REFERENCE_SEQUENCE_2 of the TEST_ANALYSIS
+    When I request DELETE for the referenceSequences of TEST_REFERENCE_SEQUENCE_2 of the TEST_ANALYSIS
     Then the response code should be 4xx
     And the result should have exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException
 
 
   Scenario: register an analysis with multiple gene reference sequences successfully
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "BRCA1",
@@ -205,7 +205,7 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_REFERENCE_SEQUENCE_1
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "BRCA2",
@@ -215,7 +215,7 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_REFERENCE_SEQUENCE_2
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -223,34 +223,34 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When user create a test study with TEST_TAXONOMY for taxonomy
+    When I create a test study with TEST_TAXONOMY for taxonomy
     Then set the URL to TEST_STUDY
-    When user create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2 for reference sequence
+    When I create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2 for reference sequence
     Then the response code should be 201
     And set the URL to TEST_ANALYSIS
-    When user request GET with value of TEST_ANALYSIS
+    When I request GET with value of TEST_ANALYSIS
     Then the response code should be 200
     And the result should have accessionVersionId.accession with value EGAA0001
-    When user request GET for referenceSequences of TEST_ANALYSIS
+    When I request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
     And the result should contain 2 reference-sequences
     And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2
 
 
   Scenario Outline: register an analysis with multiple non-gene reference sequences should fail
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     <test_reference_sequence_1_json>
     """
     Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_1
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     <test_reference_sequence_2_json>
     """
     Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_2
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -258,9 +258,9 @@ Feature: analysis object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When user create a test study with TEST_TAXONOMY for taxonomy
+    When I create a test study with TEST_TAXONOMY for taxonomy
     Then set the URL to TEST_STUDY
-    When user create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2 for reference sequence
+    When I create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE_1,TEST_REFERENCE_SEQUENCE_2 for reference sequence
     Then the response code should be 4xx
     And the result should have exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException
     And the result should have message with value Invalid type of reference sequences. When multiple reference sequence URLs are provided, all of them should point to gene sequences
@@ -273,7 +273,7 @@ Feature: analysis object
 
 
    Scenario Outline: find one analysis by type, technology or platform
-     When user request POST /reference-sequences with json data:
+     When I request POST /reference-sequences with JSON payload:
      """
      {
        "name": "GRCh37",
@@ -283,7 +283,7 @@ Feature: analysis object
      }
      """
      Then set the URL to TEST_REFERENCE_SEQUENCE
-     When user request POST /taxonomies with json data:
+     When I request POST /taxonomies with JSON payload:
      """
      {
        "taxonomyId": 9606,
@@ -291,16 +291,16 @@ Feature: analysis object
      }
      """
      Then set the URL to TEST_TAXONOMY
-     When user create a test study with TEST_TAXONOMY for taxonomy
+     When I create a test study with TEST_TAXONOMY for taxonomy
      Then set the URL to TEST_STUDY
-     When user create a test analysis with EGAA0001 for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
+     When I create a test analysis with EGAA0001 for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
      Then the response code should be 201
      And set the URL to TEST_ANALYSIS_1
-     When user create a test analysis with EGAA0002 for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, ARRAY for technology, TUMOR for type and PacBio for platform
+     When I create a test analysis with EGAA0002 for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, ARRAY for technology, TUMOR for type and PacBio for platform
      Then the response code should be 201
      And set the URL to TEST_ANALYSIS_2
 
-     When user request search for the analyses with the parameters: <query>
+     When I request search for the analyses with the parameters: <query>
      Then the response code should be 200
      And the result should contain 1 analyses
      And the href of the analysis of analyses has items <analysis_url>
@@ -317,7 +317,7 @@ Feature: analysis object
 
 
    Scenario Outline: find zero analysis by type, technology or platform
-     When user request POST /reference-sequences with json data:
+     When I request POST /reference-sequences with JSON payload:
      """
      {
        "name": "GRCh37",
@@ -327,7 +327,7 @@ Feature: analysis object
      }
      """
      Then set the URL to TEST_REFERENCE_SEQUENCE
-     When user request POST /taxonomies with json data:
+     When I request POST /taxonomies with JSON payload:
      """
      {
        "taxonomyId": 9606,
@@ -335,16 +335,16 @@ Feature: analysis object
      }
      """
      Then set the URL to TEST_TAXONOMY
-     When user create a test study with TEST_TAXONOMY for taxonomy
+     When I create a test study with TEST_TAXONOMY for taxonomy
      Then set the URL to TEST_STUDY
-     When user create a test analysis with EGAA0001 for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
+     When I create a test analysis with EGAA0001 for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
      Then the response code should be 201
      And set the URL to TEST_ANALYSIS_1
-     When user create a test analysis with EGAA0002 for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, ARRAY for technology, TUMOR for type and PacBio for platform
+     When I create a test analysis with EGAA0002 for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, ARRAY for technology, TUMOR for type and PacBio for platform
      Then the response code should be 201
      And set the URL to TEST_ANALYSIS_2
 
-     When user request search for the analyses with the parameters: <query>
+     When I request search for the analyses with the parameters: <query>
      Then the response code should be 200
      And the result should contain 0 analyses
 
@@ -356,7 +356,7 @@ Feature: analysis object
 
 
    Scenario Outline: find analysis by invalid type or technology should fail
-     When user request POST /reference-sequences with json data:
+     When I request POST /reference-sequences with JSON payload:
      """
      {
        "name": "GRCh37",
@@ -366,7 +366,7 @@ Feature: analysis object
      }
      """
      Then set the URL to TEST_REFERENCE_SEQUENCE
-     When user request POST /taxonomies with json data:
+     When I request POST /taxonomies with JSON payload:
      """
      {
        "taxonomyId": 9606,
@@ -374,16 +374,16 @@ Feature: analysis object
      }
      """
      Then set the URL to TEST_TAXONOMY
-     When user create a test study with TEST_TAXONOMY for taxonomy
+     When I create a test study with TEST_TAXONOMY for taxonomy
      Then set the URL to TEST_STUDY
-     When user create a test analysis with EGAA0001 for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
+     When I create a test analysis with EGAA0001 for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
      Then the response code should be 201
      And set the URL to TEST_ANALYSIS_1
-     When user create a test analysis with EGAA0002 for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, ARRAY for technology, TUMOR for type and PacBio for platform
+     When I create a test analysis with EGAA0002 for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, ARRAY for technology, TUMOR for type and PacBio for platform
      Then the response code should be 201
      And set the URL to TEST_ANALYSIS_2
 
-     When user request search for the analyses with the parameters: <query>
+     When I request search for the analyses with the parameters: <query>
      Then the response code should be 4xx
 
      Examples:

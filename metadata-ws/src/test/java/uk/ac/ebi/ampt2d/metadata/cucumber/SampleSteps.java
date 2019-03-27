@@ -40,18 +40,18 @@ public class SampleSteps {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @When("user create a test sample with (.*) for taxonomy")
+    @When("I create a test sample with (.*) for taxonomy")
     public void createTestSample(String testTaxonomyKeys) throws Exception {
         createTestSampleParameterized("EGAS0001", 1, "test_human_sample", testTaxonomyKeys);
     }
 
-    @When("user create a test parameterized sample with (.*) for accession, (.*) for version, (.*) for name and (.*) for taxonomy")
+    @When("I create a test parameterized sample with (.*) for accession, (.*) for version, (.*) for name and (.*) for taxonomy")
     public void createTestSampleParameterized(String accession, int version, String name, String testTaxonomyKeys) throws Exception {
         List<String> testTaxonomyList = CommonStates.getUrls(testTaxonomyKeys);
         CommonStates.setResultActions(postTestSample(accession, name, testTaxonomyList, version));
     }
 
-    @When("user create a test sample no or null accession (.*), (.*) for name and (.*) for taxonomy")
+    @When("I create a test sample no or null accession (.*), (.*) for name and (.*) for taxonomy")
     public void createTestSampleParameterizedNoAccession(boolean accession, String name, String testTaxonomyKeys) throws Exception {
         List<String> testTaxonomyList = CommonStates.getUrls(testTaxonomyKeys);
         if (accession == false) {

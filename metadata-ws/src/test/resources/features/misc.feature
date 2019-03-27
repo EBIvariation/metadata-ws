@@ -1,7 +1,7 @@
 Feature: Miscellaneous functions
 
   Scenario: verify cross origin resource sharing
-    When user request OPTIONS / with GET for Access-Control-Request-Method header and http://www.evil-url.com for Origin header
+    When I request OPTIONS / with GET for Access-Control-Request-Method header and http://www.evil-url.com for Origin header
     Then the response code should be 200
     Given there is an URL http://www.evil-url.com with key EVIL_URL
     And the Access-Control-Allow-Origin header should be present with value of EVIL_URL
@@ -9,7 +9,7 @@ Feature: Miscellaneous functions
 
   Scenario Outline: verify metadata objects are auditable
     Given current time as START_TIME1
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
       {
         "name": "GRCh37",
@@ -19,7 +19,7 @@ Feature: Miscellaneous functions
       }
       """
     Then set the URL to TEST_REFERENCE_SEQUENCE
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
       {
         "taxonomyId": 9606,
@@ -27,11 +27,11 @@ Feature: Miscellaneous functions
       }
       """
     Then set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with testhuman for accession, 1 for version, test human stud for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I create a test parameterized study with testhuman for accession, 1 for version, test human stud for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
     Then set the URL to TEST_STUDY
-    When user create a test analysis with testhuman for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
+    When I create a test analysis with testhuman for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     Then set the URL to TEST_ANALYSIS
-    When user request POST /files with json data:
+    When I request POST /files with JSON payload:
     """
       {
         "accessionVersionId": {
@@ -45,7 +45,7 @@ Feature: Miscellaneous functions
       }
       """
     Then set the URL to TEST_FILE
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
       {
         "taxonomyId": 1,
@@ -53,7 +53,7 @@ Feature: Miscellaneous functions
       }
       """
     Then set the URL to TEST_TAXONOMY1
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
       {
         "taxonomyId": 2,
@@ -61,9 +61,9 @@ Feature: Miscellaneous functions
       }
       """
     Then set the URL to TEST_TAXONOMY2
-    When user create a test parameterized sample with testhuman for accession, 1 for version, test human sample for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
+    When I create a test parameterized sample with testhuman for accession, 1 for version, test human sample for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
     Then set the URL to TEST_SAMPLE
-    When user request POST /webResources with json data:
+    When I request POST /webResources with JSON payload:
     """
       {
         "type": "CENTER_WEB",
@@ -73,18 +73,18 @@ Feature: Miscellaneous functions
     Then set the URL to TEST_WEB_RESOURCE
 
     Given current time as END_TIME1
-    When user request GET with value of <url>
+    When I request GET with value of <url>
     Then the response code should be 200
     And the href of the class <class> should be <url>
     And the result should have lastModifiedDate non empty
     And the lastModifiedDate should be after START_TIME1 and before END_TIME1
 
     Given current time as START_TIME2
-    When user request PATCH <url> with content <content> and patch false
+    When I request PATCH <url> with content <content> and patch false
     Then the response code should be 2xx
 
     Given current time as END_TIME2
-    When user request GET with value of <url>
+    When I request GET with value of <url>
     Then the response code should be 200
     And the href of the class <class> should be <url>
     And the result should have lastModifiedDate non empty

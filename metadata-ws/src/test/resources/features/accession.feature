@@ -1,7 +1,7 @@
 Feature: accession object
 
   Scenario Outline: find different objects by accession and version
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -9,8 +9,8 @@ Feature: accession object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When user create a test parameterized study with EGAS0001 for accession, 1 for version, test_study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
-    And user request POST /files with json data:
+    When I create a test parameterized study with EGAS0001 for accession, 1 for version, test_study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    And I request POST /files with JSON payload:
     """
     {
       "accessionVersionId": {
@@ -24,7 +24,7 @@ Feature: accession object
     }
     """
     Then set the URL to TEST_FILE
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 1,
@@ -32,7 +32,7 @@ Feature: accession object
     }
     """
     Then set the URL to TEST_TAXONOMY1
-    When user request POST /taxonomies with json data:
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 2,
@@ -40,23 +40,23 @@ Feature: accession object
     }
     """
     Then set the URL to TEST_TAXONOMY2
-    When user create a test parameterized sample with EGAN0001 for accession, 1 for version, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
+    When I create a test parameterized sample with EGAN0001 for accession, 1 for version, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
     Then the response code should be 201
     And set the URL to TEST_SAMPLE
 
-    When user request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001.2 and =
+    When I request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001.2 and =
     Then the response code should be 200
     And the result should contain 0 studies
 
-    When user request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001 and =
+    When I request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001 and =
     Then the response code should be 4xx
     And the result should have message with value Please provide an ID in the form accession.version
 
-    When user request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001.S1 and =
+    When I request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001.S1 and =
     Then the response code should be 4xx
     And the result should have message with value Please provide an ID in the form accession.version
 
-    When user request elaborate find for the <object> bases <bases> with the parameters: <param> and <sep>
+    When I request elaborate find for the <object> bases <bases> with the parameters: <param> and <sep>
     Then the response code should be 200
     And the result should contain 1 <object>
     And the <bases>.accession field of <object> 0 should be <value>

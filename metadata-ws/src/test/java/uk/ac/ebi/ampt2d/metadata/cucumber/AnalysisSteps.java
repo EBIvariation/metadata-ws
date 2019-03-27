@@ -40,13 +40,13 @@ public class AnalysisSteps {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @When("user create a test analysis with (.*) for study and (.*) for reference sequence")
+    @When("I create a test analysis with (.*) for study and (.*) for reference sequence")
     public void createTestAnalysis(String studyUrlKey, String referenceSequenceUrlKey) throws Exception {
         createTestAnalysisParam("EGAA0001", referenceSequenceUrlKey, studyUrlKey, Analysis.Technology.EXOME_SEQUENCING,
                 Analysis.Type.CASE_CONTROL, "Illumina");
     }
 
-    @When("user create a test analysis with (.*) for accession, (.*) for reference sequence, (.*) for study, (.*) for technology, (.*) for type and (.*) for platform")
+    @When("I create a test analysis with (.*) for accession, (.*) for reference sequence, (.*) for study, (.*) for technology, (.*) for type and (.*) for platform")
     public void createTestAnalysisParam(String accession, String referenceSequenceUrlKey, String studyUrlKey,
                                         Analysis.Technology technology, Analysis.Type type, String platform)
             throws Exception {

@@ -109,29 +109,29 @@ public class CommonSteps {
 
     /* perform http request */
 
-    @When("^user request GET ([\\S]*)$")
+    @When("^I request GET ([\\S]*)$")
     public void performGetOnResourceUri(String resourceUri) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get(resourceUri)));
     }
 
-    @When("^user request GET with value of (.*)$")
+    @When("^I request GET with value of (.*)$")
     public void performGetWithResourceUriKey(String resourceUriKey) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get(CommonStates.getUrl(resourceUriKey))));
     }
 
-    @When("^user request GET for (.*) of (.*)$")
+    @When("^I request GET for (.*) of (.*)$")
     public void performGetForLinkedObjects(String className, String resourceUriKey) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get(CommonStates.getUrl(resourceUriKey)+"/"+className)));
     }
 
-    @When("^user request POST (.*) with json data:$")
+    @When("^I request POST (.*) with JSON payload:$")
     public void performPostOnResourceUriWithJsonData(String resourceUri, String jsonData) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(post(resourceUri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData.getBytes())));
     }
 
-    @When("^user request PATCH (.*) with list (.*) for (.*)")
+    @When("^I request PATCH (.*) with list (.*) for (.*)")
     public void performPatchOnResourceWithLinkedObject(String urlKey, String linkedObjectUrlKeys,
                                                        String linkedObjectClassName) throws Exception {
         List<String> newUrls = null;
@@ -148,13 +148,13 @@ public class CommonSteps {
                 .content(jsonContent)));
     }
 
-    @When("^user request PATCH (.*) with content (.*)")
+    @When("^I request PATCH (.*) with content (.*)")
     public void performPatchOnResourceWithContent(String urlKey, String content) throws Exception {
             CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
                     .content(content)));
     }
 
-    @When("^user request DELETE for the (.*) of (.*) of the (.*)")
+    @When("^I request DELETE for the (.*) of (.*) of the (.*)")
     public void performDeleteOnResourceWithLinkedObject(String className, String linkedObjectUrlKey,
                                                         String resourceUrlKey) throws Exception {
 
@@ -168,12 +168,12 @@ public class CommonSteps {
         CommonStates.setResultActions(mockMvc.perform(delete(resourceUrl + "/" + className + "/" + idStr)));
     }
 
-    @When("^user request search for the (.*) with the parameters: (.*)$")
+    @When("^I request search for the (.*) with the parameters: (.*)$")
     public void performSearchOnResourcesWithParameters(String className, String parameters) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search?"+parameters)));
     }
 
-    @When("^user request elaborate find for the (.*) bases (.*) with the parameters: (.*) and (.*)$")
+    @When("^I request elaborate find for the (.*) bases (.*) with the parameters: (.*) and (.*)$")
     public void performFindOnResourcesWithBaseAndParameters(String className, String bases, String parameters, String separator) throws Exception {
         String[] params = parameters.split("&");
         String[] base = bases.split(",");

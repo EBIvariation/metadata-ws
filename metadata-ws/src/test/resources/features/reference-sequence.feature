@@ -1,7 +1,7 @@
 Feature: reference sequence
 
   Scenario: register a reference sequence successfully
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh37",
@@ -13,7 +13,7 @@ Feature: reference sequence
     Then set the URL to TEST_REFERENCE_SEQUENCE
     And the response code should be 201
     And the Location header should be present with value of TEST_REFERENCE_SEQUENCE
-    When user request GET with value of TEST_REFERENCE_SEQUENCE
+    When I request GET with value of TEST_REFERENCE_SEQUENCE
     Then the response code should be 200
     And the result json should be:
     """
@@ -24,12 +24,12 @@ Feature: reference sequence
       "type": "ASSEMBLY"
     }
     """
-    When user request GET /reference-sequences
+    When I request GET /reference-sequences
     Then the result should contain 1 reference-sequences
 
 
   Scenario Outline: find one reference sequence by name
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh37",
@@ -40,7 +40,7 @@ Feature: reference sequence
     """
     Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_1
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh38",
@@ -51,7 +51,7 @@ Feature: reference sequence
     """
     Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_2
-    When user request search for the reference-sequences with the parameters: <query>
+    When I request search for the reference-sequences with the parameters: <query>
     Then the response code should be 200
     And the result should contain 1 reference-sequences
     And the href of the referenceSequence of reference-sequences has items <url>
@@ -68,7 +68,7 @@ Feature: reference sequence
 
 
   Scenario Outline: find one reference sequence by accession
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh37",
@@ -79,7 +79,7 @@ Feature: reference sequence
     """
     Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_1
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh38",
@@ -90,7 +90,7 @@ Feature: reference sequence
     """
     Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_2
-    When user request search for the reference-sequences with the parameters: <query>
+    When I request search for the reference-sequences with the parameters: <query>
     Then the response code should be 200
     And the result should contain 1 reference-sequences
     And the href of the referenceSequence of reference-sequences has items <url>
@@ -104,7 +104,7 @@ Feature: reference sequence
 
 
   Scenario Outline: find one reference sequence by type
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "BRCA1",
@@ -115,7 +115,7 @@ Feature: reference sequence
     """
     Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_1
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh38",
@@ -126,7 +126,7 @@ Feature: reference sequence
     """
     Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_2
-    When user request search for the reference-sequences with the parameters: <query>
+    When I request search for the reference-sequences with the parameters: <query>
     Then the response code should be 200
     And the result should contain 1 reference-sequences
     And the href of the referenceSequence of reference-sequences has items <url>
@@ -138,7 +138,7 @@ Feature: reference sequence
       | type=ASSEMBLY | TEST_REFERENCE_SEQUENCE_2 | ASSEMBLY |
 
   Scenario Outline: find zero reference sequence
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh37",
@@ -149,7 +149,7 @@ Feature: reference sequence
     """
     Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_1
-    When user request POST /reference-sequences with json data:
+    When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh38",
@@ -161,7 +161,7 @@ Feature: reference sequence
     Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_2
 
-    When user request search for the reference-sequences with the parameters: <query>
+    When I request search for the reference-sequences with the parameters: <query>
     Then the response code should be 200
     And the result should contain 0 reference-sequences
 
@@ -177,5 +177,5 @@ Feature: reference sequence
       | type=TRANSCRIPTOME |
 
   Scenario: find reference sequence by invalid type should fail
-    When user request search for the reference-sequences with the parameters: type=UNKNOWN
+    When I request search for the reference-sequences with the parameters: type=UNKNOWN
     Then the response code should be 4xx

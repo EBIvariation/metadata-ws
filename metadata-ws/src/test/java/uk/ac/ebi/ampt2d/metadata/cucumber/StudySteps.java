@@ -39,29 +39,29 @@ public class StudySteps {
     @Autowired
     private MockMvc mockMvc;
 
-    @When("user create a test study with (.*) for taxonomy$")
+    @When("I create a test study with (.*) for taxonomy$")
     public void createTestStudy(String testTaxonomyKey) throws Exception {
         CommonStates.setResultActions(postTestStudy("EGAS0001", 1, "test_human_study", false, LocalDate.now(), testTaxonomyKey));
     }
 
-    @When("user create a test parameterized study with (.*) for accession, (.*) for version, (.*) for name, (.*) for deprecated, (.*) for releaseDay and (.*) for taxonomy$")
+    @When("I create a test parameterized study with (.*) for accession, (.*) for version, (.*) for name, (.*) for deprecated, (.*) for releaseDay and (.*) for taxonomy$")
     public void createTestStudyParameterizedMore(String accession, int version, String name, boolean deprecated, int releaseDay, String testTaxonomyKey) throws Exception {
         CommonStates.setResultActions(postTestStudy(accession, version, name, deprecated, LocalDate.now().plusDays(releaseDay), testTaxonomyKey));
     }
 
-    @When("^user request GET for the studies with query parameter (.*)")
+    @When("^I request GET for the studies with query parameter (.*)")
     public void performGetOnResourcesQuery(String param) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/studies" + "?" + param)));
     }
 
-    @When("^user request PATCH (.*) with patch and content (.*)")
+    @When("^I request PATCH (.*) with patch and content (.*)")
     public void performPatchOnResourceWithContent(String urlKey, String content) throws Exception {
             CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(content)));
     }
 
-    @When("^user request PATCH (.*) with patch and day (.*)")
+    @When("^I request PATCH (.*) with patch and day (.*)")
     public void performPatchedPatchOnResourceWithDay(String urlKey, int day) throws Exception {
         String content = "{ \"releaseDate\" : \"";
         content += LocalDate.now().plusDays(day);
@@ -72,27 +72,27 @@ public class StudySteps {
                 .content(content)));
     }
 
-    @When("^user request elaborate search for the studies base (.*) and with the parameters: (.*)$")
+    @When("^I request elaborate search for the studies base (.*) and with the parameters: (.*)$")
     public void performSearchOnResourcesWithBaseAndParameters(String base, String parameters) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base+"?"+parameters)));
     }
 
-    @When("^user request elaborate search with day for the studies base (.*) and with the parameters: (.*) and (\\d*)$")
+    @When("^I request elaborate search with day for the studies base (.*) and with the parameters: (.*) and (\\d*)$")
     public void performSearchOnResourcesWithBaseAndParametersAndDay(String base, String parameters, int day) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base+"?"+parameters+LocalDate.now().plusDays(day))));
     }
 
-    @When("^user request elaborate search with date range for the studies base (.*) and with the parameters: (\\d*)$")
+    @When("^I request elaborate search with date range for the studies base (.*) and with the parameters: (\\d*)$")
     public void performSearchOnResourcesWithBaseAndParametersAndDayRange(String base, int day) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base+"?"+"from="+LocalDate.now().plusDays(day)+"&to="+LocalDate.now().plusDays(day))));
     }
 
-    @When("^user request search for the studies with base (.*) and name (.*) value (.*)$")
+    @When("^I request search for the studies with base (.*) and name (.*) value (.*)$")
     public void performSearchOnResourcesWithParameters(String base, String name, String value) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base).param(name, value)));
     }
 
-    @When("^user request search for studies with (.*)")
+    @When("^I request search for studies with (.*)")
     public void performSearchOnResources(String param) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+param)));
     }
