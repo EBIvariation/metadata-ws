@@ -143,27 +143,27 @@ Feature: study object
     When I create a test analysis with EGAA0002 for accession, TEST_REFERENCE_SEQUENCE_2 for reference sequence, TEST_STUDY2 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     Then the response code should be 201
 
-    When I request elaborate find for the studies bases <bases> with the parameters: <param> and <sep>
+    When I request elaborate find for the studies with the parameters: <param>
     Then the response code should be 200
     And the result should contain <N> studies
     And the href of the study of studies has items <url>
 
     Examples:
-      | bases | param | N | url | sep |
-      | analyses.referenceSequences | name=GRCh37 | 1 | TEST_STUDY1 | . |
-      | analyses.referenceSequences | name=GRCh38 | 1 | TEST_STUDY2 | . |
-      | analyses.referenceSequences | name=NCBI36 | 0 | NONE | . |
-      | analyses.referenceSequences,analyses.referenceSequences | name=GRCh37&patch=p2 | 1 | TEST_STUDY1 | . |
-      | analyses.referenceSequences,analyses.referenceSequences | name=GRCh38&patch=p2 | 1 | TEST_STUDY2 | . |
-      | analyses.referenceSequences,analyses.referenceSequences | name=GRCh37&patch=p3 | 0 | NONE | . |
-      | analyses.referenceSequences,analyses.referenceSequences | name=NCBI36&patch=p2 | 0 | NONE | . |
-      | analyses | type=CASE_CONTROL | 2 | TEST_STUDY1,TEST_STUDY2 | . |
-      | analyses | type=TUMOR | 0 | NONE | . |
-      | analyses | type=COLLECTION | 0 | NONE | . |
-      | analyses.referenceSequences,analyses | name=GRCh38&type=CASE_CONTROL | 1 | TEST_STUDY2 | . |
-      | analyses.referenceSequences,analyses | name=GRCh38&type=TUMOR | 0 | NONE | . |
-      | analyses.referenceSequences,analyses | name=GRCh38&type=COLLECTION | 0 | NONE | . |
-      | analyses.referenceSequences,analyses | name=NCBI36&type=CASE_CONTROL | 0 | NONE | . |
+      | param | N | url |
+      | analyses.referenceSequences.name=GRCh37 | 1 | TEST_STUDY1 |
+      | analyses.referenceSequences.name=GRCh38 | 1 | TEST_STUDY2 |
+      | analyses.referenceSequences.name=NCBI36 | 0 | NONE |
+      | analyses.referenceSequences.name=GRCh37&analyses.referenceSequences.patch=p2 | 1 | TEST_STUDY1 |
+      | analyses.referenceSequences.name=GRCh38&analyses.referenceSequences.patch=p2 | 1 | TEST_STUDY2 |
+      | analyses.referenceSequences.name=GRCh37&analyses.referenceSequences.patch=p3 | 0 | NONE |
+      | analyses.referenceSequences.name=NCBI36&analyses.referenceSequences.patch=p2 | 0 | NONE |
+      | analyses.type=CASE_CONTROL | 2 | TEST_STUDY1,TEST_STUDY2 |
+      | analyses.type=TUMOR | 0 | NONE |
+      | analyses.type=COLLECTION | 0 | NONE |
+      | analyses.referenceSequences.name=GRCh38&analyses.type=CASE_CONTROL | 1 | TEST_STUDY2 |
+      | analyses.referenceSequences.name=GRCh38&analyses.type=TUMOR | 0 | NONE |
+      | analyses.referenceSequences.name=GRCh38&analyses.type=COLLECTION | 0 | NONE |
+      | analyses.referenceSequences.name=NCBI36&analyses.type=CASE_CONTROL | 0 | NONE |
 
 
   Scenario: search various studies by name value pair for accession

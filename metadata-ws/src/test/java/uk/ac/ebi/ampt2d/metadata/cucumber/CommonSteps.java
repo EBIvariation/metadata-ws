@@ -173,15 +173,9 @@ public class CommonSteps {
         CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search?"+parameters)));
     }
 
-    @When("^I request elaborate find for the (.*) bases (.*) with the parameters: (.*) and (.*)$")
-    public void performFindOnResourcesWithBaseAndParameters(String className, String bases, String parameters, String separator) throws Exception {
-        String[] params = parameters.split("&");
-        String[] base = bases.split(",");
-        String query = base[0] + separator + params[0];
-        for (int i = 1; i < params.length; i++) {
-            query += "&" + base[i] + separator + params[i];
-        }
-        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "?" + query)));
+    @When("^I request elaborate find for the (.*) with the parameters: (.*)$")
+    public void performFindOnResourcesWithParameters(String className, String parameters) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/"+className+"?"+parameters)));
     }
 
     @And("^set the URL to (.*)$")

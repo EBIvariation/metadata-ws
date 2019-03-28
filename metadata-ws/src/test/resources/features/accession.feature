@@ -44,25 +44,25 @@ Feature: accession object
     Then the response code should be 201
     And set the URL to TEST_SAMPLE
 
-    When I request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001.2 and =
+    When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.2
     Then the response code should be 200
     And the result should contain 0 studies
 
-    When I request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001 and =
+    When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001
     Then the response code should be 4xx
     And the result should have message with value Please provide an ID in the form accession.version
 
-    When I request elaborate find for the studies bases accessionVersionId with the parameters: EGAS0001.S1 and =
+    When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.S1
     Then the response code should be 4xx
     And the result should have message with value Please provide an ID in the form accession.version
 
-    When I request elaborate find for the <object> bases <bases> with the parameters: <param> and <sep>
+    When I request elaborate find for the <object> with the parameters: <param>
     Then the response code should be 200
     And the result should contain 1 <object>
-    And the <bases>.accession field of <object> 0 should be <value>
+    And the accessionVersionId.accession field of <object> 0 should be <value>
 
     Examples:
-      | object | bases | param | sep | value |
-      | studies | accessionVersionId | EGAS0001.1 | = | EGAS0001 |
-      | files | accessionVersionId | EGAF0001.1 | = | EGAF0001 |
-      | samples | accessionVersionId | EGAN0001.1 | = | EGAN0001 |
+      | object  | param                         | value    |
+      | studies | accessionVersionId=EGAS0001.1 | EGAS0001 |
+      | files   | accessionVersionId=EGAF0001.1 | EGAF0001 |
+      | samples | accessionVersionId=EGAN0001.1 | EGAN0001 |
