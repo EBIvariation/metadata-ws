@@ -77,9 +77,9 @@ public class StudySteps {
         CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base+"?"+parameters)));
     }
 
-    @When("^I request elaborate search with day for the studies base (.*) and with the parameters: (.*) and (\\d*)$")
-    public void performSearchOnResourcesWithBaseAndParametersAndDay(String base, String parameters, int day) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base+"?"+parameters+LocalDate.now().plusDays(day))));
+    @When("^I request search studies having release (.*) today")
+    public void performSearchOnResourcesWithBaseAndParametersAndDay(String parameter) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/release-date?"+parameter+"="+LocalDate.now())));
     }
 
     @When("^I request elaborate search with date range for the studies base (.*) and with the parameters: (\\d*)$")

@@ -68,15 +68,15 @@ Feature: study object
     When I create a test parameterized study with releasedTomorrow for accession, 1 for version, nothing important for name, false for deprecated, 1 for releaseDay and TEST_TAXONOMY for taxonomy
     Then set the URL to TEST_STUDY3
 
-    When I request elaborate search with day for the studies base <base> and with the parameters: <query> and <day>
+    When I request search studies having release <query> today
     Then the response code should be 200
     And the result should contain <N> studies
     And the href of the study of studies has items <url>
 
     Examples:
-      | base | day | query | N | url |
-      | release-date | 0 | to= | 2 | TEST_STUDY1,TEST_STUDY2 |
-      | release-date | 0 | from= | 1 | TEST_STUDY2 |
+      | query | N | url |
+      | to | 2 | TEST_STUDY1,TEST_STUDY2 |
+      | from | 1 | TEST_STUDY2 |
 
 
   Scenario Outline: find various studies by release date range
@@ -95,14 +95,14 @@ Feature: study object
     When I create a test parameterized study with releasedTomorrow for accession, 1 for version, nothing important for name, false for deprecated, 1 for releaseDay and TEST_TAXONOMY for taxonomy
     Then set the URL to TEST_STUDY3
 
-    When I request elaborate search with date range for the studies base <base> and with the parameters: <day>
+    When I request search studies having release <query> today
     Then the response code should be 200
     And the result should contain <N> studies
     And the href of the study of studies has items <url>
 
     Examples:
-      | base | day | query | N | url |
-      | release-date | 0 | from= | 1 | TEST_STUDY2 |
+      | query | N | url |
+      | from | 1 | TEST_STUDY2 |
 
 
   Scenario Outline: find various studies by analysis
