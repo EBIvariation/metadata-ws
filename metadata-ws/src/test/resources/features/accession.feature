@@ -1,6 +1,6 @@
 Feature: accession object
 
-  Scenario Outline: find different objects by accession and version
+  Scenario: validation of accession and version
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -9,7 +9,56 @@ Feature: accession object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with EGAS0001 for accession, 1 for version, test_study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    And I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "EGAS0001",
+      "version": 1
+    },
+    "name": "test_study",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
+
+    When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001
+    Then the response code should be 4xx
+    And the result should have message with value Please provide an ID in the form accession.version
+
+    When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.S1
+    Then the response code should be 4xx
+    And the result should have message with value Please provide an ID in the form accession.version
+
+    When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.1
+    Then the response code should be 200
+    And the result should contain 1 studies
+    And the accessionVersionId.accession field of studies 0 should be EGAS0001
+
+    When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.2
+    Then the response code should be 200
+    And the result should contain 0 studies
+
+
+  Scenario Outline: find objects by accession and version
+    When I request POST /taxonomies with JSON payload:
+    """
+    {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    Then set the URL to TEST_TAXONOMY
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "EGAS0001",
+      "version": 1
+    },
+    "name": "test_study",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     And I request POST /files with JSON payload:
     """
     {
@@ -43,18 +92,6 @@ Feature: accession object
     When I create a test parameterized sample with EGAN0001 for accession, 1 for version, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
     Then the response code should be 201
     And set the URL to TEST_SAMPLE
-
-    When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.2
-    Then the response code should be 200
-    And the result should contain 0 studies
-
-    When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001
-    Then the response code should be 4xx
-    And the result should have message with value Please provide an ID in the form accession.version
-
-    When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.S1
-    Then the response code should be 4xx
-    And the result should have message with value Please provide an ID in the form accession.version
 
     When I request elaborate find for the <object> with the parameters: <param>
     Then the response code should be 200

@@ -49,6 +49,43 @@ public class StudySteps {
         CommonStates.setResultActions(postTestStudy(accession, version, name, deprecated, LocalDate.now().plusDays(releaseDay), testTaxonomyKey));
     }
 
+    @When("^I request POST /studies with JSONLIKE payload:$")
+    public void postTestStudy(String jsonLikeData) throws Exception {
+        String[] values = jsonLikeData.split(",");
+        String json = "{";
+        for (String value:values) {
+            if (value.contains("releaseDate")) {
+                json += "\"releaseDate\": \"";
+                if (jsonLikeData.contains("today")) {
+                    json += LocalDate.now();
+                } else if (json.contains("yesterday")) {
+                    json += LocalDate.now().plusDays(-1);
+                } else if (json.contains("tomorrow")) {
+                    json += LocalDate.now().plusDays(+1);
+                }
+                json += "\"" + ",";
+                continue;
+            } else if (value.contains("taxonomy")) {
+                String taxonomyKey = value.substring(value.indexOf(":") + 1);
+                taxonomyKey = taxonomyKey.replace("\"", "");
+                taxonomyKey = taxonomyKey.trim();
+                String taxonomyUrl = CommonStates.getUrl(taxonomyKey);
+                json += "\"taxonomy\": \"" + taxonomyUrl + "\"";
+                json += ",";
+                continue;
+            }
+            json += value;
+            json += ",";
+        }
+        json += "\"description\": \"Nothing important\"," +
+                "\"center\": \"EBI\"" ;
+        json += "}";
+
+        CommonStates.setResultActions(mockMvc.perform(post("/studies")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json.getBytes())));
+    }
+
     @When("^I request GET for the studies with query parameter (.*)")
     public void performGetOnResourcesQuery(String param) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/studies" + "?" + param)));
