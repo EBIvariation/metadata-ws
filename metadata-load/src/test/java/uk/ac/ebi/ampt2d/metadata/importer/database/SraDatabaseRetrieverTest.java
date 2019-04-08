@@ -34,8 +34,7 @@ import java.nio.file.Paths;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
-@TestPropertySource(value = "classpath:application.properties", properties = {"import.source=DB",
-        "import.object=analysis"})
+@TestPropertySource(value = "classpath:application.properties", properties = {"import.source=DB"})
 @ContextConfiguration(classes = {SraDatabaseConfiguration.class})
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 public class SraDatabaseRetrieverTest {
@@ -46,12 +45,12 @@ public class SraDatabaseRetrieverTest {
     @Test
     @Category(OracleDbCategory.class)
     public void getXml() throws Exception {
-        String analysisAccession = "ERZ496533";
-        String analysisDocumentPath = "analysis/AnalysisDocumentDatabase.xml";
+        String studyAccession = "ERP000332";
+        String studyDocumentPath = "study/studyDocumentDB";
 
-        String xmlString = sraRetriever.getXml(analysisAccession);
+        String xmlString = sraRetriever.getXml(studyAccession);
         String expectedXmlString = new String(Files.readAllBytes(
-                Paths.get(getClass().getClassLoader().getResource(analysisDocumentPath).toURI())));
+                Paths.get(getClass().getClassLoader().getResource(studyDocumentPath).toURI())));
 
         assertEquals(expectedXmlString, xmlString);
     }

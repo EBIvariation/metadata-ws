@@ -25,16 +25,12 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 @RunWith(SpringRunner.class)
 public class PersistenceApplicationRunnerApiTest {
-    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 3;
+    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 2;
 
     private SpringApplication springApplication = new SpringApplication(MetadataImporterMainApplication.class);
 
@@ -42,72 +38,12 @@ public class PersistenceApplicationRunnerApiTest {
 
     @Before
     public void setUp() {
-        applicationArguments[0] = "--accessions.file.path=analysis/analysisAccessions.txt";
-        applicationArguments[1] = "--import.object=analysis";
-        applicationArguments[2] = "--import.source=API";
-    }
-
-    @Test
-    public void testRun() throws Exception {
-        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
-        AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
-                "analysisRepository");
-        Assert.assertEquals(2, analysisRepository.count());
-        FileRepository fileRepository = (FileRepository) getBean(configurableApplicationContext,
-                "fileRepository");
-        Assert.assertEquals(4, fileRepository.count());
-        ReferenceSequenceRepository referenceSequenceRepository =
-                (ReferenceSequenceRepository) getBean(configurableApplicationContext, "referenceSequenceRepository");
-        Assert.assertEquals(1, referenceSequenceRepository.count());
-        SampleRepository sampleRepository =
-                (SampleRepository) getBean(configurableApplicationContext, "sampleRepository");
-        Assert.assertEquals(2, sampleRepository.count());
-        StudyRepository studyRepository =
-                (StudyRepository) getBean(configurableApplicationContext, "studyRepository");
-        Assert.assertEquals(2, studyRepository.count());
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testInvalidFilePath() throws Exception {
-        applicationArguments[0] = "--accessions.file.path=InvalidFilePath/analysisAccessions.txt";
-        springApplication.run(applicationArguments);
-    }
-
-    @Test
-    public void testWithInvalidAndValidAnalysisAccession() throws Exception {
-        applicationArguments[0] = "--accessions.file.path=analysis/invalidAndValidAnalysisAccession.txt";
-
-        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
-        AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
-                "analysisRepository");
-        Assert.assertEquals(1, analysisRepository.count());
-        FileRepository fileRepository = (FileRepository) getBean(configurableApplicationContext,
-                "fileRepository");
-        Assert.assertEquals(2, fileRepository.count());
-        ReferenceSequenceRepository referenceSequenceRepository =
-                (ReferenceSequenceRepository) getBean(configurableApplicationContext, "referenceSequenceRepository");
-        Assert.assertEquals(1, referenceSequenceRepository.count());
-    }
-
-    @Test
-    public void testWithDuplicateAnalysisAccession() throws Exception {
-        applicationArguments[0] = "--accessions.file.path=analysis/duplicateAnalysisAccession.txt";
-        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
-        AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
-                "analysisRepository");
-        Assert.assertEquals(1, analysisRepository.count());
-        FileRepository fileRepository = (FileRepository) getBean(configurableApplicationContext,
-                "fileRepository");
-        Assert.assertEquals(2, fileRepository.count());
-        ReferenceSequenceRepository referenceSequenceRepository =
-                (ReferenceSequenceRepository) getBean(configurableApplicationContext, "referenceSequenceRepository");
-        Assert.assertEquals(0, referenceSequenceRepository.count());
+        applicationArguments[0] = "--accessions.file.path=study/studyAccessions.txt";
+        applicationArguments[1] = "--import.source=API";
     }
 
     @Test
     public void testRunStudy() throws Exception {
-        applicationArguments[0] = "--accessions.file.path=study/studyAccessions.txt";
-        applicationArguments[1] = "--import.object=study";
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
         StudyRepository studyRepository = (StudyRepository) getBean(configurableApplicationContext,
                 "studyRepository");

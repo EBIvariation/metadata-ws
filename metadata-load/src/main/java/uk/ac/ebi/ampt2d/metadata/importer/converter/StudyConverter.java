@@ -43,23 +43,25 @@ public class StudyConverter implements Converter<StudyType, Study> {
         String studyName = studyDescriptor.getSTUDYTITLE();
         String studyDescription = studyDescriptor.getSTUDYDESCRIPTION();
         studyDescription = (studyDescription == null) ? studyDescriptor.getSTUDYABSTRACT() : studyDescription;
-        AttributeType[] studyattributes = studyType.getSTUDYATTRIBUTES().getSTUDYATTRIBUTEArray();
+        StudyType.STUDYATTRIBUTES studyattributes = studyType.getSTUDYATTRIBUTES();
         LocalDate studyReleaseDate = getReleaseDate(studyattributes);
-        return new Study(new AccessionVersionId(studyType.getAccession(), 1), studyName,
+        return new Study(new AccessionVersionId(studyAccession, 1), studyName,
                 studyDescription, studyType.getCenterName(), studyReleaseDate, taxonomyExtractor.getTaxonomy());
     }
 
-    private LocalDate getReleaseDate(AttributeType[] studyattributes) {
+    private LocalDate getReleaseDate(StudyType.STUDYATTRIBUTES studyattributes) {
         LocalDate studyReleaseDate = LocalDate.of(9999, 12, 31);
-
-        for (int i = 0; i < studyattributes.length; i++) {
-            String attributeTag = studyattributes[i].getTAG();
+        if (studyattributes == null) {
+            return studyReleaseDate;
+        }
+        AttributeType[] studyattributesArray = studyattributes.getSTUDYATTRIBUTEArray();
+        for (int i = 0; i < studyattributesArray.length; i++) {
+            String attributeTag = studyattributesArray[i].getTAG();
             if (attributeTag.equals("ENA-FIRST-PUBLIC")) {
-                studyReleaseDate = LocalDate.parse(studyattributes[i].getVALUE());
+                studyReleaseDate = LocalDate.parse(studyattributesArray[i].getVALUE());
                 break;
             }
         }
-
         return studyReleaseDate;
     }
 }

@@ -34,7 +34,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
 @Configuration
-@ConditionalOnProperty(name = "import.object", havingValue = "study")
 public class StudyPersistenceApplicationRunnerConfiguration {
 
     @Bean

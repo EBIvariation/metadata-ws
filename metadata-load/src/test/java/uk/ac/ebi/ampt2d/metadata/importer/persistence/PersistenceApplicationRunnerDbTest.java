@@ -28,10 +28,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.database.OracleDbCategory;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 @RunWith(SpringRunner.class)
@@ -45,29 +41,6 @@ public class PersistenceApplicationRunnerDbTest {
     @Before
     public void setUp() {
         applicationArguments[0] = "--import.source=DB";
-    }
-
-    @Test
-    @Category(OracleDbCategory.class)
-    public void testRunForDBEgaAnalysis() throws Exception {
-        applicationArguments[1] = "--accessions.file.path=analysis/egaAnalysisAccessions.txt";
-        applicationArguments[2] = "--import.object=analysis";
-        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
-        AnalysisRepository analysisRepository = (AnalysisRepository) getBean(configurableApplicationContext,
-                "analysisRepository");
-        Assert.assertEquals(2, analysisRepository.count());
-        FileRepository fileRepository = (FileRepository) getBean(configurableApplicationContext,
-                "fileRepository");
-        Assert.assertEquals(2, fileRepository.count());
-        ReferenceSequenceRepository referenceSequenceRepository =
-                (ReferenceSequenceRepository) getBean(configurableApplicationContext, "referenceSequenceRepository");
-        Assert.assertEquals(1, referenceSequenceRepository.count());
-        SampleRepository sampleRepository =
-                (SampleRepository) getBean(configurableApplicationContext, "sampleRepository");
-        Assert.assertEquals(2, sampleRepository.count());
-        StudyRepository studyRepository =
-                (StudyRepository) getBean(configurableApplicationContext, "studyRepository");
-        Assert.assertEquals(1, studyRepository.count()); // Both Analysis share same study
     }
 
     @Test
