@@ -44,7 +44,7 @@ public class SraStudyXmlParserTest {
 
     @Test
     public void parseXmlApi() throws XmlException, URISyntaxException, IOException {
-        StudyType study = getStudyType(STUDY_ACCESSION_API, "study/studyDocumentApi");
+        StudyType study = getStudyType(STUDY_ACCESSION_API, "study/studyDocumentAPI");
         assertEquals("S. mansoni pop genomics", study.getAlias());
         assertEquals(STUDY_ACCESSION_API, study.getAccession());
     }
