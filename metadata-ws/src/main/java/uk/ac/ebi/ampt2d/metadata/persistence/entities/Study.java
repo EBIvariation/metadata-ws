@@ -149,6 +149,38 @@ public class Study extends Auditable<Long> {
         return childStudies;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getCenter() {
+        return center;
+    }
+
+    public Taxonomy getTaxonomy() {
+        return taxonomy;
+    }
+
+    public boolean isBrowsable() {
+        return browsable;
+    }
+
+    public List<Analysis> getAnalyses() {
+        return analyses;
+    }
+
+    public List<WebResource> getResources() {
+        return resources;
+    }
+
+    public List<Publication> getPublications() {
+        return publications;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
