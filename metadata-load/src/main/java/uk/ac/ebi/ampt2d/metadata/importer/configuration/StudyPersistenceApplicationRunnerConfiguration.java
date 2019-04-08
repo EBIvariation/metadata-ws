@@ -18,7 +18,7 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.configuration;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -35,9 +35,6 @@ import uk.ac.ebi.ena.sra.xml.StudyType;
 
 @Configuration
 public class StudyPersistenceApplicationRunnerConfiguration {
-
-    @Value("${ena.study.query}")
-    private String enaObjectQuery;
 
     @Bean
     public PersistenceApplicationRunner<StudyType, Study> pipelineApplicationRunner(
@@ -60,10 +57,5 @@ public class StudyPersistenceApplicationRunnerConfiguration {
     @Bean
     public TaxonomyExtractor getTaxonomyExtractor(TaxonomyRepository taxonomyRepository) {
         return new TaxonomyExtractor(taxonomyRepository);
-    }
-
-    @Bean
-    public String enaObjectQuery() {
-        return new String(enaObjectQuery);
     }
 }

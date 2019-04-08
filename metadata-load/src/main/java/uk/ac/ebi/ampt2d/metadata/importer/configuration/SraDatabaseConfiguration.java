@@ -17,6 +17,7 @@
  */
 package uk.ac.ebi.ampt2d.metadata.importer.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -32,6 +33,9 @@ import javax.sql.DataSource;
 @Configuration
 @ConditionalOnProperty(name = "import.source", havingValue = "DB")
 public class SraDatabaseConfiguration {
+
+    @Value("${ena.study.query}")
+    private String enaObjectQuery;
 
     @Bean("enaDatasourceProperties")
     @ConfigurationProperties("ena.datasource")
@@ -57,7 +61,7 @@ public class SraDatabaseConfiguration {
     }
 
     @Bean
-    public SraDatabaseRetriever sraDatabaseAnalysisRetriever(String enaObjectQuery) {
+    public SraDatabaseRetriever sraDatabaseAnalysisRetriever() {
         return new SraDatabaseRetriever(enaJdbcTemplate(), enaObjectQuery);
     }
 }
