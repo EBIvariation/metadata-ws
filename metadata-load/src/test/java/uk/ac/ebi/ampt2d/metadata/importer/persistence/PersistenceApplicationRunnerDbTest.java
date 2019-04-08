@@ -32,7 +32,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 @RunWith(SpringRunner.class)
 public class PersistenceApplicationRunnerDbTest {
-    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 3;
+    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 2;
 
     private SpringApplication springApplication = new SpringApplication(MetadataImporterMainApplication.class);
 
@@ -41,13 +41,12 @@ public class PersistenceApplicationRunnerDbTest {
     @Before
     public void setUp() {
         applicationArguments[0] = "--import.source=DB";
+        applicationArguments[1] = "--accessions.file.path=study/egaStudyAccessions.txt";
     }
 
     @Test
     @Category(OracleDbCategory.class)
     public void testRunForDBEgaStudies() throws Exception {
-        applicationArguments[1] = "--accessions.file.path=study/egaStudyAccessions.txt";
-        applicationArguments[2] = "--import.object=study";
         ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
         StudyRepository studyRepository =
                 (StudyRepository) getBean(configurableApplicationContext, "studyRepository");

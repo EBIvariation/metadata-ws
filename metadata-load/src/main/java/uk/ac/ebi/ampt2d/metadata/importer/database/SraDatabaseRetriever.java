@@ -17,8 +17,6 @@
  */
 package uk.ac.ebi.ampt2d.metadata.importer.database;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
@@ -30,12 +28,11 @@ public class SraDatabaseRetriever implements SraRetrieverByAccession {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    @Value("${ena.${import.object}.query}")
     private String enaObjectQuery;
 
-    @Autowired
-    public SraDatabaseRetriever(NamedParameterJdbcTemplate jdbcTemplate) {
+    public SraDatabaseRetriever(NamedParameterJdbcTemplate jdbcTemplate, String enaObjectQuery) {
         this.jdbcTemplate = jdbcTemplate;
+        this.enaObjectQuery = enaObjectQuery;
     }
 
     @Override
