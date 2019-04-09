@@ -37,10 +37,10 @@ import static org.junit.Assert.assertEquals;
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=DB"})
 @ContextConfiguration(classes = {SraDatabaseConfiguration.class})
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
-public class SraDatabaseRetrieverTest {
+public class SraObjectRetrieverThroughDatabaseTest {
 
     @Autowired
-    private SraDatabaseRetriever sraRetriever;
+    private SraObjectRetrieverThroughDatabase sraRetriever;
 
     @Test
     @Category(OracleDbCategory.class)

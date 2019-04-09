@@ -24,13 +24,13 @@ import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
 import java.sql.SQLException;
 import java.sql.SQLXML;
 
-public class SraDatabaseRetriever implements SraRetrieverByAccession {
+public class SraObjectRetrieverThroughDatabase implements SraRetrieverByAccession {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
     private String enaObjectQuery;
 
-    public SraDatabaseRetriever(NamedParameterJdbcTemplate jdbcTemplate, String enaObjectQuery) {
+    public SraObjectRetrieverThroughDatabase(NamedParameterJdbcTemplate jdbcTemplate, String enaObjectQuery) {
         this.jdbcTemplate = jdbcTemplate;
         this.enaObjectQuery = enaObjectQuery;
     }
