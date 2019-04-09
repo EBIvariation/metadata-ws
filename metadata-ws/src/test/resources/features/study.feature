@@ -28,11 +28,41 @@ Feature: study object
     When I request POST taxonomies 9598 for id, Pan troglodytes for name and TEST_TAXONOMY_1,TEST_TAXONOMY_3 for ancestors
     Then set the URL to TEST_TAXONOMY_5
 
-    When I create a test parameterized study with testhuman for accession, 1 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY_2 for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "testhuman",
+      "version": 1
+    },
+    "name": "test human study",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY_2"
+    """
     Then set the URL to TEST_STUDY1
-    When I create a test parameterized study with testbonobo for accession, 1 for version, test bonobo study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY_4 for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "testbonobo",
+      "version": 1
+    },
+    "name": "test bonobo study",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY_4"
+    """
     Then set the URL to TEST_STUDY2
-    When I create a test parameterized study with testchimpanzee for accession, 1 for version, test chimpanzee study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY_5 for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "testchimpanzee",
+      "version": 1
+    },
+    "name": "test chimpanzee study",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY_5"
+    """
     Then set the URL to TEST_STUDY3
 
     When I request elaborate search for the studies base <base> and with the parameters: <query>
@@ -61,11 +91,41 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with releasedYesterday for accession, 1 for version, nothing important for name, false for deprecated, -1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "releasedYesterday",
+      "version": 1
+    },
+    "name": "nothing important",
+    "deprecated": false,
+    "releaseDate": yesterday,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY1
-    When I create a test parameterized study with releasedToday for accession, 1 for version, nothing important for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "releasedToday",
+      "version": 1
+    },
+    "name": "nothing important",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY2
-    When I create a test parameterized study with releasedTomorrow for accession, 1 for version, nothing important for name, false for deprecated, 1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "releasedTomorrow",
+      "version": 1
+    },
+    "name": "nothing important",
+    "deprecated": false,
+    "releaseDate": tomorrow,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY3
 
     When I request search studies having release <query> today
@@ -88,11 +148,41 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with releasedYesterday for accession, 1 for version, nothing important for name, false for deprecated, -1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "releasedYesterday",
+      "version": 1
+    },
+    "name": "nothing important",
+    "deprecated": false,
+    "releaseDate": yesterday,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY1
-    When I create a test parameterized study with releasedToday for accession, 1 for version, nothing important for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "releasedToday",
+      "version": 1
+    },
+    "name": "nothing important",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY2
-    When I create a test parameterized study with releasedTomorrow for accession, 1 for version, nothing important for name, false for deprecated, 1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "releasedTomorrow",
+      "version": 1
+    },
+    "name": "nothing important",
+    "deprecated": false,
+    "releaseDate": tomorrow,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY3
 
     When I request search studies having release <query> today
@@ -134,9 +224,29 @@ Feature: study object
     }
     """
     Then set the URL to TEST_REFERENCE_SEQUENCE_2
-    When I create a test parameterized study with EGAS0001 for accession, 1 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "EGAS0001",
+      "version": 1
+    },
+    "name": "test human study",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY1
-    When I create a test parameterized study with EGAS0001 for accession, 2 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "EGAS0001",
+      "version": 2
+    },
+    "name": "test human study",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY2
     When I create a test analysis with EGAA0001 for accession, TEST_REFERENCE_SEQUENCE_1 for reference sequence, TEST_STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     Then the response code should be 201
@@ -175,11 +285,41 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with EGAS0001 for accession, 1 for version, test human study based on GRCh37 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "EGAS0001",
+      "version": 1
+    },
+    "name": "test human study based on GRCh37",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY1
-    When I create a test parameterized study with EGAS0001 for accession, 2 for version, test human study based on GRCh37 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "EGAS0001",
+      "version": 2
+    },
+    "name": "test human study based on GRCh37",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY2
-    When I create a test parameterized study with EGAS0002 for accession, 3 for version, test human study based on GRCh38 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "EGAS0002",
+      "version": 3
+    },
+    "name": "test human study based on GRCh38",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY3
 
     When I request search for the studies with base accession and name accession value EGAS0001
@@ -207,11 +347,41 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with EGAS0001 for accession, 1 for version, test human study based on GRCh37 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "EGAS0001",
+      "version": 1
+    },
+    "name": "test human study based on GRCh37",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY1
-    When I create a test parameterized study with EGAS0001 for accession, 2 for version, test human study based on GRCh37 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "EGAS0001",
+      "version": 2
+    },
+    "name": "test human study based on GRCh37",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY2
-    When I create a test parameterized study with EGAS0002 for accession, 1 for version, test human study based on GRCh38 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "EGAS0002",
+      "version": 1
+    },
+    "name": "test human study based on GRCh38",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY3
 
     When I request search for the studies with base accession and name accession value EGAS0001
@@ -245,9 +415,29 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with EGAS0001 for accession, 1 for version, test human B for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "EGAS0001",
+      "version": 1
+    },
+    "name": "test human B",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY2
-    When I create a test parameterized study with EGAS0002 for accession, 1 for version, test human A for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "EGAS0002",
+      "version": 1
+    },
+    "name": "test human A",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY1
 
     When I request GET /studies
@@ -292,11 +482,41 @@ Feature: study object
     """
     Then the response code should be 201
     And set the URL to TEST_REFERENCE_SEQUENCE_1
-    When I create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name, false for deprecated, -1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "1kg",
+      "version": 1
+    },
+    "name": "1kg pilot",
+    "deprecated": false,
+    "releaseDate": yesterday,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY1
-    When I create a test parameterized study with 1kg for accession, 2 for version, 1kg phase 1 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "1kg",
+      "version": 2
+    },
+    "name": "1kg phase 1",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY2
-    When I create a test parameterized study with 1kg for accession, 3 for version, 1kg phase 3 for name, false for deprecated, 1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "1kg",
+      "version": 3
+    },
+    "name": "1kg phase 3",
+    "deprecated": tomorrow,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY3
     When I create a test analysis with analysisReleasedYesterday for accession, TEST_REFERENCE_SEQUENCE_1 for reference sequence, TEST_STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     Then set the URL to TEST_ANALYSIS
@@ -353,9 +573,29 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name, true for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "1kg",
+      "version": 1
+    },
+    "name": "1kg pilot",
+    "deprecated": true,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY1
-    When I create a test parameterized study with 1kg for accession, 2 for version, 1kg phase 1 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "1kg",
+      "version": 2
+    },
+    "name": "1kg phase 1",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY2
 
     When I request GET /studies
@@ -401,7 +641,17 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with 1kg for accession, 3 for version, 1kg phase 3 for name, false for deprecated, 1 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "1kg",
+      "version": 3
+    },
+    "name": "1kg phase 3",
+    "deprecated": false,
+    "releaseDate": tomorrow,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY1
 
     When I request GET with value of TEST_STUDY1
@@ -431,7 +681,17 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name, true for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "1kg",
+      "version": 1
+    },
+    "name": "1kg pilot",
+    "deprecated": true,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY1
 
     When I request GET with value of TEST_STUDY1
@@ -450,7 +710,17 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "1kg",
+      "version": 1
+    },
+    "name": "1kg pilot",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY1
 
     When I request GET with value of TEST_STUDY1
@@ -476,13 +746,53 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with testhuman for accession, 1 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "testhuman",
+      "version": 1
+    },
+    "name": "test human study",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY1
-    When I create a test parameterized study with testhuman for accession, 2 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "testhuman",
+      "version": 2
+    },
+    "name": "test human study",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY2
-    When I create a test parameterized study with testhuman for accession, 3 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "testhuman",
+      "version": 3
+    },
+    "name": "test human study",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY3
-    When I create a test parameterized study with testhuman for accession, 4 for version, test human study for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "testhuman",
+      "version": 4
+    },
+    "name": "test human study",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY4
 
     When I request PATCH TEST_STUDY1 with list TEST_STUDY2,TEST_STUDY3 for childStudies
@@ -520,7 +830,17 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "1kg",
+      "version": 1
+    },
+    "name": "1kg pilot",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY
 
     When I request GET with value of TEST_STUDY
@@ -551,7 +871,17 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with 1kg for accession, 1 for version, 1kg pilot for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "1kg",
+      "version": 1
+    },
+    "name": "1kg pilot",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY
 
     When I request GET with value of TEST_STUDY
@@ -580,7 +910,17 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with 1kg for accession, 3 for version, 1kg phase 3 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "1kg",
+      "version": 3
+    },
+    "name": "1kg phase 3",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY
 
     When I request GET with value of TEST_STUDY
@@ -620,7 +960,17 @@ Feature: study object
     }
     """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with 1kg for accession, 3 for version, 1kg phase 3 for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "1kg",
+      "version": 3
+    },
+    "name": "1kg phase 3",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY
 
     When I request PATCH TEST_STUDY with content {"releaseDate": 2001}

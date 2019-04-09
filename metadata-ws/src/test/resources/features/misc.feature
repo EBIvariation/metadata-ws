@@ -27,7 +27,17 @@ Feature: Miscellaneous functions
       }
       """
     Then set the URL to TEST_TAXONOMY
-    When I create a test parameterized study with testhuman for accession, 1 for version, test human stud for name, false for deprecated, 0 for releaseDay and TEST_TAXONOMY for taxonomy
+    When I request POST /studies with JSONLIKE payload:
+    """
+    "accessionVersionId": {
+      "accession": "testhuman",
+      "version": 1
+    },
+    "name": "test human study",
+    "deprecated": false,
+    "releaseDate": today,
+    "taxonomy": "TEST_TAXONOMY"
+    """
     Then set the URL to TEST_STUDY
     When I create a test analysis with testhuman for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     Then set the URL to TEST_ANALYSIS

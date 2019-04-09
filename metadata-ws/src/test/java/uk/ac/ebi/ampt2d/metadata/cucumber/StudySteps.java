@@ -44,11 +44,6 @@ public class StudySteps {
         CommonStates.setResultActions(postTestStudy("EGAS0001", 1, "test_human_study", false, LocalDate.now(), testTaxonomyKey));
     }
 
-    @When("I create a test parameterized study with (.*) for accession, (.*) for version, (.*) for name, (.*) for deprecated, (.*) for releaseDay and (.*) for taxonomy$")
-    public void createTestStudyParameterizedMore(String accession, int version, String name, boolean deprecated, int releaseDay, String testTaxonomyKey) throws Exception {
-        CommonStates.setResultActions(postTestStudy(accession, version, name, deprecated, LocalDate.now().plusDays(releaseDay), testTaxonomyKey));
-    }
-
     @When("^I request POST /studies with JSONLIKE payload:$")
     public void postTestStudy(String jsonLikeData) throws Exception {
         String[] values = jsonLikeData.split(",");
@@ -58,9 +53,9 @@ public class StudySteps {
                 json += "\"releaseDate\": \"";
                 if (jsonLikeData.contains("today")) {
                     json += LocalDate.now();
-                } else if (json.contains("yesterday")) {
+                } else if (jsonLikeData.contains("yesterday")) {
                     json += LocalDate.now().plusDays(-1);
-                } else if (json.contains("tomorrow")) {
+                } else if (jsonLikeData.contains("tomorrow")) {
                     json += LocalDate.now().plusDays(+1);
                 }
                 json += "\"" + ",";
