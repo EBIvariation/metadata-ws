@@ -39,7 +39,7 @@ Feature: accession object
     And the result should contain 0 studies
 
 
-  Scenario Outline: find objects by accession and version
+  Scenario: find study by accession and version
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -59,6 +59,14 @@ Feature: accession object
     "releaseDate": today,
     "taxonomy": "TEST_TAXONOMY"
     """
+
+    When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.1
+    Then the response code should be 200
+    And the result should contain 1 studies
+    And the accessionVersionId.accession field of studies 0 should be EGAS0001
+
+
+  Scenario: find file by accession and version
     And I request POST /files with JSON payload:
     """
     {
@@ -73,6 +81,14 @@ Feature: accession object
     }
     """
     Then set the URL to TEST_FILE
+
+    When I request elaborate find for the files with the parameters: accessionVersionId=EGAF0001.1
+    Then the response code should be 200
+    And the result should contain 1 files
+    And the accessionVersionId.accession field of files 0 should be EGAF0001
+
+
+  Scenario: find sample by accession and version
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -93,13 +109,39 @@ Feature: accession object
     Then the response code should be 201
     And set the URL to TEST_SAMPLE
 
-    When I request elaborate find for the <object> with the parameters: <param>
+    When I request elaborate find for the samples with the parameters: accessionVersionId=EGAN0001.1
     Then the response code should be 200
-    And the result should contain 1 <object>
-    And the accessionVersionId.accession field of <object> 0 should be <value>
+    And the result should contain 1 samples
+    And the accessionVersionId.accession field of samples 0 should be EGAN0001
 
-    Examples:
-      | object  | param                         | value    |
-      | studies | accessionVersionId=EGAS0001.1 | EGAS0001 |
-      | files   | accessionVersionId=EGAF0001.1 | EGAF0001 |
-      | samples | accessionVersionId=EGAN0001.1 | EGAN0001 |
+
+  Scenario: find analysis by accession and version
+    When I request POST /reference-sequences with JSON payload:
+    """
+    {
+      "name": "GRCh37",
+      "patch": "p2",
+      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "type": "ASSEMBLY"
+    }
+    """
+    Then set the URL to TEST_REFERENCE_SEQUENCE
+    When I request POST /taxonomies with JSON payload:
+    """
+    {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    Then set the URL to TEST_TAXONOMY
+    When I create a test study with TEST_TAXONOMY for taxonomy
+    Then set the URL to TEST_STUDY
+    When I create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE for reference sequence
+    Then the response code should be 201
+    And set the URL to TEST_ANALYSIS
+
+    When I request elaborate find for the analyses with the parameters: accessionVersionId=EGAA0001.1
+    Then the response code should be 200
+    And the result should contain 1 analyses
+    And the accessionVersionId.accession field of analyses 0 should be EGAA0001
+

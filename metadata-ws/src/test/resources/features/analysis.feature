@@ -58,7 +58,7 @@ Feature: analysis object
     And the result should have accessionVersionId.accession with value EGAA0001
     When I request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
-    And the result should contain 1 reference-sequences
+    And the result should contain one reference-sequence
     And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_1
 
     When I request POST /reference-sequences with JSON payload:
@@ -78,7 +78,7 @@ Feature: analysis object
     And the result should have accessionVersionId.accession with value EGAA0001
     When I request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
-    And the result should contain 1 reference-sequences
+    And the result should contain one reference-sequence
     And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_2
 
   Scenario Outline: update an analysis with invalid reference sequences list should fail
@@ -111,7 +111,7 @@ Feature: analysis object
     And the result should have accessionVersionId.accession with value EGAA0001
     When I request GET for referenceSequences of TEST_ANALYSIS
     Then the response code should be 200
-    And the result should contain 1 reference-sequences
+    And the result should contain one reference-sequence
     And the href of the referenceSequence of reference-sequences has items TEST_REFERENCE_SEQUENCE_1
 
     When I request PATCH TEST_ANALYSIS with list <list> for referenceSequences

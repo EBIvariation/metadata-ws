@@ -25,7 +25,7 @@ Feature: reference sequence
     }
     """
     When I request GET /reference-sequences
-    Then the result should contain 1 reference-sequences
+    Then the result should contain one reference-sequence
 
 
   Scenario Outline: find one reference sequence by name
@@ -53,7 +53,7 @@ Feature: reference sequence
     And set the URL to TEST_REFERENCE_SEQUENCE_2
     When I request search for the reference-sequences with the parameters: <query>
     Then the response code should be 200
-    And the result should contain 1 reference-sequences
+    And the result should contain one reference-sequence
     And the href of the referenceSequence of reference-sequences has items <url>
     And the <field1> field of reference-sequences 0 should be <value1>
     And the <field2> field of reference-sequences 0 should be <value2>
@@ -92,7 +92,7 @@ Feature: reference sequence
     And set the URL to TEST_REFERENCE_SEQUENCE_2
     When I request search for the reference-sequences with the parameters: <query>
     Then the response code should be 200
-    And the result should contain 1 reference-sequences
+    And the result should contain one reference-sequence
     And the href of the referenceSequence of reference-sequences has items <url>
     And the accessions field of reference-sequences 0 should have item <contained_accession>
 
@@ -128,7 +128,7 @@ Feature: reference sequence
     And set the URL to TEST_REFERENCE_SEQUENCE_2
     When I request search for the reference-sequences with the parameters: <query>
     Then the response code should be 200
-    And the result should contain 1 reference-sequences
+    And the result should contain one reference-sequence
     And the href of the referenceSequence of reference-sequences has items <url>
     And the type field of reference-sequences 0 should be <type>
 
