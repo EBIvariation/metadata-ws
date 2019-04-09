@@ -34,10 +34,10 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
 @Configuration
-public class StudyPersistenceApplicationRunnerConfiguration {
+public class PersistenceApplicationRunnerConfiguration {
 
     @Bean
-    public PersistenceApplicationRunner<StudyType, Study> pipelineApplicationRunner(
+    public PersistenceApplicationRunner pipelineApplicationRunner(
             SraRetrieverByAccession sraRetrieverByAccession, SraXmlParser<StudyType> sraXmlParser,
             StudyRepository studyRepository, TaxonomyRepository taxonomyRepository) {
         return new PersistenceApplicationRunner(sraRetrieverByAccession, sraXmlParser, studyRepository,
@@ -50,7 +50,7 @@ public class StudyPersistenceApplicationRunnerConfiguration {
     }
 
     @Bean
-    public SraXmlParser<StudyType> sraXmlParser() {
+    public SraXmlParser<StudyType> sraStudyXmlParser() {
         return new SraStudyXmlParser();
     }
 

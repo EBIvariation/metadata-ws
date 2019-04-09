@@ -24,9 +24,11 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -36,7 +38,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class PersistenceApplicationRunner<SRA_OBJECT, METADATA_OBJECT> implements ApplicationRunner {
+public class PersistenceApplicationRunner implements ApplicationRunner {
 
     private static final String ACCESSION_FILE_PATH = "accessions.file.path";
 
@@ -45,18 +47,18 @@ public class PersistenceApplicationRunner<SRA_OBJECT, METADATA_OBJECT> implement
 
     private SraRetrieverByAccession sraRetrieverByAccession;
 
-    private SraXmlParser sraXmlParser;
+    private SraXmlParser<StudyType> sraStudyXmlParser;
 
-    private Converter<SRA_OBJECT, METADATA_OBJECT> sraToMetadataObjectConverter;
+    private Converter<StudyType, Study> sraToMetadataObjectConverter;
 
-    private PagingAndSortingRepository<METADATA_OBJECT, ? extends Serializable> metadataRepository;
+    private PagingAndSortingRepository<Study, AccessionVersionId> metadataStudyRepository;
 
-    public PersistenceApplicationRunner(SraRetrieverByAccession sraRetrieverByAccession, SraXmlParser sraXmlParser,
-                                        PagingAndSortingRepository metadataRepository,
-                                        Converter<SRA_OBJECT, METADATA_OBJECT> sraToMetadataObjectConverter) {
+    public PersistenceApplicationRunner(SraRetrieverByAccession sraRetrieverByAccession, SraXmlParser sraStudyXmlParser,
+                                        PagingAndSortingRepository metadataStudyRepository,
+                                        Converter<StudyType, Study> sraToMetadataObjectConverter) {
         this.sraRetrieverByAccession = sraRetrieverByAccession;
-        this.sraXmlParser = sraXmlParser;
-        this.metadataRepository = metadataRepository;
+        this.sraStudyXmlParser = sraStudyXmlParser;
+        this.metadataStudyRepository = metadataStudyRepository;
         this.sraToMetadataObjectConverter = sraToMetadataObjectConverter;
     }
 
@@ -67,9 +69,9 @@ public class PersistenceApplicationRunner<SRA_OBJECT, METADATA_OBJECT> implement
         for (String accession : accessions) {
             try {
                 String xml = sraRetrieverByAccession.getXml(accession);
-                SRA_OBJECT sraObject = (SRA_OBJECT) sraXmlParser.parseXml(xml, accession);
-                METADATA_OBJECT metadataObject = sraToMetadataObjectConverter.convert(sraObject);
-                metadataRepository.save(metadataObject);
+                StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
+                Study study = sraToMetadataObjectConverter.convert(studyType);
+                metadataStudyRepository.save(study);
             } catch (Exception exception) {
                 PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Encountered Exception for accession"
                         + accession);

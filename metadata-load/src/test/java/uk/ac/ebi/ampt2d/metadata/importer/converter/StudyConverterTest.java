@@ -29,7 +29,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataDatabaseConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.SraApiConfiguration;
-import uk.ac.ebi.ampt2d.metadata.importer.configuration.StudyPersistenceApplicationRunnerConfiguration;
+import uk.ac.ebi.ampt2d.metadata.importer.configuration.PersistenceApplicationRunnerConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
@@ -40,7 +40,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {StudyPersistenceApplicationRunnerConfiguration.class,
+@ContextConfiguration(classes = {PersistenceApplicationRunnerConfiguration.class,
         MetadataDatabaseConfiguration.class,
         SraApiConfiguration.class})
 @EnableAutoConfiguration
