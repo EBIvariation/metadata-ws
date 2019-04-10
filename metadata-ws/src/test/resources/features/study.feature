@@ -139,7 +139,7 @@ Feature: study object
       | from | 1 | TEST_STUDY2 |
 
 
-  Scenario Outline: find various studies by release date range
+  Scenario: find various studies by release date range
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -185,14 +185,10 @@ Feature: study object
     """
     Then set the URL to TEST_STUDY3
 
-    When I request search studies having release <query> today
+    When I request search studies having release from today
     Then the response code should be 200
-    And the result should contain <N> studies
-    And the href of the study of studies has items <url>
-
-    Examples:
-      | query | N | url |
-      | from | 1 | TEST_STUDY2 |
+    And the result should contain one study
+    And the href of the study of studies has items TEST_STUDY2
 
 
   Scenario Outline: find various studies by analysis
@@ -395,15 +391,15 @@ Feature: study object
     And the result should contain 2 studies
     And the accessionVersionId.accession field of studies 0 should be EGAS0001
 
-    When I request search for the <class> with base <base> and name <name> value <value>
+    When I request search for the studies with base text and name searchTerm value <value>
     Then the response code should be 200
-    And the result should contain <items> <class>
+    And the result should contain <items> studies
 
     Examples:
-      | class | base  | name | value | items |
-      | studies | text | searchTerm | human | 3 |
-      | studies | text | searchTerm | important | 3 |
-      | studies | text | searchTerm | grCh39 | 0 |
+      | value | items |
+      | human | 3 |
+      | important | 3 |
+      | grCh39 | 0 |
 
 
   Scenario Outline: search various studies by paging and sorting
@@ -449,7 +445,7 @@ Feature: study object
 
     When I request GET for the studies with query parameter <param>
     Then the response code should be 200
-    And the result should contain 1 studies
+    And the result should contain one study
     And the href of the study of studies has items <url>
 
     When I request GET for the studies with query parameter page=1
@@ -549,19 +545,19 @@ Feature: study object
 
     When I request elaborate search with date range for the studies base release-date and with the parameters: 0
     Then the response code should be 200
-    And the result should contain 1 studies
+    And the result should contain one study
     And the href of the study of studies has items TEST_STUDY2
 
     When I request elaborate search for the studies base <base> and with the parameters: <query>
     Then the response code should be 200
-    And the result should contain <N> studies
+    And the result should contain 2 studies
     And the href of the study of studies has items <url>
 
   Examples:
-    | base | query | N | url |
-    | taxonomy-id | id=9606 | 2 | TEST_STUDY1,TEST_STUDY2 |
-    | taxonomy-name | name=Homo sapiens | 2 | TEST_STUDY1,TEST_STUDY2 |
-    | text | searchTerm=1kg | 2 | TEST_STUDY1,TEST_STUDY2 |
+    | base | query | url |
+    | taxonomy-id | id=9606 | TEST_STUDY1,TEST_STUDY2 |
+    | taxonomy-name | name=Homo sapiens | TEST_STUDY1,TEST_STUDY2 |
+    | text | searchTerm=1kg | TEST_STUDY1,TEST_STUDY2 |
 
 
   Scenario Outline: search various undeprecated studies
@@ -599,7 +595,7 @@ Feature: study object
     Then set the URL to TEST_STUDY2
 
     When I request GET /studies
-    Then the result should contain 1 studies
+    Then the result should contain one study
     And the href of the study of studies has items TEST_STUDY2
 
     When I request GET with value of TEST_STUDY2
@@ -611,7 +607,7 @@ Feature: study object
 
     When I request search for the studies with the parameters: taxonomy.taxonomyId=9606
     Then the response code should be 200
-    And the result should contain 1 studies
+    And the result should contain one study
     And the href of the study of studies has items TEST_STUDY2
 
     When I request elaborate search for the studies base accession and with the parameters: accession=1kg
@@ -622,14 +618,14 @@ Feature: study object
 
     When I request elaborate search for the studies base <base> and with the parameters: <query>
     Then the response code should be 200
-    And the result should contain <N> studies
+    And the result should contain one study
     And the href of the study of studies has items <url>
 
     Examples:
-      | base | query | N | url |
-      | taxonomy-id | id=9606 | 1 | TEST_STUDY2 |
-      | taxonomy-name | name=Homo sapiens | 1 | TEST_STUDY2 |
-      | text | searchTerm=1kg | 1 | TEST_STUDY2 |
+      | base | query | url |
+      | taxonomy-id | id=9606 | TEST_STUDY2 |
+      | taxonomy-name | name=Homo sapiens | TEST_STUDY2 |
+      | text | searchTerm=1kg | TEST_STUDY2 |
 
 
   Scenario: search various yet to publish studies
@@ -800,7 +796,7 @@ Feature: study object
 
     When I request GET for linkedStudies of <url>
     Then the response code should be 200
-    And the result should contain <N> studies
+    And the result should contain 2 studies
     And the href of the study of studies has items <linkedStudies>
 
     When I request GET for linkedStudies of TEST_STUDY4
@@ -815,10 +811,10 @@ Feature: study object
     And the result should contain 0 studies
 
     Examples:
-  | url | N | linkedStudies |
-  | TEST_STUDY1 | 2 | TEST_STUDY2,TEST_STUDY3 |
-  | TEST_STUDY2 | 2 | TEST_STUDY1,TEST_STUDY3 |
-  | TEST_STUDY3 | 2 | TEST_STUDY1,TEST_STUDY2 |
+  | url | linkedStudies |
+  | TEST_STUDY1 | TEST_STUDY2,TEST_STUDY3 |
+  | TEST_STUDY2 | TEST_STUDY1,TEST_STUDY3 |
+  | TEST_STUDY3 | TEST_STUDY1,TEST_STUDY2 |
 
 
   Scenario: deprecate to undeprecate studies
@@ -897,7 +893,7 @@ Feature: study object
 
     When I request search for the studies with the parameters: browsable=true
     Then the response code should be 200
-    And the result should contain 1 studies
+    And the result should contain one study
     And the href of the study of studies has items TEST_STUDY
 
 

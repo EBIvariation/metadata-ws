@@ -31,7 +31,7 @@ Feature: accession object
 
     When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.1
     Then the response code should be 200
-    And the result should contain 1 studies
+    And the result should contain one study
     And the accessionVersionId.accession field of studies 0 should be EGAS0001
 
     When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.2
@@ -62,7 +62,7 @@ Feature: accession object
 
     When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.1
     Then the response code should be 200
-    And the result should contain 1 studies
+    And the result should contain one study
     And the accessionVersionId.accession field of studies 0 should be EGAS0001
 
 

@@ -17,6 +17,7 @@
  */
 package uk.ac.ebi.ampt2d.metadata.cucumber;
 
+import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ import java.time.LocalDate;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Ignore
@@ -124,10 +126,17 @@ public class StudySteps {
         CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base).param(name, value)));
     }
 
-    @When("^I request search for studies with (.*)")
-    public void performSearchOnResources(String param) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+param)));
+    @When("^I request search for studies with release-date")
+    public void performSearchOnResources() throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/release-date")));
     }
+
+    @Then("^the result should contain one study$")
+    public void checkResponseListSize() throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(1));
+    }
+
 
     private ResultActions postTestStudy(String accession, int version, String name, boolean deprecated, LocalDate releaseDate, String testTaxonomyKey) throws Exception {
         String jsonContent = "{" +
