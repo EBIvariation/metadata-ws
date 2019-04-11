@@ -8,12 +8,12 @@ Feature: taxonomy object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     And the response code should be 201
-    And the Location header should be present with value of TEST_TAXONOMY
-    When I request GET with value of TEST_TAXONOMY
+    And the Location header should be present with value of TAXONOMY
+    When I request GET with value of TAXONOMY
     Then the response code should be 200
-    And the result json should be:
+    And the response JSON should be:
     """
     {
       "taxonomyId": 9606,
@@ -21,7 +21,7 @@ Feature: taxonomy object
     }
     """
     When I request GET /taxonomies
-    Then the result should contain 1 taxonomies
+    Then the response should contain 1 taxonomies
 
   Scenario: register a taxonomy with taxonomyId less than 1 should fail
     When I request POST /taxonomies with JSON payload:
@@ -33,4 +33,4 @@ Feature: taxonomy object
     """
     Then the response code should be 4xx
     When I request GET /taxonomies
-    Then the result should contain 0 taxonomies
+    Then the response should contain 0 taxonomies

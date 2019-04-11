@@ -8,7 +8,7 @@ Feature: accession object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     And I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -18,25 +18,25 @@ Feature: accession object
     "name": "test_study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
 
     When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001
     Then the response code should be 4xx
-    And the result should have message with value Please provide an ID in the form accession.version
+    And the response should contain field message with value Please provide an ID in the form accession.version
 
     When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.S1
     Then the response code should be 4xx
-    And the result should have message with value Please provide an ID in the form accession.version
+    And the response should contain field message with value Please provide an ID in the form accession.version
 
     When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.1
     Then the response code should be 200
-    And the result should contain one study
+    And the response should contain one study
     And the accessionVersionId.accession field of studies 0 should be EGAS0001
 
     When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.2
     Then the response code should be 200
-    And the result should contain 0 studies
+    And the response should contain 0 studies
 
 
   Scenario: find study by accession and version
@@ -47,7 +47,7 @@ Feature: accession object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -57,12 +57,12 @@ Feature: accession object
     "name": "test_study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
 
     When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.1
     Then the response code should be 200
-    And the result should contain one study
+    And the response should contain one study
     And the accessionVersionId.accession field of studies 0 should be EGAS0001
 
 
@@ -80,11 +80,11 @@ Feature: accession object
       "type": "TSV"
     }
     """
-    Then set the URL to TEST_FILE
+    Then set the URL to FILE
 
     When I request elaborate find for the files with the parameters: accessionVersionId=EGAF0001.1
     Then the response code should be 200
-    And the result should contain 1 files
+    And the response should contain 1 files
     And the accessionVersionId.accession field of files 0 should be EGAF0001
 
 
@@ -96,7 +96,7 @@ Feature: accession object
       "name": "Species1"
     }
     """
-    Then set the URL to TEST_TAXONOMY1
+    Then set the URL to TAXONOMY1
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -104,14 +104,14 @@ Feature: accession object
       "name": "Species2"
     }
     """
-    Then set the URL to TEST_TAXONOMY2
-    When I create a test parameterized sample with EGAN0001 for accession, 1 for version, Sample1 for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
+    Then set the URL to TAXONOMY2
+    When I create a parameterized sample with EGAN0001 for accession, 1 for version, Sample1 for name and TAXONOMY1,TAXONOMY2 for taxonomy
     Then the response code should be 201
-    And set the URL to TEST_SAMPLE
+    And set the URL to SAMPLE
 
     When I request elaborate find for the samples with the parameters: accessionVersionId=EGAN0001.1
     Then the response code should be 200
-    And the result should contain 1 samples
+    And the response should contain 1 samples
     And the accessionVersionId.accession field of samples 0 should be EGAN0001
 
 
@@ -125,7 +125,7 @@ Feature: accession object
       "type": "ASSEMBLY"
     }
     """
-    Then set the URL to TEST_REFERENCE_SEQUENCE
+    Then set the URL to REFERENCE_SEQUENCE
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -133,15 +133,15 @@ Feature: accession object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
-    When I create a test study with TEST_TAXONOMY for taxonomy
-    Then set the URL to TEST_STUDY
-    When I create a test analysis with TEST_STUDY for study and TEST_REFERENCE_SEQUENCE for reference sequence
+    Then set the URL to TAXONOMY
+    When I create a study with TAXONOMY for taxonomy
+    Then set the URL to STUDY
+    When I create an analysis with STUDY for study and REFERENCE_SEQUENCE for reference sequence
     Then the response code should be 201
-    And set the URL to TEST_ANALYSIS
+    And set the URL to ANALYSIS
 
     When I request elaborate find for the analyses with the parameters: accessionVersionId=EGAA0001.1
     Then the response code should be 200
-    And the result should contain 1 analyses
+    And the response should contain 1 analyses
     And the accessionVersionId.accession field of analyses 0 should be EGAA0001
 

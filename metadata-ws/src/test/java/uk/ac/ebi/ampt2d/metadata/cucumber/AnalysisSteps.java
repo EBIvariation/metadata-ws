@@ -40,17 +40,16 @@ public class AnalysisSteps {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @When("I create a test analysis with (.*) for study and (.*) for reference sequence")
+    @When("I create an analysis with (.*) for study and (.*) for reference sequence")
     public void createTestAnalysis(String studyUrlKey, String referenceSequenceUrlKey) throws Exception {
         createTestAnalysisParam("EGAA0001", referenceSequenceUrlKey, studyUrlKey, Analysis.Technology.EXOME_SEQUENCING,
                 Analysis.Type.CASE_CONTROL, "Illumina");
     }
 
-    @When("I create a test analysis with (.*) for accession, (.*) for reference sequence, (.*) for study, (.*) for technology, (.*) for type and (.*) for platform")
+    @When("I create an analysis with (.*) for accession, (.*) for reference sequence, (.*) for study, (.*) for technology, (.*) for type and (.*) for platform")
     public void createTestAnalysisParam(String accession, String referenceSequenceUrlKey, String studyUrlKey,
                                         Analysis.Technology technology, Analysis.Type type, String platform)
             throws Exception {
-
         CommonStates.setResultActions(
                 postTestAnalysis(accession, referenceSequenceUrlKey, studyUrlKey,
                         technology, type, platform)
@@ -60,7 +59,6 @@ public class AnalysisSteps {
     private ResultActions postTestAnalysis(String accession, String referenceSequenceUrlKey, String studyUrlKey,
                                            Analysis.Technology technology, Analysis.Type type, String platform)
             throws Exception {
-
         List<String> referenceSequenceUrlList = CommonStates.getUrls(referenceSequenceUrlKey);
         String jsonContent = "{ " +
                 "\"accessionVersionId\":{ \"accession\": \"" + accession + "\",\"version\":  1 }," +

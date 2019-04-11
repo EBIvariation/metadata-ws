@@ -9,12 +9,12 @@ Feature: Web resource object
     }
     """
     Then the response code should be 201
-    And set the URL to TEST_WEB_RESOURCE
+    And set the URL to WEB_RESOURCE
 
-    When I request GET with value of TEST_WEB_RESOURCE
+    When I request GET with value of WEB_RESOURCE
     Then the response code should be 200
-    And the result should have type with value CENTER_WEB
-    And the result should have resourceUrl with value http://www.ebi.ac.uk
+    And the response should contain field type with value CENTER_WEB
+    And the response should contain field resourceUrl with value http://www.ebi.ac.uk
 
   Scenario Outline: register a web resource with valid URL should succeed
     When I request POST /webResources with JSON payload:

@@ -41,7 +41,7 @@ public class StudySteps {
     @Autowired
     private MockMvc mockMvc;
 
-    @When("I create a test study with (.*) for taxonomy$")
+    @When("I create a study with (.*) for taxonomy$")
     public void createTestStudy(String testTaxonomyKey) throws Exception {
         CommonStates.setResultActions(postTestStudy("EGAS0001", 1, "test_human_study", false, LocalDate.now(), testTaxonomyKey));
     }
@@ -50,7 +50,7 @@ public class StudySteps {
     public void postTestStudy(String jsonLikeData) throws Exception {
         String[] values = jsonLikeData.split(",");
         String json = "{";
-        for (String value:values) {
+        for (String value : values) {
             if (value.contains("releaseDate")) {
                 json += "\"releaseDate\": \"";
                 if (jsonLikeData.contains("today")) {
@@ -96,9 +96,17 @@ public class StudySteps {
     }
 
     @When("^I request PATCH (.*) with patch and day (.*)")
-    public void performPatchedPatchOnResourceWithDay(String urlKey, int day) throws Exception {
+    public void performPatchedPatchOnResourceWithDay(String urlKey, String day) throws Exception {
+        int intDay = 0;
+        if (day.equals("today")) {
+            intDay = 0;
+        } else if (day.equals("yesterday")) {
+            intDay = -1;
+        } else if (day.equals("tomorrow")) {
+            intDay = 1;
+        }
         String content = "{ \"releaseDate\" : \"";
-        content += LocalDate.now().plusDays(day);
+        content += LocalDate.now().plusDays(intDay);
         content += "\" }";
 
         CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
@@ -131,7 +139,7 @@ public class StudySteps {
         CommonStates.setResultActions(mockMvc.perform(get("/studies/search/release-date")));
     }
 
-    @Then("^the result should contain one study$")
+    @Then("^the response should contain one study$")
     public void checkResponseListSize() throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$..studies").isArray())
                 .andExpect(jsonPath("$..studies.length()").value(1));

@@ -18,7 +18,7 @@ Feature: Miscellaneous functions
         "type": "ASSEMBLY"
       }
       """
-    Then set the URL to TEST_REFERENCE_SEQUENCE
+    Then set the URL to REFERENCE_SEQUENCE
     When I request POST /taxonomies with JSON payload:
     """
       {
@@ -26,7 +26,7 @@ Feature: Miscellaneous functions
         "name": "Homo Sapiens"
       }
       """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -36,11 +36,11 @@ Feature: Miscellaneous functions
     "name": "test human study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY
-    When I create a test analysis with testhuman for accession, TEST_REFERENCE_SEQUENCE for reference sequence, TEST_STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
-    Then set the URL to TEST_ANALYSIS
+    Then set the URL to STUDY
+    When I create an analysis with testhuman for accession, REFERENCE_SEQUENCE for reference sequence, STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
+    Then set the URL to ANALYSIS
     When I request POST /files with JSON payload:
     """
       {
@@ -54,7 +54,7 @@ Feature: Miscellaneous functions
         "type": "TSV"
       }
       """
-    Then set the URL to TEST_FILE
+    Then set the URL to FILE
     When I request POST /taxonomies with JSON payload:
     """
       {
@@ -62,7 +62,7 @@ Feature: Miscellaneous functions
         "name": "Species1"
       }
       """
-    Then set the URL to TEST_TAXONOMY1
+    Then set the URL to TAXONOMY1
     When I request POST /taxonomies with JSON payload:
     """
       {
@@ -70,9 +70,9 @@ Feature: Miscellaneous functions
         "name": "Species2"
       }
       """
-    Then set the URL to TEST_TAXONOMY2
-    When I create a test parameterized sample with testhuman for accession, 1 for version, test human sample for name and TEST_TAXONOMY1,TEST_TAXONOMY2 for taxonomy
-    Then set the URL to TEST_SAMPLE
+    Then set the URL to TAXONOMY2
+    When I create a parameterized sample with testhuman for accession, 1 for version, test human sample for name and TAXONOMY1,TAXONOMY2 for taxonomy
+    Then set the URL to SAMPLE
     When I request POST /webResources with JSON payload:
     """
       {
@@ -80,13 +80,13 @@ Feature: Miscellaneous functions
         "resourceUrl": "http://www.ebi.ac.uk"
       }
       """
-    Then set the URL to TEST_WEB_RESOURCE
+    Then set the URL to WEB_RESOURCE
 
     Given current time as END_TIME1
     When I request GET with value of <url>
     Then the response code should be 200
     And the href of the class <class> should be <url>
-    And the result should have lastModifiedDate non empty
+    And the response should contain field lastModifiedDate with a non-empty value
     And the lastModifiedDate should be after START_TIME1 and before END_TIME1
 
     Given current time as START_TIME2
@@ -97,15 +97,15 @@ Feature: Miscellaneous functions
     When I request GET with value of <url>
     Then the response code should be 200
     And the href of the class <class> should be <url>
-    And the result should have lastModifiedDate non empty
+    And the response should contain field lastModifiedDate with a non-empty value
     And the lastModifiedDate should be after START_TIME2 and before END_TIME2
 
     Examples:
       | url | class | content |
-      | TEST_REFERENCE_SEQUENCE | referenceSequence | {"name": "nothing important"} |
-      | TEST_TAXONOMY | taxonomy | {"name": "nothing important"} |
-      | TEST_STUDY | study | {"name": "nothing important"} |
-      | TEST_ANALYSIS | analysis | {"name": "nothing important"} |
-      | TEST_FILE | file | {"name": "nothing important"} |
-      | TEST_SAMPLE | sample | {"name": "nothing important"} |
-      | TEST_WEB_RESOURCE | webResource | {"resourceUrl": "http://nothing.important.com"} |
+      | REFERENCE_SEQUENCE | referenceSequence | {"name": "nothing important"} |
+      | TAXONOMY | taxonomy | {"name": "nothing important"} |
+      | STUDY | study | {"name": "nothing important"} |
+      | ANALYSIS | analysis | {"name": "nothing important"} |
+      | FILE | file | {"name": "nothing important"} |
+      | SAMPLE | sample | {"name": "nothing important"} |
+      | WEB_RESOURCE | webResource | {"resourceUrl": "http://nothing.important.com"} |

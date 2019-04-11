@@ -8,25 +8,25 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
-    When I create a test study with TEST_TAXONOMY for taxonomy
-    Then set the URL to TEST_STUDY
-    When I request GET with value of TEST_STUDY
+    Then set the URL to TAXONOMY
+    When I create a study with TAXONOMY for taxonomy
+    Then set the URL to STUDY
+    When I request GET with value of STUDY
     Then the response code should be 200
-    And the result should have accessionVersionId.accession with value EGAS0001
+    And the response should contain field accessionVersionId.accession with value EGAS0001
 
 
   Scenario Outline: search various study by taxonomy name and id
     When I request POST taxonomies 207598 for id, Homininae for name and NONE for ancestors
-    Then set the URL to TEST_TAXONOMY_1
-    When I request POST taxonomies 9606 for id, Homo Sapiens for name and TEST_TAXONOMY_1 for ancestors
-    Then set the URL to TEST_TAXONOMY_2
-    When I request POST taxonomies 9596 for id, Pan for name and TEST_TAXONOMY_1 for ancestors
-    Then set the URL to TEST_TAXONOMY_3
-    When I request POST taxonomies 9597 for id, Pan paniscus for name and TEST_TAXONOMY_1,TEST_TAXONOMY_3 for ancestors
-    Then set the URL to TEST_TAXONOMY_4
-    When I request POST taxonomies 9598 for id, Pan troglodytes for name and TEST_TAXONOMY_1,TEST_TAXONOMY_3 for ancestors
-    Then set the URL to TEST_TAXONOMY_5
+    Then set the URL to TAXONOMY_1
+    When I request POST taxonomies 9606 for id, Homo Sapiens for name and TAXONOMY_1 for ancestors
+    Then set the URL to TAXONOMY_2
+    When I request POST taxonomies 9596 for id, Pan for name and TAXONOMY_1 for ancestors
+    Then set the URL to TAXONOMY_3
+    When I request POST taxonomies 9597 for id, Pan paniscus for name and TAXONOMY_1,TAXONOMY_3 for ancestors
+    Then set the URL to TAXONOMY_4
+    When I request POST taxonomies 9598 for id, Pan troglodytes for name and TAXONOMY_1,TAXONOMY_3 for ancestors
+    Then set the URL to TAXONOMY_5
 
     When I request POST /studies with JSONLIKE payload:
     """
@@ -37,9 +37,9 @@ Feature: study object
     "name": "test human study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY_2"
+    "taxonomy": "TAXONOMY_2"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -49,9 +49,9 @@ Feature: study object
     "name": "test bonobo study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY_4"
+    "taxonomy": "TAXONOMY_4"
     """
-    Then set the URL to TEST_STUDY2
+    Then set the URL to STUDY2
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -61,24 +61,24 @@ Feature: study object
     "name": "test chimpanzee study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY_5"
+    "taxonomy": "TAXONOMY_5"
     """
-    Then set the URL to TEST_STUDY3
+    Then set the URL to STUDY3
 
     When I request elaborate search for the studies base <base> and with the parameters: <query>
     Then the response code should be 200
-    And the result should contain <N> studies
+    And the response should contain <N> studies
     And the href of the study of studies has items <url>
 
     Examples:
       | base | query | N | url |
-      | taxonomy-id | id=9606 | 1 | TEST_STUDY1 |
-      | taxonomy-id | id=9596 | 2 | TEST_STUDY2,TEST_STUDY3 |
-      | taxonomy-id | id=207598 | 3 | TEST_STUDY1,TEST_STUDY2,TEST_STUDY3 |
+      | taxonomy-id | id=9606 | 1 | STUDY1 |
+      | taxonomy-id | id=9596 | 2 | STUDY2,STUDY3 |
+      | taxonomy-id | id=207598 | 3 | STUDY1,STUDY2,STUDY3 |
       | taxonomy-id | id=0 | 0 | NONE |
-      | taxonomy-name | name=Homo sapiens | 1 | TEST_STUDY1 |
-      | taxonomy-name | name=Pan | 2 | TEST_STUDY2,TEST_STUDY3 |
-      | taxonomy-name | name=Homininae | 3 | TEST_STUDY1,TEST_STUDY2,TEST_STUDY3 |
+      | taxonomy-name | name=Homo sapiens | 1 | STUDY1 |
+      | taxonomy-name | name=Pan | 2 | STUDY2,STUDY3 |
+      | taxonomy-name | name=Homininae | 3 | STUDY1,STUDY2,STUDY3 |
       | taxonomy-name | name=None | 0 | NONE |
 
 
@@ -90,7 +90,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -100,9 +100,9 @@ Feature: study object
     "name": "nothing important",
     "deprecated": false,
     "releaseDate": yesterday,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -112,9 +112,9 @@ Feature: study object
     "name": "nothing important",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY2
+    Then set the URL to STUDY2
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -124,19 +124,19 @@ Feature: study object
     "name": "nothing important",
     "deprecated": false,
     "releaseDate": tomorrow,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY3
+    Then set the URL to STUDY3
 
     When I request search studies having release <query> today
     Then the response code should be 200
-    And the result should contain <N> studies
+    And the response should contain <N> studies
     And the href of the study of studies has items <url>
 
     Examples:
       | query | N | url |
-      | to | 2 | TEST_STUDY1,TEST_STUDY2 |
-      | from | 1 | TEST_STUDY2 |
+      | to | 2 | STUDY1,STUDY2 |
+      | from | 1 | STUDY2 |
 
 
   Scenario: find various studies by release date range
@@ -147,7 +147,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -157,9 +157,9 @@ Feature: study object
     "name": "nothing important",
     "deprecated": false,
     "releaseDate": yesterday,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -169,9 +169,9 @@ Feature: study object
     "name": "nothing important",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY2
+    Then set the URL to STUDY2
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -181,14 +181,14 @@ Feature: study object
     "name": "nothing important",
     "deprecated": false,
     "releaseDate": tomorrow,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY3
+    Then set the URL to STUDY3
 
     When I request search studies having release from today
     Then the response code should be 200
-    And the result should contain one study
-    And the href of the study of studies has items TEST_STUDY2
+    And the response should contain one study
+    And the href of the study of studies has items STUDY2
 
 
   Scenario Outline: find various studies by analysis
@@ -199,7 +199,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /reference-sequences with JSON payload:
     """
     {
@@ -209,7 +209,7 @@ Feature: study object
       "type": "ASSEMBLY"
     }
     """
-    Then set the URL to TEST_REFERENCE_SEQUENCE_1
+    Then set the URL to REFERENCE_SEQUENCE_1
     When I request POST /reference-sequences with JSON payload:
     """
     {
@@ -219,7 +219,7 @@ Feature: study object
       "type": "ASSEMBLY"
     }
     """
-    Then set the URL to TEST_REFERENCE_SEQUENCE_2
+    Then set the URL to REFERENCE_SEQUENCE_2
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -229,9 +229,9 @@ Feature: study object
     "name": "test human study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -241,32 +241,32 @@ Feature: study object
     "name": "test human study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY2
-    When I create a test analysis with EGAA0001 for accession, TEST_REFERENCE_SEQUENCE_1 for reference sequence, TEST_STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
+    Then set the URL to STUDY2
+    When I create an analysis with EGAA0001 for accession, REFERENCE_SEQUENCE_1 for reference sequence, STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     Then the response code should be 201
-    When I create a test analysis with EGAA0002 for accession, TEST_REFERENCE_SEQUENCE_2 for reference sequence, TEST_STUDY2 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
+    When I create an analysis with EGAA0002 for accession, REFERENCE_SEQUENCE_2 for reference sequence, STUDY2 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
     Then the response code should be 201
 
     When I request elaborate find for the studies with the parameters: <param>
     Then the response code should be 200
-    And the result should contain <N> studies
+    And the response should contain <N> studies
     And the href of the study of studies has items <url>
 
     Examples:
       | param | N | url |
-      | analyses.referenceSequences.name=GRCh37 | 1 | TEST_STUDY1 |
-      | analyses.referenceSequences.name=GRCh38 | 1 | TEST_STUDY2 |
+      | analyses.referenceSequences.name=GRCh37 | 1 | STUDY1 |
+      | analyses.referenceSequences.name=GRCh38 | 1 | STUDY2 |
       | analyses.referenceSequences.name=NCBI36 | 0 | NONE |
-      | analyses.referenceSequences.name=GRCh37&analyses.referenceSequences.patch=p2 | 1 | TEST_STUDY1 |
-      | analyses.referenceSequences.name=GRCh38&analyses.referenceSequences.patch=p2 | 1 | TEST_STUDY2 |
+      | analyses.referenceSequences.name=GRCh37&analyses.referenceSequences.patch=p2 | 1 | STUDY1 |
+      | analyses.referenceSequences.name=GRCh38&analyses.referenceSequences.patch=p2 | 1 | STUDY2 |
       | analyses.referenceSequences.name=GRCh37&analyses.referenceSequences.patch=p3 | 0 | NONE |
       | analyses.referenceSequences.name=NCBI36&analyses.referenceSequences.patch=p2 | 0 | NONE |
-      | analyses.type=CASE_CONTROL | 2 | TEST_STUDY1,TEST_STUDY2 |
+      | analyses.type=CASE_CONTROL | 2 | STUDY1,STUDY2 |
       | analyses.type=TUMOR | 0 | NONE |
       | analyses.type=COLLECTION | 0 | NONE |
-      | analyses.referenceSequences.name=GRCh38&analyses.type=CASE_CONTROL | 1 | TEST_STUDY2 |
+      | analyses.referenceSequences.name=GRCh38&analyses.type=CASE_CONTROL | 1 | STUDY2 |
       | analyses.referenceSequences.name=GRCh38&analyses.type=TUMOR | 0 | NONE |
       | analyses.referenceSequences.name=GRCh38&analyses.type=COLLECTION | 0 | NONE |
       | analyses.referenceSequences.name=NCBI36&analyses.type=CASE_CONTROL | 0 | NONE |
@@ -280,7 +280,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -290,9 +290,9 @@ Feature: study object
     "name": "test human study based on GRCh37",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -302,9 +302,9 @@ Feature: study object
     "name": "test human study based on GRCh37",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY2
+    Then set the URL to STUDY2
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -314,21 +314,21 @@ Feature: study object
     "name": "test human study based on GRCh38",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY3
+    Then set the URL to STUDY3
 
     When I request search for the studies with base accession and name accession value EGAS0001
     Then the response code should be 200
-    And the href of the class study should be TEST_STUDY2
-    And the result should have accessionVersionId.accession with value EGAS0001
-    And the result should have accessionVersionId.version with value 2
+    And the href of the class study should be STUDY2
+    And the response should contain field accessionVersionId.accession with value EGAS0001
+    And the response should contain field accessionVersionId.version with value 2
 
     When I request search for the studies with base accession and name accession value EGAS0002
     Then the response code should be 200
-    And the href of the class study should be TEST_STUDY3
-    And the result should have accessionVersionId.accession with value EGAS0002
-    And the result should have accessionVersionId.version with value 3
+    And the href of the class study should be STUDY3
+    And the response should contain field accessionVersionId.accession with value EGAS0002
+    And the response should contain field accessionVersionId.version with value 3
 
     When I request search for the studies with base accession and name accession value EGAS0003
     Then the response code should be 404
@@ -342,7 +342,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -352,9 +352,9 @@ Feature: study object
     "name": "test human study based on GRCh37",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -364,9 +364,9 @@ Feature: study object
     "name": "test human study based on GRCh37",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY2
+    Then set the URL to STUDY2
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -376,24 +376,24 @@ Feature: study object
     "name": "test human study based on GRCh38",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY3
+    Then set the URL to STUDY3
 
     When I request search for the studies with base accession and name accession value EGAS0001
     Then the response code should be 200
-    And the href of the class study should be TEST_STUDY2
-    And the result should have accessionVersionId.accession with value EGAS0001
-    And the result should have accessionVersionId.version with value 2
+    And the href of the class study should be STUDY2
+    And the response should contain field accessionVersionId.accession with value EGAS0001
+    And the response should contain field accessionVersionId.version with value 2
 
     When I request search for the studies with base text and name searchTerm value grCh37
     Then the response code should be 200
-    And the result should contain 2 studies
+    And the response should contain 2 studies
     And the accessionVersionId.accession field of studies 0 should be EGAS0001
 
     When I request search for the studies with base text and name searchTerm value <value>
     Then the response code should be 200
-    And the result should contain <items> studies
+    And the response should contain <items> studies
 
     Examples:
       | value | items |
@@ -410,7 +410,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -420,9 +420,9 @@ Feature: study object
     "name": "test human B",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY2
+    Then set the URL to STUDY2
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -432,30 +432,30 @@ Feature: study object
     "name": "test human A",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
 
     When I request GET /studies
     Then the response code should be 200
-    And the result should contain 2 studies
-    And the result should have page.size with value 20
-    And the result should have page.totalElements with value 2
-    And the result should have page.totalPages with value 1
+    And the response should contain 2 studies
+    And the response should contain field page.size with value 20
+    And the response should contain field page.totalElements with value 2
+    And the response should contain field page.totalPages with value 1
 
     When I request GET for the studies with query parameter <param>
     Then the response code should be 200
-    And the result should contain one study
+    And the response should contain one study
     And the href of the study of studies has items <url>
 
     When I request GET for the studies with query parameter page=1
     Then the response code should be 200
-    And the result should contain 0 studies
+    And the response should contain 0 studies
 
     Examples:
     | param | url |
-    | size=1 | TEST_STUDY2 |
-    | size=1&sort=name | TEST_STUDY1 |
+    | size=1 | STUDY2 |
+    | size=1&sort=name | STUDY1 |
 
 
   Scenario Outline: search various public studies
@@ -466,7 +466,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /reference-sequences with JSON payload:
     """
     {
@@ -477,7 +477,7 @@ Feature: study object
     }
     """
     Then the response code should be 201
-    And set the URL to TEST_REFERENCE_SEQUENCE_1
+    And set the URL to REFERENCE_SEQUENCE_1
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -487,9 +487,9 @@ Feature: study object
     "name": "1kg pilot",
     "deprecated": false,
     "releaseDate": yesterday,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -499,9 +499,9 @@ Feature: study object
     "name": "1kg phase 1",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY2
+    Then set the URL to STUDY2
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -511,53 +511,53 @@ Feature: study object
     "name": "1kg phase 3",
     "deprecated": tomorrow,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY3
-    When I create a test analysis with analysisReleasedYesterday for accession, TEST_REFERENCE_SEQUENCE_1 for reference sequence, TEST_STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
-    Then set the URL to TEST_ANALYSIS
+    Then set the URL to STUDY3
+    When I create an analysis with analysisReleasedYesterday for accession, REFERENCE_SEQUENCE_1 for reference sequence, STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
+    Then set the URL to ANALYSIS
 
     When I request GET /studies
-    Then the result should contain 2 studies
-    And the href of the study of studies has items TEST_STUDY1,TEST_STUDY2
+    Then the response should contain 2 studies
+    And the href of the study of studies has items STUDY1,STUDY2
 
-    When I request GET with value of TEST_STUDY1
+    When I request GET with value of STUDY1
     Then the response code should be 200
 
-    When I request GET for analyses of TEST_STUDY1
-    Then the result should contain 1 analyses
-    And the href of the analysis of analyses has items TEST_ANALYSIS
+    When I request GET for analyses of STUDY1
+    Then the response should contain 1 analyses
+    And the href of the analysis of analyses has items ANALYSIS
 
-    When I request GET for analyses of TEST_STUDY2
+    When I request GET for analyses of STUDY2
     Then the response code should be 200
-    And the result should contain 0 analyses
+    And the response should contain 0 analyses
 
     When I request search for the studies with the parameters: taxonomy.taxonomyId=9606
     Then the response code should be 200
-    And the result should contain 2 studies
-    And the href of the study of studies has items TEST_STUDY1,TEST_STUDY2
+    And the response should contain 2 studies
+    And the href of the study of studies has items STUDY1,STUDY2
 
     When I request elaborate search for the studies base accession and with the parameters: accession=1kg
     Then the response code should be 200
-    And the result should have accessionVersionId.accession with value 1kg
-    And the result should have accessionVersionId.version with value 2
-    And the href of the class study should be TEST_STUDY2
+    And the response should contain field accessionVersionId.accession with value 1kg
+    And the response should contain field accessionVersionId.version with value 2
+    And the href of the class study should be STUDY2
 
     When I request elaborate search with date range for the studies base release-date and with the parameters: 0
     Then the response code should be 200
-    And the result should contain one study
-    And the href of the study of studies has items TEST_STUDY2
+    And the response should contain one study
+    And the href of the study of studies has items STUDY2
 
     When I request elaborate search for the studies base <base> and with the parameters: <query>
     Then the response code should be 200
-    And the result should contain 2 studies
+    And the response should contain 2 studies
     And the href of the study of studies has items <url>
 
   Examples:
     | base | query | url |
-    | taxonomy-id | id=9606 | TEST_STUDY1,TEST_STUDY2 |
-    | taxonomy-name | name=Homo sapiens | TEST_STUDY1,TEST_STUDY2 |
-    | text | searchTerm=1kg | TEST_STUDY1,TEST_STUDY2 |
+    | taxonomy-id | id=9606 | STUDY1,STUDY2 |
+    | taxonomy-name | name=Homo sapiens | STUDY1,STUDY2 |
+    | text | searchTerm=1kg | STUDY1,STUDY2 |
 
 
   Scenario Outline: search various undeprecated studies
@@ -568,7 +568,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -578,9 +578,9 @@ Feature: study object
     "name": "1kg pilot",
     "deprecated": true,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -590,42 +590,42 @@ Feature: study object
     "name": "1kg phase 1",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY2
+    Then set the URL to STUDY2
 
     When I request GET /studies
-    Then the result should contain one study
-    And the href of the study of studies has items TEST_STUDY2
+    Then the response should contain one study
+    And the href of the study of studies has items STUDY2
 
-    When I request GET with value of TEST_STUDY2
+    When I request GET with value of STUDY2
     Then the response code should be 200
-    And the href of the class study should be TEST_STUDY2
+    And the href of the class study should be STUDY2
 
-    When I request GET for analyses of TEST_STUDY2
-    Then the result should contain 0 analyses
+    When I request GET for analyses of STUDY2
+    Then the response should contain 0 analyses
 
     When I request search for the studies with the parameters: taxonomy.taxonomyId=9606
     Then the response code should be 200
-    And the result should contain one study
-    And the href of the study of studies has items TEST_STUDY2
+    And the response should contain one study
+    And the href of the study of studies has items STUDY2
 
     When I request elaborate search for the studies base accession and with the parameters: accession=1kg
     Then the response code should be 200
-    And the result should have accessionVersionId.accession with value 1kg
-    And the result should have accessionVersionId.version with value 2
-    And the href of the class study should be TEST_STUDY2
+    And the response should contain field accessionVersionId.accession with value 1kg
+    And the response should contain field accessionVersionId.version with value 2
+    And the href of the class study should be STUDY2
 
     When I request elaborate search for the studies base <base> and with the parameters: <query>
     Then the response code should be 200
-    And the result should contain one study
+    And the response should contain one study
     And the href of the study of studies has items <url>
 
     Examples:
       | base | query | url |
-      | taxonomy-id | id=9606 | TEST_STUDY2 |
-      | taxonomy-name | name=Homo sapiens | TEST_STUDY2 |
-      | text | searchTerm=1kg | TEST_STUDY2 |
+      | taxonomy-id | id=9606 | STUDY2 |
+      | taxonomy-name | name=Homo sapiens | STUDY2 |
+      | text | searchTerm=1kg | STUDY2 |
 
 
   Scenario: search various yet to publish studies
@@ -636,7 +636,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -646,26 +646,26 @@ Feature: study object
     "name": "1kg phase 3",
     "deprecated": false,
     "releaseDate": tomorrow,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
 
-    When I request GET with value of TEST_STUDY1
+    When I request GET with value of STUDY1
     Then the response code should be 404
 
-    When I request GET for analyses of TEST_STUDY1
+    When I request GET for analyses of STUDY1
     Then the response code should be 404
 
 
   Scenario: search studies invalid dates
     When I request search for studies with release-date
     Then the response code should be 4xx
-    And the result should have exception with value java.lang.IllegalArgumentException
-    And the result should have message with value Either from or to needs to be non-null
+    And the response should contain field exception with value java.lang.IllegalArgumentException
+    And the response should contain field message with value Either from or to needs to be non-null
 
     When I request elaborate search for the studies base release-date and with the parameters: from=wrong-format-date
-    Then the result should have exception with value java.lang.IllegalArgumentException
-    And the result should have message with value Please provide a date in the form yyyy-mm-dd
+    Then the response should contain field exception with value java.lang.IllegalArgumentException
+    And the response should contain field message with value Please provide a date in the form yyyy-mm-dd
 
 
   Scenario: search various deprecated studies
@@ -676,7 +676,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -686,14 +686,14 @@ Feature: study object
     "name": "1kg pilot",
     "deprecated": true,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
 
-    When I request GET with value of TEST_STUDY1
+    When I request GET with value of STUDY1
     Then the response code should be 404
 
-    When I request GET for analyses of TEST_STUDY1
+    When I request GET for analyses of STUDY1
     Then the response code should be 404
 
 
@@ -705,7 +705,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -715,20 +715,20 @@ Feature: study object
     "name": "1kg pilot",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
 
-    When I request GET with value of TEST_STUDY1
+    When I request GET with value of STUDY1
     Then the response code should be 200
-    And the href of the class study should be TEST_STUDY1
-    And the result should have description with value Nothing important
-    And the result should not contain deprecated
+    And the href of the class study should be STUDY1
+    And the response should contain field description with value Nothing important
+    And the response should not contain field deprecated
 
-    When I request PATCH TEST_STUDY1 with content {"deprecated": "true"}
+    When I request PATCH STUDY1 with content {"deprecated": "true"}
     Then the response code should be 2xx
 
-    When I request GET with value of TEST_STUDY1
+    When I request GET with value of STUDY1
     Then the response code should be 4xx
 
 
@@ -741,7 +741,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -751,9 +751,9 @@ Feature: study object
     "name": "test human study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY1
+    Then set the URL to STUDY1
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -763,9 +763,9 @@ Feature: study object
     "name": "test human study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY2
+    Then set the URL to STUDY2
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -775,9 +775,9 @@ Feature: study object
     "name": "test human study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY3
+    Then set the URL to STUDY3
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -787,34 +787,34 @@ Feature: study object
     "name": "test human study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY4
+    Then set the URL to STUDY4
 
-    When I request PATCH TEST_STUDY1 with list TEST_STUDY2,TEST_STUDY3 for childStudies
+    When I request PATCH STUDY1 with list STUDY2,STUDY3 of childStudies
     Then the response code should be 2xx
 
     When I request GET for linkedStudies of <url>
     Then the response code should be 200
-    And the result should contain 2 studies
+    And the response should contain 2 studies
     And the href of the study of studies has items <linkedStudies>
 
-    When I request GET for linkedStudies of TEST_STUDY4
+    When I request GET for linkedStudies of STUDY4
     Then the response code should be 200
-    And the result should contain 0 studies
+    And the response should contain 0 studies
 
-    When I request PATCH TEST_STUDY1 with list STUDY_NON_EXISTING for childStudies
+    When I request PATCH STUDY1 with list STUDY_NON_EXISTING of childStudies
     Then the response code should be 2xx
 
-    When I request GET for linkedStudies of TEST_STUDY1
+    When I request GET for linkedStudies of STUDY1
     Then the response code should be 200
-    And the result should contain 0 studies
+    And the response should contain 0 studies
 
     Examples:
   | url | linkedStudies |
-  | TEST_STUDY1 | TEST_STUDY2,TEST_STUDY3 |
-  | TEST_STUDY2 | TEST_STUDY1,TEST_STUDY3 |
-  | TEST_STUDY3 | TEST_STUDY1,TEST_STUDY2 |
+  | STUDY1 | STUDY2,STUDY3 |
+  | STUDY2 | STUDY1,STUDY3 |
+  | STUDY3 | STUDY1,STUDY2 |
 
 
   Scenario: deprecate to undeprecate studies
@@ -825,7 +825,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -835,26 +835,26 @@ Feature: study object
     "name": "1kg pilot",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY
+    Then set the URL to STUDY
 
-    When I request GET with value of TEST_STUDY
+    When I request GET with value of STUDY
     Then the response code should be 200
-    And the href of the class study should be TEST_STUDY
+    And the href of the class study should be STUDY
 
-    When I request PATCH TEST_STUDY with patch and content {"deprecated": "true"}
+    When I request PATCH STUDY with patch and content {"deprecated": "true"}
     Then the response code should be 2xx
-    And the href of the class study should be TEST_STUDY
+    And the href of the class study should be STUDY
 
-    When I request GET with value of TEST_STUDY
+    When I request GET with value of STUDY
     Then the response code should be 4xx
 
-    When I request PATCH TEST_STUDY with patch and content {"deprecated": "false"}
+    When I request PATCH STUDY with patch and content {"deprecated": "false"}
     Then the response code should be 2xx
-    And the href of the class study should be TEST_STUDY
+    And the href of the class study should be STUDY
 
-    When I request GET with value of TEST_STUDY
+    When I request GET with value of STUDY
     Then the response code should be 200
 
 
@@ -866,7 +866,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -876,25 +876,25 @@ Feature: study object
     "name": "1kg pilot",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY
+    Then set the URL to STUDY
 
-    When I request GET with value of TEST_STUDY
+    When I request GET with value of STUDY
     Then the response code should be 200
-    And the result should have browsable as false
+    And the response should contain field browsable with a false boolean value
 
     When I request search for the studies with the parameters: browsable=true
     Then the response code should be 200
-    And the result should contain 0 studies
+    And the response should contain 0 studies
 
-    When I request PATCH TEST_STUDY with content {"browsable": "true"}
+    When I request PATCH STUDY with content {"browsable": "true"}
     Then the response code should be 2xx
 
     When I request search for the studies with the parameters: browsable=true
     Then the response code should be 200
-    And the result should contain one study
-    And the href of the study of studies has items TEST_STUDY
+    And the response should contain one study
+    And the href of the study of studies has items STUDY
 
 
   Scenario: verify study release date could be changed
@@ -905,7 +905,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -915,36 +915,36 @@ Feature: study object
     "name": "1kg phase 3",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY
+    Then set the URL to STUDY
 
-    When I request GET with value of TEST_STUDY
+    When I request GET with value of STUDY
     Then the response code should be 200
-    And the result should have releaseDate existing
+    And the response should contain field releaseDate
 
-    When I request PATCH TEST_STUDY with patch and day 1
+    When I request PATCH STUDY with patch and day tomorrow
     Then the response code should be 200
-    And the result should have releaseDate existing
+    And the response should contain field releaseDate
     And the difference between releaseDate and today should be 1 day
 
-    When I request GET with value of TEST_STUDY
+    When I request GET with value of STUDY
     Then the response code should be 404
 
-    When I request PATCH TEST_STUDY with patch and day 0
+    When I request PATCH STUDY with patch and day today
     Then the response code should be 200
-    And the result should have releaseDate existing
+    And the response should contain field releaseDate
     And the difference between releaseDate and today should be 0 day
 
-    When I request GET with value of TEST_STUDY
+    When I request GET with value of STUDY
     Then the response code should be 200
-    And the result should have releaseDate existing
+    And the response should contain field releaseDate
     And the difference between releaseDate and today should be 0 day
 
 
   Scenario: verify non-existing study with patch
     Given there is an URL https://nohost//studies/999 with key STUDY_NON_EXISTING
-    When I request PATCH STUDY_NON_EXISTING with patch and day 0
+    When I request PATCH STUDY_NON_EXISTING with patch and day today
     Then the response code should be 4xx
 
   Scenario: patch study with invalid request
@@ -955,7 +955,7 @@ Feature: study object
       "name": "Homo Sapiens"
     }
     """
-    Then set the URL to TEST_TAXONOMY
+    Then set the URL to TAXONOMY
     When I request POST /studies with JSONLIKE payload:
     """
     "accessionVersionId": {
@@ -965,12 +965,12 @@ Feature: study object
     "name": "1kg phase 3",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TEST_TAXONOMY"
+    "taxonomy": "TAXONOMY"
     """
-    Then set the URL to TEST_STUDY
+    Then set the URL to STUDY
 
-    When I request PATCH TEST_STUDY with content {"releaseDate": 2001}
+    When I request PATCH STUDY with content {"releaseDate": 2001}
     Then the response code should be 400
 
-    When I request PATCH TEST_STUDY with content {""}
+    When I request PATCH STUDY with content {""}
     Then the response code should be 400

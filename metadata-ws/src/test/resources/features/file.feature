@@ -14,12 +14,12 @@ Feature: file object
       "type": "TSV"
     }
     """
-    Then set the URL to TEST_FILE
+    Then set the URL to FILE
     And the response code should be 201
-    And the Location header should be present with value of TEST_FILE
-    When I request GET with value of TEST_FILE
+    And the Location header should be present with value of FILE
+    When I request GET with value of FILE
     Then the response code should be 200
-    And the result json should be:
+    And the response JSON should be:
     """
     {
       "accessionVersionId": {
@@ -33,4 +33,4 @@ Feature: file object
     }
     """
     When I request GET /files
-    Then the result should contain 1 files
+    Then the response should contain 1 files

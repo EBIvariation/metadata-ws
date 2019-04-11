@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ReferenceSequenceSteps {
 
-    @Then("^the result should contain one reference-sequence$")
+    @Then("^the response should contain one reference sequence$")
     public void checkResponseListSize() throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$..reference-sequences").isArray())
                 .andExpect(jsonPath("$..reference-sequences.length()").value(1));

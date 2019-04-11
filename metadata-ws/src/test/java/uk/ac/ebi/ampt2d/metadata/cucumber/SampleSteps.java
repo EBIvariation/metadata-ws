@@ -40,27 +40,29 @@ public class SampleSteps {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @When("I create a test sample with (.*) for taxonomy")
+    @When("I create a sample with (.*) for taxonomy")
     public void createTestSample(String testTaxonomyKeys) throws Exception {
         createTestSampleParameterized("EGAS0001", 1, "test_human_sample", testTaxonomyKeys);
     }
 
-    @When("I create a test parameterized sample with (.*) for accession, (.*) for version, (.*) for name and (.*) for taxonomy")
+    @When("I create a parameterized sample with (.*) for accession, (.*) for version, (.*) for name and (.*) for taxonomy")
     public void createTestSampleParameterized(String accession, int version, String name, String testTaxonomyKeys) throws Exception {
         List<String> testTaxonomyList = CommonStates.getUrls(testTaxonomyKeys);
         CommonStates.setResultActions(postTestSample(accession, name, testTaxonomyList, version));
     }
 
-    @When("I create a test sample no or null accession (.*), (.*) for name and (.*) for taxonomy")
-    public void createTestSampleParameterizedNoAccession(boolean accession, String name, String testTaxonomyKeys) throws Exception {
+    @When("I create a no accession sample with (.*) for name and (.*) for taxonomy")
+    public void createTestSampleParameterizedNoAccession(String name, String testTaxonomyKeys) throws Exception {
         List<String> testTaxonomyList = CommonStates.getUrls(testTaxonomyKeys);
-        if (accession == false) {
-            // no accession
-            CommonStates.setResultActions(postTestSampleNoOrNullAccession(false, name, testTaxonomyList));
-        } else {
-            // null accession
-            CommonStates.setResultActions(postTestSampleNoOrNullAccession(true, name, testTaxonomyList));
-        }
+        // no accession
+        CommonStates.setResultActions(postTestSampleNoOrNullAccession(false, name, testTaxonomyList));
+    }
+
+    @When("I create a null accession sample with (.*) for name and (.*) for taxonomy")
+    public void createTestSampleParameterizedNullAccession(String name, String testTaxonomyKeys) throws Exception {
+        List<String> testTaxonomyList = CommonStates.getUrls(testTaxonomyKeys);
+        // null accession
+        CommonStates.setResultActions(postTestSampleNoOrNullAccession(true, name, testTaxonomyList));
     }
 
     private ResultActions postTestSample(String accession, String name, List<String> testTaxonomyList, int version) throws Exception {

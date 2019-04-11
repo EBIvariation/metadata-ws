@@ -131,7 +131,7 @@ public class CommonSteps {
                 .content(jsonData.getBytes())));
     }
 
-    @When("^I request PATCH (.*) with list (.*) for (.*)")
+    @When("^I request PATCH (.*) with list (.*) of (.*)")
     public void performPatchOnResourceWithLinkedObject(String urlKey, String linkedObjectUrlKeys,
                                                        String linkedObjectClassName) throws Exception {
         List<String> newUrls = null;
@@ -157,7 +157,6 @@ public class CommonSteps {
     @When("^I request DELETE for the (.*) of (.*) of the (.*)")
     public void performDeleteOnResourceWithLinkedObject(String className, String linkedObjectUrlKey,
                                                         String resourceUrlKey) throws Exception {
-
         String linkedObjectUrl = CommonStates.getUrl(linkedObjectUrlKey);
         String resourceUrl = CommonStates.getUrl(resourceUrlKey);
         if (linkedObjectUrl == null || resourceUrl == null) {
@@ -213,33 +212,33 @@ public class CommonSteps {
 
     /* check http response body */
 
-    @Then("^the result json should be:$")
+    @Then("^the response JSON should be:$")
     public void checkResponseJsonMatch(String jsonString) throws Exception {
         CommonStates.getResultActions().andExpect(content().json(jsonString));
     }
 
-    @Then("^the result should contain (\\d*) (.*)$")
+    @Then("^the response should contain (\\d*) (.*)$")
     public void checkResponseListSize(int size, String className) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$.."+className).isArray())
                 .andExpect(jsonPath("$.."+className+".length()").value(size));
     }
 
-    @Then("^the result should have (.*) with value (.*)$")
+    @Then("^the response should contain field (.*) with value (.*)$")
     public void checkResponseJsonFieldValue(String field, String value) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(value));
     }
 
-    @Then("^the result should have (.*) as number$")
+    @Then("^the response should contain field (.*) with a numeric value$")
     public void checkResponseJsonFieldValueNumber(String field) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).isNumber());
     }
 
-    @Then("^the result should have (.*) as null$")
+    @Then("^the response should contain field (.*) with null value$")
     public void checkResponseJsonFieldValueNull(String field) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(nullValue()));
     }
 
-    @Then("^the result should have (.*) as false$")
+    @Then("^the response should contain field (.*) with a false boolean value$")
     public void checkResponseJsonFieldValueFalse(String field) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(false));
     }
@@ -250,17 +249,17 @@ public class CommonSteps {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(days.toString()));
     }
 
-    @Then("^the result should have (.*) existing$")
-    public void checkResponseJsonFieldValueExist(String field) throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$."+field).exists());
+    @Then("^the response should contain field releaseDate$")
+    public void checkResponseJsonFieldValueExist() throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$.releaseDate").exists());
     }
 
-    @Then("^the result should have (.*) non empty$")
+    @Then("^the response should contain field (.*) with a non-empty value$")
     public void checkResponseJsonFieldValueNotEmpty(String field) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).isNotEmpty());
     }
 
-    @Then("^the result should not contain (.*)$")
+    @Then("^the response should not contain field (.*)$")
     public void checkResponseJsonNoField(String field) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).doesNotExist());
     }
