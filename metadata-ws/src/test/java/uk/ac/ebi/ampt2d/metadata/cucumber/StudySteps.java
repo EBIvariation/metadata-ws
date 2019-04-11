@@ -46,7 +46,7 @@ public class StudySteps {
         CommonStates.setResultActions(postTestStudy("EGAS0001", 1, "test_human_study", false, LocalDate.now(), testTaxonomyKey));
     }
 
-    @When("^I request POST /studies with JSONLIKE payload:$")
+    @When("^I request POST /studies with JSON-like payload:$")
     public void postTestStudy(String jsonLikeData) throws Exception {
         String[] values = jsonLikeData.split(",");
         String json = "{";
@@ -60,23 +60,19 @@ public class StudySteps {
                 } else if (jsonLikeData.contains("tomorrow")) {
                     json += LocalDate.now().plusDays(+1);
                 }
-                json += "\"" + ",";
+                json += "\",";
                 continue;
             } else if (value.contains("taxonomy")) {
                 String taxonomyKey = value.substring(value.indexOf(":") + 1);
-                taxonomyKey = taxonomyKey.replace("\"", "");
-                taxonomyKey = taxonomyKey.trim();
+                taxonomyKey = taxonomyKey.replace("\"", "").trim();
                 String taxonomyUrl = CommonStates.getUrl(taxonomyKey);
-                json += "\"taxonomy\": \"" + taxonomyUrl + "\"";
-                json += ",";
+                json += "\"taxonomy\": \"" + taxonomyUrl + "\",";
                 continue;
             }
-            json += value;
-            json += ",";
+            json += value + ",";
         }
         json += "\"description\": \"Nothing important\"," +
-                "\"center\": \"EBI\"" ;
-        json += "}";
+                "\"center\": \"EBI\"}";
 
         CommonStates.setResultActions(mockMvc.perform(post("/studies")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -134,7 +130,7 @@ public class StudySteps {
         CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base).param(name, value)));
     }
 
-    @When("^I request search for studies with release-date")
+    @When("^I request search for studies that have been released")
     public void performSearchOnResources() throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/studies/search/release-date")));
     }

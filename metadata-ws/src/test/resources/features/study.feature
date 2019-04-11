@@ -17,18 +17,18 @@ Feature: study object
 
 
   Scenario Outline: search various study by taxonomy name and id
-    When I request POST taxonomies 207598 for id, Homininae for name and NONE for ancestors
+    When I request POST taxonomies with 207598 for ID, Homininae for name and NONE for ancestors
     Then set the URL to TAXONOMY_1
-    When I request POST taxonomies 9606 for id, Homo Sapiens for name and TAXONOMY_1 for ancestors
+    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for ancestors
     Then set the URL to TAXONOMY_2
-    When I request POST taxonomies 9596 for id, Pan for name and TAXONOMY_1 for ancestors
+    When I request POST taxonomies with 9596 for ID, Pan for name and TAXONOMY_1 for ancestors
     Then set the URL to TAXONOMY_3
-    When I request POST taxonomies 9597 for id, Pan paniscus for name and TAXONOMY_1,TAXONOMY_3 for ancestors
+    When I request POST taxonomies with 9597 for ID, Pan paniscus for name and TAXONOMY_1,TAXONOMY_3 for ancestors
     Then set the URL to TAXONOMY_4
-    When I request POST taxonomies 9598 for id, Pan troglodytes for name and TAXONOMY_1,TAXONOMY_3 for ancestors
+    When I request POST taxonomies with 9598 for ID, Pan troglodytes for name and TAXONOMY_1,TAXONOMY_3 for ancestors
     Then set the URL to TAXONOMY_5
 
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "testhuman",
@@ -40,7 +40,7 @@ Feature: study object
     "taxonomy": "TAXONOMY_2"
     """
     Then set the URL to STUDY1
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "testbonobo",
@@ -52,7 +52,7 @@ Feature: study object
     "taxonomy": "TAXONOMY_4"
     """
     Then set the URL to STUDY2
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "testchimpanzee",
@@ -91,7 +91,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "releasedYesterday",
@@ -103,7 +103,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY1
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "releasedToday",
@@ -115,7 +115,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY2
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "releasedTomorrow",
@@ -148,7 +148,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "releasedYesterday",
@@ -160,7 +160,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY1
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "releasedToday",
@@ -172,7 +172,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY2
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "releasedTomorrow",
@@ -220,7 +220,7 @@ Feature: study object
     }
     """
     Then set the URL to REFERENCE_SEQUENCE_2
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "EGAS0001",
@@ -232,7 +232,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY1
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "EGAS0001",
@@ -281,7 +281,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "EGAS0001",
@@ -293,7 +293,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY1
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "EGAS0001",
@@ -305,7 +305,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY2
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "EGAS0002",
@@ -343,7 +343,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "EGAS0001",
@@ -355,7 +355,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY1
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "EGAS0001",
@@ -367,7 +367,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY2
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "EGAS0002",
@@ -411,7 +411,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "EGAS0001",
@@ -423,7 +423,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY2
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "EGAS0002",
@@ -478,7 +478,7 @@ Feature: study object
     """
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_1
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "1kg",
@@ -490,7 +490,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY1
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "1kg",
@@ -502,7 +502,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY2
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "1kg",
@@ -569,7 +569,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "1kg",
@@ -581,7 +581,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY1
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "1kg",
@@ -637,7 +637,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "1kg",
@@ -658,7 +658,7 @@ Feature: study object
 
 
   Scenario: search studies invalid dates
-    When I request search for studies with release-date
+    When I request search for studies that have been released
     Then the response code should be 4xx
     And the response should contain field exception with value java.lang.IllegalArgumentException
     And the response should contain field message with value Either from or to needs to be non-null
@@ -677,7 +677,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "1kg",
@@ -706,7 +706,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "1kg",
@@ -742,7 +742,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "testhuman",
@@ -754,7 +754,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY1
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "testhuman",
@@ -766,7 +766,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY2
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "testhuman",
@@ -778,7 +778,7 @@ Feature: study object
     "taxonomy": "TAXONOMY"
     """
     Then set the URL to STUDY3
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "testhuman",
@@ -826,7 +826,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "1kg",
@@ -867,7 +867,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "1kg",
@@ -906,7 +906,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "1kg",
@@ -947,6 +947,7 @@ Feature: study object
     When I request PATCH STUDY_NON_EXISTING with patch and day today
     Then the response code should be 4xx
 
+
   Scenario: patch study with invalid request
     When I request POST /taxonomies with JSON payload:
     """
@@ -956,7 +957,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "1kg",

@@ -28,6 +28,7 @@ Feature: analysis object
     Then the response code should be 200
     And the response should contain field accessionVersionId.accession with value EGAA0001
 
+
   Scenario: update an analysis successfully
     When I request POST /reference-sequences with JSON payload:
     """
@@ -81,6 +82,7 @@ Feature: analysis object
     And the response should contain one reference sequence
     And the href of the referenceSequence of reference-sequences has items REFERENCE_SEQUENCE_2
 
+
   Scenario Outline: update an analysis with invalid reference sequences list should fail
     When I request POST /reference-sequences with JSON payload:
     """
@@ -124,6 +126,7 @@ Feature: analysis object
      | EMPTY | uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException   |
      | REFERENCE_SEQUENCE_1,EMPTY | uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException |
 
+
   Scenario Outline: register an analysis with invalid reference sequence should fail
     When I request POST /taxonomies with JSON payload:
     """
@@ -143,6 +146,7 @@ Feature: analysis object
       | list | exception |
       | NONE | uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException |
       | EMPTY | uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException |
+
 
   Scenario: delete all of an analysis's reference sequences should fail
     When I request POST /reference-sequences with JSON payload:

@@ -43,7 +43,7 @@ public class TaxonomySteps {
                 .andExpect(jsonPath("$..taxonomies.length()").value(0));
     }
 
-    @When("^I request POST taxonomies (\\d*) for id, (.*) for name and (.*) for ancestors")
+    @When("^I request POST taxonomies with (\\d*) for ID, (.*) for name and (.*) for ancestors")
     public void performPostOnTaxonomies(long id, String name, String ancestorKeys) throws Exception {
         List<String> newUrls = CommonStates.getUrls(ancestorKeys);
         String jsonContent = "{ " +

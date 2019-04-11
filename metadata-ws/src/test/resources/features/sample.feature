@@ -69,6 +69,7 @@ Feature: sample object
       | NONE |
       | BLANK |
 
+
   Scenario: delete all of a sample's taxonomies should fail
     When I request POST /taxonomies with JSON payload:
     """

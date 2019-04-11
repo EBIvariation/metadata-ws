@@ -23,6 +23,7 @@ Feature: taxonomy object
     When I request GET /taxonomies
     Then the response should contain one taxonomy
 
+
   Scenario: register a taxonomy with taxonomyId less than 1 should fail
     When I request POST /taxonomies with JSON payload:
     """

@@ -137,6 +137,7 @@ Feature: reference sequence
       | type=GENE | REFERENCE_SEQUENCE_1 | GENE |
       | type=ASSEMBLY | REFERENCE_SEQUENCE_2 | ASSEMBLY |
 
+
   Scenario Outline: find zero reference sequence
     When I request POST /reference-sequences with JSON payload:
     """
@@ -175,6 +176,7 @@ Feature: reference sequence
       | name=GRCh37&patch=p3&accessions=GCA_000001405.3 |
       | type=GENE |
       | type=TRANSCRIPTOME |
+
 
   Scenario: find reference sequence by invalid type should fail
     When I request search for the reference-sequences with the parameters: type=UNKNOWN

@@ -9,7 +9,7 @@ Feature: accession object
     }
     """
     Then set the URL to TAXONOMY
-    And I request POST /studies with JSONLIKE payload:
+    And I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "EGAS0001",
@@ -48,7 +48,7 @@ Feature: accession object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "EGAS0001",

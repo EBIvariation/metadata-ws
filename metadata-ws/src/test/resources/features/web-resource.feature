@@ -16,6 +16,7 @@ Feature: Web resource object
     And the response should contain field type with value CENTER_WEB
     And the response should contain field resourceUrl with value http://www.ebi.ac.uk
 
+
   Scenario Outline: register a web resource with valid URL should succeed
     When I request POST /webResources with JSON payload:
     """

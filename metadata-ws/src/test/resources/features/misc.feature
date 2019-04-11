@@ -3,9 +3,11 @@ Feature: Miscellaneous functions
   Scenario: verify cross origin resource sharing
     When I request OPTIONS / with GET for Access-Control-Request-Method header and http://www.evil-url.com for Origin header
     Then the response code should be 200
+
     Given there is an URL http://www.evil-url.com with key EVIL_URL
     And the Access-Control-Allow-Origin header should be present with value of EVIL_URL
     And the Allow header should contain GET
+
 
   Scenario Outline: verify metadata objects are auditable
     Given current time as START_TIME1
@@ -19,6 +21,7 @@ Feature: Miscellaneous functions
       }
       """
     Then set the URL to REFERENCE_SEQUENCE
+
     When I request POST /taxonomies with JSON payload:
     """
       {
@@ -27,7 +30,7 @@ Feature: Miscellaneous functions
       }
       """
     Then set the URL to TAXONOMY
-    When I request POST /studies with JSONLIKE payload:
+    When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
       "accession": "testhuman",
@@ -85,6 +88,7 @@ Feature: Miscellaneous functions
     Given current time as END_TIME1
     When I request GET with value of <url>
     Then the response code should be 200
+
     And the href of the class <class> should be <url>
     And the response should contain field lastModifiedDate with a non-empty value
     And the lastModifiedDate should be after START_TIME1 and before END_TIME1
@@ -96,6 +100,7 @@ Feature: Miscellaneous functions
     Given current time as END_TIME2
     When I request GET with value of <url>
     Then the response code should be 200
+
     And the href of the class <class> should be <url>
     And the response should contain field lastModifiedDate with a non-empty value
     And the lastModifiedDate should be after START_TIME2 and before END_TIME2
