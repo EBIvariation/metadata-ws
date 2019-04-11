@@ -21,7 +21,7 @@ Feature: taxonomy object
     }
     """
     When I request GET /taxonomies
-    Then the response should contain 1 taxonomies
+    Then the response should contain one taxonomy
 
   Scenario: register a taxonomy with taxonomyId less than 1 should fail
     When I request POST /taxonomies with JSON payload:
@@ -33,4 +33,4 @@ Feature: taxonomy object
     """
     Then the response code should be 4xx
     When I request GET /taxonomies
-    Then the response should contain 0 taxonomies
+    Then the response should contain no taxonomy

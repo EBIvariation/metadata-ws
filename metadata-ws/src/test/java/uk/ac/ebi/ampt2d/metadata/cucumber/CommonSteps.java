@@ -223,6 +223,30 @@ public class CommonSteps {
                 .andExpect(jsonPath("$.."+className+".length()").value(size));
     }
 
+    @Then("^the response should contain no study$")
+    public void checkStudyResponseSize() throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$..studies").isArray())
+                .andExpect(jsonPath("$..studies.length()").value(0));
+    }
+
+    @Then("^the response should contain one file$")
+    public void checkFileResponseSize() throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$..files").isArray())
+                .andExpect(jsonPath("$..files.length()").value(1));
+    }
+
+    @Then("^the response should contain one sample$")
+    public void checkSampleResponseSize() throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(1));
+    }
+
+    @Then("^the response should contain one taxonomy$")
+    public void checkTaxonomyResponseSize() throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$..taxonomies").isArray())
+                .andExpect(jsonPath("$..taxonomies.length()").value(1));
+    }
+
     @Then("^the response should contain field (.*) with value (.*)$")
     public void checkResponseJsonFieldValue(String field, String value) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(value));
@@ -238,30 +262,15 @@ public class CommonSteps {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(nullValue()));
     }
 
-    @Then("^the response should contain field (.*) with a false boolean value$")
-    public void checkResponseJsonFieldValueFalse(String field) throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(false));
-    }
-
     @Then("^the difference between (.*) and today should be (\\d*) day$")
     public void checkResponseJsonFieldValueDay(String field, int diff) throws Exception {
         LocalDate days = LocalDate.now().plusDays(diff);
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(days.toString()));
     }
 
-    @Then("^the response should contain field releaseDate$")
-    public void checkResponseJsonFieldValueExist() throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$.releaseDate").exists());
-    }
-
     @Then("^the response should contain field (.*) with a non-empty value$")
     public void checkResponseJsonFieldValueNotEmpty(String field) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).isNotEmpty());
-    }
-
-    @Then("^the response should not contain field (.*)$")
-    public void checkResponseJsonNoField(String field) throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$."+field).doesNotExist());
     }
 
     @And("^the href of the class (.*) should be (.*)$")

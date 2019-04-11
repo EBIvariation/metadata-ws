@@ -450,7 +450,7 @@ Feature: study object
 
     When I request GET for the studies with query parameter page=1
     Then the response code should be 200
-    And the response should contain 0 studies
+    And the response should contain no study
 
     Examples:
     | param | url |
@@ -525,12 +525,12 @@ Feature: study object
     Then the response code should be 200
 
     When I request GET for analyses of STUDY1
-    Then the response should contain 1 analyses
+    Then the response should contain one analysis
     And the href of the analysis of analyses has items ANALYSIS
 
     When I request GET for analyses of STUDY2
     Then the response code should be 200
-    And the response should contain 0 analyses
+    And the response should contain no analysis
 
     When I request search for the studies with the parameters: taxonomy.taxonomyId=9606
     Then the response code should be 200
@@ -603,7 +603,7 @@ Feature: study object
     And the href of the class study should be STUDY2
 
     When I request GET for analyses of STUDY2
-    Then the response should contain 0 analyses
+    Then the response should contain no analysis
 
     When I request search for the studies with the parameters: taxonomy.taxonomyId=9606
     Then the response code should be 200
@@ -801,14 +801,14 @@ Feature: study object
 
     When I request GET for linkedStudies of STUDY4
     Then the response code should be 200
-    And the response should contain 0 studies
+    And the response should contain no study
 
     When I request PATCH STUDY1 with list STUDY_NON_EXISTING of childStudies
     Then the response code should be 2xx
 
     When I request GET for linkedStudies of STUDY1
     Then the response code should be 200
-    And the response should contain 0 studies
+    And the response should contain no study
 
     Examples:
   | url | linkedStudies |
@@ -886,7 +886,7 @@ Feature: study object
 
     When I request search for the studies with the parameters: browsable=true
     Then the response code should be 200
-    And the response should contain 0 studies
+    And the response should contain no study
 
     When I request PATCH STUDY with content {"browsable": "true"}
     Then the response code should be 2xx

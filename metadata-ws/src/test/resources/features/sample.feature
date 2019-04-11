@@ -18,7 +18,7 @@ Feature: sample object
     And the response should contain field name with value test_human_sample
     When I request GET for taxonomies of SAMPLE
     Then the response code should be 200
-    And the response should contain 1 taxonomies
+    And the response should contain one taxonomy
     And the href of the taxonomy of taxonomies has items TAXONOMY
 
 
@@ -40,7 +40,7 @@ Feature: sample object
     And the response should contain field name with value test_human_sample
     When I request GET for taxonomies of SAMPLE
     Then the response code should be 200
-    And the response should contain 1 taxonomies
+    And the response should contain one taxonomy
     And the href of the taxonomy of taxonomies has items TAXONOMY_1
 
     When I request POST /taxonomies with JSON payload:
@@ -55,7 +55,7 @@ Feature: sample object
     Then the response code should be 2xx
     When I request GET for taxonomies of SAMPLE
     Then the response code should be 200
-    And the response should contain 1 taxonomies
+    And the response should contain one taxonomy
     And the href of the taxonomy of taxonomies has items TAXONOMY_2
 
 
@@ -124,7 +124,7 @@ Feature: sample object
     And the response should contain field name with value test_human_sample
     When I request GET for taxonomies of SAMPLE
     Then the response code should be 200
-    And the response should contain 1 taxonomies
+    And the response should contain one taxonomy
     And the href of the taxonomy of taxonomies has items TAXONOMY
 
     When I request PATCH SAMPLE with list <list> of taxonomies
@@ -236,7 +236,7 @@ Feature: sample object
 
     When I request search for the samples with the parameters: <query>
     Then the response code should be 200
-    And the response should contain 1 samples
+    And the response should contain one sample
     And the href of the sample of samples has items <url>
 
     Examples:
@@ -289,7 +289,7 @@ Feature: sample object
 
     When I request search for the samples with the parameters: <query>
     And the response code should be 200
-    And the response should contain 0 samples
+    And the response should contain no sample
 
     Examples:
       | query |

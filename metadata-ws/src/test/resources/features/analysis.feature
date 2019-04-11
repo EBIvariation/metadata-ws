@@ -346,7 +346,7 @@ Feature: analysis object
 
      When I request search for the analyses with the parameters: <query>
      Then the response code should be 200
-     And the response should contain 0 analyses
+     And the response should contain no analysis
 
      Examples:
        | query |

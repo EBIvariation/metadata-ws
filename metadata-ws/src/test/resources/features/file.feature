@@ -33,4 +33,4 @@ Feature: file object
     }
     """
     When I request GET /files
-    Then the response should contain 1 files
+    Then the response should contain one file

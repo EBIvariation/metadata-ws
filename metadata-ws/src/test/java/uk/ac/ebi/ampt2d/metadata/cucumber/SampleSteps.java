@@ -18,6 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.cucumber;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @Ignore
 @AutoConfigureMockMvc
@@ -63,6 +65,12 @@ public class SampleSteps {
         List<String> testTaxonomyList = CommonStates.getUrls(testTaxonomyKeys);
         // null accession
         CommonStates.setResultActions(postTestSampleNoOrNullAccession(true, name, testTaxonomyList));
+    }
+
+    @Then("^the response should contain no sample$")
+    public void checkStudyResponseSize() throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$..samples").isArray())
+                .andExpect(jsonPath("$..samples.length()").value(0));
     }
 
     private ResultActions postTestSample(String accession, String name, List<String> testTaxonomyList, int version) throws Exception {

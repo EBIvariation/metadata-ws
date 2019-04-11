@@ -18,6 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.cucumber;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @Ignore
 @AutoConfigureMockMvc
@@ -54,6 +56,18 @@ public class AnalysisSteps {
                 postTestAnalysis(accession, referenceSequenceUrlKey, studyUrlKey,
                         technology, type, platform)
         );
+    }
+
+    @Then("^the response should contain one analysis$")
+    public void checkResponseListSize() throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(1));
+    }
+
+    @Then("^the response should contain no analysis$")
+    public void checkResponseSize() throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$..analyses").isArray())
+                .andExpect(jsonPath("$..analyses.length()").value(0));
     }
 
     private ResultActions postTestAnalysis(String accession, String referenceSequenceUrlKey, String studyUrlKey,

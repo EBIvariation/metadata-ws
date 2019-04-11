@@ -36,7 +36,7 @@ Feature: accession object
 
     When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.2
     Then the response code should be 200
-    And the response should contain 0 studies
+    And the response should contain no study
 
 
   Scenario: find study by accession and version
@@ -84,7 +84,7 @@ Feature: accession object
 
     When I request elaborate find for the files with the parameters: accessionVersionId=EGAF0001.1
     Then the response code should be 200
-    And the response should contain 1 files
+    And the response should contain one file
     And the accessionVersionId.accession field of files 0 should be EGAF0001
 
 
@@ -111,7 +111,7 @@ Feature: accession object
 
     When I request elaborate find for the samples with the parameters: accessionVersionId=EGAN0001.1
     Then the response code should be 200
-    And the response should contain 1 samples
+    And the response should contain one sample
     And the accessionVersionId.accession field of samples 0 should be EGAN0001
 
 

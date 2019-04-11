@@ -145,6 +145,20 @@ public class StudySteps {
                 .andExpect(jsonPath("$..studies.length()").value(1));
     }
 
+    @Then("^the response should contain field releaseDate$")
+    public void checkResponseJsonFieldValueExist() throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$.releaseDate").exists());
+    }
+
+    @Then("^the response should contain field (.*) with a false boolean value$")
+    public void checkResponseJsonFieldValueFalse(String field) throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(false));
+    }
+
+    @Then("^the response should not contain field (.*)$")
+    public void checkResponseJsonNoField(String field) throws Exception {
+        CommonStates.getResultActions().andExpect(jsonPath("$."+field).doesNotExist());
+    }
 
     private ResultActions postTestStudy(String accession, int version, String name, boolean deprecated, LocalDate releaseDate, String testTaxonomyKey) throws Exception {
         String jsonContent = "{" +
