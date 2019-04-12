@@ -316,7 +316,7 @@ Feature: sample object
     """
     Then set the URL to TAXONOMY2
 
-    When I create a no accession sample with Sample1 for name and TAXONOMY1,TAXONOMY2 for taxonomy
+    When I create a non-accessioned sample with Sample1 for name and TAXONOMY1,TAXONOMY2 for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE
     When I request GET with value of SAMPLE
@@ -324,7 +324,7 @@ Feature: sample object
     And the response should contain field id with a numeric value
     And the response should contain field accessionVersionId with null value
 
-    When I create a null accession sample with Sample1 for name and TAXONOMY1,TAXONOMY2 for taxonomy
+    When I provide a null accession for a sample with Sample1 for name and TAXONOMY1,TAXONOMY2 for taxonomy
     Then the response code should be 4xx
     And the property field of errors 0 should be accessionVersionId.accession
     And the message field of errors 0 should be may not be null

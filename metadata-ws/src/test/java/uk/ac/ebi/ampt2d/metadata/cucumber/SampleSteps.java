@@ -53,14 +53,14 @@ public class SampleSteps {
         CommonStates.setResultActions(postTestSample(accession, name, testTaxonomyList, version));
     }
 
-    @When("I create a no accession sample with (.*) for name and (.*) for taxonomy")
+    @When("I create a non-accessioned sample with (.*) for name and (.*) for taxonomy")
     public void createTestSampleParameterizedNoAccession(String name, String testTaxonomyKeys) throws Exception {
         List<String> testTaxonomyList = CommonStates.getUrls(testTaxonomyKeys);
         // no accession
         CommonStates.setResultActions(postTestSampleNoOrNullAccession(false, name, testTaxonomyList));
     }
 
-    @When("I create a null accession sample with (.*) for name and (.*) for taxonomy")
+    @When("I provide a null accession for a sample with (.*) for name and (.*) for taxonomy")
     public void createTestSampleParameterizedNullAccession(String name, String testTaxonomyKeys) throws Exception {
         List<String> testTaxonomyList = CommonStates.getUrls(testTaxonomyKeys);
         // null accession
