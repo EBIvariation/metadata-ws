@@ -200,24 +200,22 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /reference-sequences with JSON payload:
+    When I request POST /reference-sequences with JSON-like payload:
     """
-    {
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY"
-    }
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE_1
-    When I request POST /reference-sequences with JSON payload:
+    When I request POST /reference-sequences with JSON-like payload:
     """
-    {
       "name": "GRCh38",
       "patch": "p2",
       "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
-      "type": "ASSEMBLY"
-    }
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE_2
     When I request POST /studies with JSON-like payload:
@@ -467,14 +465,13 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I request POST /reference-sequences with JSON payload:
+    When I request POST /reference-sequences with JSON-like payload:
     """
-    {
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY"
-    }
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_1

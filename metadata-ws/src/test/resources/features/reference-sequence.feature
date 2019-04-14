@@ -1,14 +1,22 @@
 Feature: reference sequence
 
   Scenario: register a reference sequence successfully
-    When I request POST /reference-sequences with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
     {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY"
-    }
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE
     And the response code should be 201
@@ -29,25 +37,32 @@ Feature: reference sequence
 
 
   Scenario Outline: find one reference sequence by name
-    When I request POST /reference-sequences with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
     {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY"
-    }
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_1
-    When I request POST /reference-sequences with JSON payload:
+    When I request POST /reference-sequences with JSON-like payload:
     """
-    {
       "name": "GRCh38",
       "patch": "p2",
       "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
-      "type": "ASSEMBLY"
-    }
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_2
@@ -68,25 +83,32 @@ Feature: reference sequence
 
 
   Scenario Outline: find one reference sequence by accession
-    When I request POST /reference-sequences with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
     {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY"
-    }
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_1
-    When I request POST /reference-sequences with JSON payload:
+    When I request POST /reference-sequences with JSON-like payload:
     """
-    {
       "name": "GRCh38",
       "patch": "p2",
       "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
-      "type": "ASSEMBLY"
-    }
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_2
@@ -104,25 +126,32 @@ Feature: reference sequence
 
 
   Scenario Outline: find one reference sequence by type
-    When I request POST /reference-sequences with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
     {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
       "name": "BRCA1",
       "patch": "3",
       "accessions": ["NM_007294.3"],
-      "type": "GENE"
-    }
+      "type": "GENE",
+      "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_1
-    When I request POST /reference-sequences with JSON payload:
+    When I request POST /reference-sequences with JSON-like payload:
     """
-    {
       "name": "GRCh38",
       "patch": "p2",
       "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
-      "type": "ASSEMBLY"
-    }
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_2
@@ -139,25 +168,32 @@ Feature: reference sequence
 
 
   Scenario Outline: find zero reference sequence
-    When I request POST /reference-sequences with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
     {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY"
-    }
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_1
-    When I request POST /reference-sequences with JSON payload:
+    When I request POST /reference-sequences with JSON-like payload:
     """
-    {
       "name": "GRCh38",
       "patch": "p2",
       "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
-      "type": "ASSEMBLY"
-    }
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_2
