@@ -95,4 +95,7 @@ public class ReferenceSequence extends Auditable<Long> {
         return type;
     }
 
+    public Taxonomy getTaxonomy() {
+        return taxonomy;
+    }
 }

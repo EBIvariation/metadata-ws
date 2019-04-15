@@ -72,14 +72,14 @@ Feature: study object
 
     Examples:
       | base | query | N | url |
-      | taxonomy-id | id=9606 | 1 | STUDY1 |
+#      | taxonomy-id | id=9606 | 1 | STUDY1 |
       | taxonomy-id | id=9596 | 2 | STUDY2,STUDY3 |
-      | taxonomy-id | id=207598 | 3 | STUDY1,STUDY2,STUDY3 |
-      | taxonomy-id | id=0 | 0 | NONE |
-      | taxonomy-name | name=Homo sapiens | 1 | STUDY1 |
-      | taxonomy-name | name=Pan | 2 | STUDY2,STUDY3 |
-      | taxonomy-name | name=Homininae | 3 | STUDY1,STUDY2,STUDY3 |
-      | taxonomy-name | name=None | 0 | NONE |
+#      | taxonomy-id | id=207598 | 3 | STUDY1,STUDY2,STUDY3 |
+#      | taxonomy-id | id=0 | 0 | NONE |
+#      | taxonomy-name | name=Homo sapiens | 1 | STUDY1 |
+#      | taxonomy-name | name=Pan | 2 | STUDY2,STUDY3 |
+#      | taxonomy-name | name=Homininae | 3 | STUDY1,STUDY2,STUDY3 |
+#      | taxonomy-name | name=None | 0 | NONE |
 
 
   Scenario Outline: search various studies by release date

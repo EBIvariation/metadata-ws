@@ -22,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceService;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.ReferenceSequenceResource;
 
@@ -50,6 +52,10 @@ public class ReferenceSequenceRestController implements ResourceProcessor<Reposi
 
     @Autowired
     private GenericResourceAssembler<ReferenceSequence, ReferenceSequenceResource> resourceAssembler;
+
+    @Autowired
+    private ReferenceSequenceService referenceSequenceService;
+
 
     @ApiOperation(value="Get a filtered list of reference sequences based on filtering criteria")
     @ApiImplicitParams({
@@ -70,9 +76,37 @@ public class ReferenceSequenceRestController implements ResourceProcessor<Reposi
         return ResponseEntity.ok(resources);
     }
 
+    @ApiOperation(value = "Get the list of reference-sequences filtered by taxonomy id")
+    @ApiParam(name = "id", value = "Taxonomy's id", type = "long", required = true, example = "9606")
+    @RequestMapping(method = RequestMethod.GET, path = "search/taxonomy-id", produces = "application/json")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Resources<ReferenceSequenceResource>> findReferenceSequencesByTaxonomyId(long id) {
+        List<ReferenceSequence> referenceSequences = referenceSequenceService.findReferenceSequencesByTaxonomyId(id);
+
+        Resources<ReferenceSequenceResource> resources = (Resources<ReferenceSequenceResource>) resourceAssembler.toResources(ReferenceSequence.class, referenceSequences);
+
+        return ResponseEntity.ok(resources);
+    }
+
+    @ApiOperation(value = "Get the list of reference-sequences filtered by taxonomy name")
+    @ApiParam(name = "name", value = "Taxonomy's name", type = "string", required = true, example = "Homo sapiens")
+    @RequestMapping(method = RequestMethod.GET, path = "search/taxonomy-name", produces = "application/json")
+    @ResponseBody
+    @SuppressWarnings("unchecked")
+    public ResponseEntity<Resources<ReferenceSequenceResource>> findReferenceSequencesByTaxonomyName(String name) {
+        List<ReferenceSequence> referenceSequences = referenceSequenceService.findReferenceSequencesByTaxonomyName(name);
+
+        Resources<ReferenceSequenceResource> resources = (Resources<ReferenceSequenceResource>) resourceAssembler.toResources(ReferenceSequence.class, referenceSequences);
+
+        return ResponseEntity.ok(resources);
+    }
+
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
         resource.add(ControllerLinkBuilder.linkTo(ReferenceSequenceRestController.class).slash("/search").withRel("reference-sequences"));
+        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/taxonomy-id").withRel("studies"));
+        resource.add(ControllerLinkBuilder.linkTo(StudyRestController.class).slash("/search/taxonomy-name").withRel("studies"));
         return resource;
     }
 
