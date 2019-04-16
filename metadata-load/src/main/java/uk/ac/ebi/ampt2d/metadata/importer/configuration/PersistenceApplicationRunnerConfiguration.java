@@ -65,6 +65,7 @@ public class PersistenceApplicationRunnerConfiguration {
         return new TaxonomyExtractor(taxonomyRepository);
     }
 
+    @Bean
     public ObjectsImporter objectImporter(SraRetrieverByAccession sraRetrieverByAccession,
                                           SraXmlParser<StudyType> sraStudyXmlParser,
                                           Converter<StudyType, Study> studyConverter) {

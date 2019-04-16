@@ -30,6 +30,11 @@ public class AnalysisObject implements ObjectToImport<AnalysisObject> {
 
     private List<Analysis> analyses;
 
+    public AnalysisObject(Set<String> accessions, List<Analysis> analyses) {
+        this.accessions = accessions;
+        this.analyses = analyses;
+    }
+
     public Set<String> getAccessions() {
         return accessions;
     }

@@ -59,7 +59,7 @@ public class PersistenceApplicationRunner implements ApplicationRunner {
         studyObject.setAccessions(accessions);
         studyObject = objectsImporter.importObject(studyObject);
         //TODO save study Object importing dependent objects
-        //studyRepository.save(studyObject.getStudies());
+        studyRepository.save(studyObject.getStudies());
     }
 
     private Set<String> readAccessionsFromFile(ApplicationArguments arguments) {

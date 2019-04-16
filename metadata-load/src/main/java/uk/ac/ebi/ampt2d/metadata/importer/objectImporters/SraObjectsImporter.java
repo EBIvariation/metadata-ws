@@ -31,6 +31,7 @@ import uk.ac.ebi.ena.sra.xml.LinkType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.ena.sra.xml.XRefType;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -71,8 +72,7 @@ public class SraObjectsImporter implements ObjectsImporter {
                 String xml = sraRetrieverByAccession.getXml(accession);
                 StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
                 Study study = studyConverter.convert(studyType);
-                AnalysisObject analysisObject = new AnalysisObject();
-                analysisObject.setAccessions(getAnalysisAccessions(studyType));
+                AnalysisObject analysisObject = new AnalysisObject(getAnalysisAccessions(studyType), new ArrayList<>());
                 analysisObject.doImport(this);
                 study.setAnalyses(analysisObject.getAnalyses());
                 studyObject.getStudies().add(study);
