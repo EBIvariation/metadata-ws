@@ -56,7 +56,6 @@ public class ReferenceSequenceRestController implements ResourceProcessor<Reposi
     @Autowired
     private ReferenceSequenceService referenceSequenceService;
 
-
     @ApiOperation(value="Get a filtered list of reference sequences based on filtering criteria")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "name", dataType = "string", paramType = "query", example = "GRCh38"),

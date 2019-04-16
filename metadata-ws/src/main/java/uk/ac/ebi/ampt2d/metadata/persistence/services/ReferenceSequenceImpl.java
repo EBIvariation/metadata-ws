@@ -31,11 +31,6 @@ public class ReferenceSequenceImpl implements ReferenceSequenceService {
     private ReferenceSequenceRepository referenceSequenceRepository;
 
     @Override
-    public List<ReferenceSequence> findReferenceSequencesByPredicate(Predicate predicate) {
-        return (List<ReferenceSequence>) referenceSequenceRepository.findAll(predicate);
-    }
-
-    @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyId(long id) {
         QReferenceSequence referenceSequence = QReferenceSequence.referenceSequence;
         Predicate predicate = referenceSequence.taxonomy.taxonomyId.eq(id).
@@ -52,4 +47,9 @@ public class ReferenceSequenceImpl implements ReferenceSequenceService {
 
         return findReferenceSequencesByPredicate(predicate);
     }
+
+    private List<ReferenceSequence> findReferenceSequencesByPredicate(Predicate predicate) {
+        return (List<ReferenceSequence>) referenceSequenceRepository.findAll(predicate);
+    }
+
 }

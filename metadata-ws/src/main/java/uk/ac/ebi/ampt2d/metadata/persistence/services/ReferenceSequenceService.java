@@ -17,14 +17,11 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
-import com.querydsl.core.types.Predicate;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 
 import java.util.List;
 
 public interface ReferenceSequenceService {
-
-    List<ReferenceSequence> findReferenceSequencesByPredicate(Predicate predicate);
 
     List<ReferenceSequence> findReferenceSequencesByTaxonomyId(long id);
 
