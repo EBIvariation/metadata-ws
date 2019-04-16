@@ -317,9 +317,17 @@ Feature: reference sequence
     Then the response code should be 4xx
 
 
-  Scenario: search various refence sequences by taxonomy name and id
+  Scenario Outline: search various reference sequences by taxonomy name and id
     When I request POST taxonomies with 207598 for ID, Homininae for name and NONE for ancestors
     Then set the URL to TAXONOMY_1
+    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for ancestors
+    Then set the URL to TAXONOMY_2
+    When I request POST taxonomies with 9596 for ID, Pan for name and TAXONOMY_1 for ancestors
+    Then set the URL to TAXONOMY_3
+    When I request POST taxonomies with 9597 for ID, Pan paniscus for name and TAXONOMY_1,TAXONOMY_3 for ancestors
+    Then set the URL to TAXONOMY_4
+    When I request POST taxonomies with 9598 for ID, Pan troglodytes for name and TAXONOMY_1,TAXONOMY_3 for ancestors
+    Then set the URL to TAXONOMY_5
 
     When I request POST /reference-sequences with JSON-like payload:
     """
@@ -327,11 +335,42 @@ Feature: reference sequence
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
       "type": "ASSEMBLY",
-      "taxonomy": "TAXONOMY_1"
+      "taxonomy": "TAXONOMY_2"
     """
-    Then set the URL to REFERENCE_SEQUENCE
+    Then set the URL to REFERENCE_SEQUENCE1
 
-    When I request elaborate search for the reference-sequences base taxonomy-id and with the parameters: id=207598
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh38",
+      "patch": "p2",
+      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY_4"
+    """
+    Then set the URL to REFERENCE_SEQUENCE2
+
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh39",
+      "patch": "p2",
+      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY_5"
+    """
+    Then set the URL to REFERENCE_SEQUENCE3
+
+    When I request elaborate search for the reference-sequences base <base> and with the parameters: <query>
     Then the response code should be 200
-    And the response should contain 1 reference-sequences
-    And the href of the referenceSequence of reference-sequences has items REFERENCE_SEQUENCE
+    And the response should contain <N> reference-sequences
+    And the href of the referenceSequence of reference-sequences has items <url>
+
+    Examples:
+      | base | query | N | url |
+      | taxonomy-id | id=9606 | 1 | REFERENCE_SEQUENCE1 |
+      | taxonomy-id | id=9596 | 2 | REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
+      | taxonomy-id | id=207598 | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
+      | taxonomy-id | id=0 | 0 | NONE |
+      | taxonomy-name | name=Homo sapiens | 1 | REFERENCE_SEQUENCE1 |
+      | taxonomy-name | name=Pan | 2 | REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
+      | taxonomy-name | name=Homininae | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
+      | taxonomy-name | name=None | 0 | NONE |

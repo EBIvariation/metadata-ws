@@ -36,13 +36,4 @@ public interface ReferenceSequenceRepository extends PagingAndSortingRepository<
                 .first((path, value) -> path.any().equalsIgnoreCase(value.iterator().next()));
     }
 
-
-    /*
-        default void customize(QuerydslBindings bindings, QStudy study) {
-        bindings.bind(study.analyses.any().referenceSequences.any().name,
-                study.analyses.any().referenceSequences.any().patch)
-                .first((path, value) -> path.equalsIgnoreCase(value));
-    }
-     */
-
 }
