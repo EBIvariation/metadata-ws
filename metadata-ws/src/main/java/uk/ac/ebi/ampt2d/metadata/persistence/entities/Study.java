@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.LocalDateAttributeConverter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Embedded;
@@ -105,7 +106,7 @@ public class Study extends Auditable<Long> {
     @OneToMany
     private List<Study> childStudies;
 
-    @OneToMany(mappedBy = "study")
+    @OneToMany(mappedBy = "study", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Analysis> analyses;
 
     @OneToMany
@@ -119,7 +120,7 @@ public class Study extends Auditable<Long> {
 
     public Study(AccessionVersionId accessionVersionId, String name, String description, String center,
                  LocalDate
-            releaseDate, Taxonomy taxonomy) {
+                         releaseDate, Taxonomy taxonomy) {
         this.accessionVersionId = accessionVersionId;
         this.name = name;
         this.description = description;
@@ -145,6 +146,10 @@ public class Study extends Auditable<Long> {
         return releaseDate;
     }
 
+    public void setReleaseDate(LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
     public List<Study> getChildStudies() {
         return childStudies;
     }
@@ -153,16 +158,32 @@ public class Study extends Auditable<Long> {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getCenter() {
         return center;
     }
 
+    public void setCenter(String center) {
+        this.center = center;
+    }
+
     public Taxonomy getTaxonomy() {
         return taxonomy;
+    }
+
+    public void setTaxonomy(Taxonomy taxonomy) {
+        this.taxonomy = taxonomy;
     }
 
     public boolean isBrowsable() {
@@ -173,31 +194,18 @@ public class Study extends Auditable<Long> {
         return analyses;
     }
 
+    public void setAnalyses(List<Analysis> analyses) {
+        for (Analysis analysis : analyses) {
+            analysis.setStudy(this);
+            this.getAnalyses().add(analysis);
+        }
+    }
+
     public List<WebResource> getResources() {
         return resources;
     }
 
     public List<Publication> getPublications() {
         return publications;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setCenter(String center) {
-        this.center = center;
-    }
-
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
-    }
-
-    public void setTaxonomy(Taxonomy taxonomy) {
-        this.taxonomy = taxonomy;
     }
 }

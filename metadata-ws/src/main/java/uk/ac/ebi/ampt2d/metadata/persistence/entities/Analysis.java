@@ -167,6 +167,10 @@ public class Analysis extends Auditable<Long> {
         return study;
     }
 
+    public void setStudy(Study study) {
+        this.study = study;
+    }
+
     public Technology getTechnology() {
         return technology;
     }
@@ -179,4 +183,7 @@ public class Analysis extends Auditable<Long> {
         return referenceSequences;
     }
 
+    public void setReferenceSequences(List<ReferenceSequence> referenceSequences) {
+        this.getReferenceSequences().addAll(referenceSequences);
+    }
 }

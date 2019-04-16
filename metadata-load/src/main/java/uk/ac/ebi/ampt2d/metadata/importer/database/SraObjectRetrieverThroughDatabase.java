@@ -46,4 +46,8 @@ public class SraObjectRetrieverThroughDatabase implements SraRetrieverByAccessio
             throw new RuntimeException(e);
         }
     }
+
+    public void setEnaObjectQuery(String enaObjectQuery) {
+        this.enaObjectQuery = enaObjectQuery;
+    }
 }

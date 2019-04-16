@@ -20,13 +20,9 @@ package uk.ac.ebi.ampt2d.metadata.importer.persistence;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
-import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
-import uk.ac.ebi.ena.sra.xml.StudyType;
+import uk.ac.ebi.ampt2d.metadata.importer.objectImporters.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.importer.objects.StudyObject;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -45,39 +41,25 @@ public class PersistenceApplicationRunner implements ApplicationRunner {
     private static final Logger PERSISTENCE_APPLICATION_LOGGER =
             Logger.getLogger(PersistenceApplicationRunner.class.getName());
 
-    private SraRetrieverByAccession sraRetrieverByAccession;
+    private StudyObject studyObject;
 
-    private SraXmlParser<StudyType> sraStudyXmlParser;
+    private ObjectsImporter objectsImporter;
 
-    private Converter<StudyType, Study> sraToMetadataObjectConverter;
+    private StudyRepository studyRepository;
 
-    private PagingAndSortingRepository<Study, AccessionVersionId> metadataStudyRepository;
-
-    public PersistenceApplicationRunner(SraRetrieverByAccession sraRetrieverByAccession, SraXmlParser sraStudyXmlParser,
-                                        PagingAndSortingRepository metadataStudyRepository,
-                                        Converter<StudyType, Study> sraToMetadataObjectConverter) {
-        this.sraRetrieverByAccession = sraRetrieverByAccession;
-        this.sraStudyXmlParser = sraStudyXmlParser;
-        this.metadataStudyRepository = metadataStudyRepository;
-        this.sraToMetadataObjectConverter = sraToMetadataObjectConverter;
+    public PersistenceApplicationRunner(StudyObject studyObject, ObjectsImporter objectsImporter, StudyRepository studyRepository) {
+        this.studyObject = studyObject;
+        this.objectsImporter = objectsImporter;
+        this.studyRepository = studyRepository;
     }
 
     @Override
     public void run(ApplicationArguments arguments) throws Exception {
         Set<String> accessions = readAccessionsFromFile(arguments);
-
-        for (String accession : accessions) {
-            try {
-                String xml = sraRetrieverByAccession.getXml(accession);
-                StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
-                Study study = sraToMetadataObjectConverter.convert(studyType);
-                metadataStudyRepository.save(study);
-            } catch (Exception exception) {
-                PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, "Encountered Exception for accession"
-                        + accession);
-                PERSISTENCE_APPLICATION_LOGGER.log(Level.SEVERE, exception.getMessage());
-            }
-        }
+        studyObject.setAccessions(accessions);
+        studyObject = objectsImporter.importObject(studyObject);
+        //TODO save study Object importing dependent objects
+        //studyRepository.save(studyObject.getStudies());
     }
 
     private Set<String> readAccessionsFromFile(ApplicationArguments arguments) {
