@@ -120,8 +120,10 @@ public class Analysis extends Auditable<Long> {
     private Technology technology;
 
     @ApiModelProperty(position = 8, required = true)
+    @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Type type;
 
     @ApiModelProperty(position = 9, required = true)
@@ -184,6 +186,6 @@ public class Analysis extends Auditable<Long> {
     }
 
     public void setReferenceSequences(List<ReferenceSequence> referenceSequences) {
-        this.getReferenceSequences().addAll(referenceSequences);
+        this.referenceSequences = referenceSequences;
     }
 }

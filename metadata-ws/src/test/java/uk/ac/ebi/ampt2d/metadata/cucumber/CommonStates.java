@@ -19,8 +19,8 @@ package uk.ac.ebi.ampt2d.metadata.cucumber;
 
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ public class CommonStates {
 
     private static Map<String, String> urlMap = new HashMap<>();
 
-    private static Map<String, ZonedDateTime> timeMap = new HashMap<>();
+    private static Map<String, Date> timeMap = new HashMap<>();
 
     private static ResultActions resultActions;
 
@@ -57,11 +57,11 @@ public class CommonStates {
         CommonStates.resultActions = resultActions;
     }
 
-    public static void setTime(String key, ZonedDateTime value) {
+    public static void setTime(String key, Date value) {
         timeMap.put(key, value);
     }
 
-    public static ZonedDateTime getTime(String key) {
+    public static Date getTime(String key) {
         return timeMap.get(key);
     }
 
