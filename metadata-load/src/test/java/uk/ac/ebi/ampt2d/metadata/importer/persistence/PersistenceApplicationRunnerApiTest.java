@@ -50,6 +50,24 @@ public class PersistenceApplicationRunnerApiTest {
         Assert.assertEquals(2, studyRepository.count());
     }
 
+    @Test(expected = RuntimeException.class)
+    public void testInvalidFilePath() throws Exception {
+        applicationArguments[0] = "--accessions.file.path=InvalidFilePath/studyAccessions.txt";
+        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
+        StudyRepository studyRepository = (StudyRepository) getBean(configurableApplicationContext,
+                "studyRepository");
+        Assert.assertEquals(0, studyRepository.count());
+    }
+
+    @Test
+    public void testDuplicateStudy() throws Exception {
+        applicationArguments[0] = "--accessions.file.path=study/duplicateStudyAccessions.txt";
+        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
+        StudyRepository studyRepository = (StudyRepository) getBean(configurableApplicationContext,
+                "studyRepository");
+        Assert.assertEquals(1, studyRepository.count());
+    }
+
     private Object getBean(ConfigurableApplicationContext configurableApplicationContext, String bean) {
         return configurableApplicationContext.getBeanFactory().getBean(bean);
     }

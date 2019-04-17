@@ -20,7 +20,6 @@ package uk.ac.ebi.ampt2d.metadata.importer.objectImporters;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
-import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectRetrieverThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.objects.AnalysisObject;
 import uk.ac.ebi.ampt2d.metadata.importer.objects.ReferenceSequenceObject;
 import uk.ac.ebi.ampt2d.metadata.importer.objects.SampleObject;
@@ -40,7 +39,7 @@ import java.util.stream.Stream;
 
 public class SraObjectsImporter implements ObjectsImporter {
 
-    private static final String STUDY_QUERY = "SELECT STUDY_XML FROM ERA.ANALYSIS WHERE STUDY_ID = :accession";
+    private static final String STUDY_QUERY = "SELECT STUDY_XML FROM ERA.STUDY WHERE STUDY_ID = :accession";
 
     private static final Logger IMPORT_LOGGER = Logger.getLogger(SraObjectsImporter.class.getName());
 
@@ -60,10 +59,6 @@ public class SraObjectsImporter implements ObjectsImporter {
 
     @Override
     public StudyObject importObject(StudyObject studyObject) {
-
-        if (sraRetrieverByAccession instanceof SraObjectRetrieverThroughDatabase) {
-            ((SraObjectRetrieverThroughDatabase) sraRetrieverByAccession).setEnaObjectQuery(STUDY_QUERY);
-        }
 
         Set<String> accessions = studyObject.getAccessions();
 

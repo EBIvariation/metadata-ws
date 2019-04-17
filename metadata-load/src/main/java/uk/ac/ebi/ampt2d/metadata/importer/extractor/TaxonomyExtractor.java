@@ -27,7 +27,7 @@ public class TaxonomyExtractor {
     private static Taxonomy taxonomy;
 
     public TaxonomyExtractor(TaxonomyRepository taxonomyRepository) {
-        taxonomy = taxonomyRepository.findOne(TAXONOMY_ID);
+        taxonomy = taxonomyRepository.save(new Taxonomy(9606,"Homo Sapiens"));
     }
 
     public Taxonomy getTaxonomy() {

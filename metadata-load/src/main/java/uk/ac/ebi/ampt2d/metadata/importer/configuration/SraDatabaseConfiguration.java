@@ -27,15 +27,13 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectRetrieverThroughDatabase;
+import uk.ac.ebi.ampt2d.metadata.importer.objects.EnaObjectQuery;
 
 import javax.sql.DataSource;
 
 @Configuration
 @ConditionalOnProperty(name = "import.source", havingValue = "DB")
 public class SraDatabaseConfiguration {
-
-    @Value("${ena.study.query}")
-    private String enaObjectQuery;
 
     @Bean("enaDatasourceProperties")
     @ConfigurationProperties("ena.datasource")
@@ -62,6 +60,6 @@ public class SraDatabaseConfiguration {
 
     @Bean
     public SraObjectRetrieverThroughDatabase sraDatabaseAnalysisRetriever() {
-        return new SraObjectRetrieverThroughDatabase(enaJdbcTemplate(), enaObjectQuery);
+        return new SraObjectRetrieverThroughDatabase(enaJdbcTemplate(), EnaObjectQuery.STUDY_QUERY);
     }
 }

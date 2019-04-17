@@ -40,10 +40,9 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,8 +63,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class CommonSteps {
-
-    private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
     @Autowired
     private MockMvc mockMvc;
@@ -333,15 +330,15 @@ public class CommonSteps {
 
     @Given("^current time as (.*)$")
     public void setTime(String timeKey) {
-        CommonStates.setTime(timeKey, new Date());
+        CommonStates.setTime(timeKey, ZonedDateTime.now());
     }
 
     @Then("^the (.*) should be after (.*) and before (.*)$")
     public void checkDateTimeBetween(String dateTime, String afterKey, String beforeKey) throws Exception {
         JSONObject jsonObject = new JSONObject(CommonStates.getResultActions().andReturn().getResponse().getContentAsString());
-        Date lastModifiedDate = format.parse(jsonObject.getString(dateTime));
-        assert lastModifiedDate.after(CommonStates.getTime(afterKey));
-        assert lastModifiedDate.before(CommonStates.getTime(beforeKey));
+        ZonedDateTime lastModifiedDate = ZonedDateTime.parse(jsonObject.getString(dateTime));
+        assert lastModifiedDate.isAfter(CommonStates.getTime(afterKey));
+        assert lastModifiedDate.isBefore(CommonStates.getTime(beforeKey));
     }
 
     @Given("^there is an URL (.*) with key (.*)$")

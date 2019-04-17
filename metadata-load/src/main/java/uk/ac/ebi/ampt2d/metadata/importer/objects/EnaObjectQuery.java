@@ -16,23 +16,9 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.persistence.idconverter;
+package uk.ac.ebi.ampt2d.metadata.importer.objects;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
-import java.sql.Date;
-import java.time.LocalDate;
+public interface EnaObjectQuery {
 
-@Converter(autoApply = true)
-public class LocalDateAttributeConverter implements AttributeConverter<LocalDate, Date> {
-
-    @Override
-    public Date convertToDatabaseColumn(LocalDate locDate) {
-        return (locDate == null ? null : Date.valueOf(locDate));
-    }
-
-    @Override
-    public LocalDate convertToEntityAttribute(Date sqlDate) {
-        return (sqlDate == null ? null : sqlDate.toLocalDate());
-    }
+    String STUDY_QUERY = "SELECT STUDY_XML FROM ERA.STUDY WHERE STUDY_ID = :accession";
 }
