@@ -266,6 +266,11 @@ public class CommonSteps {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(value));
     }
 
+    @Then("^the response should contain error message (.*)$")
+    public void checkResponseJsonMessage(String message) throws Exception {
+        CommonStates.getResultActions().andReturn().getResponse().getContentAsString().contains(message);
+    }
+
     @Then("^the response should contain field (.*) with a numeric value$")
     public void checkResponseJsonFieldValueNumber(String field) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).isNumber());

@@ -272,10 +272,10 @@ Feature: reference sequence
       "type": "ASSEMBLY"
     }
     """
-    And the response should contain field exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.ReferenceSequenceWithoutValidTaxonomyException
+    And the response should contain error message A reference sequence must have one valid URL to taxonomy
     Then the response code should be 4xx
 
-  Scenario: register a reference sequence with invalid taxonomy and fail
+    Scenario: register a reference sequence with invalid taxonomy and fail
     When I request POST /reference-sequences with JSON payload:
     """
     {
@@ -286,7 +286,7 @@ Feature: reference sequence
       "taxonomy": "http://nohost/taxonomy/999"
     }
     """
-    And the response should contain field exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.ReferenceSequenceWithoutValidTaxonomyException
+    And the response should contain error message A reference sequence must have one valid URL to taxonomy
     Then the response code should be 4xx
 
 
@@ -313,7 +313,7 @@ Feature: reference sequence
     And the response code should be 201
 
     When I request PATCH REFERENCE_SEQUENCE with content {"taxonomy": "http://nohost/taxonomy/999"}
-    And the response should contain field exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.ReferenceSequenceWithoutValidTaxonomyException
+    And the response should contain error message A reference sequence must have one valid URL to taxonomy
     Then the response code should be 4xx
 
 

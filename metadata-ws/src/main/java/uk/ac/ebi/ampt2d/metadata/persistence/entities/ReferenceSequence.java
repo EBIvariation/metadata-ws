@@ -83,6 +83,7 @@ public class ReferenceSequence extends Auditable<Long> {
 
     @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "URL to a taxonomy")
     @JsonProperty
+    @NotNull(message = "A reference sequence must have one valid URL to taxonomy")
     @ManyToOne(optional = false)
     private Taxonomy taxonomy;
 

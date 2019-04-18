@@ -20,7 +20,6 @@ package uk.ac.ebi.ampt2d.metadata.persistence.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.AnalysisEventHandler;
-import uk.ac.ebi.ampt2d.metadata.persistence.events.ReferenceSequenceEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.SampleEventHandler;
 
 @Configuration
@@ -34,11 +33,6 @@ public class RepositoryConfiguration {
     @Bean
     AnalysisEventHandler analysisEventHandler() {
         return new AnalysisEventHandler();
-    }
-
-    @Bean
-    ReferenceSequenceEventHandler referenceSequenceEventHandler() {
-        return new ReferenceSequenceEventHandler();
     }
 
 }
