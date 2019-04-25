@@ -25,7 +25,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepos
 
 import java.util.List;
 
-public class ReferenceSequenceImpl implements ReferenceSequenceService {
+public class ReferenceSequenceServiceImpl implements ReferenceSequenceService {
 
     @Autowired
     private ReferenceSequenceRepository referenceSequenceRepository;

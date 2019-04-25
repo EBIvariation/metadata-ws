@@ -42,7 +42,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
-import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceImpl;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
@@ -120,7 +120,7 @@ public class SpringDataRestConfig {
 
     @Bean
     public ReferenceSequenceService referenceSequenceService() {
-        return new ReferenceSequenceImpl();
+        return new ReferenceSequenceServiceImpl();
     }
 
     @Bean
