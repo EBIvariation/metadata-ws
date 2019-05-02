@@ -1,17 +1,7 @@
 Feature: analysis object
 
   Scenario: register an analysis successfully
-    When I request POST /reference-sequences with JSON payload:
-    """
-    {
-      "name": "GRCh37",
-      "patch": "p2",
-      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
-      "type": "ASSEMBLY"
-    }
-    """
-    Then set the URL to REFERENCE_SEQUENCE
-    When I request POST /taxonomies with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -19,6 +9,16 @@ Feature: analysis object
     }
     """
     Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh37",
+      "patch": "p2",
+      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
+    """
+    Then set the URL to REFERENCE_SEQUENCE
     When I create a study with TAXONOMY for taxonomy
     Then set the URL to STUDY
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE for reference sequence
@@ -30,17 +30,7 @@ Feature: analysis object
 
 
   Scenario: update an analysis successfully
-    When I request POST /reference-sequences with JSON payload:
-    """
-    {
-      "name": "GRCh37",
-      "patch": "p2",
-      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
-      "type": "ASSEMBLY"
-    }
-    """
-    Then set the URL to REFERENCE_SEQUENCE_1
-    When I request POST /taxonomies with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -48,6 +38,16 @@ Feature: analysis object
     }
     """
     Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh37",
+      "patch": "p2",
+      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
+    """
+    Then set the URL to REFERENCE_SEQUENCE_1
     When I create a study with TAXONOMY for taxonomy
     Then set the URL to STUDY
 
@@ -62,14 +62,13 @@ Feature: analysis object
     And the response should contain one reference sequence
     And the href of the referenceSequence of reference-sequences has items REFERENCE_SEQUENCE_1
 
-    When I request POST /reference-sequences with JSON payload:
+    When I request POST /reference-sequences with JSON-like payload:
     """
-    {
       "name": "GRCh37",
       "patch": "p3",
       "accessions": ["GCA_000001407.4", "GCF_000001407.15"],
-      "type": "ASSEMBLY"
-    }
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE_2
     When I request PATCH ANALYSIS with list REFERENCE_SEQUENCE_2 of referenceSequences
@@ -84,17 +83,7 @@ Feature: analysis object
 
 
   Scenario Outline: update an analysis with invalid reference sequences list should fail
-    When I request POST /reference-sequences with JSON payload:
-    """
-    {
-      "name": "GRCh37",
-      "patch": "p2",
-      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
-      "type": "ASSEMBLY"
-    }
-    """
-    Then set the URL to REFERENCE_SEQUENCE_1
-    When I request POST /taxonomies with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -102,6 +91,16 @@ Feature: analysis object
     }
     """
     Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh37",
+      "patch": "p2",
+      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
+    """
+    Then set the URL to REFERENCE_SEQUENCE_1
     When I create a study with TAXONOMY for taxonomy
     Then set the URL to STUDY
 
@@ -149,27 +148,7 @@ Feature: analysis object
 
 
   Scenario: delete all of an analysis's reference sequences should fail
-    When I request POST /reference-sequences with JSON payload:
-    """
-    {
-      "name": "BRCA1",
-      "patch": "3",
-      "accessions": ["NM_007294.3"],
-      "type": "GENE"
-    }
-    """
-    Then set the URL to REFERENCE_SEQUENCE_1
-    When I request POST /reference-sequences with JSON payload:
-    """
-    {
-      "name": "BRCA2",
-      "patch": "3",
-      "accessions": ["NM_000059.3"],
-      "type": "GENE"
-    }
-    """
-    Then set the URL to REFERENCE_SEQUENCE_2
-    When I request POST /taxonomies with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -177,6 +156,25 @@ Feature: analysis object
     }
     """
     Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "BRCA1",
+      "patch": "3",
+      "accessions": ["NM_007294.3"],
+      "type": "GENE",
+      "taxonomy": "TAXONOMY"
+    """
+    Then set the URL to REFERENCE_SEQUENCE_1
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "BRCA2",
+      "patch": "3",
+      "accessions": ["NM_000059.3"],
+      "type": "GENE",
+      "taxonomy": "TAXONOMY"
+    """
+    Then set the URL to REFERENCE_SEQUENCE_2
     When I create a study with TAXONOMY for taxonomy
     Then set the URL to STUDY
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE_1,REFERENCE_SEQUENCE_2 for reference sequence
@@ -199,27 +197,7 @@ Feature: analysis object
 
 
   Scenario: register an analysis with multiple gene reference sequences successfully
-    When I request POST /reference-sequences with JSON payload:
-    """
-    {
-      "name": "BRCA1",
-      "patch": "3",
-      "accessions": ["NM_007294.3"],
-      "type": "GENE"
-    }
-    """
-    Then set the URL to REFERENCE_SEQUENCE_1
-    When I request POST /reference-sequences with JSON payload:
-    """
-    {
-      "name": "BRCA2",
-      "patch": "3",
-      "accessions": ["NM_000059.3"],
-      "type": "GENE"
-    }
-    """
-    Then set the URL to REFERENCE_SEQUENCE_2
-    When I request POST /taxonomies with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -227,6 +205,25 @@ Feature: analysis object
     }
     """
     Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "BRCA1",
+      "patch": "3",
+      "accessions": ["NM_007294.3"],
+      "type": "GENE",
+      "taxonomy": "TAXONOMY"
+    """
+    Then set the URL to REFERENCE_SEQUENCE_1
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "BRCA2",
+      "patch": "3",
+      "accessions": ["NM_000059.3"],
+      "type": "GENE",
+      "taxonomy": "TAXONOMY"
+    """
+    Then set the URL to REFERENCE_SEQUENCE_2
     When I create a study with TAXONOMY for taxonomy
     Then set the URL to STUDY
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE_1,REFERENCE_SEQUENCE_2 for reference sequence
@@ -242,19 +239,7 @@ Feature: analysis object
 
 
   Scenario Outline: register an analysis with multiple non-gene reference sequences should fail
-    When I request POST /reference-sequences with JSON payload:
-    """
-    <test_reference_sequence_1_json>
-    """
-    Then the response code should be 201
-    And set the URL to REFERENCE_SEQUENCE_1
-    When I request POST /reference-sequences with JSON payload:
-    """
-    <test_reference_sequence_2_json>
-    """
-    Then the response code should be 201
-    And set the URL to REFERENCE_SEQUENCE_2
-    When I request POST /taxonomies with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -262,6 +247,20 @@ Feature: analysis object
     }
     """
     Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+    <test_reference_sequence_1_json>
+    """
+    Then the response code should be 201
+    And set the URL to REFERENCE_SEQUENCE_1
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+    <test_reference_sequence_2_json>
+    """
+    Then the response code should be 201
+    And set the URL to REFERENCE_SEQUENCE_2
+
     When I create a study with TAXONOMY for taxonomy
     Then set the URL to STUDY
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE_1,REFERENCE_SEQUENCE_2 for reference sequence
@@ -271,23 +270,13 @@ Feature: analysis object
 
     Examples:
       | test_reference_sequence_1_json | test_reference_sequence_2_json |
-      | {"name": "GRCh37","patch": "p2","accessions": ["GCA_000001407.3", "GCF_000001407.14"],"type": "ASSEMBLY"} | {"name": "GRCh37","patch": "p3","accessions": ["GCA_000001407.4", "GCF_000001407.15"],"type": "ASSEMBLY"} |
-      | {"name": "FOXP2","patch": "nothing important","accessions": ["NM_014491.3"],"type": "TRANSCRIPTOME"} | {"name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME"} |
-      | {"name": "BRCA1","patch": "3","accessions": ["NM_007294.3"],"type": "GENE"} | {"name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME"} |
+      | "name": "GRCh37","patch": "p2","accessions": ["GCA_000001407.3", "GCF_000001407.14"],"type": "ASSEMBLY","taxonomy": "TAXONOMY" | "name": "GRCh37","patch": "p3","accessions": ["GCA_000001407.4", "GCF_000001407.15"],"type": "ASSEMBLY","taxonomy": "TAXONOMY" |
+      | "name": "FOXP2","patch": "nothing important","accessions": ["NM_014491.3"],"type": "TRANSCRIPTOME","taxonomy": "TAXONOMY" | "name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME","taxonomy": "TAXONOMY" |
+      | "name": "BRCA1","patch": "3","accessions": ["NM_007294.3"],"type": "GENE","taxonomy": "TAXONOMY" | "name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME","taxonomy": "TAXONOMY" |
 
 
    Scenario Outline: find one analysis by type, technology or platform
-     When I request POST /reference-sequences with JSON payload:
-     """
-     {
-       "name": "GRCh37",
-       "patch": "p2",
-       "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
-       "type": "ASSEMBLY"
-     }
-     """
-     Then set the URL to REFERENCE_SEQUENCE
-     When I request POST /taxonomies with JSON payload:
+     Given I request POST /taxonomies with JSON payload:
      """
      {
        "taxonomyId": 9606,
@@ -295,6 +284,17 @@ Feature: analysis object
      }
      """
      Then set the URL to TAXONOMY
+     And the response code should be 201
+
+     When I request POST /reference-sequences with JSON-like payload:
+     """
+       "name": "GRCh37",
+       "patch": "p2",
+       "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+       "type": "ASSEMBLY",
+       "taxonomy": "TAXONOMY"
+     """
+     Then set the URL to REFERENCE_SEQUENCE
      When I create a study with TAXONOMY for taxonomy
      Then set the URL to STUDY
      When I create an analysis with EGAA0001 for accession, REFERENCE_SEQUENCE for reference sequence, STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
@@ -321,17 +321,7 @@ Feature: analysis object
 
 
    Scenario Outline: find zero analysis by type, technology or platform
-     When I request POST /reference-sequences with JSON payload:
-     """
-     {
-       "name": "GRCh37",
-       "patch": "p2",
-       "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
-       "type": "ASSEMBLY"
-     }
-     """
-     Then set the URL to REFERENCE_SEQUENCE
-     When I request POST /taxonomies with JSON payload:
+     Given I request POST /taxonomies with JSON payload:
      """
      {
        "taxonomyId": 9606,
@@ -339,6 +329,17 @@ Feature: analysis object
      }
      """
      Then set the URL to TAXONOMY
+     And the response code should be 201
+
+     When I request POST /reference-sequences with JSON-like payload:
+     """
+       "name": "GRCh37",
+       "patch": "p2",
+       "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+       "type": "ASSEMBLY",
+       "taxonomy": "TAXONOMY"
+     """
+     Then set the URL to REFERENCE_SEQUENCE
      When I create a study with TAXONOMY for taxonomy
      Then set the URL to STUDY
      When I create an analysis with EGAA0001 for accession, REFERENCE_SEQUENCE for reference sequence, STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
@@ -360,17 +361,7 @@ Feature: analysis object
 
 
    Scenario Outline: find analysis by invalid type or technology should fail
-     When I request POST /reference-sequences with JSON payload:
-     """
-     {
-       "name": "GRCh37",
-       "patch": "p2",
-       "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
-       "type": "ASSEMBLY"
-     }
-     """
-     Then set the URL to REFERENCE_SEQUENCE
-     When I request POST /taxonomies with JSON payload:
+     Given I request POST /taxonomies with JSON payload:
      """
      {
        "taxonomyId": 9606,
@@ -378,6 +369,17 @@ Feature: analysis object
      }
      """
      Then set the URL to TAXONOMY
+     And the response code should be 201
+
+     When I request POST /reference-sequences with JSON-like payload:
+     """
+       "name": "GRCh37",
+       "patch": "p2",
+       "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+       "type": "ASSEMBLY",
+       "taxonomy": "TAXONOMY"
+     """
+     Then set the URL to REFERENCE_SEQUENCE
      When I create a study with TAXONOMY for taxonomy
      Then set the URL to STUDY
      When I create an analysis with EGAA0001 for accession, REFERENCE_SEQUENCE for reference sequence, STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform

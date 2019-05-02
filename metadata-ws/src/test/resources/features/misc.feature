@@ -11,25 +11,25 @@ Feature: Miscellaneous functions
 
   Scenario Outline: verify metadata objects are auditable
     Given current time as START_TIME1
-    When I request POST /reference-sequences with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
-      {
+    {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
         "name": "GRCh37",
         "patch": "p2",
         "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-        "type": "ASSEMBLY"
-      }
+        "type": "ASSEMBLY",
+        "taxonomy": "TAXONOMY"
       """
     Then set the URL to REFERENCE_SEQUENCE
 
-    When I request POST /taxonomies with JSON payload:
-    """
-      {
-        "taxonomyId": 9606,
-        "name": "Homo Sapiens"
-      }
-      """
-    Then set the URL to TAXONOMY
     When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {

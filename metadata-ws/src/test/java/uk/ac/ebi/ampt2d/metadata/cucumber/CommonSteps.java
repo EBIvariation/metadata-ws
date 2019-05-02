@@ -132,7 +132,7 @@ public class CommonSteps {
     }
 
     @When("^I request PATCH (.*) with list (.*) of (.*)")
-    public void performPatchOnResourceWithLinkedObject(String urlKey, String linkedObjectUrlKeys,
+    public void performPatchOnResourceWithLinkedObjectList(String urlKey, String linkedObjectUrlKeys,
                                                        String linkedObjectClassName) throws Exception {
         List<String> newUrls = null;
         if (!linkedObjectUrlKeys.equals("NONE")) {
@@ -144,6 +144,15 @@ public class CommonSteps {
                 + "\"" + linkedObjectClassName + "\":" + objectMapper.writeValueAsString(newUrls)
                 + "}";
 
+        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
+                .content(jsonContent)));
+    }
+
+    @When("^I request PATCH (.*) with taxonomy (.*)")
+    public void performPatchOnResourceWithLinkedObject(String urlKey, String linkedObjectUrlKey) throws Exception {
+        String jsonContent = "{"
+                + "\"taxonomy\": \"" + CommonStates.getUrl(linkedObjectUrlKey)
+                + "\"}";
         CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
                 .content(jsonContent)));
     }
@@ -175,6 +184,11 @@ public class CommonSteps {
     @When("^I request elaborate find for the (.*) with the parameters: (.*)$")
     public void performFindOnResourcesWithParameters(String className, String parameters) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/"+className+"?"+parameters)));
+    }
+
+    @When("^I request elaborate search for the (.*) base (.*) and with the parameters: (.*)$")
+    public void performSearchOnResourcesWithBaseAndParameters(String className, String base, String parameters) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "/search/"+base+"?"+parameters)));
     }
 
     @And("^set the URL to (.*)$")
@@ -250,6 +264,11 @@ public class CommonSteps {
     @Then("^the response should contain field (.*) with value (.*)$")
     public void checkResponseJsonFieldValue(String field, String value) throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(value));
+    }
+
+    @Then("^the response should contain error message (.*)$")
+    public void checkResponseJsonMessage(String message) throws Exception {
+        CommonStates.getResultActions().andReturn().getResponse().getContentAsString().contains(message);
     }
 
     @Then("^the response should contain field (.*) with a numeric value$")

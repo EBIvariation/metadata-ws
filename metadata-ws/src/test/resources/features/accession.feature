@@ -116,17 +116,7 @@ Feature: accession object
 
 
   Scenario: find analysis by accession and version
-    When I request POST /reference-sequences with JSON payload:
-    """
-    {
-      "name": "GRCh37",
-      "patch": "p2",
-      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
-      "type": "ASSEMBLY"
-    }
-    """
-    Then set the URL to REFERENCE_SEQUENCE
-    When I request POST /taxonomies with JSON payload:
+    Given I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -134,6 +124,16 @@ Feature: accession object
     }
     """
     Then set the URL to TAXONOMY
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh37",
+      "patch": "p2",
+      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
+    """
+    Then set the URL to REFERENCE_SEQUENCE
     When I create a study with TAXONOMY for taxonomy
     Then set the URL to STUDY
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE for reference sequence

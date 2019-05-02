@@ -28,6 +28,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
@@ -80,14 +81,11 @@ public class ReferenceSequence extends Auditable<Long> {
     @Column(nullable = false)
     private Type type;
 
-    ReferenceSequence() {}
-
-    public ReferenceSequence(String name, String patch, List<String> accessions, Type type) {
-        this.name = name;
-        this.patch = patch;
-        this.accessions = accessions;
-        this.type = type;
-    }
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "URL to a taxonomy")
+    @JsonProperty
+    @NotNull(message = "A reference sequence must have one valid URL to taxonomy")
+    @ManyToOne(optional = false)
+    private Taxonomy taxonomy;
 
     @Override
     public Long getId() {
@@ -98,4 +96,7 @@ public class ReferenceSequence extends Auditable<Long> {
         return type;
     }
 
+    public Taxonomy getTaxonomy() {
+        return taxonomy;
+    }
 }
