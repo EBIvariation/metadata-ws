@@ -23,10 +23,10 @@ Feature: publication object
       When I request POST /publications with JSON payload:
       """
       {
-        "publicationId": "Publication1"
+        "publicationId": "Publication2"
       }
       """
-      Then set the URL to PUBLICATION
+      Then set the URL to PUBLICATION2
       And the response code should be 201
-      When I request GET /publications/Publication1
+      When I request GET /publications/Publication2
       Then the response code should be 4xx
