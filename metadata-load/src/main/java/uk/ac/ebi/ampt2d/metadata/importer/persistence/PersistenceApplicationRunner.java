@@ -57,7 +57,7 @@ public class PersistenceApplicationRunner implements ApplicationRunner {
     public void run(ApplicationArguments arguments) throws Exception {
         Set<String> accessions = readAccessionsFromFile(arguments);
         studyObject.setAccessions(accessions);
-        studyObject = objectsImporter.importObject(studyObject);
+        studyObject = studyObject.accept(objectsImporter);
         //TODO save study Object importing dependent objects
         studyRepository.save(studyObject.getStudies());
     }

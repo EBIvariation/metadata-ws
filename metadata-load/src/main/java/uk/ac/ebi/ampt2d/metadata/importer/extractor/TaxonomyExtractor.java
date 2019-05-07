@@ -21,13 +21,16 @@ package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 
+/**
+ * This class is temporarily used for creating mandatory Taxonomy for Study, once ReferenceSequence Extractor is
+ * implemented this class can be removed.
+ */
 public class TaxonomyExtractor {
-    private static final Long TAXONOMY_ID = new Long(1);
 
     private static Taxonomy taxonomy;
 
     public TaxonomyExtractor(TaxonomyRepository taxonomyRepository) {
-        taxonomy = taxonomyRepository.save(new Taxonomy(9606,"Homo Sapiens"));
+        taxonomy = taxonomyRepository.save(new Taxonomy(9606, "Homo Sapiens"));
     }
 
     public Taxonomy getTaxonomy() {

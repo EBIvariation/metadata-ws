@@ -52,7 +52,7 @@ public class StudyObject implements ObjectToImport<StudyObject> {
     }
 
     @Override
-    public StudyObject doImport(ObjectsImporter objectsImporter) {
+    public StudyObject accept(ObjectsImporter objectsImporter) {
         return objectsImporter.importObject(this);
     }
 }

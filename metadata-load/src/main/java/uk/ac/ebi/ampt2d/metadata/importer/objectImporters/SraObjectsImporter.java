@@ -68,7 +68,7 @@ public class SraObjectsImporter implements ObjectsImporter {
                 StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
                 Study study = studyConverter.convert(studyType);
                 AnalysisObject analysisObject = new AnalysisObject(getAnalysisAccessions(studyType), new ArrayList<>());
-                analysisObject.doImport(this);
+                analysisObject.accept(this);
                 study.setAnalyses(analysisObject.getAnalyses());
                 studyObject.getStudies().add(study);
             } catch (Exception exception) {

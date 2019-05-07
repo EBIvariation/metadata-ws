@@ -47,7 +47,7 @@ public class SampleObject implements ObjectToImport<SampleObject> {
     }
 
     @Override
-    public SampleObject doImport(ObjectsImporter objectsImporter) {
+    public SampleObject accept(ObjectsImporter objectsImporter) {
         return objectsImporter.importObject(this);
     }
 }

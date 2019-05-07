@@ -22,5 +22,5 @@ import uk.ac.ebi.ampt2d.metadata.importer.objectImporters.ObjectsImporter;
 
 public interface ObjectToImport<OBJECT_TYPE> {
 
-    OBJECT_TYPE doImport(ObjectsImporter objectsImporter);
+    OBJECT_TYPE accept(ObjectsImporter objectsImporter);
 }

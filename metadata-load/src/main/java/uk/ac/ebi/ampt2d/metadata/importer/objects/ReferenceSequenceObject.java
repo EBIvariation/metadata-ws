@@ -47,7 +47,7 @@ public class ReferenceSequenceObject implements ObjectToImport<ReferenceSequence
     }
 
     @Override
-    public ReferenceSequenceObject doImport(ObjectsImporter objectsImporter) {
+    public ReferenceSequenceObject accept(ObjectsImporter objectsImporter) {
         return objectsImporter.importObject(this);
     }
 }
