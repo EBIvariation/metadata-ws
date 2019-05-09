@@ -142,10 +142,6 @@ public class Study extends Auditable<Long> {
         return deprecated;
     }
 
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-
     public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
@@ -218,4 +214,11 @@ public class Study extends Auditable<Long> {
     public void setPublications(List<Publication> publications) {
         this.publications = publications;
     }
+
+    // Release date control
+    @Override
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
 }

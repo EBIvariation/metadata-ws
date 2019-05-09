@@ -32,6 +32,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
@@ -160,6 +162,25 @@ public class CommonSteps {
     @When("^I request PATCH (.*) with content (.*)")
     public void performPatchOnResourceWithContent(String urlKey, String content) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
+                .content(content)));
+    }
+
+    @When("^I request PATCH (.*) with patch and day (.*)")
+    public void performPatchedPatchOnResourceWithDay(String urlKey, String day) throws Exception {
+        int intDay = 0;
+        if (day.equals("today")) {
+            intDay = 0;
+        } else if (day.equals("yesterday")) {
+            intDay = -1;
+        } else if (day.equals("tomorrow")) {
+            intDay = 1;
+        }
+        String content = "{ \"releaseDate\" : \"";
+        content += LocalDate.now().plusDays(intDay);
+        content += "\" }";
+
+        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
+                .contentType(MediaType.APPLICATION_JSON)
                 .content(content)));
     }
 
