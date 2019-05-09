@@ -37,6 +37,7 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -193,5 +194,11 @@ public class Analysis extends Auditable<Long> {
 
     public void setSamples(List<Sample> samples) {
         this.samples = samples;
+    }
+
+    // Release date control: Study <1..M> Analysis, hence just getting the parent study is enough
+    @Override
+    public LocalDate getReleaseDate(){
+        return getStudy().getReleaseDate();
     }
 }

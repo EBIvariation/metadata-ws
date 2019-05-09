@@ -398,3 +398,40 @@ Feature: analysis object
        | technology=UNKNOWN |
 
 
+  Scenario: attempt to get an analysis of an unreleased study must fail
+
+    Given I request POST /taxonomies with JSON payload:
+    """
+    {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
+    Then the response code should be 201
+    And set the URL to TAXONOMY
+
+    Given I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh37",
+      "patch": "p2",
+      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
+    """
+    Then the response code should be 201
+    And set the URL to REFERENCE_SEQUENCE
+
+    Given I create a study with TAXONOMY for taxonomy
+    Then the response code should be 201
+    And set the URL to STUDY
+
+    Given I create an analysis with STUDY for study and REFERENCE_SEQUENCE for reference sequence
+    Then the response code should be 201
+    And set the URL to ANALYSIS
+    When I request GET with value of ANALYSIS
+    Then the response code should be 200
+
+    Given I request PATCH STUDY with patch and day tomorrow
+    Then the response code should be 200
+    When I request GET with value of ANALYSIS
+    Then the response code should be 404

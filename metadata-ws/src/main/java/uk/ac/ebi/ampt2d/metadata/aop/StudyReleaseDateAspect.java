@@ -17,14 +17,13 @@
  */
 package uk.ac.ebi.ampt2d.metadata.aop;
 
-import com.querydsl.core.types.Predicate;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.*;
 
 import java.time.LocalDate;
+import java.util.Iterator;
 
 /**
  * An @Aspect for ensuring only published studies are returned through checking a study's releaseDate field
@@ -42,39 +41,44 @@ public class StudyReleaseDateAspect {
      * @return the return object from join point method execution
      * @throws Throwable
      */
-    @Around("execution(* uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository.findAll(..))")
+
+    @Around("execution(* uk.ac.ebi.ampt2d.metadata.persistence.repositories.*.findAll(..))")
     public Object filterOnReleaseDateAdviceFindAll(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
-        Object[] args = proceedingJoinPoint.getArgs();
-        Predicate predicate = (Predicate) args[0];
-
-        QStudy study = QStudy.study;
-        Predicate dateRestrictedPredicate = study.releaseDate.between(null, LocalDate.now()).and(predicate);
-
-        args[0] = dateRestrictedPredicate;
-
-        return proceedingJoinPoint.proceed(args);
+        Iterable<Object> results = (Iterable<Object>) proceedingJoinPoint.proceed();
+        Iterator<Object> i = results.iterator();
+        while (i.hasNext()) {
+            Object result = i.next();
+            if (processReleaseControlledObject(result) == null) {
+                i.remove();
+            }
+        }
+        return results;
     }
 
     /**
      * An @Around advice for CrudRepository.findOne(..) method execution
      *
      * It takes the returned object from join point method execution and check the returned object. If the returned
-     * object is not a Study object, return as it is. If the returned object is a Study object, check the study's
-     * releaseDate field. Return null if the releaseDate is a date in the future.
+     * object is not a Auditable object, return as it is. If the returned object is an Auditable object, check its
+     * getReleaseDate() method. Return null if the release date is null (i. e., not set) or a date in the future.
      *
      * @param proceedingJoinPoint
      * @return null or object
      * @throws Throwable
      */
-    @Around("execution(* org.springframework.data.repository.CrudRepository.findOne(java.io.Serializable))")
+    @Around("execution(* uk.ac.ebi.ampt2d.metadata.persistence.repositories.*.findOne(java.io.Serializable))")
     public Object filterOnReleaseDateAdviceFindOne(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object result = proceedingJoinPoint.proceed();
+        return processReleaseControlledObject(result);
+    }
 
-        if ( result == null ||
-                (result instanceof Study && ((Study) result).getReleaseDate().isAfter(LocalDate.now())) ) {
-            return null;
+    private Object processReleaseControlledObject(Object result) {
+        if (result instanceof Auditable) {
+            LocalDate releaseDate = ((Auditable) result).getReleaseDate();
+            if (releaseDate != null && releaseDate.isAfter(LocalDate.now())) {
+                return null;
+            }
         }
-
         return result;
     }
 
