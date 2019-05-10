@@ -16,20 +16,23 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.importer.objectImporters;
+package uk.ac.ebi.ampt2d.metadata.persistence;
 
-import uk.ac.ebi.ampt2d.metadata.importer.objects.AnalysisObject;
-import uk.ac.ebi.ampt2d.metadata.importer.objects.ReferenceSequenceObject;
-import uk.ac.ebi.ampt2d.metadata.importer.objects.SampleObject;
-import uk.ac.ebi.ampt2d.metadata.importer.objects.StudyObject;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+
+import java.util.List;
+import java.util.Set;
 
 public interface ObjectsImporter {
 
-    StudyObject importObject(StudyObject studyObject);
+    List<Study> importStudy(Set<String> accessions);
 
-    AnalysisObject importObject(AnalysisObject analysisObject);
+    List<Analysis> importAnalysis(Set<String> accessions);
 
-    ReferenceSequenceObject importObject(ReferenceSequenceObject referenceSequenceObject);
+    List<ReferenceSequence> importReferenceSequence(Set<String> accessions);
 
-    SampleObject importObject(SampleObject sampleObject);
+    List<Sample> importSample(Set<String> accessions);
 }

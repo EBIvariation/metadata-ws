@@ -19,6 +19,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import uk.ac.ebi.ampt2d.metadata.persistence.ObjectsImporter;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -37,6 +38,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name","patch"}))
@@ -110,5 +112,9 @@ public class ReferenceSequence extends Auditable<Long> {
 
     public Taxonomy getTaxonomy() {
         return taxonomy;
+    }
+
+    public static List<ReferenceSequence> accept(ObjectsImporter objectsImporter, Set<String> accessions) {
+        return objectsImporter.importReferenceSequence(accessions);
     }
 }

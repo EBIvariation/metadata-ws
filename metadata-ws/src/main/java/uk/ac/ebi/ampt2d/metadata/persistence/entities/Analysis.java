@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
+import uk.ac.ebi.ampt2d.metadata.persistence.ObjectsImporter;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -38,6 +39,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
@@ -187,5 +189,9 @@ public class Analysis extends Auditable<Long> {
 
     public void setReferenceSequences(List<ReferenceSequence> referenceSequences) {
         this.referenceSequences = referenceSequences;
+    }
+
+    public static List<Analysis> accept(ObjectsImporter objectsImporter, Set<String> accessions) {
+        return objectsImporter.importAnalysis(accessions);
     }
 }

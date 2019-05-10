@@ -16,11 +16,9 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.importer.objects;
+package uk.ac.ebi.ampt2d.metadata.importer.database;
 
-import uk.ac.ebi.ampt2d.metadata.importer.objectImporters.ObjectsImporter;
+public interface EnaObjectQuery {
 
-public interface ObjectToImport<OBJECT_TYPE> {
-
-    OBJECT_TYPE accept(ObjectsImporter objectsImporter);
+    String STUDY_QUERY = "SELECT STUDY_XML FROM ERA.STUDY WHERE STUDY_ID = :accession";
 }

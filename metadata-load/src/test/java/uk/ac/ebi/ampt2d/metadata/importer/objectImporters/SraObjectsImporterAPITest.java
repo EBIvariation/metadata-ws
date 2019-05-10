@@ -26,10 +26,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
-import uk.ac.ebi.ampt2d.metadata.importer.objects.StudyObject;
+import uk.ac.ebi.ampt2d.metadata.persistence.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RunWith(SpringRunner.class)
@@ -45,10 +46,9 @@ public class SraObjectsImporterAPITest {
         Set<String> studyAccessions = new HashSet<>();
         studyAccessions.add("ERP000054");
         studyAccessions.add("SRP000717");
-        StudyObject studyObject = new StudyObject(studyAccessions, new ArrayList<>());
-        sraObjectImporter.importObject(studyObject);
-        Assert.assertNotNull(studyObject.getStudies());
-        Assert.assertEquals(2, studyObject.getStudies().size());
+        List<Study> studies = sraObjectImporter.importStudy(studyAccessions);
+        Assert.assertNotNull(studies);
+        Assert.assertEquals(2, studies.size());
     }
 
 }

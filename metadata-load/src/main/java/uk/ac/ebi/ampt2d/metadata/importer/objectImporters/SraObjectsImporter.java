@@ -20,11 +20,11 @@ package uk.ac.ebi.ampt2d.metadata.importer.objectImporters;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
-import uk.ac.ebi.ampt2d.metadata.importer.objects.AnalysisObject;
-import uk.ac.ebi.ampt2d.metadata.importer.objects.ReferenceSequenceObject;
-import uk.ac.ebi.ampt2d.metadata.importer.objects.SampleObject;
-import uk.ac.ebi.ampt2d.metadata.importer.objects.StudyObject;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
+import uk.ac.ebi.ampt2d.metadata.persistence.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ena.sra.xml.LinkType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
@@ -32,14 +32,13 @@ import uk.ac.ebi.ena.sra.xml.XRefType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class SraObjectsImporter implements ObjectsImporter {
-
-    private static final String STUDY_QUERY = "SELECT STUDY_XML FROM ERA.STUDY WHERE STUDY_ID = :accession";
 
     private static final Logger IMPORT_LOGGER = Logger.getLogger(SraObjectsImporter.class.getName());
 
@@ -58,41 +57,37 @@ public class SraObjectsImporter implements ObjectsImporter {
     }
 
     @Override
-    public StudyObject importObject(StudyObject studyObject) {
-
-        Set<String> accessions = studyObject.getAccessions();
-
+    public List<Study> importStudy(Set<String> accessions) {
+        List<Study> studies = new ArrayList<>();
         for (String accession : accessions) {
             try {
                 String xml = sraRetrieverByAccession.getXml(accession);
                 StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
                 Study study = studyConverter.convert(studyType);
-                AnalysisObject analysisObject = new AnalysisObject(getAnalysisAccessions(studyType), new ArrayList<>());
-                analysisObject.accept(this);
-                study.setAnalyses(analysisObject.getAnalyses());
-                studyObject.getStudies().add(study);
+                List<Analysis> analyses = Analysis.accept(this, getAnalysisAccessions(studyType));
+                study.setAnalyses(analyses);
+                studies.add(study);
             } catch (Exception exception) {
                 IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for accession" + accession);
                 IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
             }
         }
-
-        return studyObject;
+        return studies;
     }
 
     @Override
-    public AnalysisObject importObject(AnalysisObject analysisObject) {
-        return null;
+    public List<Analysis> importAnalysis(Set<String> accessions) {
+        return new ArrayList<>();
     }
 
     @Override
-    public ReferenceSequenceObject importObject(ReferenceSequenceObject referenceSequenceObject) {
-        return null;
+    public List<ReferenceSequence> importReferenceSequence(Set<String> accessions) {
+        return new ArrayList<>();
     }
 
     @Override
-    public SampleObject importObject(SampleObject sampleObject) {
-        return null;
+    public List<Sample> importSample(Set<String> accessions) {
+        return new ArrayList<>();
     }
 
     private Set<String> getAnalysisAccessions(StudyType studyType) {
@@ -116,21 +111,21 @@ public class SraObjectsImporter implements ObjectsImporter {
             return analysisAccessions;
         }
         Stream.of(analyses.split(","))
-                .forEach(a -> {
-                    String[] ab = a.split("-");
-                    if (ab.length > 1) {
-                        String frstElement = ab[0];
-                        String secondElement = ab[1];
-                        String frstAnalysisStringPart = frstElement.split("\\d")[0];
-                        int frstAnalysisNumericPart = Integer.valueOf(frstElement.split("[A-Z]*[^\\d]")[1]);
-                        int lastAnlysisNumericPart = Integer.valueOf(secondElement.split("[A-Z]*[^\\d]")[1]);
-                        int lengthOfNumericPartOfAccession = frstElement.length() - frstAnalysisStringPart.length();
-                        for (int i = frstAnalysisNumericPart; i <= lastAnlysisNumericPart; i++) {
-                            analysisAccessions.add(frstAnalysisStringPart + String.format
-                                    ("%0" + lengthOfNumericPartOfAccession + "d", i));
+                .forEach(analysis -> {
+                    String[] range = analysis.split("-");
+                    if (range.length > 1) {
+                        String startRange = range[0];
+                        String endRange = range[1];
+                        String analysisAccessionPrefix = startRange.split("\\d")[0];
+                        int startRangeNumericPart = Integer.valueOf(startRange.split("[A-Z]*[^\\d]")[1]);
+                        int endRangeNumericPart = Integer.valueOf(endRange.split("[A-Z]*[^\\d]")[1]);
+                        int lengthOfNumericPartOfAccessionWithZeros = startRange.length() - analysisAccessionPrefix.length();
+                        for (int i = startRangeNumericPart; i <= endRangeNumericPart; i++) {
+                            analysisAccessions.add(analysisAccessionPrefix + String.format
+                                    ("%0" + lengthOfNumericPartOfAccessionWithZeros + "d", i));
                         }
                     } else {
-                        analysisAccessions.add(a);
+                        analysisAccessions.add(analysis);
                     }
                 });
 
