@@ -19,7 +19,6 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import uk.ac.ebi.ampt2d.metadata.persistence.ObjectsImporter;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -112,9 +111,5 @@ public class ReferenceSequence extends Auditable<Long> {
 
     public Taxonomy getTaxonomy() {
         return taxonomy;
-    }
-
-    public static List<ReferenceSequence> accept(ObjectsImporter objectsImporter, Set<String> accessions) {
-        return objectsImporter.importReferenceSequence(accessions);
     }
 }

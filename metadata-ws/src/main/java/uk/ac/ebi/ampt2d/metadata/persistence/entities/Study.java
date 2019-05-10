@@ -20,7 +20,6 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
-import uk.ac.ebi.ampt2d.metadata.persistence.ObjectsImporter;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -206,9 +205,5 @@ public class Study extends Auditable<Long> {
 
     public List<Publication> getPublications() {
         return publications;
-    }
-
-    public static List<Study> accept(ObjectsImporter objectsImporter, Set<String> accessions) {
-        return objectsImporter.importStudy(accessions);
     }
 }

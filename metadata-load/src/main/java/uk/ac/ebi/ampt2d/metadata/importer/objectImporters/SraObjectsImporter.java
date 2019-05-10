@@ -21,7 +21,6 @@ package uk.ac.ebi.ampt2d.metadata.importer.objectImporters;
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
-import uk.ac.ebi.ampt2d.metadata.persistence.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
@@ -64,7 +63,7 @@ public class SraObjectsImporter implements ObjectsImporter {
                 String xml = sraRetrieverByAccession.getXml(accession);
                 StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
                 Study study = studyConverter.convert(studyType);
-                List<Analysis> analyses = Analysis.accept(this, getAnalysisAccessions(studyType));
+                List<Analysis> analyses = importAnalysis(getAnalysisAccessions(studyType));
                 study.setAnalyses(analyses);
                 studies.add(study);
             } catch (Exception exception) {

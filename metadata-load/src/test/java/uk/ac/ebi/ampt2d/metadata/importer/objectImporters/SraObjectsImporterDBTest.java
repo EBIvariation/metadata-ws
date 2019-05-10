@@ -28,7 +28,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.database.OracleDbCategory;
-import uk.ac.ebi.ampt2d.metadata.persistence.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
 import java.util.HashSet;

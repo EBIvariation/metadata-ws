@@ -23,7 +23,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import uk.ac.ebi.ampt2d.metadata.persistence.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.importer.objectImporters.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
@@ -59,7 +59,7 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments applicationArguments) throws Exception {
         Set<String> accessions = readAccessionsFromFile(applicationArguments);
-        List<Study> studies = Study.accept(objectsImporter, accessions);
+        List<Study> studies = objectsImporter.importStudy(accessions);
         //TODO save study Object importing dependent objects
         studyRepository.save(studies);
     }
