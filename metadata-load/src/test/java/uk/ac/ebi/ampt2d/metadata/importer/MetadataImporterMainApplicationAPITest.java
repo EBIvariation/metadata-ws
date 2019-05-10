@@ -16,20 +16,17 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.importer.persistence;
+package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.test.context.junit4.SpringRunner;
-import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
-@RunWith(SpringRunner.class)
-public class PersistenceApplicationRunnerApiTest {
+public class MetadataImporterMainApplicationAPITest {
+
     private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 2;
 
     private SpringApplication springApplication = new SpringApplication(MetadataImporterMainApplication.class);
