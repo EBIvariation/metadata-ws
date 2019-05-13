@@ -206,4 +206,12 @@ public class Study extends Auditable<Long> {
     public List<Publication> getPublications() {
         return publications;
     }
+
+    public void setResources(List<WebResource> resources) {
+        this.resources = resources;
+    }
+
+    public void setPublications(List<Publication> publications) {
+        this.publications = publications;
+    }
 }

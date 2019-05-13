@@ -25,7 +25,7 @@ import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class Publication {
+public class Publication extends Auditable<String>{
 
     @ApiModelProperty(position = 1, value = "PubmedId", required = true)
     @JsonProperty
@@ -33,4 +33,15 @@ public class Publication {
     @Id
     private String id;
 
+    public Publication() {
+    }
+
+    public Publication(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getId() {
+        return id;
+    }
 }

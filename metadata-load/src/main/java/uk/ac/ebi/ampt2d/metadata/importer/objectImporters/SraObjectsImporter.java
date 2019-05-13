@@ -20,11 +20,15 @@ package uk.ac.ebi.ampt2d.metadata.importer.objectImporters;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationOrWebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Auditable;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Publication;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ena.sra.xml.LinkType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.ena.sra.xml.XRefType;
@@ -32,10 +36,14 @@ import uk.ac.ebi.ena.sra.xml.XRefType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+
+import static uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationOrWebResourceExtractorFromStudy.PUBLICATIONS;
+import static uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationOrWebResourceExtractorFromStudy.WEB_RESOURCES;
 
 public class SraObjectsImporter implements ObjectsImporter {
 
@@ -47,12 +55,16 @@ public class SraObjectsImporter implements ObjectsImporter {
 
     private Converter<StudyType, Study> studyConverter;
 
+    private PublicationOrWebResourceExtractorFromStudy publicationOrWebResourceExtractorFromStudy;
+
     public SraObjectsImporter(SraRetrieverByAccession sraRetrieverByAccession,
                               SraXmlParser<StudyType> sraStudyXmlParser,
-                              Converter<StudyType, Study> studyConverter) {
+                              Converter<StudyType, Study> studyConverter,
+                              PublicationOrWebResourceExtractorFromStudy publicationOrWebResourceExtractorFromStudy) {
         this.sraRetrieverByAccession = sraRetrieverByAccession;
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.studyConverter = studyConverter;
+        this.publicationOrWebResourceExtractorFromStudy = publicationOrWebResourceExtractorFromStudy;
     }
 
     @Override
@@ -63,6 +75,11 @@ public class SraObjectsImporter implements ObjectsImporter {
                 String xml = sraRetrieverByAccession.getXml(accession);
                 StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
                 Study study = studyConverter.convert(studyType);
+                Map<String, List<? extends Auditable>> mapOfPublicationAndWebResources =
+                        publicationOrWebResourceExtractorFromStudy
+                                .getPublicationsAndWebResources(studyType.getSTUDYLINKS());
+                study.setPublications((List<Publication>) mapOfPublicationAndWebResources.get(PUBLICATIONS));
+                study.setResources((List<WebResource>) mapOfPublicationAndWebResources.get(WEB_RESOURCES));
                 List<Analysis> analyses = importAnalysis(getAnalysisAccessions(studyType));
                 study.setAnalyses(analyses);
                 studies.add(study);
@@ -90,9 +107,7 @@ public class SraObjectsImporter implements ObjectsImporter {
     }
 
     private Set<String> getAnalysisAccessions(StudyType studyType) {
-
         Set<String> analysisAccessions = new HashSet<>();
-
         StudyType.STUDYLINKS studylinks = studyType.getSTUDYLINKS();
         if (studylinks == null) {
             return analysisAccessions;
@@ -118,7 +133,8 @@ public class SraObjectsImporter implements ObjectsImporter {
                         String analysisAccessionPrefix = startRange.split("\\d")[0];
                         int startRangeNumericPart = Integer.valueOf(startRange.split("[A-Z]*[^\\d]")[1]);
                         int endRangeNumericPart = Integer.valueOf(endRange.split("[A-Z]*[^\\d]")[1]);
-                        int lengthOfNumericPartOfAccessionWithZeros = startRange.length() - analysisAccessionPrefix.length();
+                        int lengthOfNumericPartOfAccessionWithZeros =
+                                startRange.length() - analysisAccessionPrefix.length();
                         for (int i = startRangeNumericPart; i <= endRangeNumericPart; i++) {
                             analysisAccessions.add(analysisAccessionPrefix + String.format
                                     ("%0" + lengthOfNumericPartOfAccessionWithZeros + "d", i));

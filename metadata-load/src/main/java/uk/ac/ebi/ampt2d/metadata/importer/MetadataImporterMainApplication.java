@@ -18,7 +18,6 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -45,11 +44,14 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
     private static final Logger METADATA_IMPORTER_MAIN_APPLICATION_LOGGER =
             Logger.getLogger(MetadataImporterMainApplication.class.getName());
 
-    @Autowired
     private ObjectsImporter objectsImporter;
 
-    @Autowired
     private StudyRepository studyRepository;
+
+    public MetadataImporterMainApplication(ObjectsImporter objectsImporter, StudyRepository studyRepository) {
+        this.objectsImporter = objectsImporter;
+        this.studyRepository = studyRepository;
+    }
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(MetadataImporterMainApplication.class, args);

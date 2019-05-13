@@ -23,4 +23,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 
 @RepositoryRestResource
 public interface WebResourceRepository extends PagingAndSortingRepository<WebResource, Long> {
+
+    WebResource findByResourceUrl(String url);
 }
