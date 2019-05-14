@@ -19,10 +19,12 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDate;
 
 @Entity
 public class Publication extends Auditable<String>{
@@ -43,5 +45,17 @@ public class Publication extends Auditable<String>{
     @Override
     public String getId() {
         return id;
+    }
+
+    // Release date control: get the *earliest* release date from all studies which link to this publication
+    @Formula("(SELECT min(study.release_date) FROM publication " +
+             "INNER JOIN study_publications on publication.id = study_publications.study_id " +
+             "INNER JOIN study on study_publications.study_id = study.id" +
+             "WHERE publication.id=id)"
+    )
+    private LocalDate releaseDate;
+
+    public LocalDate getReleaseDate(){
+        return releaseDate;
     }
 }
