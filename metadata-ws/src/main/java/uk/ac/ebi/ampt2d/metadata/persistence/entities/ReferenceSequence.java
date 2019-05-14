@@ -19,6 +19,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -35,6 +36,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -124,6 +126,18 @@ public class ReferenceSequence extends Auditable<Long> {
 
     public void setTaxonomy(Taxonomy taxonomy) {
         this.taxonomy = taxonomy;
+    }
+
+    // Release date control: get the *earliest* release date from all studies which link to this reference sequence
+    @Formula("(SELECT min(study.release_date) FROM reference_sequence " +
+            "INNER JOIN analysis_reference_sequences on reference_sequence.id=analysis_reference_sequences.reference_sequences_id " +
+            "INNER JOIN analysis on analysis_reference_sequences.analysis_id = analysis.id " +
+            "INNER JOIN study on analysis.study_id = study.id " +
+            "WHERE reference_sequence.id=id)")
+    private LocalDate releaseDate;
+
+    public LocalDate getReleaseDate() {
+        return releaseDate;
     }
 
 }
