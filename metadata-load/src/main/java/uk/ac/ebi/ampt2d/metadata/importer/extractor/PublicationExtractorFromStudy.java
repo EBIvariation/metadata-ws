@@ -18,69 +18,38 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Auditable;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Publication;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 import uk.ac.ebi.ena.sra.xml.LinkType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.ena.sra.xml.XRefType;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class PublicationOrWebResourceExtractorFromStudy {
-
-    public static final String PUBLICATIONS = "publications";
-
-    public static final String WEB_RESOURCES = "webResources";
+public class PublicationExtractorFromStudy {
 
     private static final String PUB_MED = "pubmed";
 
     private PublicationRepository publicationRepository;
 
-    private WebResourceRepository webResourceRepository;
-
-    public PublicationOrWebResourceExtractorFromStudy(PublicationRepository publicationRepository, WebResourceRepository webResourceRepository) {
+    public PublicationExtractorFromStudy(PublicationRepository publicationRepository) {
         this.publicationRepository = publicationRepository;
-        this.webResourceRepository = webResourceRepository;
     }
 
-    public Map<String, List<? extends Auditable>> getPublicationsAndWebResources(StudyType.STUDYLINKS studylinks) {
-        Map<String, List<? extends Auditable>> mapOfPublicationAndWebResources = new HashMap<>();
+    public List<Publication> getPublications(StudyType.STUDYLINKS studylinks) {
         List<Publication> publications = new ArrayList<>();
-        List<WebResource> webResources = new ArrayList<>();
         if (studylinks == null) {
-            return mapOfPublicationAndWebResources;
+            return publications;
         }
         LinkType[] studyLinksArray = studylinks.getSTUDYLINKArray();
-
         for (int i = 0; i < studyLinksArray.length; i++) {
             XRefType xRefType = studyLinksArray[i].getXREFLINK();
             if (xRefType != null && xRefType.getDB().equals(PUB_MED)) {
                 publications.add(findOrCreatePublication(xRefType.getID()));
-            } else {
-                LinkType.URLLINK urlLink = studyLinksArray[i].getURLLINK();
-                if (urlLink != null) {
-                    webResources.add(findOrCreateWebResource(urlLink.getURL()));
-                }
             }
-
         }
-        mapOfPublicationAndWebResources.put(PUBLICATIONS, publications);
-        mapOfPublicationAndWebResources.put(WEB_RESOURCES, webResources);
-        return mapOfPublicationAndWebResources;
-    }
-
-    private WebResource findOrCreateWebResource(String url) {
-        WebResource webResource = webResourceRepository.findByResourceUrl(url);
-        if (webResource == null) {
-            webResource = webResourceRepository.save(new WebResource(WebResource.Type.STUDY_WEB, url));
-        }
-        return webResource;
+        return publications;
     }
 
     private Publication findOrCreatePublication(String id) {

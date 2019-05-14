@@ -21,12 +21,13 @@ package uk.ac.ebi.ampt2d.metadata.importer.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.importer.SraObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.StudyConverter;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationOrWebResourceExtractorFromStudy;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
-import uk.ac.ebi.ampt2d.metadata.importer.objectImporters.ObjectsImporter;
-import uk.ac.ebi.ampt2d.metadata.importer.objectImporters.SraObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
@@ -44,7 +45,8 @@ public class MetadataImporterMainApplicationConfiguration {
                                           PublicationRepository publicationRepository,
                                           WebResourceRepository webResourceRepository) {
         return new SraObjectsImporter(sraRetrieverByAccession, sraStudyXmlParser(), studyConverter,
-                new PublicationOrWebResourceExtractorFromStudy(publicationRepository, webResourceRepository));
+                new PublicationExtractorFromStudy(publicationRepository),
+                new WebResourceExtractorFromStudy(webResourceRepository));
     }
 
     @Bean

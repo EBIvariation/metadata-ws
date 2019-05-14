@@ -18,7 +18,6 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.converter;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,8 +27,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataDatabaseConfiguration;
-import uk.ac.ebi.ampt2d.metadata.importer.configuration.SraApiConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataImporterMainApplicationConfiguration;
+import uk.ac.ebi.ampt2d.metadata.importer.configuration.SraApiConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
@@ -39,6 +38,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {MetadataImporterMainApplicationConfiguration.class,
         MetadataDatabaseConfiguration.class,
@@ -47,9 +49,9 @@ import java.time.LocalDate;
 @TestPropertySource(locations = "classpath:application.properties", properties = {"import.source=API"})
 public class StudyConverterTest {
 
-    private static final String STUDY_DOCUMENT_API_XML = "study/studyDocumentAPI";
+    private static final String STUDY_DOCUMENT_API_XML = "study/StudyDocumentAPI.xml";
 
-    private static final String STUDY_DOCUMENT_DATABASE_XML = "study/studyDocumentDB";
+    private static final String STUDY_DOCUMENT_DATABASE_XML = "study/StudyDocumentDB.xml";
 
     private SraXmlParser<StudyType> xmlParser;
 
@@ -67,13 +69,12 @@ public class StudyConverterTest {
         StudyType studyType = getStudyType(STUDY_DOCUMENT_API_XML, studyAccession);
         Study study = studyConverter.convert(studyType);
 
-        Assert.assertNotNull(study);
-        Assert.assertEquals(studyAccession, study.getAccessionVersionId().getAccession());
-        Assert.assertEquals("Whole genome resequencing of the human parasite Schistosoma mansoni reveals population history\n" +
+        assertNotNull(study);
+        assertEquals(studyAccession, study.getAccessionVersionId().getAccession());
+        assertEquals("Whole genome resequencing of the human parasite Schistosoma mansoni reveals population history\n" +
                 "                and effects of selection", study.getName());
-        Assert.assertEquals(LocalDate.parse("2016-04-20"), study.getReleaseDate());
-        Assert.assertEquals("Wellcome Trust Sanger Institute", study.getCenter());
-
+        assertEquals(LocalDate.parse("2016-04-20"), study.getReleaseDate());
+        assertEquals("Wellcome Trust Sanger Institute", study.getCenter());
     }
 
     @Test
@@ -81,13 +82,11 @@ public class StudyConverterTest {
         String studyAccession = "ERP000332";
         StudyType studyType = getStudyType(STUDY_DOCUMENT_DATABASE_XML, studyAccession);
         Study study = studyConverter.convert(studyType);
-
-        Assert.assertNotNull(study);
-        Assert.assertEquals(studyAccession, study.getAccessionVersionId().getAccession());
-        Assert.assertEquals("Breast Cancer Follow Up Series", study.getName());
-        Assert.assertEquals(LocalDate.parse("9999-12-31"), study.getReleaseDate());
-        Assert.assertEquals("SC", study.getCenter());
-
+        assertNotNull(study);
+        assertEquals(studyAccession, study.getAccessionVersionId().getAccession());
+        assertEquals("Breast Cancer Follow Up Series", study.getName());
+        assertEquals(LocalDate.parse("9999-12-31"), study.getReleaseDate());
+        assertEquals("SC", study.getCenter());
     }
 
     private StudyType getStudyType(String xml, String accession) throws Exception {

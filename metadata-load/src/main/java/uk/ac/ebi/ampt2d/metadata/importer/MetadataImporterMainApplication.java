@@ -22,7 +22,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import uk.ac.ebi.ampt2d.metadata.importer.objectImporters.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
@@ -55,14 +54,12 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(MetadataImporterMainApplication.class, args);
-
     }
 
     @Override
     public void run(ApplicationArguments applicationArguments) throws Exception {
         Set<String> accessions = readAccessionsFromFile(applicationArguments);
         List<Study> studies = objectsImporter.importStudy(accessions);
-        //TODO save study Object importing dependent objects
         studyRepository.save(studies);
     }
 
@@ -78,12 +75,13 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
             accessions = new HashSet<>(Files.readAllLines(Paths.get(MetadataImporterMainApplication.class
                     .getClassLoader().getResource(accessionFilePath).toURI())));
         } catch (NullPointerException | URISyntaxException exception) {
-            METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE,
-                    "Provided file path is invalid/file does not exists");
-            throw new RuntimeException("Provided file path is invalid/file does not exists");
+            String message = "Provided file path is invalid/file does not exists";
+            METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, message);
+            throw new RuntimeException(message);
         } catch (IOException exception) {
-            METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, "Provided file is not valid/corrupt");
-            throw new RuntimeException("Provided file is not valid/corrupt");
+            String message = "Provided file is not valid/corrupt";
+            METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, message);
+            throw new RuntimeException(message);
         }
 
         return accessions;

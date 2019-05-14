@@ -44,21 +44,21 @@ public class SraStudyXmlParserTest {
 
     @Test
     public void parseXmlApi() throws XmlException, URISyntaxException, IOException {
-        StudyType study = getStudyType(STUDY_ACCESSION_API, "study/studyDocumentAPI");
+        StudyType study = getStudyType(STUDY_ACCESSION_API, "study/StudyDocumentAPI.xml");
         assertEquals("S. mansoni pop genomics", study.getAlias());
         assertEquals(STUDY_ACCESSION_API, study.getAccession());
     }
 
     @Test
     public void parseXmlDatabase() throws XmlException, URISyntaxException, IOException {
-        StudyType study = getStudyType(STUDY_ACCESSION_DB, "study/studyDocumentDB");
+        StudyType study = getStudyType(STUDY_ACCESSION_DB, "study/StudyDocumentDB.xml");
         assertEquals("Breast Cancer Follow Up Series-sc-2010-09-08", study.getAlias());
         assertEquals(STUDY_ACCESSION_DB, study.getAccession());
     }
 
     @Test(expected = XmlException.class)
     public void parseNotFoundXml() throws XmlException, URISyntaxException, IOException {
-        StudyType study = getStudyType(STUDY_ACCESSION_DB, "study/studyDocumentNotFound");
+        StudyType study = getStudyType(STUDY_ACCESSION_DB, "study/StudyDocumentNotFound.xml");
     }
 
     private StudyType getStudyType(String studyAccession, String studyDocumentPath)

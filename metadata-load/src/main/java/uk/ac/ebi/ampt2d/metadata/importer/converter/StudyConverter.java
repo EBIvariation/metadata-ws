@@ -37,7 +37,6 @@ public class StudyConverter implements Converter<StudyType, Study> {
 
     @Override
     public Study convert(StudyType studyType) {
-        //TODO Fetch Analysis Xml and dependent objects and add to Study object
         StudyType.DESCRIPTOR studyDescriptor = studyType.getDESCRIPTOR();
         String studyAccession = studyType.getAccession();
         String studyName = studyDescriptor.getSTUDYTITLE();

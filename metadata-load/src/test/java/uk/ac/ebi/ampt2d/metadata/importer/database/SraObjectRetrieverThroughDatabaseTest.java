@@ -46,7 +46,7 @@ public class SraObjectRetrieverThroughDatabaseTest {
     @Category(OracleDbCategory.class)
     public void getXml() throws Exception {
         String studyAccession = "ERP000332";
-        String studyDocumentPath = "study/studyDocumentDB";
+        String studyDocumentPath = "study/StudyDocumentDB.xml";
 
         String xmlString = sraRetriever.getXml(studyAccession);
         String expectedXmlString = new String(Files.readAllBytes(

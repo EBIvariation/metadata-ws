@@ -18,55 +18,53 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.DefaultApplicationArguments;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
+import static org.junit.Assert.assertEquals;
+
+@RunWith(SpringRunner.class)
+@TestPropertySource(value = "classpath:application.properties",
+        properties = "import.source=API")
+@ContextConfiguration(classes = {MetadataImporterMainApplication.class})
 public class MetadataImporterMainApplicationAPITest {
 
-    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 2;
+    @Autowired
+    private MetadataImporterMainApplication metadataImporterMainApplication;
 
-    private SpringApplication springApplication = new SpringApplication(MetadataImporterMainApplication.class);
-
-    private String[] applicationArguments = new String[NUMBER_OF_APPLICATION_ARGUMENTS];
+    @Autowired
+    private StudyRepository studyRepository;
 
     @Before
     public void setUp() {
-        applicationArguments[0] = "--accessions.file.path=study/studyAccessions.txt";
-        applicationArguments[1] = "--import.source=API";
+        studyRepository.deleteAll();
     }
 
     @Test
-    public void testRunStudy() throws Exception {
-        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
-        StudyRepository studyRepository = (StudyRepository) getBean(configurableApplicationContext,
-                "studyRepository");
-        Assert.assertEquals(2, studyRepository.count());
+    public void run() throws Exception {
+        metadataImporterMainApplication.run(new DefaultApplicationArguments(
+                new String[]{"--accessions.file.path=study/studyAccessions.txt"}));
+        assertEquals(2, studyRepository.count());
     }
 
     @Test(expected = RuntimeException.class)
     public void testInvalidFilePath() throws Exception {
-        applicationArguments[0] = "--accessions.file.path=InvalidFilePath/studyAccessions.txt";
-        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
-        StudyRepository studyRepository = (StudyRepository) getBean(configurableApplicationContext,
-                "studyRepository");
-        Assert.assertEquals(0, studyRepository.count());
+        metadataImporterMainApplication.run(new DefaultApplicationArguments(
+                new String[]{"--accessions.file.path=InvalidFilePath/studyAccessions.txt"}));
     }
 
     @Test
     public void testDuplicateStudy() throws Exception {
-        applicationArguments[0] = "--accessions.file.path=study/duplicateStudyAccessions.txt";
-        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
-        StudyRepository studyRepository = (StudyRepository) getBean(configurableApplicationContext,
-                "studyRepository");
-        Assert.assertEquals(1, studyRepository.count());
-    }
-
-    private Object getBean(ConfigurableApplicationContext configurableApplicationContext, String bean) {
-        return configurableApplicationContext.getBeanFactory().getBean(bean);
+        metadataImporterMainApplication.run(new DefaultApplicationArguments(
+                new String[]{"--accessions.file.path=study/duplicateStudyAccessions.txt"}));
+        assertEquals(1, studyRepository.count());
     }
 
 }

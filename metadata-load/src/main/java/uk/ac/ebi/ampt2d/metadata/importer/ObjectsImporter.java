@@ -16,7 +16,7 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.importer.objectImporters;
+package uk.ac.ebi.ampt2d.metadata.importer;
 
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;

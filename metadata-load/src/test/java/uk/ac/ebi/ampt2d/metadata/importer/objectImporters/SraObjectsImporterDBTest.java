@@ -18,7 +18,6 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.objectImporters;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -27,12 +26,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
+import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.database.OracleDbCategory;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=DB"})
@@ -44,13 +47,13 @@ public class SraObjectsImporterDBTest {
 
     @Test
     @Category(OracleDbCategory.class)
-    public void importObject() throws Exception {
+    public void importStudy() throws Exception {
         Set<String> studyAccessions = new HashSet<>();
         studyAccessions.add("ERP000860");
         studyAccessions.add("ERP000858");
         List<Study> studies = sraObjectImporter.importStudy(studyAccessions);
-        Assert.assertNotNull(studies);
-        Assert.assertEquals(2, studies.size());
+        assertNotNull(studies);
+        assertEquals(2, studies.size());
     }
 
 }

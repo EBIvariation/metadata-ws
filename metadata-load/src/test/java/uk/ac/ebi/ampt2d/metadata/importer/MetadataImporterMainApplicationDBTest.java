@@ -18,40 +18,43 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.springframework.boot.SpringApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.DefaultApplicationArguments;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.database.OracleDbCategory;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
+import static org.junit.Assert.assertEquals;
+
+@RunWith(SpringRunner.class)
+@TestPropertySource(value = "classpath:application.properties",
+        properties = "import.source=DB")
+@ContextConfiguration(classes = {MetadataImporterMainApplication.class})
 public class MetadataImporterMainApplicationDBTest {
 
-    private final static int NUMBER_OF_APPLICATION_ARGUMENTS = 2;
+    @Autowired
+    private MetadataImporterMainApplication metadataImporterMainApplication;
 
-    private SpringApplication springApplication = new SpringApplication(MetadataImporterMainApplication.class);
-
-    private String[] applicationArguments = new String[NUMBER_OF_APPLICATION_ARGUMENTS];
+    @Autowired
+    private StudyRepository studyRepository;
 
     @Before
     public void setUp() {
-        applicationArguments[0] = "--import.source=DB";
-        applicationArguments[1] = "--accessions.file.path=study/egaStudyAccessions.txt";
+        studyRepository.deleteAll();
     }
 
     @Test
     @Category(OracleDbCategory.class)
-    public void testRunForDBEgaStudies() throws Exception {
-        ConfigurableApplicationContext configurableApplicationContext = springApplication.run(applicationArguments);
-        StudyRepository studyRepository =
-                (StudyRepository) getBean(configurableApplicationContext, "studyRepository");
-        Assert.assertEquals(2, studyRepository.count());
-    }
-
-    private Object getBean(ConfigurableApplicationContext configurableApplicationContext, String bean) {
-        return configurableApplicationContext.getBeanFactory().getBean(bean);
+    public void run() throws Exception {
+        metadataImporterMainApplication.run(new DefaultApplicationArguments(
+                new String[]{"--accessions.file.path=study/egaStudyAccessions.txt"}));
+        assertEquals(2, studyRepository.count());
     }
 
 }
