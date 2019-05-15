@@ -2,6 +2,9 @@
 
 Metadata API for projects that follow the SRA model, such as those submitted to the EGA, EVA and AMP T2D.
 
+Available documentation:
+* [Release date control](release-date.md)
+
 
 ## Tests
 
