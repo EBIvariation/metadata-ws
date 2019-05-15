@@ -26,18 +26,20 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
 @Entity
+@SequenceGenerator(initialValue=1, allocationSize=1 , name="TAXONOMY_SEQ", sequenceName="taxonomy_sequence")
 public class Taxonomy extends Auditable<Long> {
 
     @ApiModelProperty(position = 1, value = "Taxonomy auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="TAXONOMY_SEQ")
     private long id;
 
     @ApiModelProperty(position = 2, example = "1")
@@ -56,6 +58,14 @@ public class Taxonomy extends Auditable<Long> {
     @ManyToMany
     @JsonProperty
     private List<Taxonomy> ancestors;
+
+    public Taxonomy() {
+    }
+
+    public Taxonomy(long taxonomyId, String name) {
+        this.taxonomyId = taxonomyId;
+        this.name = name;
+    }
 
     public Long getId() {
         return id;

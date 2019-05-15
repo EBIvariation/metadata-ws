@@ -27,21 +27,24 @@ import javax.persistence.ManyToMany;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
+@SequenceGenerator(initialValue=1, allocationSize=1 , name="SAMPLE_SEQ", sequenceName="sample_sequence")
 public class Sample extends Auditable<Long> {
 
     @ApiModelProperty(position = 1, value = "Sample auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="SAMPLE_SEQ")
     private long id;
 
     @ApiModelProperty(position = 2)
@@ -67,6 +70,12 @@ public class Sample extends Auditable<Long> {
     Sample() {
     }
 
+    public Sample(AccessionVersionId accessionVersionId, String name, List<Taxonomy> taxonomies) {
+        this.accessionVersionId = accessionVersionId;
+        this.name = name;
+        this.taxonomies = taxonomies;
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -79,5 +88,4 @@ public class Sample extends Auditable<Long> {
     public List<Taxonomy> getTaxonomies() {
         return taxonomies;
     }
-
 }

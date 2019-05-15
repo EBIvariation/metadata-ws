@@ -31,15 +31,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
+@SequenceGenerator(initialValue = 1, allocationSize = 1, name = "ANALYSIS_SEQ", sequenceName = "analysis_sequence")
 public class Analysis extends Auditable<Long> {
 
     public enum Type {
@@ -68,14 +71,16 @@ public class Analysis extends Auditable<Long> {
 
         ARRAY,
 
-        CURATION
+        CURATION ,
+
+        UNSPECIFIED
 
     }
 
     @ApiModelProperty(position = 1, value = "Analysis auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ANALYSIS_SEQ")
     private long id;
 
     @ApiModelProperty(position = 2)
@@ -135,6 +140,23 @@ public class Analysis extends Auditable<Long> {
     @ManyToMany
     private List<File> files;
 
+    public Analysis() {
+    }
+
+    public Analysis(AccessionVersionId accessionVersionId, String name, String description,
+                    Study study, List<ReferenceSequence> referenceSequences, Technology technology,
+                    String platform, List<File> files, List<Sample> samples) {
+        this.accessionVersionId = accessionVersionId;
+        this.name = name;
+        this.description = description;
+        this.study = study;
+        this.referenceSequences = referenceSequences;
+        this.technology = technology;
+        this.platform = platform;
+        this.files = files;
+        this.samples=samples;
+    }
+
     @Override
     public Long getId() {
         return id;
@@ -144,8 +166,27 @@ public class Analysis extends Auditable<Long> {
         return accessionVersionId;
     }
 
+    public Study getStudy() {
+        return study;
+    }
+
+    public void setStudy(Study study) {
+        this.study = study;
+    }
+
+    public Technology getTechnology() {
+        return technology;
+    }
+
+    public List<File> getFiles() {
+        return files;
+    }
+
     public List<ReferenceSequence> getReferenceSequences() {
         return referenceSequences;
     }
 
+    public void setReferenceSequences(List<ReferenceSequence> referenceSequences) {
+        this.referenceSequences = referenceSequences;
+    }
 }

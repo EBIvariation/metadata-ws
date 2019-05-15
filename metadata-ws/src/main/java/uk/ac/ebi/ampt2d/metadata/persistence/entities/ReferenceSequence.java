@@ -25,19 +25,24 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name","patch"}))
+@SequenceGenerator(initialValue=1, allocationSize=1 , name="REFERENCE_SEQUENCE_SEQ",
+        sequenceName="reference_sequence_sequence")
 public class ReferenceSequence extends Auditable<Long> {
 
     public enum Type {
@@ -53,7 +58,7 @@ public class ReferenceSequence extends Auditable<Long> {
     @ApiModelProperty(position = 1, value = "Reference Sequence auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="REFERENCE_SEQUENCE_SEQ")
     private long id;
 
     @ApiModelProperty(position = 2, required = true)
@@ -71,7 +76,7 @@ public class ReferenceSequence extends Auditable<Long> {
     @ApiModelProperty(position = 4, required = true)
     @NotNull
     @JsonProperty
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> accessions = new ArrayList<String>();
 
     @ApiModelProperty(position = 5, required = true)
@@ -90,6 +95,14 @@ public class ReferenceSequence extends Auditable<Long> {
     @Override
     public Long getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<String> getAccessions() {
+        return accessions;
     }
 
     public Type getType() {

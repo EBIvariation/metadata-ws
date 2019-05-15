@@ -76,6 +76,7 @@
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <reuseForks>false</reuseForks>
                             <excludedGroups>uk.ac.ebi.ampt2d.metadata.importer.database.OracleDbCategory</excludedGroups>
                         </configuration>
                     </plugin>

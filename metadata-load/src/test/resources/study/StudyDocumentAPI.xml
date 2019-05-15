@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ROOT request="ERP015186&amp;display=xml">
+    <STUDY accession="ERP015186" alias="S. mansoni pop genomics" broker_name="European Bioinformatics Institute"
+           center_name="Wellcome Trust Sanger Institute">
+        <IDENTIFIERS>
+            <PRIMARY_ID>ERP015186</PRIMARY_ID>
+            <SECONDARY_ID>PRJEB13625</SECONDARY_ID>
+            <SUBMITTER_ID namespace="Wellcome Trust Sanger Institute">S. mansoni pop genomics</SUBMITTER_ID>
+        </IDENTIFIERS>
+        <DESCRIPTOR>
+            <STUDY_TITLE>Whole genome resequencing of the human parasite Schistosoma mansoni reveals population history
+                and effects of selection</STUDY_TITLE>
+            <STUDY_ABSTRACT>Whole genome sequences of S. mansoni and S. rodhaini aligned to S. masoni v5.2 reference.
+                Samples collected from Africa and Carribean to faciliate coalescence modelling of population history
+            </STUDY_ABSTRACT>
+            <STUDY_DESCRIPTION>Whole genome sequences of S. mansoni and S. rodhaini aligned to S. masoni v5.2 reference.
+                Samples collected from Africa and Carribean to faciliate coalescence modelling of population history
+            </STUDY_DESCRIPTION>
+            <STUDY_TYPE existing_study_type="Population Genomics"/>
+        </DESCRIPTOR>
+        <STUDY_LINKS>
+            <STUDY_LINK>
+                <XREF_LINK>
+                    <DB>ENA-ANALYSIS</DB>
+                    <ID>ERZ297260-ERZ297270</ID>
+                </XREF_LINK>
+            </STUDY_LINK>
+            <STUDY_LINK>
+                <XREF_LINK>
+                    <DB>ENA-SUBMISSION</DB>
+                    <ID>ERA607760</ID>
+                </XREF_LINK>
+            </STUDY_LINK>
+            <STUDY_LINK>
+                <XREF_LINK>
+                    <DB>ENA-FASTQ-FILES</DB>
+                    <ID>
+                        <![CDATA[http://www.ebi.ac.uk/ena/data/warehouse/filereport?accession=ERP015186&result=read_run&fields=run_accession,fastq_ftp,fastq_md5,fastq_bytes]]></ID>
+                </XREF_LINK>
+            </STUDY_LINK>
+            <STUDY_LINK>
+                <XREF_LINK>
+                    <DB>ENA-SUBMITTED-FILES</DB>
+                    <ID>
+                        <![CDATA[http://www.ebi.ac.uk/ena/data/warehouse/filereport?accession=ERP015186&result=read_run&fields=run_accession,submitted_ftp,submitted_md5,submitted_bytes,submitted_format]]></ID>
+                </XREF_LINK>
+            </STUDY_LINK>
+        </STUDY_LINKS>
+        <STUDY_ATTRIBUTES>
+            <STUDY_ATTRIBUTE>
+                <TAG>ENA-FIRST-PUBLIC</TAG>
+                <VALUE>2016-04-20</VALUE>
+            </STUDY_ATTRIBUTE>
+            <STUDY_ATTRIBUTE>
+                <TAG>ENA-LAST-UPDATE</TAG>
+                <VALUE>2016-04-20</VALUE>
+            </STUDY_ATTRIBUTE>
+        </STUDY_ATTRIBUTES>
+    </STUDY>
+</ROOT>

@@ -28,6 +28,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
@@ -35,6 +36,7 @@ import javax.validation.constraints.Pattern;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"type","resourceUrl"}))
+@SequenceGenerator(initialValue=1, allocationSize=1 , name="WEB_RESOURCE_SEQ", sequenceName="web_resource_sequence")
 public class WebResource extends Auditable<Long> {
 
     public enum Type {
@@ -50,7 +52,7 @@ public class WebResource extends Auditable<Long> {
     @ApiModelProperty(position = 1, value = "Web resource auto generated id", readOnly = true, required = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="WEB_RESOURCE_SEQ")
     private long id;
 
     @ApiModelProperty(position = 2, required = true)

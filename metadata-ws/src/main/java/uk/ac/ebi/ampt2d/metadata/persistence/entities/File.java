@@ -28,6 +28,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
@@ -36,6 +37,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
+@SequenceGenerator(initialValue=1, allocationSize=1 , name="FILE_SEQ", sequenceName="file_sequence")
 public class File extends Auditable<Long> {
 
     public enum Type {
@@ -48,7 +50,7 @@ public class File extends Auditable<Long> {
     @ApiModelProperty(position = 1, value = "File auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="FILE_SEQ")
     private Long id;
 
     @ApiModelProperty(position = 2)

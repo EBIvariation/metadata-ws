@@ -20,7 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.importer.xml;
 import org.apache.xmlbeans.XmlException;
 import org.junit.Before;
 import org.junit.Test;
-import uk.ac.ebi.ena.sra.xml.AnalysisType;
+import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -29,43 +29,43 @@ import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
 
-public class SraAnalysisXmlParserTest {
+public class SraStudyXmlParserTest {
 
-    private SraXmlParser<AnalysisType> xmlParser;
+    public static final String STUDY_ACCESSION_API = "ERP015186";
+
+    public static final String STUDY_ACCESSION_DB = "ERP000332";
+
+    private SraXmlParser<StudyType> xmlParser;
 
     @Before
     public void setUp() {
-        xmlParser = new SraAnalysisXmlParser();
+        xmlParser = new SraStudyXmlParser();
     }
 
     @Test
     public void parseXmlApi() throws XmlException, URISyntaxException, IOException {
-        AnalysisType analysis = getAnalysisType("ERZ496533", "AnalysisDocumentApi.xml");
-        assertEquals("DNA sequencing ACAN", analysis.getTITLE());
-        assertEquals("GCA_000002305.1",
-                analysis.getANALYSISTYPE().getSEQUENCEVARIATION().getASSEMBLY().getSTANDARD().getAccession());
-        assertEquals(2, analysis.getFILES().sizeOfFILEArray());
+        StudyType study = getStudyType(STUDY_ACCESSION_API, "study/StudyDocumentAPI.xml");
+        assertEquals("S. mansoni pop genomics", study.getAlias());
+        assertEquals(STUDY_ACCESSION_API, study.getAccession());
     }
 
     @Test
     public void parseXmlDatabase() throws XmlException, URISyntaxException, IOException {
-        AnalysisType analysis = getAnalysisType("ERZ496533", "AnalysisDocumentDatabase.xml");
-        assertEquals("DNA sequencing ACAN", analysis.getTITLE());
-        assertEquals("GCA_000002305.1",
-                analysis.getANALYSISTYPE().getSEQUENCEVARIATION().getASSEMBLY().getSTANDARD().getAccession());
-        assertEquals(2, analysis.getFILES().sizeOfFILEArray());
+        StudyType study = getStudyType(STUDY_ACCESSION_DB, "study/StudyDocumentDB.xml");
+        assertEquals("Breast Cancer Follow Up Series-sc-2010-09-08", study.getAlias());
+        assertEquals(STUDY_ACCESSION_DB, study.getAccession());
     }
 
     @Test(expected = XmlException.class)
     public void parseNotFoundXml() throws XmlException, URISyntaxException, IOException {
-        AnalysisType analysis = getAnalysisType("ERZ496533", "AnalysisDocumentNotFound.xml");
+        StudyType study = getStudyType(STUDY_ACCESSION_DB, "study/StudyDocumentNotFound.xml");
     }
 
-    private AnalysisType getAnalysisType(String analysisAccession, String analysisDocumentPath)
+    private StudyType getStudyType(String studyAccession, String studyDocumentPath)
             throws XmlException, URISyntaxException, IOException {
         String xmlString = new String(Files.readAllBytes(
-                Paths.get(getClass().getClassLoader().getResource(analysisDocumentPath).toURI())));
-        return xmlParser.parseXml(xmlString, analysisAccession);
+                Paths.get(getClass().getClassLoader().getResource(studyDocumentPath).toURI())));
+        return xmlParser.parseXml(xmlString, studyAccession);
     }
 
 }

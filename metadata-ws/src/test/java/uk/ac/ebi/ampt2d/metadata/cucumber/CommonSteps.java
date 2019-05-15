@@ -121,7 +121,7 @@ public class CommonSteps {
 
     @When("^I request GET for (.*) of (.*)$")
     public void performGetForLinkedObjects(String className, String resourceUriKey) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get(CommonStates.getUrl(resourceUriKey)+"/"+className)));
+        CommonStates.setResultActions(mockMvc.perform(get(CommonStates.getUrl(resourceUriKey) + "/" + className)));
     }
 
     @When("^I request POST (.*) with JSON payload:$")
@@ -159,8 +159,8 @@ public class CommonSteps {
 
     @When("^I request PATCH (.*) with content (.*)")
     public void performPatchOnResourceWithContent(String urlKey, String content) throws Exception {
-            CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
-                    .content(content)));
+        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
+                .content(content)));
     }
 
     @When("^I request DELETE for the (.*) of (.*) of the (.*)")
@@ -178,12 +178,12 @@ public class CommonSteps {
 
     @When("^I request search for the (.*) with the parameters: (.*)$")
     public void performSearchOnResourcesWithParameters(String className, String parameters) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/"+className+"/search?"+parameters)));
+        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "/search?" + parameters)));
     }
 
     @When("^I request elaborate find for the (.*) with the parameters: (.*)$")
     public void performFindOnResourcesWithParameters(String className, String parameters) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/"+className+"?"+parameters)));
+        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "?" + parameters)));
     }
 
     @When("^I request elaborate search for the (.*) base (.*) and with the parameters: (.*)$")
@@ -233,8 +233,8 @@ public class CommonSteps {
 
     @Then("^the response should contain (\\d*) (.*)$")
     public void checkResponseListSize(int size, String className) throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$.."+className).isArray())
-                .andExpect(jsonPath("$.."+className+".length()").value(size));
+        CommonStates.getResultActions().andExpect(jsonPath("$.." + className).isArray())
+                .andExpect(jsonPath("$.." + className + ".length()").value(size));
     }
 
     @Then("^the response should contain no study$")
@@ -263,7 +263,7 @@ public class CommonSteps {
 
     @Then("^the response should contain field (.*) with value (.*)$")
     public void checkResponseJsonFieldValue(String field, String value) throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(value));
+        CommonStates.getResultActions().andExpect(jsonPath("$." + field).value(value));
     }
 
     @Then("^the response should contain error message (.*)$")
@@ -273,29 +273,29 @@ public class CommonSteps {
 
     @Then("^the response should contain field (.*) with a numeric value$")
     public void checkResponseJsonFieldValueNumber(String field) throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$."+field).isNumber());
+        CommonStates.getResultActions().andExpect(jsonPath("$." + field).isNumber());
     }
 
     @Then("^the response should contain field (.*) with null value$")
     public void checkResponseJsonFieldValueNull(String field) throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(nullValue()));
+        CommonStates.getResultActions().andExpect(jsonPath("$." + field).value(nullValue()));
     }
 
     @Then("^the difference between (.*) and today should be (\\d*) day$")
     public void checkResponseJsonFieldValueDay(String field, int diff) throws Exception {
         LocalDate days = LocalDate.now().plusDays(diff);
-        CommonStates.getResultActions().andExpect(jsonPath("$."+field).value(days.toString()));
+        CommonStates.getResultActions().andExpect(jsonPath("$." + field).value(days.toString()));
     }
 
     @Then("^the response should contain field (.*) with a non-empty value$")
     public void checkResponseJsonFieldValueNotEmpty(String field) throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$."+field).isNotEmpty());
+        CommonStates.getResultActions().andExpect(jsonPath("$." + field).isNotEmpty());
     }
 
     @And("^the href of the class (.*) should be (.*)$")
     public void checkResponseLinkedObjectHref(String className, String valueKey)
             throws Exception {
-        CommonStates.getResultActions().andExpect(jsonPath("$.."+className+".href")
+        CommonStates.getResultActions().andExpect(jsonPath("$.." + className + ".href")
                 .value(CommonStates.getUrl(valueKey)));
     }
 
@@ -309,7 +309,7 @@ public class CommonSteps {
                     .toArray(String[]::new);
         }
 
-        CommonStates.getResultActions().andExpect(jsonPath("$.."+className+"[*].."+field+".href",
+        CommonStates.getResultActions().andExpect(jsonPath("$.." + className + "[*].." + field + ".href",
                 containsInAnyOrder(urls)));
     }
 
@@ -317,15 +317,15 @@ public class CommonSteps {
     public void checkResponseLinkedObjectFieldValue(String field, String className, int index, String fieldValue)
             throws Exception {
         CommonStates.getResultActions()
-                .andExpect(jsonPath("$.."+className+"["+index+"]."+field).value(fieldValue));
+                .andExpect(jsonPath("$.." + className + "[" + index + "]." + field).value(fieldValue));
     }
 
     @And("^the (.*) field of (.*) (\\d*) should have item (.*)$")
     public void checkResponseLinkedObjectFieldItem(String field, String className, int index, String fieldValue)
             throws Exception {
         CommonStates.getResultActions()
-                .andExpect(jsonPath("$.."+className+"["+index+"]."+field).isArray())
-                .andExpect(jsonPath("$.."+className+"["+index+"]."+field+"[*]", hasItems(fieldValue)));
+                .andExpect(jsonPath("$.." + className + "[" + index + "]." + field).isArray())
+                .andExpect(jsonPath("$.." + className + "[" + index + "]." + field + "[*]", hasItems(fieldValue)));
     }
 
     @Given("^current time as (.*)$")
@@ -334,7 +334,7 @@ public class CommonSteps {
     }
 
     @Then("^the (.*) should be after (.*) and before (.*)$")
-    public void checkDateTimeBetween(String dateTime, String afterKey, String beforeKey) throws Exception{
+    public void checkDateTimeBetween(String dateTime, String afterKey, String beforeKey) throws Exception {
         JSONObject jsonObject = new JSONObject(CommonStates.getResultActions().andReturn().getResponse().getContentAsString());
         ZonedDateTime lastModifiedDate = ZonedDateTime.parse(jsonObject.getString(dateTime));
         assert lastModifiedDate.isAfter(CommonStates.getTime(afterKey));

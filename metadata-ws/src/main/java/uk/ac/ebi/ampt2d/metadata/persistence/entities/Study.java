@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -30,6 +31,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
@@ -37,14 +39,16 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
+@SequenceGenerator(initialValue = 1, allocationSize = 1, name = "STUDY_SEQ", sequenceName = "study_sequence")
 public class Study extends Auditable<Long> {
 
     @ApiModelProperty(position = 1, value = "Study auto generated id", required = true, readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "STUDY_SEQ")
     @Id
     private long id;
 
@@ -100,7 +104,7 @@ public class Study extends Auditable<Long> {
     @OneToMany
     private List<Study> childStudies;
 
-    @OneToMany(mappedBy = "study")
+    @OneToMany(mappedBy = "study", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Analysis> analyses;
 
     @OneToMany
@@ -108,6 +112,20 @@ public class Study extends Auditable<Long> {
 
     @ManyToMany
     private List<Publication> publications;
+
+    public Study() {
+    }
+
+    public Study(AccessionVersionId accessionVersionId, String name, String description, String center,
+                 LocalDate
+                         releaseDate, Taxonomy taxonomy) {
+        this.accessionVersionId = accessionVersionId;
+        this.name = name;
+        this.description = description;
+        this.center = center;
+        this.releaseDate = releaseDate;
+        this.taxonomy = taxonomy;
+    }
 
     @Override
     public Long getId() {
@@ -126,8 +144,74 @@ public class Study extends Auditable<Long> {
         return releaseDate;
     }
 
+    public void setReleaseDate(LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
     public List<Study> getChildStudies() {
         return childStudies;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getCenter() {
+        return center;
+    }
+
+    public void setCenter(String center) {
+        this.center = center;
+    }
+
+    public Taxonomy getTaxonomy() {
+        return taxonomy;
+    }
+
+    public void setTaxonomy(Taxonomy taxonomy) {
+        this.taxonomy = taxonomy;
+    }
+
+    public boolean isBrowsable() {
+        return browsable;
+    }
+
+    public List<Analysis> getAnalyses() {
+        return analyses;
+    }
+
+    public void setAnalyses(List<Analysis> analyses) {
+        for (Analysis analysis : analyses) {
+            analysis.setStudy(this);
+            this.getAnalyses().add(analysis);
+        }
+    }
+
+    public List<WebResource> getResources() {
+        return resources;
+    }
+
+    public List<Publication> getPublications() {
+        return publications;
+    }
+
+    public void setResources(List<WebResource> resources) {
+        this.resources = resources;
+    }
+
+    public void setPublications(List<Publication> publications) {
+        this.publications = publications;
+    }
 }

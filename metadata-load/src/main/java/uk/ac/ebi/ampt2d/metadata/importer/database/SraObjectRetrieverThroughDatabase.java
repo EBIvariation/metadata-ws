@@ -17,8 +17,6 @@
  */
 package uk.ac.ebi.ampt2d.metadata.importer.database;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
@@ -26,27 +24,30 @@ import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
 import java.sql.SQLException;
 import java.sql.SQLXML;
 
-public class SraDatabaseAnalysisRetriever implements SraRetrieverByAccession {
+public class SraObjectRetrieverThroughDatabase implements SraRetrieverByAccession {
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    @Value("${ena.analysis.query}")
-    private String enaAnalysisQuery;
+    private String enaObjectQuery;
 
-    @Autowired
-    public SraDatabaseAnalysisRetriever(NamedParameterJdbcTemplate jdbcTemplate) {
+    public SraObjectRetrieverThroughDatabase(NamedParameterJdbcTemplate jdbcTemplate, String enaObjectQuery) {
         this.jdbcTemplate = jdbcTemplate;
+        this.enaObjectQuery = enaObjectQuery;
     }
 
     @Override
     public String getXml(String accession) {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("accession", accession);
-        SQLXML sqlxml = jdbcTemplate.queryForObject(enaAnalysisQuery, parameters, SQLXML.class);
+        SQLXML sqlxml = jdbcTemplate.queryForObject(enaObjectQuery, parameters, SQLXML.class);
         try {
             return sqlxml.getString();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setEnaObjectQuery(String enaObjectQuery) {
+        this.enaObjectQuery = enaObjectQuery;
     }
 }
