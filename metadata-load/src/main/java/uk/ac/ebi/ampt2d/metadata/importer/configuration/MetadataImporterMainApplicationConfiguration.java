@@ -34,7 +34,6 @@ import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughData
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraXmlRetrieverThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractorFromReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
@@ -67,7 +66,6 @@ public class MetadataImporterMainApplicationConfiguration {
                 studyConverter(),
                 publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository),
-                taxonomyExtractor(taxonomyRepository),
                 taxonomyExtractorFromReferenceSequence(taxonomyRepository),
                 sraAnalysisXmlParser(),
                 analysisConverter(),
@@ -96,7 +94,6 @@ public class MetadataImporterMainApplicationConfiguration {
                 studyConverter(),
                 publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository),
-                taxonomyExtractor(taxonomyRepository),
                 taxonomyExtractorFromReferenceSequence(taxonomyRepository),
                 sraAnalysisXmlParser(),
                 analysisConverter(),
@@ -136,10 +133,6 @@ public class MetadataImporterMainApplicationConfiguration {
     private MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister(
             ReferenceSequenceRepository referenceSequenceRepository) {
         return new MetadataReferenceSequenceFinderOrPersister(referenceSequenceRepository);
-    }
-
-    private TaxonomyExtractor taxonomyExtractor(TaxonomyRepository taxonomyRepository) {
-        return new TaxonomyExtractor(taxonomyRepository);
     }
 
     private TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence(

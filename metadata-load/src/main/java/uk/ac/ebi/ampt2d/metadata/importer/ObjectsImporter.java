@@ -24,7 +24,6 @@ import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataReferenceSequenceFind
 import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataStudyFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractorFromReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
@@ -74,8 +73,6 @@ public abstract class ObjectsImporter {
 
     private WebResourceExtractorFromStudy webResourceExtractorFromStudy;
 
-    private TaxonomyExtractor taxonomyExtractor;
-
     private TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence;
 
     private FileExtractorFromAnalysis fileExtractorFromAnalysis;
@@ -89,7 +86,6 @@ public abstract class ObjectsImporter {
                            Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
                            PublicationExtractorFromStudy publicationExtractorFromStudy,
                            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
-                           TaxonomyExtractor taxonomyExtractor,
                            TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence,
                            FileExtractorFromAnalysis fileExtractorFromAnalysis,
                            MetadataAnalysisPersister metadataAnalysisPersister,
@@ -104,7 +100,6 @@ public abstract class ObjectsImporter {
         this.referenceSequenceConverter = referenceSequenceConverter;
         this.publicationExtractorFromStudy = publicationExtractorFromStudy;
         this.webResourceExtractorFromStudy = webResourceExtractorFromStudy;
-        this.taxonomyExtractor = taxonomyExtractor;
         this.taxonomyExtractorFromReferenceSequence = taxonomyExtractorFromReferenceSequence;
         this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
         this.metadataAnalysisPersister = metadataAnalysisPersister;
@@ -121,7 +116,6 @@ public abstract class ObjectsImporter {
             StudyType.STUDYLINKS studylinks = studyType.getSTUDYLINKS();
             study.setPublications(publicationExtractorFromStudy.getPublications(studylinks));
             study.setResources(webResourceExtractorFromStudy.getWebResources(studylinks));
-            study.setTaxonomy(taxonomyExtractor.getTaxonomy());
             study = extractAnalysisFromStudy(studyType, study);
         } catch (Exception exception) {
             IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for accession " + accession);

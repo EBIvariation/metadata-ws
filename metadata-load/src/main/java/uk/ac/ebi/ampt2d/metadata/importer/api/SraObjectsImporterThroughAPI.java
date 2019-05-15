@@ -25,7 +25,6 @@ import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataReferenceSequenceFind
 import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataStudyFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractorFromReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
@@ -51,7 +50,6 @@ public class SraObjectsImporterThroughAPI extends ObjectsImporter {
             Converter<StudyType, Study> studyConverter,
             PublicationExtractorFromStudy publicationExtractorFromStudy,
             WebResourceExtractorFromStudy webResourceExtractorFromStudy,
-            TaxonomyExtractor taxonomyExtractor,
             TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
             Converter<AnalysisType, Analysis> analysisConverter,
@@ -71,7 +69,6 @@ public class SraObjectsImporterThroughAPI extends ObjectsImporter {
                 referenceSequenceConverter,
                 publicationExtractorFromStudy,
                 webResourceExtractorFromStudy,
-                taxonomyExtractor,
                 taxonomyExtractorFromReferenceSequence,
                 fileExtractorFromAnalysis,
                 metadataAnalysisPersister,

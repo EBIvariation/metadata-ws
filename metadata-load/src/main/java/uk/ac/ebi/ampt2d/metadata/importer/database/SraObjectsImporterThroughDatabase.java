@@ -22,7 +22,6 @@ import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractorFromReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
@@ -50,7 +49,6 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             Converter<StudyType, Study> studyConverter,
             PublicationExtractorFromStudy publicationExtractorFromStudy,
             WebResourceExtractorFromStudy webResourceExtractorFromStudy,
-            TaxonomyExtractor taxonomyExtractor,
             TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
             Converter<AnalysisType, Analysis> analysisConverter,
@@ -70,7 +68,6 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                 referenceSequenceConverter,
                 publicationExtractorFromStudy,
                 webResourceExtractorFromStudy,
-                taxonomyExtractor,
                 taxonomyExtractorFromReferenceSequence,
                 fileExtractorFromAnalysis,
                 metadataAnalysisPersister,
