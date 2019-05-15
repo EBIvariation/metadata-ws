@@ -89,7 +89,7 @@ public class WebResource extends Auditable<Long> {
 
     // Release date control: Study <1..M> WebResource, hence just getting the parent study is enough
     @Override
-    public LocalDate getReleaseDate(){
+    public LocalDate getReleaseDate() {
         Study study = getStudy();
         if (study == null) {
             return null;

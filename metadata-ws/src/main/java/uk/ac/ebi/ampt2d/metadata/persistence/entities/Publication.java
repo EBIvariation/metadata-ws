@@ -28,7 +28,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Entity
-public class Publication extends Auditable<String>{
+public class Publication extends Auditable<String> {
 
     @ApiModelProperty(position = 1, value = "PubmedId", required = true)
     @JsonProperty
@@ -52,12 +52,11 @@ public class Publication extends Auditable<String>{
     @Formula("(SELECT min(study.release_date) FROM publication " +
              "INNER JOIN study_publications on publication.id = study_publications.study_id " +
              "INNER JOIN study on study_publications.study_id = study.id" +
-             "WHERE publication.id=id)"
-    )
+             "WHERE publication.id=id)")
     @JsonIgnore
     private LocalDate releaseDate;
 
-    public LocalDate getReleaseDate(){
+    public LocalDate getReleaseDate() {
         return releaseDate;
     }
 }

@@ -198,7 +198,7 @@ public class Analysis extends Auditable<Long> {
 
     // Release date control: Study <1..M> Analysis, hence just getting the parent study is enough
     @Override
-    public LocalDate getReleaseDate(){
+    public LocalDate getReleaseDate() {
         return getStudy().getReleaseDate();
     }
 }

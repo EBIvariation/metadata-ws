@@ -20,22 +20,21 @@ package uk.ac.ebi.ampt2d.metadata.aop;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.*;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Auditable;
 
 import java.time.LocalDate;
 import java.util.Iterator;
 
 /**
- * An @Aspect for ensuring only published studies are returned through checking a study's releaseDate field
+ * An @Aspect for ensuring only published entities are returned through checking an entity's releaseDate field
  */
 @Aspect
-public class StudyReleaseDateAspect {
+public class ReleaseDateAspect {
 
     /**
-     * An @Around advice for StudyRepository.findAll(..) method execution.
+     * An @Around advice for repositories.*.findAll(..) method execution.
      *
-     * It takes the first argument of the join point method and adds a new Predicate for checking a study's
-     * releaseDate field. It then calls the join point method with updated arguments.
+     * Check the release field of each entity and return only published entities.
      *
      * @param proceedingJoinPoint
      * @return the return object from join point method execution
@@ -58,9 +57,9 @@ public class StudyReleaseDateAspect {
     /**
      * An @Around advice for CrudRepository.findOne(..) method execution
      *
-     * It takes the returned object from join point method execution and check the returned object. If the returned
+     * It takes the returned object from join point method execution and checks the returned object. If the returned
      * object is not a Auditable object, return as it is. If the returned object is an Auditable object, check its
-     * getReleaseDate() method. Return null if the release date is null (i. e., not set) or a date in the future.
+     * release date. Return null if the release date is a date in the future.
      *
      * @param proceedingJoinPoint
      * @return null or object
