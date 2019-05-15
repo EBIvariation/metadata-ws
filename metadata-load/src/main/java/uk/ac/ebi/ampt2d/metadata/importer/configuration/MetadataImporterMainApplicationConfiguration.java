@@ -31,7 +31,6 @@ import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughData
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraXmlRetrieverThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAssemblyXmlParser;
@@ -63,7 +62,6 @@ public class MetadataImporterMainApplicationConfiguration {
                 studyConverter(),
                 publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository),
-                taxonomyExtractor(taxonomyRepository),
                 sraAnalysisXmlParser(),
                 analysisConverter(),
                 fileExtractorFromAnalysis(fileRepository),
@@ -93,7 +91,6 @@ public class MetadataImporterMainApplicationConfiguration {
                 studyConverter(),
                 publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository),
-                taxonomyExtractor(taxonomyRepository),
                 sraAnalysisXmlParser(),
                 analysisConverter(),
                 fileExtractorFromAnalysis(fileRepository),
@@ -120,10 +117,6 @@ public class MetadataImporterMainApplicationConfiguration {
 
     private SraAnalysisXmlParser sraAnalysisXmlParser() {
         return new SraAnalysisXmlParser();
-    }
-
-    private TaxonomyExtractor taxonomyExtractor(TaxonomyRepository taxonomyRepository) {
-        return new TaxonomyExtractor(taxonomyRepository);
     }
 
     private FileExtractorFromAnalysis fileExtractorFromAnalysis(FileRepository fileRepository) {
