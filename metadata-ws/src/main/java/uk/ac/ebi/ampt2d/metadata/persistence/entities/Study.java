@@ -107,7 +107,7 @@ public class Study extends Auditable<Long> {
     @OneToMany(mappedBy = "study",fetch = FetchType.EAGER)
     private List<Analysis> analyses;
 
-    @OneToMany
+    @OneToMany(mappedBy = "study", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<WebResource> resources;
 
     @ManyToMany
@@ -201,6 +201,16 @@ public class Study extends Auditable<Long> {
 
     public void setResources(List<WebResource> resources) {
         this.resources = resources;
+    }
+
+    public void setResource(WebResource resource) {
+        List<WebResource> resources = this.getResources();
+        if (resources != null) {
+            resources.add(resource);
+        } else {
+            resources = new ArrayList<>();
+            resources.add(resource);
+        }
     }
 
     public List<Publication> getPublications() {

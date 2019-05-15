@@ -21,18 +21,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"type","resourceUrl"}))
@@ -70,6 +62,11 @@ public class WebResource extends Auditable<Long> {
     @Pattern(message = "Must be a valid URL.", regexp="(^(https?|ftp):(//|\\\\))[-a-zA-Z0-9+&@#/%?=~_|!:,.;$'`*\\[\\]()]+")
     private String resourceUrl;
 
+    @ApiModelProperty(position = 4, dataType = "java.lang.String", notes = "Url to a Study")
+    @JsonProperty
+    @ManyToOne
+    private Study study;
+
     WebResource() {}
 
     public WebResource(Type type, String resourceUrl) {
@@ -79,5 +76,25 @@ public class WebResource extends Auditable<Long> {
 
     public Long getId() {
         return id;
+    }
+
+    public Study getStudy() {
+        return study;
+    }
+
+    public void setStudy(Study study) {
+        this.study = study;
+        study.setResource(this);
+    }
+
+    // Release date control: Study <1..M> WebResource, hence just getting the parent study is enough
+    @Override
+    public LocalDate getReleaseDate(){
+        Study study = getStudy();
+        if (study == null) {
+            return null;
+        } else {
+            return study.getReleaseDate();
+        }
     }
 }
