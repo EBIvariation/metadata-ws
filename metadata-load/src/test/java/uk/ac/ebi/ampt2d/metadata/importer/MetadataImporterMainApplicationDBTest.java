@@ -33,8 +33,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
-@TestPropertySource(value = "classpath:application.properties",
-        properties = "import.source=DB")
+@TestPropertySource(value = "classpath:application.properties", properties = "import.source=DB")
 @ContextConfiguration(classes = {MetadataImporterMainApplication.class})
 public class MetadataImporterMainApplicationDBTest {
 
@@ -53,7 +52,7 @@ public class MetadataImporterMainApplicationDBTest {
     @Category(OracleDbCategory.class)
     public void run() throws Exception {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
-                new String[]{"--accessions.file.path=study/egaStudyAccessions.txt"}));
+                new String[]{"--accessions.file.path=study/EgaStudyAccessions.txt"}));
         assertEquals(2, studyRepository.count());
     }
 

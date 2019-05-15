@@ -31,8 +31,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
-@TestPropertySource(value = "classpath:application.properties",
-        properties = "import.source=API")
+@TestPropertySource(value = "classpath:application.properties", properties = "import.source=API")
 @ContextConfiguration(classes = {MetadataImporterMainApplication.class})
 public class MetadataImporterMainApplicationAPITest {
 
@@ -50,20 +49,20 @@ public class MetadataImporterMainApplicationAPITest {
     @Test
     public void run() throws Exception {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
-                new String[]{"--accessions.file.path=study/studyAccessions.txt"}));
+                new String[]{"--accessions.file.path=study/StudyAccessions.txt"}));
         assertEquals(2, studyRepository.count());
     }
 
     @Test(expected = RuntimeException.class)
     public void testInvalidFilePath() throws Exception {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
-                new String[]{"--accessions.file.path=InvalidFilePath/studyAccessions.txt"}));
+                new String[]{"--accessions.file.path=InvalidFilePath/StudyAccessions.txt"}));
     }
 
     @Test
     public void testDuplicateStudy() throws Exception {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
-                new String[]{"--accessions.file.path=study/duplicateStudyAccessions.txt"}));
+                new String[]{"--accessions.file.path=study/DuplicateStudyAccessions.txt"}));
         assertEquals(1, studyRepository.count());
     }
 
