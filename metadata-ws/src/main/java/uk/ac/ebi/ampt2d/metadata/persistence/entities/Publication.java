@@ -17,6 +17,7 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.Formula;
@@ -62,6 +63,7 @@ public class Publication extends Auditable<Long>{
              "INNER JOIN study on study_publications.study_id = study.id" +
              "WHERE publication.id=id)"
     )
+    @JsonIgnore
     private LocalDate releaseDate;
 
     public LocalDate getReleaseDate(){
