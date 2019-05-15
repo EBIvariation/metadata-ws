@@ -44,5 +44,7 @@ public abstract class Auditable<ID> {
 
     public abstract ID getId();
 
-    public LocalDate getReleaseDate() {return null;}
+    public LocalDate getReleaseDate() {
+        return null;
+    }
 }

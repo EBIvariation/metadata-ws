@@ -122,5 +122,3 @@ Feature: Transitive release date control for child objects of a Study
       | tomorrow   | tomorrow   | 4xx | 4xx | 4xx | 4xx | 4xx |
       | tomorrow   | yesterday  | 4xx | 2xx | 4xx | 2xx | 2xx |
       | yesterday  | yesterday  | 2xx | 2xx | 2xx | 2xx | 2xx |
-
-

@@ -41,16 +41,16 @@ public class StudySteps {
     @Autowired
     private MockMvc mockMvc;
 
+    @When("I create a study with (.*) for taxonomy$")
+    public void createTestStudy(String testTaxonomyKey) throws Exception {
+        createTestStudyWithTaxonomyAndAccession(testTaxonomyKey, "EGAS0001");
+    }
+
     @When("I create a study with (.*) for taxonomy and (.*) for accession$")
-    public void createTestStudyAccession(String testTaxonomyKey, String accession) throws Exception {
+    public void createTestStudyWithTaxonomyAndAccession(String testTaxonomyKey, String accession) throws Exception {
         CommonStates.setResultActions(postTestStudy(
                 accession, 1, "test_human_study", false, LocalDate.now(), testTaxonomyKey
         ));
-    }
-
-    @When("I create a study with (.*) for taxonomy$")
-    public void createTestStudy(String testTaxonomyKey) throws Exception {
-        CommonStates.setResultActions(postTestStudy("EGAS0001", 1, "test_human_study", false, LocalDate.now(), testTaxonomyKey));
     }
 
     @When("^I request POST /studies with JSON-like payload:$")

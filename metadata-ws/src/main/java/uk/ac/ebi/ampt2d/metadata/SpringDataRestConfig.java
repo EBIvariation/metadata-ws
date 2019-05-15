@@ -31,8 +31,8 @@ import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import uk.ac.ebi.ampt2d.metadata.aop.ReleaseDateAspect;
 import uk.ac.ebi.ampt2d.metadata.aop.StudyDeprecationAspect;
-import uk.ac.ebi.ampt2d.metadata.aop.StudyReleaseDateAspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Publication;
@@ -156,17 +156,17 @@ public class SpringDataRestConfig {
     }
 
     /**
-     * Inject StudyReleaseDateAspect bean conditionally
+     * Inject ReleaseDateAspect bean conditionally
      *
-     * The StudyReleaseDateAspect ensures every GET request returns only published studies
+     * The ReleaseDateAspect ensures every GET request returns only published entities
      * Set "endpoints.studies.date.restricted" to false if you don't want this restriction
      *
-     * @return StudyReleaseDateAspect
+     * @return ReleaseDateAspect
      */
     @Bean
-    @ConditionalOnProperty(name = "endpoints.studies.release-date.restricted", matchIfMissing = true)
-    public StudyReleaseDateAspect studyReleaseDateAspect() {
-        return new StudyReleaseDateAspect();
+    @ConditionalOnProperty(name = "endpoints.entities.release-date.restricted", matchIfMissing = true)
+    public ReleaseDateAspect releaseDateAspect() {
+        return new ReleaseDateAspect();
     }
 
 }
