@@ -73,13 +73,13 @@ public class SraObjectsImporterThroughDatabase extends SraObjectsImporterThrough
     }
 
     @Override
-    public Study importStudyFromAnalysis(String accession) {
-        Study sharedStudy = accessionsToStudy.get(accession);
+    public Study importStudyFromAnalysis(String studyAccession) {
+        Study sharedStudy = accessionsToStudy.get(studyAccession);
         if (sharedStudy != null) {
             return sharedStudy;
         }
-        Study study = importStudy(accession);
-        accessionsToStudy.put(accession, study);
+        Study study = importStudy(studyAccession);
+        accessionsToStudy.put(studyAccession, study);
         return study;
     }
 

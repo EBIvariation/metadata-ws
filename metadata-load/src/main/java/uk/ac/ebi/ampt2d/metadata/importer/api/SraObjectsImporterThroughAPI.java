@@ -135,7 +135,7 @@ public class SraObjectsImporterThroughAPI implements ObjectsImporter {
             }
             analysis.setSamples(samples);
             if (sraXmlRetrieverByAccession instanceof SraXmlRetrieverThroughDatabase) {
-                Study study = this.importStudyFromAnalysis(analysisType.getSTUDYREF().getAccession());
+                Study study = importStudyFromAnalysis(analysisType.getSTUDYREF().getAccession());
                 analysis.setStudy(study);
             }
         } catch (Exception exception) {
@@ -146,8 +146,8 @@ public class SraObjectsImporterThroughAPI implements ObjectsImporter {
         return analysis;
     }
 
-    protected Study importStudyFromAnalysis(String accession) {
-        return null;
+    protected Study importStudyFromAnalysis(String studyAccession) {
+        return this.importStudyFromAnalysis(studyAccession);
     }
 
     private Set<String> getSampleAccessions(AnalysisType analysisType) {
