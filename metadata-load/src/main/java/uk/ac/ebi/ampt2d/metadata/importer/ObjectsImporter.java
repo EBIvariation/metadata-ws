@@ -31,6 +31,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
+import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceSequenceType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
@@ -56,9 +57,13 @@ public abstract class ObjectsImporter {
 
     private SraXmlParser<AnalysisType> sraAnalysisXmlParser;
 
+    private SraXmlParser<AssemblyType> sraAssemblyXmlParser;
+
     private Converter<StudyType, Study> studyConverter;
 
     private Converter<AnalysisType, Analysis> analysisConverter;
+
+    private Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter;
 
     private PublicationExtractorFromStudy publicationExtractorFromStudy;
 
@@ -69,9 +74,12 @@ public abstract class ObjectsImporter {
     private FileExtractorFromAnalysis fileExtractorFromAnalysis;
 
     public ObjectsImporter(SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
-                           SraXmlParser<StudyType> sraStudyXmlParser, SraXmlParser<AnalysisType> sraAnalysisXmlParser,
+                           SraXmlParser<StudyType> sraStudyXmlParser,
+                           SraXmlParser<AnalysisType> sraAnalysisXmlParser,
+                           SraXmlParser<AssemblyType> sraAssemblyXmlParser,
                            Converter<StudyType, Study> studyConverter,
                            Converter<AnalysisType, Analysis> analysisConverter,
+                           Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
                            PublicationExtractorFromStudy publicationExtractorFromStudy,
                            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
                            TaxonomyExtractor taxonomyExtractor,
@@ -81,8 +89,10 @@ public abstract class ObjectsImporter {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
+        this.sraAssemblyXmlParser = sraAssemblyXmlParser;
         this.studyConverter = studyConverter;
         this.analysisConverter = analysisConverter;
+        this.referenceSequenceConverter = referenceSequenceConverter;
         this.publicationExtractorFromStudy = publicationExtractorFromStudy;
         this.webResourceExtractorFromStudy = webResourceExtractorFromStudy;
         this.taxonomyExtractor = taxonomyExtractor;
@@ -120,8 +130,7 @@ public abstract class ObjectsImporter {
             analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
             List<ReferenceSequence> referenceSequences = new ArrayList<>();
             for (String referenceSequenceAccession : getReferenceSequenceAccessions(analysisType)) {
-                //TODO ReferenceSequence Import
-                //referenceSequences.add(importReferenceSequence(referenceSequenceAccession));
+                referenceSequences.add(importReferenceSequence(referenceSequenceAccession));
             }
             analysis.setReferenceSequences(referenceSequences);
             List<Sample> samples = new ArrayList<>();
@@ -142,6 +151,52 @@ public abstract class ObjectsImporter {
     protected abstract Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis);
 
     public ReferenceSequence importReferenceSequence(String accession) {
+        ReferenceSequence referenceSequence = null;
+        try {
+            String assemblyXml = sraXmlRetrieverByAccession.getXml(accession);
+            AssemblyType assembly = sraAssemblyXmlParser.parseXml(assemblyXml, accession);
+            referenceSequence = referenceSequenceConverter.convert(assembly);
+        } catch (Exception exception) {
+            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for ReferenceSequence accession " + accession);
+            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+        }
+        return referenceSequence;
+    }
+
+    private Set<String> getReferenceSequenceAccessions(AnalysisType analysisType) {
+        Set<String> referenceSequenceAccessions = new HashSet<>();
+        AnalysisType.ANALYSISTYPE analysisType1 = analysisType.getANALYSISTYPE();
+        // ENA records can contain a reference sequence in either of the three analysis categories:
+        // REFERENCE_ALIGNMENT, SEQUENCE_VARIATION, and PROCESSED_READS. All accessions are collected and returned.
+        if (analysisType1.isSetREFERENCEALIGNMENT()) {
+            referenceSequenceAccessions.add(
+                    // TODO: should we use getRefname() or getAccession()?
+                    getAccessionFromReferenceSequenceType(analysisType1.getREFERENCEALIGNMENT()));
+        }
+        else if (analysisType1.isSetSEQUENCEVARIATION()) {
+            referenceSequenceAccessions.add(
+                    getAccessionFromReferenceSequenceType(analysisType1.getSEQUENCEVARIATION()));
+        }
+        else if (analysisType1.isSetPROCESSEDREADS()) {
+            referenceSequenceAccessions.add(
+                    getAccessionFromReferenceSequenceType(analysisType1.getPROCESSEDREADS()));
+        }
+        referenceSequenceAccessions.remove(null);
+        return referenceSequenceAccessions;
+    }
+
+    private String getAccessionFromReferenceSequenceType(ReferenceSequenceType referenceSequenceType){
+        if (referenceSequenceType == null) {
+            return null;
+        }
+        ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
+        if (referenceAssemblyType == null) {
+            return null;
+        }
+        ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
+        if (standard != null) {
+            return standard.getAccession();
+        }
         return null;
     }
 
@@ -158,20 +213,4 @@ public abstract class ObjectsImporter {
         return sampleAccessions;
     }
 
-    private Set<String> getReferenceSequenceAccessions(AnalysisType analysisType) {
-        Set<String> referenceSequenceAccessions = new HashSet<>();
-        ReferenceSequenceType referenceSequenceType = analysisType.getANALYSISTYPE().getREFERENCEALIGNMENT();
-        if (referenceSequenceType == null) {
-            return referenceSequenceAccessions;
-        }
-        ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
-        if (referenceAssemblyType == null) {
-            return referenceSequenceAccessions;
-        }
-        ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
-        if (standard != null) {
-            referenceSequenceAccessions.add(standard.getAccession());
-        }
-        return referenceSequenceAccessions;
-    }
 }

@@ -28,8 +28,11 @@ import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
+import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.LinkType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.ena.sra.xml.XRefType;
@@ -49,11 +52,25 @@ public class SraObjectsImporterThroughAPI extends ObjectsImporter {
                                         SraXmlParser<AnalysisType> sraAnalysisXmlParser,
                                         Converter<AnalysisType, Analysis> analysisConverter,
                                         FileExtractorFromAnalysis fileExtractorFromAnalysis,
+                                        SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+                                        Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
                                         MetadataAnalysisPersister metadataAnalysisPersister,
                                         MetadataStudyFinderOrPersister metadataStudyFinderOrPersister) {
-        super(sraXmlRetrieverThroughApi, sraStudyXmlParser, sraAnalysisXmlParser, studyConverter, analysisConverter,
-                publicationExtractorFromStudy, webResourceExtractorFromStudy, taxonomyExtractor,
-                fileExtractorFromAnalysis, metadataAnalysisPersister, metadataStudyFinderOrPersister);
+        super(
+                sraXmlRetrieverThroughApi,
+                sraStudyXmlParser,
+                sraAnalysisXmlParser,
+                sraAssemblyXmlParser,
+                studyConverter,
+                analysisConverter,
+                referenceSequenceConverter,
+                publicationExtractorFromStudy,
+                webResourceExtractorFromStudy,
+                taxonomyExtractor,
+                fileExtractorFromAnalysis,
+                metadataAnalysisPersister,
+                metadataStudyFinderOrPersister
+        );
     }
 
     @Override
@@ -70,6 +87,11 @@ public class SraObjectsImporterThroughAPI extends ObjectsImporter {
     @Override
     protected Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis) {
         return analysis;
+    }
+
+    @Override
+    public Sample importSample(String accession) {
+        return null;
     }
 
     private Set<String> getAnalysisAccessions(StudyType studyType) {
