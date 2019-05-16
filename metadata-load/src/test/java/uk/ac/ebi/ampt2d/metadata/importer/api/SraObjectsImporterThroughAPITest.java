@@ -35,6 +35,11 @@ import java.time.LocalDate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
+
+import java.util.Arrays;
+
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=API"})
@@ -94,4 +99,16 @@ public class SraObjectsImporterThroughAPITest {
         assertEquals(0, studyRepository.count());
         assertEquals(0, analysisRepository.count());
     }
+
+    @Test
+    public void importReferenceSequenceObject() throws Exception {
+        ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GCA_000002305.1");
+        assertEquals(Arrays.asList("GCA_000002305.1"), referenceSequence.getAccessions());
+        assertEquals("EquCab2.0", referenceSequence.getName());
+        assertEquals(ReferenceSequence.Type.ASSEMBLY, referenceSequence.getType());
+        Taxonomy taxonomy = referenceSequence.getTaxonomy();
+        assertEquals(9796, taxonomy.getTaxonomyId().longValue());
+        assertEquals("Equus caballus", taxonomy.getName());
+    }
+
 }
