@@ -32,6 +32,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
+import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.util.HashMap;
@@ -53,11 +54,25 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                                              SraXmlParser<AnalysisType> sraAnalysisXmlParser,
                                              Converter<AnalysisType, Analysis> analysisConverter,
                                              FileExtractorFromAnalysis fileExtractorFromAnalysis,
+                                             SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+                                             Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
                                              AnalysisRepository analysisRepository,
                                              StudyRepository studyRepository) {
-        super(sraXmlRetrieverThroughDatabase, sraStudyXmlParser, sraAnalysisXmlParser, studyConverter, analysisConverter,
-                publicationExtractorFromStudy, webResourceExtractorFromStudy, taxonomyExtractor,
-                fileExtractorFromAnalysis, analysisRepository, studyRepository);
+        super(
+                sraXmlRetrieverThroughDatabase,
+                sraStudyXmlParser,
+                sraAnalysisXmlParser,
+                sraAssemblyXmlParser,
+                studyConverter,
+                analysisConverter,
+                referenceSequenceConverter,
+                publicationExtractorFromStudy,
+                webResourceExtractorFromStudy,
+                taxonomyExtractor,
+                fileExtractorFromAnalysis,
+                analysisRepository,
+                studyRepository
+        );
     }
 
     @Override
