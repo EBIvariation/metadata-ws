@@ -92,6 +92,16 @@ public class ReferenceSequence extends Auditable<Long> {
     @ManyToOne(optional = false)
     private Taxonomy taxonomy;
 
+    public ReferenceSequence() {}
+
+    public ReferenceSequence(String name, String patch, List<String> accessions, Type type, Taxonomy taxonomy) {
+        this.name = name;
+        this.patch = patch;
+        this.accessions = accessions;
+        this.type = type;
+        this.taxonomy = taxonomy;
+    }
+
     @Override
     public Long getId() {
         return id;
