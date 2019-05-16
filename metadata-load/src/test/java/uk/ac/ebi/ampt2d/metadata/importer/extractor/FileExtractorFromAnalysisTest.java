@@ -43,7 +43,7 @@ public class FileExtractorFromAnalysisTest {
 
     private static final String ANALYSIS_DOCUMENT_API_XML = "analysis/AnalysisDocumentAPI.xml";
 
-    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "analysis/AnalysisDocumentDatabase.xml";
+    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "analysis/AnalysisDocumentDB.xml";
 
     private SraXmlParser<AnalysisType> xmlParser;
 

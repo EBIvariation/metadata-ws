@@ -22,7 +22,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.test.context.ContextConfiguration;
@@ -49,7 +48,7 @@ public class AnalysisConverterTest {
 
     private static final String ANALYSIS_DOCUMENT_API_XML = "analysis/AnalysisDocumentAPI.xml";
 
-    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "analysis/AnalysisDocumentDatabase.xml";
+    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "analysis/AnalysisDocumentDB.xml";
 
     private Converter<AnalysisType,Analysis> analysisConverter;
 
