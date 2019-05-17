@@ -74,12 +74,12 @@ Feature: reference sequence
     And the <field2> field of reference-sequences 0 should be <value2>
 
     Examples:
-      | query | url | field1 | value1 | field2 | value2 |
-      | name=GRCh37 | REFERENCE_SEQUENCE_1 | name | GRCh37 | patch | p2 |
-      | name=GRCh38 | REFERENCE_SEQUENCE_2 | name | GRCh38 | patch | p2 |
-      | name=GRCh37&patch=p2 | REFERENCE_SEQUENCE_1 | name | GRCh37 | patch | p2 |
-      | name=GRCh38&patch=p2 | REFERENCE_SEQUENCE_2 | name | GRCh38 | patch | p2 |
-      | name=GRCh37&patch=p2&accessions=GCA_000001405.3 | REFERENCE_SEQUENCE_1 | name | GRCh37 | patch | p2 |
+      | query                                           | url                  | field1 | value1 | field2 | value2 |
+      | name=GRCh37                                     | REFERENCE_SEQUENCE_1 | name   | GRCh37 | patch  | p2     |
+      | name=GRCh38                                     | REFERENCE_SEQUENCE_2 | name   | GRCh38 | patch  | p2     |
+      | name=GRCh37&patch=p2                            | REFERENCE_SEQUENCE_1 | name   | GRCh37 | patch  | p2     |
+      | name=GRCh38&patch=p2                            | REFERENCE_SEQUENCE_2 | name   | GRCh38 | patch  | p2     |
+      | name=GRCh37&patch=p2&accessions=GCA_000001405.3 | REFERENCE_SEQUENCE_1 | name   | GRCh37 | patch  | p2     |
 
 
   Scenario Outline: find one reference sequence by accession
@@ -119,10 +119,10 @@ Feature: reference sequence
     And the accessions field of reference-sequences 0 should have item <contained_accession>
 
     Examples:
-      | query | url | contained_accession |
-      | accessions=GCA_000001405.3 | REFERENCE_SEQUENCE_1 |  GCA_000001405.3 |
-      | accessions=GCF_000001405.28 | REFERENCE_SEQUENCE_2 |  GCF_000001405.28 |
-      | patch=p2&accessions=GCA_000001405.3 | REFERENCE_SEQUENCE_1 |  GCA_000001405.3 |
+      | query                               | url                  | contained_accession |
+      | accessions=GCA_000001405.3          | REFERENCE_SEQUENCE_1 | GCA_000001405.3     |
+      | accessions=GCF_000001405.28         | REFERENCE_SEQUENCE_2 | GCF_000001405.28    |
+      | patch=p2&accessions=GCA_000001405.3 | REFERENCE_SEQUENCE_1 | GCA_000001405.3     |
 
 
   Scenario Outline: find one reference sequence by type
@@ -162,8 +162,8 @@ Feature: reference sequence
     And the type field of reference-sequences 0 should be <type>
 
     Examples:
-      | query | url | type |
-      | type=GENE | REFERENCE_SEQUENCE_1 | GENE |
+      | query         | url                  | type     |
+      | type=GENE     | REFERENCE_SEQUENCE_1 | GENE     |
       | type=ASSEMBLY | REFERENCE_SEQUENCE_2 | ASSEMBLY |
 
 
@@ -203,15 +203,15 @@ Feature: reference sequence
     And the response should contain 0 reference-sequences
 
     Examples:
-      | query |
-      | name=NCBI36 |
-      | name=NCBI36&patch=p2 |
-      | name=GRCh37&patch=p3 |
-      | name=GRCh38&patch=p3 |
-      | accessions=GCA_000001405.2 |
+      | query                                           |
+      | name=NCBI36                                     |
+      | name=NCBI36&patch=p2                            |
+      | name=GRCh37&patch=p3                            |
+      | name=GRCh38&patch=p3                            |
+      | accessions=GCA_000001405.2                      |
       | name=GRCh37&patch=p3&accessions=GCA_000001405.3 |
-      | type=GENE |
-      | type=TRANSCRIPTOME |
+      | type=GENE                                       |
+      | type=TRANSCRIPTOME                              |
 
 
   Scenario: find reference sequence by invalid type should fail
@@ -365,12 +365,12 @@ Feature: reference sequence
     And the href of the referenceSequence of reference-sequences has items <url>
 
     Examples:
-      | base | query | N | url |
-      | taxonomy-id | id=9606 | 1 | REFERENCE_SEQUENCE1 |
-      | taxonomy-id | id=9596 | 2 | REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
-      | taxonomy-id | id=207598 | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
-      | taxonomy-id | id=0 | 0 | NONE |
-      | taxonomy-name | name=Homo sapiens | 1 | REFERENCE_SEQUENCE1 |
-      | taxonomy-name | name=Pan | 2 | REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
-      | taxonomy-name | name=Homininae | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
-      | taxonomy-name | name=None | 0 | NONE |
+      | base          | query             | N | url                                                         |
+      | taxonomy-id   | id=9606           | 1 | REFERENCE_SEQUENCE1                                         |
+      | taxonomy-id   | id=9596           | 2 | REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3                     |
+      | taxonomy-id   | id=207598         | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
+      | taxonomy-id   | id=0              | 0 | NONE                                                        |
+      | taxonomy-name | name=Homo sapiens | 1 | REFERENCE_SEQUENCE1                                         |
+      | taxonomy-name | name=Pan          | 2 | REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3                     |
+      | taxonomy-name | name=Homininae    | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
+      | taxonomy-name | name=None         | 0 | NONE                                                        |

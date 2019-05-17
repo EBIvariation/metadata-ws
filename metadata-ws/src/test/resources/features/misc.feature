@@ -105,11 +105,11 @@ Feature: Miscellaneous functions
     And the lastModifiedDate should be after START_TIME2 and before END_TIME2
 
     Examples:
-      | url | class | content |
-      | REFERENCE_SEQUENCE | referenceSequence | {"name": "nothing important"} |
-      | TAXONOMY | taxonomy | {"name": "nothing important"} |
-      | STUDY | study | {"name": "nothing important"} |
-      | ANALYSIS | analysis | {"name": "nothing important"} |
-      | FILE | file | {"name": "nothing important"} |
-      | SAMPLE | sample | {"name": "nothing important"} |
-      | WEB_RESOURCE | webResource | {"resourceUrl": "http://nothing.important.com"} |
+      | url                | class             | content                                         |
+      | REFERENCE_SEQUENCE | referenceSequence | {"name": "nothing important"}                   |
+      | TAXONOMY           | taxonomy          | {"name": "nothing important"}                   |
+      | STUDY              | study             | {"name": "nothing important"}                   |
+      | ANALYSIS           | analysis          | {"name": "nothing important"}                   |
+      | FILE               | file              | {"name": "nothing important"}                   |
+      | SAMPLE             | sample            | {"name": "nothing important"}                   |
+      | WEB_RESOURCE       | webResource       | {"resourceUrl": "http://nothing.important.com"} |

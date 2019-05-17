@@ -65,8 +65,8 @@ Feature: sample object
     And the response should contain field exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException
 
     Examples:
-      | list |
-      | NONE |
+      | list  |
+      | NONE  |
       | BLANK |
 
 
@@ -133,10 +133,10 @@ Feature: sample object
     And the response should contain field exception with value <exception>
 
     Examples:
-      | list | exception |
-      | NONE | uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException |
-      | BLANK | uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidTaxonomyException |
-      | TAXONOMY,BLANK | uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidTaxonomyException |
+      | list           | exception                                                                  |
+      | NONE           | uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException |
+      | BLANK          | uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidTaxonomyException       |
+      | TAXONOMY,BLANK | uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidTaxonomyException       |
 
 
   Scenario Outline: find two samples by taxonomy
@@ -188,11 +188,11 @@ Feature: sample object
     And the href of the sample of samples has items <url>
 
     Examples:
-      | query | url |
-      | taxonomies.name=Homininae | SAMPLE1,SAMPLE3 |
+      | query                        | url             |
+      | taxonomies.name=Homininae    | SAMPLE1,SAMPLE3 |
       | taxonomies.name=Pan paniscus | SAMPLE2,SAMPLE3 |
       | taxonomies.taxonomyId=207598 | SAMPLE1,SAMPLE3 |
-      | taxonomies.taxonomyId=9597 | SAMPLE2,SAMPLE3 |
+      | taxonomies.taxonomyId=9597   | SAMPLE2,SAMPLE3 |
 
 
   Scenario Outline: find one sample by taxonomy
@@ -241,11 +241,11 @@ Feature: sample object
     And the href of the sample of samples has items <url>
 
     Examples:
-      | query | url |
-      | taxonomies.name=Homo sapiens | SAMPLE1 |
+      | query                           | url     |
+      | taxonomies.name=Homo sapiens    | SAMPLE1 |
       | taxonomies.name=Pan troglodytes | SAMPLE2 |
-      | taxonomies.taxonomyId=9606 | SAMPLE1 |
-      | taxonomies.taxonomyId=9598 | SAMPLE2 |
+      | taxonomies.taxonomyId=9606      | SAMPLE1 |
+      | taxonomies.taxonomyId=9598      | SAMPLE2 |
 
 
   Scenario Outline: find no sample by non-existing taxonomy
@@ -293,9 +293,9 @@ Feature: sample object
     And the response should contain no sample
 
     Examples:
-      | query |
+      | query                       |
       | taxonomies.name=NonExisting |
-      | taxonomies.taxonomyId=0 |
+      | taxonomies.taxonomyId=0     |
 
 
   Scenario Outline: verify various accession version with samples
@@ -336,6 +336,6 @@ Feature: sample object
 
 
     Examples:
-    | accession | version | property | message |
-    |  | 1 | accessionVersionId.accession | size must be between 1 and 255 |
-    | EGAN0001 | 0 |accessionVersionId.version | must be greater than or equal to 1 |
+      | accession | version | property                     | message                            |
+      |           | 1       | accessionVersionId.accession | size must be between 1 and 255     |
+      | EGAN0001  | 0       | accessionVersionId.version   | must be greater than or equal to 1 |

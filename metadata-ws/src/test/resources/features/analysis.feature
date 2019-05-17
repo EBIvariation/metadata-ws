@@ -120,10 +120,10 @@ Feature: analysis object
     And the response should contain field exception with value <exception>
 
     Examples:
-     | list | exception |
-     | NONE | uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException |
-     | EMPTY | uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException   |
-     | REFERENCE_SEQUENCE_1,EMPTY | uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException |
+      | list                       | exception                                                                             |
+      | NONE                       | uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException |
+      | EMPTY                      | uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException         |
+      | REFERENCE_SEQUENCE_1,EMPTY | uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException         |
 
 
   Scenario Outline: register an analysis with invalid reference sequence should fail
@@ -142,8 +142,8 @@ Feature: analysis object
     And the response should contain field exception with value <exception>
 
     Examples:
-      | list | exception |
-      | NONE | uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException |
+      | list  | exception                                                                             |
+      | NONE  | uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException |
       | EMPTY | uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException |
 
 
@@ -269,10 +269,10 @@ Feature: analysis object
     And the response should contain field message with value Invalid type of reference sequences. When multiple reference sequence URLs are provided, all of them should point to gene sequences
 
     Examples:
-      | test_reference_sequence_1_json | test_reference_sequence_2_json |
+      | test_reference_sequence_1_json                                                                                                 | test_reference_sequence_2_json                                                                                                 |
       | "name": "GRCh37","patch": "p2","accessions": ["GCA_000001407.3", "GCF_000001407.14"],"type": "ASSEMBLY","taxonomy": "TAXONOMY" | "name": "GRCh37","patch": "p3","accessions": ["GCA_000001407.4", "GCF_000001407.15"],"type": "ASSEMBLY","taxonomy": "TAXONOMY" |
-      | "name": "FOXP2","patch": "nothing important","accessions": ["NM_014491.3"],"type": "TRANSCRIPTOME","taxonomy": "TAXONOMY" | "name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME","taxonomy": "TAXONOMY" |
-      | "name": "BRCA1","patch": "3","accessions": ["NM_007294.3"],"type": "GENE","taxonomy": "TAXONOMY" | "name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME","taxonomy": "TAXONOMY" |
+      | "name": "FOXP2","patch": "nothing important","accessions": ["NM_014491.3"],"type": "TRANSCRIPTOME","taxonomy": "TAXONOMY"      | "name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME","taxonomy": "TAXONOMY"      |
+      | "name": "BRCA1","patch": "3","accessions": ["NM_007294.3"],"type": "GENE","taxonomy": "TAXONOMY"                               | "name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME","taxonomy": "TAXONOMY"      |
 
 
    Scenario Outline: find one analysis by type, technology or platform
@@ -310,14 +310,14 @@ Feature: analysis object
      And the href of the analysis of analyses has items <analysis_url>
 
      Examples:
-      | query | analysis_url |
-      | type=CASE_CONTROL | ANALYSIS_1 |
-      | type=TUMOR | ANALYSIS_2 |
-      | platform=Illumina | ANALYSIS_1 |
-      | platform=PacBio | ANALYSIS_2 |
-      | platform=pacbio&type=TUMOR | ANALYSIS_2 |
-      | technology=GWAS | ANALYSIS_1 |
-      | technology=ARRAY&type=TUMOR | ANALYSIS_2 |
+       | query                       | analysis_url |
+       | type=CASE_CONTROL           | ANALYSIS_1   |
+       | type=TUMOR                  | ANALYSIS_2   |
+       | platform=Illumina           | ANALYSIS_1   |
+       | platform=PacBio             | ANALYSIS_2   |
+       | platform=pacbio&type=TUMOR  | ANALYSIS_2   |
+       | technology=GWAS             | ANALYSIS_1   |
+       | technology=ARRAY&type=TUMOR | ANALYSIS_2   |
 
 
    Scenario Outline: find zero analysis by type, technology or platform
@@ -354,9 +354,9 @@ Feature: analysis object
      And the response should contain no analysis
 
      Examples:
-       | query |
-       | type=COLLECTION |
-       | platform=nextSeq |
+       | query               |
+       | type=COLLECTION     |
+       | platform=nextSeq    |
        | technology=CURATION |
 
 
@@ -393,6 +393,6 @@ Feature: analysis object
      Then the response code should be 4xx
 
      Examples:
-       | query |
-       | type=UNKNOWN |
+       | query              |
+       | type=UNKNOWN       |
        | technology=UNKNOWN |
