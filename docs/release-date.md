@@ -14,5 +14,5 @@ To enforce that, transitive release date control is implemented. It works in the
     child studies in either direction.
 * For all other **Auditable** entities:
   + If at least one released Study links to an entity (including transitive linking, e. g. Study linking to Analysis
-    linking to File), this entity is considered to be released and becomes retrievable through API.
-  + Otherwise, the entity is not released and not retrievable through API.
+    linking to File), this entity is considered to be released and becomes retrievable through the API.
+  + Otherwise, the entity is not released and not retrievable through the API.
