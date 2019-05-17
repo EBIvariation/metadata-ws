@@ -78,19 +78,4 @@ public class Taxonomy extends Auditable<Long> {
 
     public String getName() { return name; }
 
-    // Release date control: get the *earliest* release date from all studies which link to this taxonomy
-    @Formula("(SELECT min(study.release_date) FROM taxonomy " +
-            "INNER JOIN sample_taxonomies on taxonomy.id = sample_taxonomies.taxonomies_id " +
-            "INNER JOIN sample on sample_taxonomies.sample_id = sample.id " +
-            "INNER JOIN analysis_samples on sample.id = analysis_samples.samples_id " +
-            "INNER JOIN analysis on analysis_samples.analysis_id = analysis.id " +
-            "INNER JOIN study on analysis.study_id = study.id " +
-            "WHERE sample.id=id)")
-    @JsonIgnore
-    private LocalDate releaseDate;
-
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-
 }
