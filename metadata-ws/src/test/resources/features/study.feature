@@ -9,7 +9,7 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
-    When I create a study with TAXONOMY for taxonomy
+    When I create a study
     Then set the URL to STUDY
     When I request GET with value of STUDY
     Then the response code should be 200
@@ -17,6 +17,7 @@ Feature: study object
 
 
   Scenario Outline: search various study by taxonomy name and id
+    # Create taxonomies
     When I request POST taxonomies with 207598 for ID, Homininae for name and NONE for ancestors
     Then set the URL to TAXONOMY_1
     When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for ancestors
@@ -28,6 +29,36 @@ Feature: study object
     When I request POST taxonomies with 9598 for ID, Pan troglodytes for name and TAXONOMY_1,TAXONOMY_3 for ancestors
     Then set the URL to TAXONOMY_5
 
+    # Create reference sequences
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh37",
+      "patch": "p2",
+      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY_2"
+    """
+    Then set the URL to REFERENCE_SEQUENCE1
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh38",
+      "patch": "p2",
+      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY_4"
+    """
+    Then set the URL to REFERENCE_SEQUENCE2
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh39",
+      "patch": "p2",
+      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY_5"
+    """
+    Then set the URL to REFERENCE_SEQUENCE3
+
+    # Create studies
     When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
@@ -36,8 +67,7 @@ Feature: study object
     },
     "name": "test human study",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY_2"
+    "releaseDate": today
     """
     Then set the URL to STUDY1
     When I request POST /studies with JSON-like payload:
@@ -48,9 +78,9 @@ Feature: study object
     },
     "name": "test bonobo study",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY_4"
+    "releaseDate": today
     """
+    And the response code should be 2xx
     Then set the URL to STUDY2
     When I request POST /studies with JSON-like payload:
     """
@@ -60,10 +90,14 @@ Feature: study object
     },
     "name": "test chimpanzee study",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY_5"
+    "releaseDate": today
     """
     Then set the URL to STUDY3
+
+    # Create analyses to link studies to taxonomies
+    When I create an analysis with Analysis1 for accession, REFERENCE_SEQUENCE1 for reference sequence and STUDY1 for study
+    When I create an analysis with Analysis2 for accession, REFERENCE_SEQUENCE2 for reference sequence and STUDY2 for study
+    When I create an analysis with Analysis3 for accession, REFERENCE_SEQUENCE3 for reference sequence and STUDY3 for study
 
     When I request elaborate search for the studies base <base> and with the parameters: <query>
     Then the response code should be 200
@@ -99,8 +133,7 @@ Feature: study object
     },
     "name": "nothing important",
     "deprecated": false,
-    "releaseDate": yesterday,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": yesterday
     """
     Then set the URL to STUDY1
     When I request POST /studies with JSON-like payload:
@@ -111,8 +144,7 @@ Feature: study object
     },
     "name": "nothing important",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY2
     When I request POST /studies with JSON-like payload:
@@ -123,8 +155,7 @@ Feature: study object
     },
     "name": "nothing important",
     "deprecated": false,
-    "releaseDate": tomorrow,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": tomorrow
     """
     Then set the URL to STUDY3
 
@@ -156,8 +187,7 @@ Feature: study object
     },
     "name": "nothing important",
     "deprecated": false,
-    "releaseDate": yesterday,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": yesterday
     """
     Then set the URL to STUDY1
     When I request POST /studies with JSON-like payload:
@@ -168,8 +198,7 @@ Feature: study object
     },
     "name": "nothing important",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY2
     When I request POST /studies with JSON-like payload:
@@ -180,8 +209,7 @@ Feature: study object
     },
     "name": "nothing important",
     "deprecated": false,
-    "releaseDate": tomorrow,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": tomorrow
     """
     Then set the URL to STUDY3
 
@@ -226,8 +254,7 @@ Feature: study object
     },
     "name": "test human study",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY1
     When I request POST /studies with JSON-like payload:
@@ -238,8 +265,7 @@ Feature: study object
     },
     "name": "test human study",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY2
     When I create an analysis with EGAA0001 for accession, REFERENCE_SEQUENCE_1 for reference sequence, STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
@@ -287,8 +313,7 @@ Feature: study object
     },
     "name": "test human study based on GRCh37",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY1
     When I request POST /studies with JSON-like payload:
@@ -299,8 +324,7 @@ Feature: study object
     },
     "name": "test human study based on GRCh37",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY2
     When I request POST /studies with JSON-like payload:
@@ -311,8 +335,7 @@ Feature: study object
     },
     "name": "test human study based on GRCh38",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY3
 
@@ -349,8 +372,7 @@ Feature: study object
     },
     "name": "test human study based on GRCh37",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY1
     When I request POST /studies with JSON-like payload:
@@ -361,8 +383,7 @@ Feature: study object
     },
     "name": "test human study based on GRCh37",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY2
     When I request POST /studies with JSON-like payload:
@@ -373,8 +394,7 @@ Feature: study object
     },
     "name": "test human study based on GRCh38",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY3
 
@@ -417,8 +437,7 @@ Feature: study object
     },
     "name": "test human B",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY2
     When I request POST /studies with JSON-like payload:
@@ -429,8 +448,7 @@ Feature: study object
     },
     "name": "test human A",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY1
 
@@ -457,6 +475,7 @@ Feature: study object
 
 
   Scenario Outline: search various public studies
+    # Create a common taxonomy
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -465,6 +484,8 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
+
+    # Create a common reference sequence
     When I request POST /reference-sequences with JSON-like payload:
     """
       "name": "GRCh37",
@@ -475,6 +496,8 @@ Feature: study object
     """
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_1
+
+    # Create three studies
     When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
@@ -483,8 +506,7 @@ Feature: study object
     },
     "name": "1kg pilot",
     "deprecated": false,
-    "releaseDate": yesterday,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": yesterday
     """
     Then set the URL to STUDY1
     When I request POST /studies with JSON-like payload:
@@ -495,8 +517,7 @@ Feature: study object
     },
     "name": "1kg phase 1",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY2
     When I request POST /studies with JSON-like payload:
@@ -507,12 +528,16 @@ Feature: study object
     },
     "name": "1kg phase 3",
     "deprecated": tomorrow,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY3
+
+    # Create three analyses to link studies to reference sequences and taxonomies
     When I create an analysis with analysisReleasedYesterday for accession, REFERENCE_SEQUENCE_1 for reference sequence, STUDY1 for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
-    Then set the URL to ANALYSIS
+    Then set the URL to ANALYSIS1
+    When I create an analysis with Analysis2 for accession, REFERENCE_SEQUENCE_1 for reference sequence and STUDY2 for study
+    Then set the URL to ANALYSIS2
+    When I create an analysis with Analysis3 for accession, REFERENCE_SEQUENCE_1 for reference sequence and STUDY3 for study
 
     When I request GET /studies
     Then the response should contain 2 studies
@@ -523,11 +548,11 @@ Feature: study object
 
     When I request GET for analyses of STUDY1
     Then the response should contain one analysis
-    And the href of the analysis of analyses has items ANALYSIS
+    And the href of the analysis of analyses has items ANALYSIS1
 
     When I request GET for analyses of STUDY2
-    Then the response code should be 200
-    And the response should contain no analysis
+    Then the response should contain one analysis
+    And the href of the analysis of analyses has items ANALYSIS2
 
     When I request search for the studies with the parameters: taxonomy.taxonomyId=9606
     Then the response code should be 200
@@ -558,6 +583,7 @@ Feature: study object
 
 
   Scenario Outline: search various undeprecated studies
+    # Create common taxonomy
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -566,6 +592,19 @@ Feature: study object
     }
     """
     Then set the URL to TAXONOMY
+
+    # Create common reference sequence
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh37",
+      "patch": "p2",
+      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
+    """
+    Then set the URL to REFERENCE_SEQUENCE
+
+    # Create two studies
     When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
@@ -574,8 +613,7 @@ Feature: study object
     },
     "name": "1kg pilot",
     "deprecated": true,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY1
     When I request POST /studies with JSON-like payload:
@@ -586,10 +624,15 @@ Feature: study object
     },
     "name": "1kg phase 1",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY2
+
+    # Create two analyses to link studies with reference sequences and taxonomies
+    When I create an analysis with Analysis1 for accession, REFERENCE_SEQUENCE for reference sequence and STUDY1 for study
+    Then set the URL to ANALYSIS1
+    When I create an analysis with Analysis2 for accession, REFERENCE_SEQUENCE for reference sequence and STUDY2 for study
+    Then set the URL to ANALYSIS2
 
     When I request GET /studies
     Then the response should contain one study
@@ -600,7 +643,8 @@ Feature: study object
     And the href of the class study should be STUDY2
 
     When I request GET for analyses of STUDY2
-    Then the response should contain no analysis
+    Then the response should contain one analysis
+    And the href of the analysis of analyses has items ANALYSIS2
 
     When I request search for the studies with the parameters: taxonomy.taxonomyId=9606
     Then the response code should be 200
@@ -642,8 +686,7 @@ Feature: study object
     },
     "name": "1kg phase 3",
     "deprecated": false,
-    "releaseDate": tomorrow,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": tomorrow
     """
     Then set the URL to STUDY1
 
@@ -682,8 +725,7 @@ Feature: study object
     },
     "name": "1kg pilot",
     "deprecated": true,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY1
 
@@ -711,8 +753,7 @@ Feature: study object
     },
     "name": "1kg pilot",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY1
 
@@ -747,8 +788,7 @@ Feature: study object
     },
     "name": "test human study",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY1
     When I request POST /studies with JSON-like payload:
@@ -759,8 +799,7 @@ Feature: study object
     },
     "name": "test human study",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY2
     When I request POST /studies with JSON-like payload:
@@ -771,8 +810,7 @@ Feature: study object
     },
     "name": "test human study",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY3
     When I request POST /studies with JSON-like payload:
@@ -783,8 +821,7 @@ Feature: study object
     },
     "name": "test human study",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY4
 
@@ -831,8 +868,7 @@ Feature: study object
     },
     "name": "1kg pilot",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY
 
@@ -872,8 +908,7 @@ Feature: study object
     },
     "name": "1kg pilot",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY
 
@@ -911,8 +946,7 @@ Feature: study object
     },
     "name": "1kg phase 3",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY
 
@@ -962,8 +996,7 @@ Feature: study object
     },
     "name": "1kg phase 3",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY
 

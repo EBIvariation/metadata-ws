@@ -18,7 +18,6 @@ Feature: accession object
     "name": "test_study",
     "deprecated": false,
     "releaseDate": today,
-    "taxonomy": "TAXONOMY"
     """
 
     When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001
@@ -56,8 +55,7 @@ Feature: accession object
     },
     "name": "test_study",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
 
     When I request elaborate find for the studies with the parameters: accessionVersionId=EGAS0001.1
@@ -134,7 +132,7 @@ Feature: accession object
       "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE
-    When I create a study with TAXONOMY for taxonomy
+    When I create a study
     Then set the URL to STUDY
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE for reference sequence
     Then the response code should be 201

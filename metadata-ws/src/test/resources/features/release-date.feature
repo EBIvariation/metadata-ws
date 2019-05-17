@@ -20,10 +20,10 @@ Feature: Transitive release date control for child objects of a Study
     Then the response code should be 201
 
     # Create two studies with the release date of "yesterday"
-    When I create a study with TAXONOMY for taxonomy and Study1 for accession
+    When I create a study with Study1 for accession
     And set the URL to STUDY1
     Then the response code should be 201
-    When I create a study with TAXONOMY for taxonomy and Study2 for accession
+    When I create a study with Study2 for accession
     And set the URL to STUDY2
     Then the response code should be 201
 
@@ -158,13 +158,8 @@ Feature: Transitive release date control for child objects of a Study
 
   Scenario Outline: patching Study between released and unreleased states must work both ways
 
-    # Create the common taxonomy
-    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and NONE for ancestors
-    And set the URL to TAXONOMY
-    Then the response code should be 201
-
     # Create the study
-    When I create a study with TAXONOMY for taxonomy
+    When I create a study
     And set the URL to STUDY
     Then the response code should be 201
 

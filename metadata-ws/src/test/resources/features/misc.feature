@@ -38,8 +38,7 @@ Feature: Miscellaneous functions
     },
     "name": "test human study",
     "deprecated": false,
-    "releaseDate": today,
-    "taxonomy": "TAXONOMY"
+    "releaseDate": today
     """
     Then set the URL to STUDY
     When I create an analysis with testhuman for accession, REFERENCE_SEQUENCE for reference sequence, STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
