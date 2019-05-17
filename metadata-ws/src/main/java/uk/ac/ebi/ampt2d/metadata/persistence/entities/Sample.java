@@ -92,7 +92,9 @@ public class Sample extends Auditable<Long> {
         return taxonomies;
     }
 
-    // Release date control: get the *earliest* release date from all studies which link to this sample
+    /**
+     * Release date control: get the *earliest* release date from all studies which link to this sample.
+     */
     @Formula("(SELECT min(study.release_date) FROM sample " +
             "INNER JOIN analysis_samples on sample.id = analysis_samples.samples_id " +
             "INNER JOIN analysis on analysis_samples.analysis_id = analysis.id " +

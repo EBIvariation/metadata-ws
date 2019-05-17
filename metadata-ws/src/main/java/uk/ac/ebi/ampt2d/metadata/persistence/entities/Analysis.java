@@ -196,7 +196,10 @@ public class Analysis extends Auditable<Long> {
         this.samples = samples;
     }
 
-    // Release date control: Study <1..M> Analysis, hence just getting the parent study is enough
+    /**
+     * Release date control: Study <1..M> Analysis, hence just getting the parent study is enough.
+     * @return the date at which Analysis should become available.
+     */
     @Override
     public LocalDate getReleaseDate() {
         return getStudy().getReleaseDate();
