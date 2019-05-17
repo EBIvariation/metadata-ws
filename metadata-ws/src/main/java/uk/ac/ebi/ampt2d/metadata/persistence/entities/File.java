@@ -127,7 +127,9 @@ public class File extends Auditable<Long> {
         return type;
     }
 
-    // Release date control: get the *earliest* release date from all studies which link to this file
+    /**
+     * Release date control: get the *earliest* release date from all studies which link to this file.
+     */
     @Formula("(SELECT min(study.release_date) FROM file " +
              "INNER JOIN analysis_files on file.id = analysis_files.files_id " +
              "INNER JOIN analysis on analysis_files.analysis_id = analysis.id " +

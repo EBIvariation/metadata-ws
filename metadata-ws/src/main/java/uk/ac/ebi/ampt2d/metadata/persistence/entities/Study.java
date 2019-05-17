@@ -221,7 +221,10 @@ public class Study extends Auditable<Long> {
         this.publications = publications;
     }
 
-    // Release date control
+    /**
+     * Release date control for Study.
+     * @return the date at which Study should become available.
+     */
     @Override
     public LocalDate getReleaseDate() {
         return releaseDate;

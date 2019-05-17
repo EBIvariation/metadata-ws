@@ -97,7 +97,10 @@ public class WebResource extends Auditable<Long> {
         study.setResource(this);
     }
 
-    // Release date control: Study <1..M> WebResource, hence just getting the parent study is enough
+    /**
+     * Release date control: Study <1..M> WebResource, hence just getting the parent study is enough.
+     * @return the date at which WebResource should become available.
+     */
     @Override
     public LocalDate getReleaseDate() {
         Study study = getStudy();
