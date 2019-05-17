@@ -4,11 +4,11 @@ Feature: Transitive release date control for child objects of a Study
 
     # Create the common taxonomy
     When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and NONE for ancestors
-    Then set the URL to TAXONOMY
-    And the response code should be 201
+    And set the URL to TAXONOMY
+    Then the response code should be 201
 
     # Create the common reference sequences
-    Given I request POST /reference-sequences with JSON-like payload:
+    When I request POST /reference-sequences with JSON-like payload:
     """
           "name": "GRCh37",
           "patch": "p2",
@@ -16,27 +16,27 @@ Feature: Transitive release date control for child objects of a Study
           "type": "ASSEMBLY",
           "taxonomy": "TAXONOMY"
     """
-    Then set the URL to REFERENCE_SEQUENCE
-    And the response code should be 201
+    And set the URL to REFERENCE_SEQUENCE
+    Then the response code should be 201
 
     # Create two studies with the release date of "yesterday"
-    Given I create a study with TAXONOMY for taxonomy and Study1 for accession
-    Then set the URL to STUDY1
-    And the response code should be 201
-    Given I create a study with TAXONOMY for taxonomy and Study2 for accession
-    Then set the URL to STUDY2
-    And the response code should be 201
+    When I create a study with TAXONOMY for taxonomy and Study1 for accession
+    And set the URL to STUDY1
+    Then the response code should be 201
+    When I create a study with TAXONOMY for taxonomy and Study2 for accession
+    And set the URL to STUDY2
+    Then the response code should be 201
 
     # Create two analyses: Study1 → Analysis1 and Study2 → Analysis2
-    Given I create an analysis with Analysis1 for accession, REFERENCE_SEQUENCE for reference sequence and STUDY1 for study
-    Then set the URL to ANALYSIS1
-    And the response code should be 201
-    Given I create an analysis with Analysis2 for accession, REFERENCE_SEQUENCE for reference sequence and STUDY2 for study
-    Then set the URL to ANALYSIS2
-    And the response code should be 201
+    When I create an analysis with Analysis1 for accession, REFERENCE_SEQUENCE for reference sequence and STUDY1 for study
+    And set the URL to ANALYSIS1
+    Then the response code should be 201
+    When I create an analysis with Analysis2 for accession, REFERENCE_SEQUENCE for reference sequence and STUDY2 for study
+    And set the URL to ANALYSIS2
+    Then the response code should be 201
 
     # Create three files
-    Given I request POST /files with JSON payload:
+    When I request POST /files with JSON payload:
     """
     {
       "accessionVersionId": {
@@ -49,10 +49,10 @@ Feature: Transitive release date control for child objects of a Study
       "type": "TSV"
     }
     """
-    Then the response code should be 201
     And set the URL to FILE1
+    Then the response code should be 201
 
-    Given I request POST /files with JSON payload:
+    When I request POST /files with JSON payload:
     """
     {
       "accessionVersionId": {
@@ -65,10 +65,10 @@ Feature: Transitive release date control for child objects of a Study
       "type": "TSV"
     }
     """
-    Then the response code should be 201
     And set the URL to FILE2
+    Then the response code should be 201
 
-    Given I request POST /files with JSON payload:
+    When I request POST /files with JSON payload:
     """
     {
       "accessionVersionId": {
@@ -91,9 +91,9 @@ Feature: Transitive release date control for child objects of a Study
     Then the response code should be 2xx
 
     # Set release dates for studies
-    Given I request PATCH STUDY1 with patch and day <S1_RELEASE>
+    When I request PATCH STUDY1 with patch and day <S1_RELEASE>
     Then the response code should be 200
-    Given I request PATCH STUDY2 with patch and day <S2_RELEASE>
+    When I request PATCH STUDY2 with patch and day <S2_RELEASE>
     Then the response code should be 200
 
     # Check availability of analyses
@@ -111,7 +111,7 @@ Feature: Transitive release date control for child objects of a Study
     Then the response code should be <F3>
 
     Examples:
-      # Analysis is available WHEN AND ONLY WHEN its parent study is available
+      # Analysis, Publication, and WebResource are available WHEN AND ONLY WHEN their parent study is available
       # File is available WHEN AND ONLY WHEN at least one study which links to it is available
       # Release dates of "null" or "yesterday" should result in a RELEASED state;
       # "tomorrow" in an UNRELEASED state.
