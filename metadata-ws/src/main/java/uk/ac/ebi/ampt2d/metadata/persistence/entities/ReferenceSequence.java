@@ -129,17 +129,4 @@ public class ReferenceSequence extends Auditable<Long> {
         this.taxonomy = taxonomy;
     }
 
-    // Release date control: get the *earliest* release date from all studies which link to this reference sequence
-    @Formula("(SELECT min(study.release_date) FROM reference_sequence " +
-            "INNER JOIN analysis_reference_sequences on reference_sequence.id=analysis_reference_sequences.reference_sequences_id " +
-            "INNER JOIN analysis on analysis_reference_sequences.analysis_id = analysis.id " +
-            "INNER JOIN study on analysis.study_id = study.id " +
-            "WHERE reference_sequence.id=id)")
-    @JsonIgnore
-    private LocalDate releaseDate;
-
-    public LocalDate getReleaseDate() {
-        return releaseDate;
-    }
-
 }
