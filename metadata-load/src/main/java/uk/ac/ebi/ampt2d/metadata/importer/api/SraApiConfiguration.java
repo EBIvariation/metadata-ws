@@ -28,7 +28,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 public class SraApiConfiguration {
 
     @Bean
-    public SraXmlRetrieverByAccession sraRetrieverByAccessionFromAPI() {
+    public SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi() {
         return new SraXmlRetrieverThroughApi();
     }
 }

@@ -29,7 +29,6 @@ import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -61,10 +60,9 @@ public class FileExtractorFromAnalysis {
                 }
                 return fileRepository.save(file);
             }).collect(Collectors.toList());
-
         } catch (Exception exception) {
-            FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, "Encountered Exception for analysis files"
-                    + analysisType.getAccession());
+            String message = "Encountered exception when extracting files from analysis ";
+            FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, message + analysisType.getAccession());
             FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, exception.getMessage());
         }
         return files;

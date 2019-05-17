@@ -38,6 +38,9 @@ import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {MetadataImporterMainApplicationConfiguration.class,
         MetadataDatabaseConfiguration.class,
@@ -62,14 +65,12 @@ public class AnalysisConverterTest {
 
     @Test
     public void convertFromApiXml() throws Exception {
-
         String accession = "ERZ496533";
         AnalysisType analysisType = getAnalysisType(ANALYSIS_DOCUMENT_API_XML, accession);
         Analysis analysis = analysisConverter.convert(analysisType);
-
-        Assert.assertNotNull(analysis);
-        Assert.assertEquals(accession, analysis.getAccessionVersionId().getAccession());
-        Assert.assertEquals(Analysis.Technology.EXOME_SEQUENCING, analysis.getTechnology());
+        assertNotNull(analysis);
+        assertEquals(accession, analysis.getAccessionVersionId().getAccession());
+        assertEquals(Analysis.Technology.EXOME_SEQUENCING, analysis.getTechnology());
     }
 
     @Test
@@ -77,9 +78,9 @@ public class AnalysisConverterTest {
         String accession = "ERZ000011";
         AnalysisType analysisType = getAnalysisType(ANALYSIS_DOCUMENT_DATABASE_XML, accession);
         Analysis analysis = analysisConverter.convert(analysisType);
-        Assert.assertNotNull(analysis);
-        Assert.assertEquals(accession, analysis.getAccessionVersionId().getAccession());
-        Assert.assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
+        assertNotNull(analysis);
+        assertEquals(accession, analysis.getAccessionVersionId().getAccession());
+        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
     }
 
     private AnalysisType getAnalysisType(String xml, String accession) throws Exception {

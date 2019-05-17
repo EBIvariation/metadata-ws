@@ -22,11 +22,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
-import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughAPI;
+import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.StudyConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
+import uk.ac.ebi.ampt2d.metadata.importer.database.SraXmlRetrieverThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
@@ -43,12 +44,12 @@ public class MetadataImporterMainApplicationConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "API")
-    public ObjectsImporter objectImporterForNonEga(SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
+    public ObjectsImporter objectImporterForNonEga(SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
                                                    PublicationRepository publicationRepository,
                                                    WebResourceRepository webResourceRepository,
                                                    FileRepository fileRepository,
                                                    TaxonomyRepository taxonomyRepository) {
-        return new SraObjectsImporterThroughAPI(sraXmlRetrieverByAccession, sraStudyXmlParser(),
+        return new SraObjectsImporterThroughAPI(sraXmlRetrieverThroughApi, sraStudyXmlParser(),
                 studyConverter(), publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository), taxonomyExtractor(taxonomyRepository),
                 sraAnalysisXmlParser(), analysisConverter(), fileExtractorFromAnalysis(fileRepository));
@@ -56,12 +57,12 @@ public class MetadataImporterMainApplicationConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "DB")
-    public ObjectsImporter objectImporterForEga(SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
+    public ObjectsImporter objectImporterForEga(SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
                                                 PublicationRepository publicationRepository,
                                                 WebResourceRepository webResourceRepository,
                                                 FileRepository fileRepository,
                                                 TaxonomyRepository taxonomyRepository) {
-        return new SraObjectsImporterThroughDatabase(sraXmlRetrieverByAccession, sraStudyXmlParser(),
+        return new SraObjectsImporterThroughDatabase(sraXmlRetrieverThroughDatabase, sraStudyXmlParser(),
                 studyConverter(), publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository), taxonomyExtractor(taxonomyRepository),
                 sraAnalysisXmlParser(), analysisConverter(), fileExtractorFromAnalysis(fileRepository));
@@ -75,20 +76,20 @@ public class MetadataImporterMainApplicationConfiguration {
         return new AnalysisConverter();
     }
 
-    private TaxonomyExtractor taxonomyExtractor(TaxonomyRepository taxonomyRepository) {
-        return new TaxonomyExtractor(taxonomyRepository);
-    }
-
-    private FileExtractorFromAnalysis fileExtractorFromAnalysis(FileRepository fileRepository) {
-        return new FileExtractorFromAnalysis(fileRepository);
-    }
-
     private SraStudyXmlParser sraStudyXmlParser() {
         return new SraStudyXmlParser();
     }
 
     private SraAnalysisXmlParser sraAnalysisXmlParser() {
         return new SraAnalysisXmlParser();
+    }
+
+    private TaxonomyExtractor taxonomyExtractor(TaxonomyRepository taxonomyRepository) {
+        return new TaxonomyExtractor(taxonomyRepository);
+    }
+
+    private FileExtractorFromAnalysis fileExtractorFromAnalysis(FileRepository fileRepository) {
+        return new FileExtractorFromAnalysis(fileRepository);
     }
 
     private PublicationExtractorFromStudy publicationExtractorFromStudy(PublicationRepository publicationRepository) {

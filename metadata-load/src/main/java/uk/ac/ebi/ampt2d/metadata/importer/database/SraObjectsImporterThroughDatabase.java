@@ -19,8 +19,7 @@
 package uk.ac.ebi.ampt2d.metadata.importer.database;
 
 import org.springframework.core.convert.converter.Converter;
-import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
-import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughAPI;
+import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
@@ -39,11 +38,11 @@ import java.util.Map;
 /**
  * This importer is mainly used for EGA studies where Study XML doesn't have analysis accessions
  */
-public class SraObjectsImporterThroughDatabase extends SraObjectsImporterThroughAPI {
+public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
-    private static Map<String, Study> accessionsToStudy = new HashMap<>();
+    private Map<String, Study> accessionsToStudy = new HashMap<>();
 
-    public SraObjectsImporterThroughDatabase(SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
+    public SraObjectsImporterThroughDatabase(SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
                                              SraXmlParser<StudyType> sraStudyXmlParser,
                                              Converter<StudyType, Study> studyConverter,
                                              PublicationExtractorFromStudy publicationExtractorFromStudy,
@@ -52,8 +51,8 @@ public class SraObjectsImporterThroughDatabase extends SraObjectsImporterThrough
                                              SraXmlParser<AnalysisType> sraAnalysisXmlParser,
                                              Converter<AnalysisType, Analysis> analysisConverter,
                                              FileExtractorFromAnalysis fileExtractorFromAnalysis) {
-        super(sraXmlRetrieverByAccession, sraStudyXmlParser, studyConverter, publicationExtractorFromStudy,
-                webResourceExtractorFromStudy, taxonomyExtractor, sraAnalysisXmlParser, analysisConverter,
+        super(sraXmlRetrieverThroughDatabase, sraStudyXmlParser, sraAnalysisXmlParser, studyConverter, analysisConverter,
+                publicationExtractorFromStudy, webResourceExtractorFromStudy, taxonomyExtractor,
                 fileExtractorFromAnalysis);
     }
 
@@ -73,17 +72,6 @@ public class SraObjectsImporterThroughDatabase extends SraObjectsImporterThrough
     }
 
     @Override
-    public Study importStudyFromAnalysis(String studyAccession) {
-        Study sharedStudy = accessionsToStudy.get(studyAccession);
-        if (sharedStudy != null) {
-            return sharedStudy;
-        }
-        Study study = importStudy(studyAccession);
-        accessionsToStudy.put(studyAccession, study);
-        return study;
-    }
-
-    @Override
     public ReferenceSequence importReferenceSequence(String accession) {
         return super.importReferenceSequence(accession);
     }
@@ -93,7 +81,29 @@ public class SraObjectsImporterThroughDatabase extends SraObjectsImporterThrough
         return super.importSample(accession);
     }
 
-    public void setEnaObjectQuery(String query) {
+    @Override
+    protected Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis) {
+        Study study = importStudyFromAnalysis(analysisType.getSTUDYREF().getAccession());
+        analysis.setStudy(study);
+        return analysis;
+    }
+
+    @Override
+    protected Study extractAnalysisFromStudy(StudyType studyType, Study study) {
+        return study;
+    }
+
+    private Study importStudyFromAnalysis(String studyAccession) {
+        Study sharedStudy = accessionsToStudy.get(studyAccession);
+        if (sharedStudy != null) {
+            return sharedStudy;
+        }
+        Study study = importStudy(studyAccession);
+        accessionsToStudy.put(studyAccession, study);
+        return study;
+    }
+
+    private void setEnaObjectQuery(String query) {
         ((SraXmlRetrieverThroughDatabase) sraXmlRetrieverByAccession).setEnaObjectQuery(query);
     }
 }

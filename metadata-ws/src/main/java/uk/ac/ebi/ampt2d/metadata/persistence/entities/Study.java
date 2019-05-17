@@ -192,12 +192,10 @@ public class Study extends Auditable<Long> {
 
     public void setAnalysis(Analysis analysis) {
         List<Analysis> analyses = this.getAnalyses();
-        if (analyses != null) {
-            analyses.add(analysis);
-        } else {
+        if (analyses == null) {
             analyses = new ArrayList<>();
-            analyses.add(analysis);
         }
+        analyses.add(analysis);
         this.analyses = analyses;
     }
 

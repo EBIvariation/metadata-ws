@@ -30,6 +30,8 @@ import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
+import java.time.LocalDate;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -46,6 +48,15 @@ public class SraObjectsImporterThroughDBTest {
     public void importStudy() throws Exception {
         Study study = sraObjectImporter.importStudy("ERP000860");
         assertNotNull(study);
+        assertEquals("ERP000860", study.getAccessionVersionId().getAccession());
+        assertEquals(LocalDate.of(9999, 12, 31), study.getReleaseDate());
+        assertEquals("UK10K_OBESITY_SCOOP", study.getName());
+
+        study = sraObjectImporter.importStudy("ERP000858");
+        assertNotNull(study);
+        assertEquals("ERP000858", study.getAccessionVersionId().getAccession());
+        assertEquals(LocalDate.of(9999, 12, 31), study.getReleaseDate());
+        assertEquals("UK10K_NEURO_MUIR", study.getName());
     }
 
     @Test
