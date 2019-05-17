@@ -51,10 +51,9 @@ public class Publication extends Auditable<String> {
     /**
      * Release date control: get the *earliest* release date from all studies which link to this publication.
      */
-    @Formula("(SELECT min(study.release_date) FROM publication " +
-             "INNER JOIN study_publications on publication.id = study_publications.study_id " +
-             "INNER JOIN study on study_publications.study_id = study.id" +
-             "WHERE publication.id=id)")
+    @Formula("(SELECT min(study.release_date) FROM study_publications " +
+             "INNER JOIN study on study_publications.study_id = study.id " +
+             "WHERE study_publications.publications_id=id)")
     @JsonIgnore
     private LocalDate releaseDate;
 
