@@ -17,8 +17,10 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.annotations.Formula;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Column;
@@ -72,11 +74,6 @@ public class WebResource extends Auditable<Long> {
     @Pattern(message = "Must be a valid URL.", regexp="(^(https?|ftp):(//|\\\\))[-a-zA-Z0-9+&@#/%?=~_|!:,.;$'`*\\[\\]()]+")
     private String resourceUrl;
 
-    @ApiModelProperty(position = 4, dataType = "java.lang.String", notes = "Url to a Study")
-    @JsonProperty
-    @ManyToOne
-    private Study study;
-
     WebResource() {}
 
     public WebResource(Type type, String resourceUrl) {
@@ -88,26 +85,17 @@ public class WebResource extends Auditable<Long> {
         return id;
     }
 
-    public Study getStudy() {
-        return study;
-    }
-
-    public void setStudy(Study study) {
-        this.study = study;
-        study.setResource(this);
-    }
-
     /**
-     * Release date control: Study <1..M> WebResource, hence just getting the parent study is enough.
-     * @return the date at which WebResource should become available.
+     * Release date control: get the *earliest* release date from all studies which link to this web resource.
      */
+    @Formula("(SELECT min(study.release_date) FROM study_resources " +
+            "INNER JOIN study on study_resources.study_id = study.id " +
+            "WHERE study_resources.resources_id=id)")
+    @JsonIgnore
+    private LocalDate releaseDate;
+
     @Override
     public LocalDate getReleaseDate() {
-        Study study = getStudy();
-        if (study == null) {
-            return null;
-        } else {
-            return study.getReleaseDate();
-        }
+        return releaseDate;
     }
 }

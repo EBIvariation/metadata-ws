@@ -112,7 +112,7 @@ public class Study extends Auditable<Long> {
     @OneToMany(mappedBy = "study",fetch = FetchType.EAGER)
     private List<Analysis> analyses;
 
-    @OneToMany(mappedBy = "study", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany
     private List<WebResource> resources;
 
 
