@@ -72,8 +72,10 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals("ERP000858", study.getAccessionVersionId().getAccession());
         assertEquals(LocalDate.of(9999, 12, 31), study.getReleaseDate());
         assertEquals("UK10K_NEURO_MUIR", study.getName());
-        assertEquals(2, studyRepository.count());
-        assertEquals(0, analysisRepository.count()); //analyses aren't imported when source is database
+
+        //studies and analysis aren't imported when source is database and if we start with importStudy
+        assertEquals(0, studyRepository.count());
+        assertEquals(0, analysisRepository.count());
     }
 
     @Test
@@ -85,6 +87,9 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
         assertEquals(1, analysis.getFiles().size());
         assertEquals("ERP000860", analysis.getStudy().getAccessionVersionId().getAccession());
+
+        assertEquals(1, studyRepository.count());
+        assertEquals(1, analysisRepository.count());
     }
 
 }

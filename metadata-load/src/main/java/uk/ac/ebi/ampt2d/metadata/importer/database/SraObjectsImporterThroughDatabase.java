@@ -100,7 +100,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             return sharedStudy;
         }
         Study study = importStudy(studyAccession);
-        metadataStudyFinderOrPersister.findOrPersistStudy(study);
+        study = metadataStudyFinderOrPersister.findOrPersistStudy(study);
         accessionsToStudy.put(studyAccession, study);
         return study;
     }

@@ -85,10 +85,13 @@ public class SraObjectsImporterThroughAPITest {
 
     @Test
     public void importAnalysisObject() throws Exception {
-        sraObjectImporter.importStudy("ERP107353");
         Analysis analysis = sraObjectImporter.importAnalysis("ERZ496533");
         assertEquals("ERZ496533", analysis.getAccessionVersionId().getAccession());
         assertEquals(Analysis.Technology.EXOME_SEQUENCING, analysis.getTechnology());
         assertEquals(2, analysis.getFiles().size());
+
+        //studies and analysis aren't imported when source is API and if we start with importAnalysis
+        assertEquals(0, studyRepository.count());
+        assertEquals(0, analysisRepository.count());
     }
 }
