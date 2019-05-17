@@ -28,10 +28,10 @@ Feature: Web resource object
     Then the response code should be 201
 
     Examples:
-      | url |
+      | url                                                                                       |
       | http://api.plos.org/search?q=title:%22Drosophila%22%20and%20body:%22RNA%22&fl=id,abstract |
-      | https://localhost:8090/swagger-ui.html#/WebResource_Entity/saveWebResourceUsingPOST |
-      | ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.study.xsd                              |
+      | https://localhost:8090/swagger-ui.html#/WebResource_Entity/saveWebResourceUsingPOST       |
+      | ftp://ftp.sra.ebi.ac.uk/meta/xsd/sra_1_5/SRA.study.xsd                                    |
       | http://MVSXX.COMPANY.COM:04445/CICSPLEXSM//JSMITH/VIEW/OURLOCTRAN?A_TRANID=P*&O_TRANID=NE |
 
 
@@ -46,9 +46,9 @@ Feature: Web resource object
     Then the response code should be 4xx
 
     Examples:
-      | malformed_url |
-      |               |
-      | htttps://www.ebi.ac.uk |
-      | www.google.com         |
-      | http://www.space address.org |
+      | malformed_url                       |
+      |                                     |
+      | htttps://www.ebi.ac.uk              |
+      | www.google.com                      |
+      | http://www.space address.org        |
       | //fileserver/code/src/main/app.java |

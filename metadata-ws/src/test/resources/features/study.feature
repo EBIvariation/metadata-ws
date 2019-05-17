@@ -105,15 +105,15 @@ Feature: study object
     And the href of the study of studies has items <url>
 
     Examples:
-      | base | query | N | url |
-      | taxonomy-id | id=9606 | 1 | STUDY1 |
-      | taxonomy-id | id=9596 | 2 | STUDY2,STUDY3 |
-      | taxonomy-id | id=207598 | 3 | STUDY1,STUDY2,STUDY3 |
-      | taxonomy-id | id=0 | 0 | NONE |
-      | taxonomy-name | name=Homo sapiens | 1 | STUDY1 |
-      | taxonomy-name | name=Pan | 2 | STUDY2,STUDY3 |
-      | taxonomy-name | name=Homininae | 3 | STUDY1,STUDY2,STUDY3 |
-      | taxonomy-name | name=None | 0 | NONE |
+      | base          | query             | N | url                  |
+      | taxonomy-id   | id=9606           | 1 | STUDY1               |
+      | taxonomy-id   | id=9596           | 2 | STUDY2,STUDY3        |
+      | taxonomy-id   | id=207598         | 3 | STUDY1,STUDY2,STUDY3 |
+      | taxonomy-id   | id=0              | 0 | NONE                 |
+      | taxonomy-name | name=Homo sapiens | 1 | STUDY1               |
+      | taxonomy-name | name=Pan          | 2 | STUDY2,STUDY3        |
+      | taxonomy-name | name=Homininae    | 3 | STUDY1,STUDY2,STUDY3 |
+      | taxonomy-name | name=None         | 0 | NONE                 |
 
 
   Scenario Outline: search various studies by release date
@@ -165,9 +165,9 @@ Feature: study object
     And the href of the study of studies has items <url>
 
     Examples:
-      | query | N | url |
-      | to | 2 | STUDY1,STUDY2 |
-      | from | 1 | STUDY2 |
+      | query | N | url           |
+      | to    | 2 | STUDY1,STUDY2 |
+      | from  | 1 | STUDY2        |
 
 
   Scenario: find various studies by release date range
@@ -279,21 +279,21 @@ Feature: study object
     And the href of the study of studies has items <url>
 
     Examples:
-      | param | N | url |
-      | analyses.referenceSequences.name=GRCh37 | 1 | STUDY1 |
-      | analyses.referenceSequences.name=GRCh38 | 1 | STUDY2 |
-      | analyses.referenceSequences.name=NCBI36 | 0 | NONE |
-      | analyses.referenceSequences.name=GRCh37&analyses.referenceSequences.patch=p2 | 1 | STUDY1 |
-      | analyses.referenceSequences.name=GRCh38&analyses.referenceSequences.patch=p2 | 1 | STUDY2 |
-      | analyses.referenceSequences.name=GRCh37&analyses.referenceSequences.patch=p3 | 0 | NONE |
-      | analyses.referenceSequences.name=NCBI36&analyses.referenceSequences.patch=p2 | 0 | NONE |
-      | analyses.type=CASE_CONTROL | 2 | STUDY1,STUDY2 |
-      | analyses.type=TUMOR | 0 | NONE |
-      | analyses.type=COLLECTION | 0 | NONE |
-      | analyses.referenceSequences.name=GRCh38&analyses.type=CASE_CONTROL | 1 | STUDY2 |
-      | analyses.referenceSequences.name=GRCh38&analyses.type=TUMOR | 0 | NONE |
-      | analyses.referenceSequences.name=GRCh38&analyses.type=COLLECTION | 0 | NONE |
-      | analyses.referenceSequences.name=NCBI36&analyses.type=CASE_CONTROL | 0 | NONE |
+      | param                                                                        | N | url           |
+      | analyses.referenceSequences.name=GRCh37                                      | 1 | STUDY1        |
+      | analyses.referenceSequences.name=GRCh38                                      | 1 | STUDY2        |
+      | analyses.referenceSequences.name=NCBI36                                      | 0 | NONE          |
+      | analyses.referenceSequences.name=GRCh37&analyses.referenceSequences.patch=p2 | 1 | STUDY1        |
+      | analyses.referenceSequences.name=GRCh38&analyses.referenceSequences.patch=p2 | 1 | STUDY2        |
+      | analyses.referenceSequences.name=GRCh37&analyses.referenceSequences.patch=p3 | 0 | NONE          |
+      | analyses.referenceSequences.name=NCBI36&analyses.referenceSequences.patch=p2 | 0 | NONE          |
+      | analyses.type=CASE_CONTROL                                                   | 2 | STUDY1,STUDY2 |
+      | analyses.type=TUMOR                                                          | 0 | NONE          |
+      | analyses.type=COLLECTION                                                     | 0 | NONE          |
+      | analyses.referenceSequences.name=GRCh38&analyses.type=CASE_CONTROL           | 1 | STUDY2        |
+      | analyses.referenceSequences.name=GRCh38&analyses.type=TUMOR                  | 0 | NONE          |
+      | analyses.referenceSequences.name=GRCh38&analyses.type=COLLECTION             | 0 | NONE          |
+      | analyses.referenceSequences.name=NCBI36&analyses.type=CASE_CONTROL           | 0 | NONE          |
 
 
   Scenario: search various studies by name value pair for accession
@@ -414,10 +414,10 @@ Feature: study object
     And the response should contain <items> studies
 
     Examples:
-      | value | items |
-      | human | 3 |
-      | important | 3 |
-      | grCh39 | 0 |
+      | value     | items |
+      | human     | 3     |
+      | important | 3     |
+      | grCh39    | 0     |
 
 
   Scenario Outline: search various studies by paging and sorting
@@ -469,9 +469,9 @@ Feature: study object
     And the response should contain no study
 
     Examples:
-    | param | url |
-    | size=1 | STUDY2 |
-    | size=1&sort=name | STUDY1 |
+      | param            | url    |
+      | size=1           | STUDY2 |
+      | size=1&sort=name | STUDY1 |
 
 
   Scenario Outline: search various public studies
@@ -576,10 +576,10 @@ Feature: study object
     And the href of the study of studies has items <url>
 
   Examples:
-    | base | query | url |
-    | taxonomy-id | id=9606 | STUDY1,STUDY2 |
+    | base          | query             | url           |
+    | taxonomy-id   | id=9606           | STUDY1,STUDY2 |
     | taxonomy-name | name=Homo sapiens | STUDY1,STUDY2 |
-    | text | searchTerm=1kg | STUDY1,STUDY2 |
+    | text          | searchTerm=1kg    | STUDY1,STUDY2 |
 
 
   Scenario Outline: search various undeprecated studies
@@ -663,10 +663,10 @@ Feature: study object
     And the href of the study of studies has items <url>
 
     Examples:
-      | base | query | url |
-      | taxonomy-id | id=9606 | STUDY2 |
+      | base          | query             | url    |
+      | taxonomy-id   | id=9606           | STUDY2 |
       | taxonomy-name | name=Homo sapiens | STUDY2 |
-      | text | searchTerm=1kg | STUDY2 |
+      | text          | searchTerm=1kg    | STUDY2 |
 
 
   Scenario: search various yet to publish studies
@@ -845,10 +845,10 @@ Feature: study object
     And the response should contain no study
 
     Examples:
-  | url | linkedStudies |
-  | STUDY1 | STUDY2,STUDY3 |
-  | STUDY2 | STUDY1,STUDY3 |
-  | STUDY3 | STUDY1,STUDY2 |
+      | url    | linkedStudies |
+      | STUDY1 | STUDY2,STUDY3 |
+      | STUDY2 | STUDY1,STUDY3 |
+      | STUDY3 | STUDY1,STUDY2 |
 
 
   Scenario: deprecate to undeprecate studies
