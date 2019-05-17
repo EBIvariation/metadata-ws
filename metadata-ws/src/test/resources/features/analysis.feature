@@ -19,7 +19,7 @@ Feature: analysis object
       "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE
-    When I create a study with TAXONOMY for taxonomy
+    When I create a study
     Then set the URL to STUDY
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE for reference sequence
     Then the response code should be 201
@@ -48,7 +48,7 @@ Feature: analysis object
       "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE_1
-    When I create a study with TAXONOMY for taxonomy
+    When I create a study
     Then set the URL to STUDY
 
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE_1 for reference sequence
@@ -101,7 +101,7 @@ Feature: analysis object
       "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE_1
-    When I create a study with TAXONOMY for taxonomy
+    When I create a study
     Then set the URL to STUDY
 
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE_1 for reference sequence
@@ -135,7 +135,7 @@ Feature: analysis object
     }
     """
     Then set the URL to TAXONOMY
-    When I create a study with TAXONOMY for taxonomy
+    When I create a study
     Then set the URL to STUDY
     When I create an analysis with STUDY for study and <list> for reference sequence
     Then the response code should be 4xx
@@ -175,7 +175,7 @@ Feature: analysis object
       "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE_2
-    When I create a study with TAXONOMY for taxonomy
+    When I create a study
     Then set the URL to STUDY
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE_1,REFERENCE_SEQUENCE_2 for reference sequence
     Then the response code should be 201
@@ -224,7 +224,7 @@ Feature: analysis object
       "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE_2
-    When I create a study with TAXONOMY for taxonomy
+    When I create a study
     Then set the URL to STUDY
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE_1,REFERENCE_SEQUENCE_2 for reference sequence
     Then the response code should be 201
@@ -261,7 +261,7 @@ Feature: analysis object
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_2
 
-    When I create a study with TAXONOMY for taxonomy
+    When I create a study
     Then set the URL to STUDY
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE_1,REFERENCE_SEQUENCE_2 for reference sequence
     Then the response code should be 4xx
@@ -295,7 +295,7 @@ Feature: analysis object
        "taxonomy": "TAXONOMY"
      """
      Then set the URL to REFERENCE_SEQUENCE
-     When I create a study with TAXONOMY for taxonomy
+     When I create a study
      Then set the URL to STUDY
      When I create an analysis with EGAA0001 for accession, REFERENCE_SEQUENCE for reference sequence, STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
      Then the response code should be 201
@@ -340,7 +340,7 @@ Feature: analysis object
        "taxonomy": "TAXONOMY"
      """
      Then set the URL to REFERENCE_SEQUENCE
-     When I create a study with TAXONOMY for taxonomy
+     When I create a study
      Then set the URL to STUDY
      When I create an analysis with EGAA0001 for accession, REFERENCE_SEQUENCE for reference sequence, STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
      Then the response code should be 201
@@ -380,7 +380,7 @@ Feature: analysis object
        "taxonomy": "TAXONOMY"
      """
      Then set the URL to REFERENCE_SEQUENCE
-     When I create a study with TAXONOMY for taxonomy
+     When I create a study
      Then set the URL to STUDY
      When I create an analysis with EGAA0001 for accession, REFERENCE_SEQUENCE for reference sequence, STUDY for study, GWAS for technology, CASE_CONTROL for type and Illumina for platform
      Then the response code should be 201
