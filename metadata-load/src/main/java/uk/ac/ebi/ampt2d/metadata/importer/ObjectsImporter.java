@@ -19,6 +19,8 @@
 package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.springframework.core.convert.converter.Converter;
+import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataAnalysisPersister;
+import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataStudyFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
@@ -46,6 +48,10 @@ public abstract class ObjectsImporter {
 
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
 
+    protected MetadataAnalysisPersister metadataAnalysisPersister;
+
+    protected MetadataStudyFinderOrPersister metadataStudyFinderOrPersister;
+
     private SraXmlParser<StudyType> sraStudyXmlParser;
 
     private SraXmlParser<AnalysisType> sraAnalysisXmlParser;
@@ -69,7 +75,9 @@ public abstract class ObjectsImporter {
                            PublicationExtractorFromStudy publicationExtractorFromStudy,
                            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
                            TaxonomyExtractor taxonomyExtractor,
-                           FileExtractorFromAnalysis fileExtractorFromAnalysis) {
+                           FileExtractorFromAnalysis fileExtractorFromAnalysis,
+                           MetadataAnalysisPersister metadataAnalysisPersister,
+                           MetadataStudyFinderOrPersister metadataStudyFinderOrPersister) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
@@ -79,6 +87,8 @@ public abstract class ObjectsImporter {
         this.webResourceExtractorFromStudy = webResourceExtractorFromStudy;
         this.taxonomyExtractor = taxonomyExtractor;
         this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
+        this.metadataAnalysisPersister = metadataAnalysisPersister;
+        this.metadataStudyFinderOrPersister = metadataStudyFinderOrPersister;
     }
 
     public Study importStudy(String accession) {

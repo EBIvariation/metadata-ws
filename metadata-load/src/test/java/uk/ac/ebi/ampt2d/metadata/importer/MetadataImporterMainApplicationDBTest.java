@@ -18,7 +18,6 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -29,6 +28,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.database.OracleDbCategory;
+import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
@@ -44,22 +44,27 @@ public class MetadataImporterMainApplicationDBTest {
     private MetadataImporterMainApplication metadataImporterMainApplication;
 
     @Autowired
+    private SraObjectsImporterThroughDatabase sraObjectsImporterThroughDatabase;
+
+    @Autowired
     private StudyRepository studyRepository;
 
     @Autowired
     private AnalysisRepository analysisRepository;
-
-    @Before
-    public void setUp() {
-        studyRepository.deleteAll();
-        analysisRepository.deleteAll();
-    }
 
     @Test
     @Category(OracleDbCategory.class)
     public void run() throws Exception {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
                 new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessions.txt"}));
+        assertEquals(2, studyRepository.count());
+        assertEquals(6, analysisRepository.count());
+
+        sraObjectsImporterThroughDatabase.getAccessionsToStudy().clear();
+
+        /** Import analysis having shared study that are already imported before**/
+        metadataImporterMainApplication.run(new DefaultApplicationArguments(
+                new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessionsSharedStudyPreviousImport.txt"}));
         assertEquals(2, studyRepository.count());
         assertEquals(11, analysisRepository.count());
     }

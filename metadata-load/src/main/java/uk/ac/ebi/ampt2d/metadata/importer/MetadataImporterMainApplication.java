@@ -23,8 +23,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -46,11 +44,8 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
 
     private ObjectsImporter objectsImporter;
 
-    private StudyRepository studyRepository;
-
-    public MetadataImporterMainApplication(ObjectsImporter objectsImporter, StudyRepository studyRepository) {
+    public MetadataImporterMainApplication(ObjectsImporter objectsImporter) {
         this.objectsImporter = objectsImporter;
-        this.studyRepository = studyRepository;
     }
 
     public static void main(String[] args) throws Exception {
@@ -61,15 +56,11 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments applicationArguments) throws Exception {
         Set<String> accessions = readAccessionsFromFile(applicationArguments);
-        Set<Study> studies = new HashSet<>();
-        for (String accession : accessions) {
-            if (objectsImporter instanceof SraObjectsImporterThroughDatabase) {
-                studies.add(objectsImporter.importAnalysis(accession).getStudy());
-            } else {
-                studies.add(objectsImporter.importStudy(accession));
-            }
+        if (objectsImporter instanceof SraObjectsImporterThroughDatabase) {
+            accessions.parallelStream().forEach(accession -> objectsImporter.importAnalysis(accession));
+        } else {
+            accessions.parallelStream().forEach(accession -> objectsImporter.importStudy(accession));
         }
-        studyRepository.save(studies);
     }
 
     private Set<String> readAccessionsFromFile(ApplicationArguments applicationArguments) {

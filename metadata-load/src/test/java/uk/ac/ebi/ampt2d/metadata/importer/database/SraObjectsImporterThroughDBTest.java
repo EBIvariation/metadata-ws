@@ -18,6 +18,7 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.database;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -29,6 +30,8 @@ import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
 
@@ -42,6 +45,18 @@ public class SraObjectsImporterThroughDBTest {
 
     @Autowired
     private ObjectsImporter sraObjectImporter;
+
+    @Autowired
+    private StudyRepository studyRepository;
+
+    @Autowired
+    private AnalysisRepository analysisRepository;
+
+    @Before
+    public void setUp() {
+        analysisRepository.deleteAll();
+        studyRepository.deleteAll();
+    }
 
     @Test
     @Category(OracleDbCategory.class)
@@ -57,6 +72,8 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals("ERP000858", study.getAccessionVersionId().getAccession());
         assertEquals(LocalDate.of(9999, 12, 31), study.getReleaseDate());
         assertEquals("UK10K_NEURO_MUIR", study.getName());
+        assertEquals(2, studyRepository.count());
+        assertEquals(0, analysisRepository.count()); //analyses aren't imported when source is database
     }
 
     @Test

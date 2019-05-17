@@ -18,6 +18,7 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.api;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
 
@@ -41,6 +44,18 @@ public class SraObjectsImporterThroughAPITest {
     @Autowired
     private SraObjectsImporterThroughAPI sraObjectImporter;
 
+    @Autowired
+    private StudyRepository studyRepository;
+
+    @Autowired
+    private AnalysisRepository analysisRepository;
+
+    @Before
+    public void setUp() {
+        analysisRepository.deleteAll();
+        studyRepository.deleteAll();
+    }
+
     @Test
     public void importStudy() throws Exception {
         Study study = sraObjectImporter.importStudy("ERP000054");
@@ -49,6 +64,7 @@ public class SraObjectsImporterThroughAPITest {
         assertEquals(LocalDate.of(2010, 04, 8), study.getReleaseDate());
         assertEquals("CEBPA binding in five vertebrates", study.getName());
 
+        // Below two studies doesn't have analysis associated with it
         study = sraObjectImporter.importStudy("SRP000392");
         assertNotNull(study);
         assertEquals("SRP000392", study.getAccessionVersionId().getAccession());
@@ -62,10 +78,14 @@ public class SraObjectsImporterThroughAPITest {
         assertEquals(LocalDate.of(2010, 02, 26), study.getReleaseDate());
         assertEquals("Reference genome for the Human Microbiome Project", study.getName());
         assertEquals(1, study.getResources().size());
+
+        assertEquals(3, studyRepository.count());
+        assertEquals(1, analysisRepository.count());
     }
 
     @Test
     public void importAnalysisObject() throws Exception {
+        sraObjectImporter.importStudy("ERP107353");
         Analysis analysis = sraObjectImporter.importAnalysis("ERZ496533");
         assertEquals("ERZ496533", analysis.getAccessionVersionId().getAccession());
         assertEquals(Analysis.Technology.EXOME_SEQUENCING, analysis.getTechnology());

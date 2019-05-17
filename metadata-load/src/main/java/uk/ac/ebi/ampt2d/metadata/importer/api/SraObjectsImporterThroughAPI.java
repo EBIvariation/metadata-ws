@@ -20,6 +20,8 @@ package uk.ac.ebi.ampt2d.metadata.importer.api;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataAnalysisPersister;
+import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataStudyFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
@@ -46,17 +48,21 @@ public class SraObjectsImporterThroughAPI extends ObjectsImporter {
                                         TaxonomyExtractor taxonomyExtractor,
                                         SraXmlParser<AnalysisType> sraAnalysisXmlParser,
                                         Converter<AnalysisType, Analysis> analysisConverter,
-                                        FileExtractorFromAnalysis fileExtractorFromAnalysis) {
+                                        FileExtractorFromAnalysis fileExtractorFromAnalysis,
+                                        MetadataAnalysisPersister metadataAnalysisPersister,
+                                        MetadataStudyFinderOrPersister metadataStudyFinderOrPersister) {
         super(sraXmlRetrieverThroughApi, sraStudyXmlParser, sraAnalysisXmlParser, studyConverter, analysisConverter,
                 publicationExtractorFromStudy, webResourceExtractorFromStudy, taxonomyExtractor,
-                fileExtractorFromAnalysis);
+                fileExtractorFromAnalysis, metadataAnalysisPersister, metadataStudyFinderOrPersister);
     }
 
     @Override
     protected Study extractAnalysisFromStudy(StudyType studyType, Study study) {
+        metadataStudyFinderOrPersister.persistStudy(study);
         for (String analysisAccession : getAnalysisAccessions(studyType)) {
             Analysis analysis = importAnalysis(analysisAccession);
             analysis.setStudy(study);
+            metadataAnalysisPersister.persistAnalysis(analysis);
         }
         return study;
     }

@@ -50,10 +50,12 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                                              TaxonomyExtractor taxonomyExtractor,
                                              SraXmlParser<AnalysisType> sraAnalysisXmlParser,
                                              Converter<AnalysisType, Analysis> analysisConverter,
-                                             FileExtractorFromAnalysis fileExtractorFromAnalysis) {
+                                             FileExtractorFromAnalysis fileExtractorFromAnalysis,
+                                             MetadataAnalysisPersister metadataAnalysisPersister,
+                                             MetadataStudyFinderOrPersister metadataStudyFinderOrPersister) {
         super(sraXmlRetrieverThroughDatabase, sraStudyXmlParser, sraAnalysisXmlParser, studyConverter, analysisConverter,
                 publicationExtractorFromStudy, webResourceExtractorFromStudy, taxonomyExtractor,
-                fileExtractorFromAnalysis);
+                fileExtractorFromAnalysis, metadataAnalysisPersister, metadataStudyFinderOrPersister);
     }
 
     @Override
@@ -67,8 +69,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     @Override
     public Analysis importAnalysis(String accession) {
         setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
-        Analysis analysis = super.importAnalysis(accession);
-        return analysis;
+        return super.importAnalysis(accession);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     protected Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis) {
         Study study = importStudyFromAnalysis(analysisType.getSTUDYREF().getAccession());
         analysis.setStudy(study);
-        return analysis;
+        return metadataAnalysisPersister.persistAnalysis(analysis);
     }
 
     @Override
@@ -93,17 +94,22 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         return study;
     }
 
-    private Study importStudyFromAnalysis(String studyAccession) {
+    private synchronized Study importStudyFromAnalysis(String studyAccession) {
         Study sharedStudy = accessionsToStudy.get(studyAccession);
         if (sharedStudy != null) {
             return sharedStudy;
         }
         Study study = importStudy(studyAccession);
+        metadataStudyFinderOrPersister.findOrPersistStudy(study);
         accessionsToStudy.put(studyAccession, study);
         return study;
     }
 
     private void setEnaObjectQuery(String query) {
         ((SraXmlRetrieverThroughDatabase) sraXmlRetrieverByAccession).setEnaObjectQuery(query);
+    }
+
+    public Map<String, Study> getAccessionsToStudy() {
+        return accessionsToStudy;
     }
 }
