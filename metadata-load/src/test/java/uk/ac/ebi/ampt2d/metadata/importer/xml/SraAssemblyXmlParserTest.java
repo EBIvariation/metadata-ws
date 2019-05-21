@@ -42,15 +42,14 @@ public class SraAssemblyXmlParserTest {
 
     @Test
     public void parseXmlApi() throws XmlException, URISyntaxException, IOException {
-        AssemblyType assembly = getAssemblyType(ASSEMBLY_ACCESSION_API, "assembly/assemblyDocumentAPI");
+        AssemblyType assembly = getAssemblyType(ASSEMBLY_ACCESSION_API, "assembly/AssemblyDocumentAPI.xml");
         assertEquals(ASSEMBLY_ACCESSION_API, assembly.getAccession());
         assertEquals("EquCab2.0", assembly.getAlias());
-
     }
 
     @Test(expected = XmlException.class)
     public void parseNotFoundXml() throws XmlException, URISyntaxException, IOException {
-        AssemblyType assembly = getAssemblyType(ASSEMBLY_ACCESSION_API, "assembly/assemblyDocumentNotFound");
+        AssemblyType assembly = getAssemblyType(ASSEMBLY_ACCESSION_API, "assembly/AssemblyDocumentNotFound.xml");
     }
 
     private AssemblyType getAssemblyType(String assemblyAccession, String assemblyDocumentPath)
