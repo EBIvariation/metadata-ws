@@ -65,7 +65,7 @@ public class ReleaseDateAspect {
      * @return null or object
      * @throws Throwable
      */
-    @Around("execution(* uk.ac.ebi.ampt2d.metadata.persistence.repositories.*.findOne(java.io.Serializable))")
+    @Around("execution(* org.springframework.data.repository.CrudRepository.findOne(java.io.Serializable))")
     public Object filterOnReleaseDateAdviceFindOne(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object result = proceedingJoinPoint.proceed();
         return processReleaseControlledObject(result);
