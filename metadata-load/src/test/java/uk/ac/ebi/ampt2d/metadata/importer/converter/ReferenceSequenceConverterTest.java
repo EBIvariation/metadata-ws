@@ -50,7 +50,7 @@ import java.util.Arrays;
 @TestPropertySource(locations = "classpath:application.properties", properties = {"import.source=API"})
 public class ReferenceSequenceConverterTest {
 
-    private static final String ASSEMBLY_DOCUMENT_API_XML = "assembly/assemblyDocumentAPI";
+    private static final String ASSEMBLY_DOCUMENT_API_XML = "assembly/AssemblyDocumentAPI.xml";
 
     private SraXmlParser<AssemblyType> xmlParser;
 
