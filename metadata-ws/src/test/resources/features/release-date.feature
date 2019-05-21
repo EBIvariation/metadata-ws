@@ -118,7 +118,7 @@ Feature: Transitive release date control for child objects of a Study
     # Set both studies to released initially
     When I request PATCH STUDY1 with patch and day null
     Then the response code should be 200
-    When I request PATCH STUDY1 with patch and day yesterday
+    When I request PATCH STUDY1 with patch and day today
     Then the response code should be 200
 
     # Make sure that all elements are available initially
@@ -163,12 +163,16 @@ Feature: Transitive release date control for child objects of a Study
     Examples:
       # Analysis, Publication, and WebResource are available WHEN AND ONLY WHEN their parent study is available
       # File is available WHEN AND ONLY WHEN at least one study which links to it is available
-      # Release dates of "null" or "yesterday" should result in a RELEASED state;
+      # Release dates of "null", "yesterday", or "today" should result in a RELEASED state;
       # "tomorrow" in an UNRELEASED state.
       | S1_RELEASE | S2_RELEASE | A1  | A2  | F1  | F2  | F3  | P1  | W2  |
       | null       | null       | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx |
-      | null       | tomorrow   | 2xx | 4xx | 2xx | 4xx | 2xx | 2xx | 4xx |
       | null       | yesterday  | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx |
-      | tomorrow   | tomorrow   | 4xx | 4xx | 4xx | 4xx | 4xx | 4xx | 4xx |
-      | tomorrow   | yesterday  | 4xx | 2xx | 4xx | 2xx | 2xx | 4xx | 2xx |
+      | null       | today      | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx |
+      | null       | tomorrow   | 2xx | 4xx | 2xx | 4xx | 2xx | 2xx | 4xx |
       | yesterday  | yesterday  | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx |
+      | yesterday  | today      | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx |
+      | yesterday  | tomorrow   | 2xx | 4xx | 2xx | 4xx | 2xx | 2xx | 4xx |
+      | today      | today      | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx |
+      | today      | tomorrow   | 2xx | 4xx | 2xx | 4xx | 2xx | 2xx | 4xx |
+      | tomorrow   | tomorrow   | 4xx | 4xx | 4xx | 4xx | 4xx | 4xx | 4xx |
