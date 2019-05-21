@@ -23,6 +23,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractorFromReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
@@ -45,19 +46,22 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
     private Map<String, Study> accessionsToStudy = new HashMap<>();
 
-    public SraObjectsImporterThroughDatabase(SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
-                                             SraXmlParser<StudyType> sraStudyXmlParser,
-                                             Converter<StudyType, Study> studyConverter,
-                                             PublicationExtractorFromStudy publicationExtractorFromStudy,
-                                             WebResourceExtractorFromStudy webResourceExtractorFromStudy,
-                                             TaxonomyExtractor taxonomyExtractor,
-                                             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
-                                             Converter<AnalysisType, Analysis> analysisConverter,
-                                             FileExtractorFromAnalysis fileExtractorFromAnalysis,
-                                             SraXmlParser<AssemblyType> sraAssemblyXmlParser,
-                                             Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
-                                             AnalysisRepository analysisRepository,
-                                             StudyRepository studyRepository) {
+    public SraObjectsImporterThroughDatabase(
+            SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
+            SraXmlParser<StudyType> sraStudyXmlParser,
+            Converter<StudyType, Study> studyConverter,
+            PublicationExtractorFromStudy publicationExtractorFromStudy,
+            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
+            TaxonomyExtractor taxonomyExtractor,
+            TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence,
+            SraXmlParser<AnalysisType> sraAnalysisXmlParser,
+            Converter<AnalysisType, Analysis> analysisConverter,
+            FileExtractorFromAnalysis fileExtractorFromAnalysis,
+            SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+            Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
+            AnalysisRepository analysisRepository,
+            StudyRepository studyRepository,
+            MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister) {
         super(
                 sraXmlRetrieverThroughDatabase,
                 sraStudyXmlParser,
@@ -69,9 +73,11 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                 publicationExtractorFromStudy,
                 webResourceExtractorFromStudy,
                 taxonomyExtractor,
+                taxonomyExtractorFromReferenceSequence,
                 fileExtractorFromAnalysis,
                 analysisRepository,
-                studyRepository
+                studyRepository,
+                metadataReferenceSequenceFinderOrPersister
         );
     }
 

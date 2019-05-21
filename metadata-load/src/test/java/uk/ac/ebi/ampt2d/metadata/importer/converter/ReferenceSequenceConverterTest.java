@@ -56,16 +56,10 @@ public class ReferenceSequenceConverterTest {
 
     private Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter;
 
-    @Autowired
-    private TaxonomyRepository taxonomyRepository;
-
-    @Autowired
-    private ReferenceSequenceRepository referenceSequenceRepository;
-
     @Before
     public void setUp() {
         xmlParser = new SraAssemblyXmlParser();
-        referenceSequenceConverter = new ReferenceSequenceConverter(taxonomyRepository, referenceSequenceRepository);
+        referenceSequenceConverter = new ReferenceSequenceConverter();
     }
 
     @Test
@@ -73,7 +67,6 @@ public class ReferenceSequenceConverterTest {
         String assemblyAccession = "GCA_000002305.1";
         AssemblyType assemblyType = getAssemblyType(ASSEMBLY_DOCUMENT_API_XML, assemblyAccession);
         ReferenceSequence referenceSequence = referenceSequenceConverter.convert(assemblyType);
-
         Assert.assertNotNull(referenceSequence);
         Assert.assertEquals(Arrays.asList(assemblyAccession), referenceSequence.getAccessions());
         Assert.assertEquals("EquCab2.0", referenceSequence.getName());

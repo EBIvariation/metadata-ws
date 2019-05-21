@@ -19,48 +19,22 @@ package uk.ac.ebi.ampt2d.metadata.importer.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
 
 import java.util.Arrays;
 
 public class ReferenceSequenceConverter implements Converter<AssemblyType, ReferenceSequence> {
 
-    private TaxonomyRepository taxonomyRepository;
-    private ReferenceSequenceRepository referenceSequenceRepository;
-
-    public ReferenceSequenceConverter(TaxonomyRepository taxonomyRepository,
-                                      ReferenceSequenceRepository referenceSequenceRepository) {
-        this.taxonomyRepository = taxonomyRepository;
-        this.referenceSequenceRepository = referenceSequenceRepository;
+    public ReferenceSequenceConverter() {
     }
 
     @Override
     public ReferenceSequence convert(AssemblyType assemblyType) {
-        Taxonomy taxonomy = findExistingorSaveandReturnTaxonomy(assemblyType);
-        return convertSaveAndReturnNewReferenceSequence(assemblyType, taxonomy);
-    }
-
-    private Taxonomy findExistingorSaveandReturnTaxonomy(AssemblyType assemblyType) {
-        long taxonomyId = assemblyType.getTAXON().getTAXONID();
-        Taxonomy taxonomy = taxonomyRepository.findByTaxonomyId(taxonomyId);
-        if (taxonomy == null) {
-            taxonomy = taxonomyRepository.save(new Taxonomy(taxonomyId, assemblyType.getTAXON().getSCIENTIFICNAME()));
-        }
-        return taxonomy;
-    }
-
-    private ReferenceSequence convertSaveAndReturnNewReferenceSequence(AssemblyType assemblyType, Taxonomy taxonomy) {
-        return referenceSequenceRepository.save(
-                new ReferenceSequence(
-                        assemblyType.getNAME(),
-                        "NOT_SPECIFIED",  // ENA only specifies accession+version, not the patch
-                        Arrays.asList(assemblyType.getAccession()),
-                        ReferenceSequence.Type.ASSEMBLY,  // ENA data model only has ASSEMBLY type
-                        taxonomy
-                )
+        return new ReferenceSequence(
+                assemblyType.getNAME(),
+                "NOT_SPECIFIED",  // ENA only specifies accession+version, not the patch
+                Arrays.asList(assemblyType.getAccession()),
+                ReferenceSequence.Type.ASSEMBLY  // ENA data model only has ASSEMBLY type
         );
     }
 
