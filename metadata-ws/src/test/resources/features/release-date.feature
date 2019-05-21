@@ -111,31 +111,9 @@ Feature: Transitive release date control for child objects of a Study
       "resourceUrl": "http://test-release-date.example.com"
     }
     """
-    Then set the URL to WEBRESOURCE2
-    And the response code should be 201
+    And set the URL to WEBRESOURCE2
+    Then the response code should be 201
     When I request PATCH STUDY2 with list WEBRESOURCE2 of resources
-    Then the response code should be 2xx
-
-    # Set both studies to released initially
-    When I request PATCH STUDY1 with patch and day null
-    Then the response code should be 200
-    When I request PATCH STUDY1 with patch and day today
-    Then the response code should be 200
-
-    # Make sure that all elements are available initially
-    When I request GET with value of ANALYSIS1
-    Then the response code should be 2xx
-    When I request GET with value of ANALYSIS2
-    Then the response code should be 2xx
-    When I request GET with value of FILE1
-    Then the response code should be 2xx
-    When I request GET with value of FILE2
-    Then the response code should be 2xx
-    When I request GET with value of FILE3
-    Then the response code should be 2xx
-    When I request GET with value of PUBLICATION1
-    Then the response code should be 2xx
-    When I request GET with value of WEBRESOURCE2
     Then the response code should be 2xx
 
     # Set release dates for studies according to the scenario
@@ -177,3 +155,37 @@ Feature: Transitive release date control for child objects of a Study
       | today      | today      | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx | 2xx |
       | today      | tomorrow   | 2xx | 4xx | 2xx | 4xx | 2xx | 2xx | 4xx |
       | tomorrow   | tomorrow   | 4xx | 4xx | 4xx | 4xx | 4xx | 4xx | 4xx |
+
+
+  Scenario Outline: patching Study between released and unreleased states must work both ways
+
+    # Create the common taxonomy
+    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and NONE for ancestors
+    And set the URL to TAXONOMY
+    Then the response code should be 201
+
+    # Create the study
+    When I create a study with TAXONOMY for taxonomy
+    And set the URL to STUDY
+    Then the response code should be 201
+
+    # Set original release date & check availability
+    When I request PATCH STUDY with patch and day <DATE1>
+    Then the response code should be 2xx
+    When I request GET with value of STUDY
+    Then the response code should be <CODE1>
+
+    # Set new release date & check availability
+    When I request PATCH STUDY with patch and day <DATE2>
+    Then the response code should be 2xx
+    When I request GET with value of STUDY
+    Then the response code should be <CODE2>
+
+    Examples:
+      | DATE1     | CODE1 | DATE2     | CODE2 |
+      | null      | 2xx   | tomorrow  | 4xx   |
+      | yesterday | 2xx   | tomorrow  | 4xx   |
+      | today     | 2xx   | tomorrow  | 4xx   |
+      | tomorrow  | 4xx   | null      | 2xx   |
+      | tomorrow  | 4xx   | yesterday | 2xx   |
+      | tomorrow  | 4xx   | today     | 2xx   |
