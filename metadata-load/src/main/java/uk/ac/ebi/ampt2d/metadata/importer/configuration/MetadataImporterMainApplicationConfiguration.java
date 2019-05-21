@@ -28,12 +28,14 @@ import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.ReferenceSequenceConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.StudyConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataAnalysisPersister;
+import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataReferenceSequenceFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataStudyFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraXmlRetrieverThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractorFromReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAssemblyXmlParser;
@@ -66,13 +68,15 @@ public class MetadataImporterMainApplicationConfiguration {
                 publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository),
                 taxonomyExtractor(taxonomyRepository),
+                taxonomyExtractorFromReferenceSequence(taxonomyRepository),
                 sraAnalysisXmlParser(),
                 analysisConverter(),
                 fileExtractorFromAnalysis(fileRepository),
                 sraAssemblyXmlParser(),
-                referenceSequenceConverter(taxonomyRepository, referenceSequenceRepository),
+                referenceSequenceConverter(),
                 metadataAnalysisPersister(analysisRepository),
-                metadataStudyFinderOrPersister(studyRepository)
+                metadataStudyFinderOrPersister(studyRepository),
+                metadataReferenceSequenceFinderOrPersister(referenceSequenceRepository)
         );
     }
 
@@ -93,13 +97,15 @@ public class MetadataImporterMainApplicationConfiguration {
                 publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository),
                 taxonomyExtractor(taxonomyRepository),
+                taxonomyExtractorFromReferenceSequence(taxonomyRepository),
                 sraAnalysisXmlParser(),
                 analysisConverter(),
                 fileExtractorFromAnalysis(fileRepository),
                 sraAssemblyXmlParser(),
-                referenceSequenceConverter(taxonomyRepository, referenceSequenceRepository),
+                referenceSequenceConverter(),
                 metadataAnalysisPersister(analysisRepository),
-                metadataStudyFinderOrPersister(studyRepository)
+                metadataStudyFinderOrPersister(studyRepository),
+                metadataReferenceSequenceFinderOrPersister(referenceSequenceRepository)
         );
     }
 
@@ -127,8 +133,18 @@ public class MetadataImporterMainApplicationConfiguration {
         return new MetadataAnalysisPersister(analysisRepository);
     }
 
+    private MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister(
+            ReferenceSequenceRepository referenceSequenceRepository) {
+        return new MetadataReferenceSequenceFinderOrPersister(referenceSequenceRepository);
+    }
+
     private TaxonomyExtractor taxonomyExtractor(TaxonomyRepository taxonomyRepository) {
         return new TaxonomyExtractor(taxonomyRepository);
+    }
+
+    private TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence(
+            TaxonomyRepository taxonomyRepository) {
+        return new TaxonomyExtractorFromReferenceSequence(taxonomyRepository);
     }
 
     private FileExtractorFromAnalysis fileExtractorFromAnalysis(FileRepository fileRepository) {
@@ -147,8 +163,7 @@ public class MetadataImporterMainApplicationConfiguration {
         return new WebResourceExtractorFromStudy(webResourceRepository);
     }
 
-    private ReferenceSequenceConverter referenceSequenceConverter(
-            TaxonomyRepository taxonomyRepository,ReferenceSequenceRepository referenceSequenceRepository) {
-        return new ReferenceSequenceConverter(taxonomyRepository, referenceSequenceRepository);
+    private ReferenceSequenceConverter referenceSequenceConverter() {
+        return new ReferenceSequenceConverter();
     }
 }

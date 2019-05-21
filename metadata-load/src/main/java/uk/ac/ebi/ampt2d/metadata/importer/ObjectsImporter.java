@@ -20,16 +20,19 @@ package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataAnalysisPersister;
+import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataReferenceSequenceFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataStudyFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractorFromReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
@@ -53,6 +56,8 @@ public abstract class ObjectsImporter {
 
     protected MetadataStudyFinderOrPersister metadataStudyFinderOrPersister;
 
+    protected MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister;
+
     private SraXmlParser<StudyType> sraStudyXmlParser;
 
     private SraXmlParser<AnalysisType> sraAnalysisXmlParser;
@@ -71,6 +76,8 @@ public abstract class ObjectsImporter {
 
     private TaxonomyExtractor taxonomyExtractor;
 
+    private TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence;
+
     private FileExtractorFromAnalysis fileExtractorFromAnalysis;
 
     public ObjectsImporter(SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
@@ -83,9 +90,11 @@ public abstract class ObjectsImporter {
                            PublicationExtractorFromStudy publicationExtractorFromStudy,
                            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
                            TaxonomyExtractor taxonomyExtractor,
+                           TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence,
                            FileExtractorFromAnalysis fileExtractorFromAnalysis,
                            MetadataAnalysisPersister metadataAnalysisPersister,
-                           MetadataStudyFinderOrPersister metadataStudyFinderOrPersister) {
+                           MetadataStudyFinderOrPersister metadataStudyFinderOrPersister,
+                           MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
@@ -96,9 +105,11 @@ public abstract class ObjectsImporter {
         this.publicationExtractorFromStudy = publicationExtractorFromStudy;
         this.webResourceExtractorFromStudy = webResourceExtractorFromStudy;
         this.taxonomyExtractor = taxonomyExtractor;
+        this.taxonomyExtractorFromReferenceSequence = taxonomyExtractorFromReferenceSequence;
         this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
         this.metadataAnalysisPersister = metadataAnalysisPersister;
         this.metadataStudyFinderOrPersister = metadataStudyFinderOrPersister;
+        this.metadataReferenceSequenceFinderOrPersister = metadataReferenceSequenceFinderOrPersister;
     }
 
     public Study importStudy(String accession) {
@@ -156,6 +167,10 @@ public abstract class ObjectsImporter {
             String assemblyXml = sraXmlRetrieverByAccession.getXml(accession);
             AssemblyType assembly = sraAssemblyXmlParser.parseXml(assemblyXml, accession);
             referenceSequence = referenceSequenceConverter.convert(assembly);
+            Taxonomy taxonomy = taxonomyExtractorFromReferenceSequence.getTaxonomy(assembly.getTAXON());
+            referenceSequence.setTaxonomy(taxonomy);
+            referenceSequence = metadataReferenceSequenceFinderOrPersister.findOrPersistReferenceSequence(
+                    referenceSequence);
         } catch (Exception exception) {
             IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for ReferenceSequence accession " + accession);
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());

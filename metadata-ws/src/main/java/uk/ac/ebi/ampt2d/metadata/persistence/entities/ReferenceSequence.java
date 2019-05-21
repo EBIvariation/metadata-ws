@@ -94,12 +94,11 @@ public class ReferenceSequence extends Auditable<Long> {
 
     public ReferenceSequence() {}
 
-    public ReferenceSequence(String name, String patch, List<String> accessions, Type type, Taxonomy taxonomy) {
+    public ReferenceSequence(String name, String patch, List<String> accessions, Type type) {
         this.name = name;
         this.patch = patch;
         this.accessions = accessions;
         this.type = type;
-        this.taxonomy = taxonomy;
     }
 
     @Override
@@ -122,4 +121,9 @@ public class ReferenceSequence extends Auditable<Long> {
     public Taxonomy getTaxonomy() {
         return taxonomy;
     }
+
+    public void setTaxonomy(Taxonomy taxonomy) {
+        this.taxonomy = taxonomy;
+    }
+
 }
