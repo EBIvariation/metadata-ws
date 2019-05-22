@@ -51,7 +51,6 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(MetadataImporterMainApplication.class, args);
-
     }
 
     /**
