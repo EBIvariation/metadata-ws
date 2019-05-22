@@ -62,7 +62,7 @@ public class MetadataImporterMainApplicationDBTest {
 
         sraObjectsImporterThroughDatabase.getAccessionsToStudy().clear();
 
-        /** Import analysis having shared study that are already imported before**/
+        // Import analysis having shared study that is already imported before
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
                 new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessionsSharedStudyPreviousImport.txt"}));
         assertEquals(2, studyRepository.count());

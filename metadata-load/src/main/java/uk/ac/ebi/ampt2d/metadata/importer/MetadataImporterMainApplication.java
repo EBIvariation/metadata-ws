@@ -22,6 +22,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughAPI;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 
 import java.io.IOException;
@@ -53,13 +54,24 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
 
     }
 
+    /**
+     * This method executes the task of importing studies or analyses based on import source.
+     * We are starting with analyses in case of objects import through database because the study xmls in database
+     * does not contain analysis accessions to import.
+     *
+     * @param applicationArguments
+     */
     @Override
     public void run(ApplicationArguments applicationArguments) throws Exception {
         Set<String> accessions = readAccessionsFromFile(applicationArguments);
         if (objectsImporter instanceof SraObjectsImporterThroughDatabase) {
             accessions.parallelStream().forEach(accession -> objectsImporter.importAnalysis(accession));
         } else {
-            accessions.parallelStream().forEach(accession -> objectsImporter.importStudy(accession));
+            if (objectsImporter instanceof SraObjectsImporterThroughAPI) {
+                accessions.parallelStream().forEach(accession -> objectsImporter.importStudy(accession));
+            } else {
+                throw new RuntimeException("ObjectsImporter instance not known/supported");
+            }
         }
     }
 

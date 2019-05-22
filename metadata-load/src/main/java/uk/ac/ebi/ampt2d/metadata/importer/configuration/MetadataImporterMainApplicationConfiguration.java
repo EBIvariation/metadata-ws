@@ -48,13 +48,13 @@ public class MetadataImporterMainApplicationConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "API")
-    public ObjectsImporter objectImporterForNonEga(SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
-                                                   PublicationRepository publicationRepository,
-                                                   WebResourceRepository webResourceRepository,
-                                                   FileRepository fileRepository,
-                                                   TaxonomyRepository taxonomyRepository,
-                                                   AnalysisRepository analysisRepository,
-                                                   StudyRepository studyRepository) {
+    public ObjectsImporter objectImporterThroughEnaApi(SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
+                                                       PublicationRepository publicationRepository,
+                                                       WebResourceRepository webResourceRepository,
+                                                       FileRepository fileRepository,
+                                                       TaxonomyRepository taxonomyRepository,
+                                                       AnalysisRepository analysisRepository,
+                                                       StudyRepository studyRepository) {
         return new SraObjectsImporterThroughAPI(sraXmlRetrieverThroughApi, sraStudyXmlParser(),
                 studyConverter(), publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository), taxonomyExtractor(taxonomyRepository),
@@ -64,13 +64,14 @@ public class MetadataImporterMainApplicationConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "DB")
-    public ObjectsImporter objectImporterForEga(SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
-                                                PublicationRepository publicationRepository,
-                                                WebResourceRepository webResourceRepository,
-                                                FileRepository fileRepository,
-                                                TaxonomyRepository taxonomyRepository,
-                                                AnalysisRepository analysisRepository,
-                                                StudyRepository studyRepository) {
+    public ObjectsImporter objectImporterThroughEnaDatabase(
+            SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
+            PublicationRepository publicationRepository,
+            WebResourceRepository webResourceRepository,
+            FileRepository fileRepository,
+            TaxonomyRepository taxonomyRepository,
+            AnalysisRepository analysisRepository,
+            StudyRepository studyRepository) {
         return new SraObjectsImporterThroughDatabase(sraXmlRetrieverThroughDatabase, sraStudyXmlParser(),
                 studyConverter(), publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository), taxonomyExtractor(taxonomyRepository),
