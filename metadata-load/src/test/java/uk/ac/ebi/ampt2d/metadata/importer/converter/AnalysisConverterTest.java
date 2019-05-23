@@ -18,7 +18,6 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.converter;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -53,7 +52,7 @@ public class AnalysisConverterTest {
 
     private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "analysis/AnalysisDocumentDB.xml";
 
-    private Converter<AnalysisType,Analysis> analysisConverter;
+    private Converter<AnalysisType, Analysis> analysisConverter;
 
     private SraXmlParser<AnalysisType> analysisTypeSraXmlParser;
 
