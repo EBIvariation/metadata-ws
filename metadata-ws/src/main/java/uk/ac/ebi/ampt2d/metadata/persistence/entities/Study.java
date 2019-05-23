@@ -203,14 +203,6 @@ public class Study extends Auditable<Long> {
         this.resources = resources;
     }
 
-    public void setResource(WebResource resource) {
-        List<WebResource> resources = this.getResources();
-        if (resources == null) {
-            resources = new ArrayList<>();
-        }
-        resources.add(resource);
-    }
-
     public List<Publication> getPublications() {
         return publications;
     }
