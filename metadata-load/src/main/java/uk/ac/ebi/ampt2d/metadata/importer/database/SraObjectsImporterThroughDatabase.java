@@ -31,6 +31,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
@@ -61,7 +62,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
             AnalysisRepository analysisRepository,
             StudyRepository studyRepository,
-            MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister) {
+            ReferenceSequenceRepository referenceSequenceRepository) {
         super(
                 sraXmlRetrieverThroughDatabase,
                 sraStudyXmlParser,
@@ -77,7 +78,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                 fileExtractorFromAnalysis,
                 analysisRepository,
                 studyRepository,
-                metadataReferenceSequenceFinderOrPersister
+                referenceSequenceRepository
         );
     }
 

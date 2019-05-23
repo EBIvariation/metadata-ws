@@ -17,20 +17,14 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QReferenceSequence;
 
-import java.util.List;
-
 @RepositoryRestResource(collectionResourceRel = "reference-sequences", path = "reference-sequences")
-public interface ReferenceSequenceRepository extends PagingAndSortingRepository<ReferenceSequence, Long>,
-        QueryDslPredicateExecutor<ReferenceSequence>, QuerydslBinderCustomizer<QReferenceSequence> {
+public interface ReferenceSequenceRepository extends ReferenceSequenceCustomRepository,
+        QuerydslBinderCustomizer<QReferenceSequence> {
 
     default void customize(QuerydslBindings bindings, QReferenceSequence referenceSequence) {
         bindings.bind(referenceSequence.name, referenceSequence.patch)
@@ -38,7 +32,5 @@ public interface ReferenceSequenceRepository extends PagingAndSortingRepository<
         bindings.bind(referenceSequence.accessions)
                 .first((path, value) -> path.any().equalsIgnoreCase(value.iterator().next()));
     }
-
-    ReferenceSequence findByAccessions(@Param("accessions") List<String> accessions);
 
 }

@@ -27,7 +27,6 @@ import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.ReferenceSequenceConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.StudyConverter;
-import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataReferenceSequenceFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraXmlRetrieverThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
@@ -74,7 +73,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 referenceSequenceConverter(),
                 analysisRepository,
                 studyRepository,
-                metadataReferenceSequenceFinderOrPersister(referenceSequenceRepository)
+                referenceSequenceRepository
         );
     }
 
@@ -103,7 +102,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 referenceSequenceConverter(),
                 analysisRepository,
                 studyRepository,
-                metadataReferenceSequenceFinderOrPersister(referenceSequenceRepository)
+                referenceSequenceRepository
         );
     }
 
@@ -121,11 +120,6 @@ public class MetadataImporterMainApplicationConfiguration {
 
     private SraAnalysisXmlParser sraAnalysisXmlParser() {
         return new SraAnalysisXmlParser();
-    }
-
-    private MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister(
-            ReferenceSequenceRepository referenceSequenceRepository) {
-        return new MetadataReferenceSequenceFinderOrPersister(referenceSequenceRepository);
     }
 
     private TaxonomyExtractor taxonomyExtractor(TaxonomyRepository taxonomyRepository) {

@@ -20,7 +20,6 @@ package uk.ac.ebi.ampt2d.metadata.importer.api;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
-import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataReferenceSequenceFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
@@ -32,6 +31,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
@@ -60,7 +60,7 @@ public class SraObjectsImporterThroughAPI extends ObjectsImporter {
             Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
             AnalysisRepository analysisRepository,
             StudyRepository studyRepository,
-            MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister) {
+            ReferenceSequenceRepository referenceSequenceRepository) {
         super(
                 sraXmlRetrieverThroughApi,
                 sraStudyXmlParser,
@@ -76,7 +76,7 @@ public class SraObjectsImporterThroughAPI extends ObjectsImporter {
                 fileExtractorFromAnalysis,
                 analysisRepository,
                 studyRepository,
-                metadataReferenceSequenceFinderOrPersister
+                referenceSequenceRepository
         );
     }
 

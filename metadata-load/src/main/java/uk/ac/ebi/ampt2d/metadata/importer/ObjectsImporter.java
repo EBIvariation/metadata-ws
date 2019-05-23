@@ -19,7 +19,6 @@
 package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.springframework.core.convert.converter.Converter;
-import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataReferenceSequenceFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
@@ -31,6 +30,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
@@ -56,7 +56,7 @@ public abstract class ObjectsImporter {
 
     protected AnalysisRepository analysisRepository;
 
-    protected MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister;
+    protected ReferenceSequenceRepository referenceSequenceRepository;
 
     private SraXmlParser<StudyType> sraStudyXmlParser;
 
@@ -94,7 +94,7 @@ public abstract class ObjectsImporter {
                            FileExtractorFromAnalysis fileExtractorFromAnalysis,
                            AnalysisRepository analysisRepository,
                            StudyRepository studyRepository,
-                           MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister) {
+                           ReferenceSequenceRepository referenceSequenceRepository) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
@@ -109,7 +109,7 @@ public abstract class ObjectsImporter {
         this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
         this.analysisRepository = analysisRepository;
         this.studyRepository = studyRepository;
-        this.metadataReferenceSequenceFinderOrPersister = metadataReferenceSequenceFinderOrPersister;
+        this.referenceSequenceRepository = referenceSequenceRepository;
     }
 
     public Study importStudy(String accession) {
@@ -169,8 +169,7 @@ public abstract class ObjectsImporter {
             referenceSequence = referenceSequenceConverter.convert(assembly);
             Taxonomy taxonomy = taxonomyExtractorFromReferenceSequence.getTaxonomy(assembly.getTAXON());
             referenceSequence.setTaxonomy(taxonomy);
-            referenceSequence = metadataReferenceSequenceFinderOrPersister.findOrPersistReferenceSequence(
-                    referenceSequence);
+            referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
         } catch (Exception exception) {
             IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for ReferenceSequence accession " + accession);
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());

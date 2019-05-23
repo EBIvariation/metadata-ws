@@ -16,32 +16,29 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.importer.database;
+package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.repository.NoRepositoryBean;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 
-public class MetadataReferenceSequenceFinderOrPersister {
+import java.util.List;
 
-    private ReferenceSequenceRepository referenceSequenceRepository;
+@NoRepositoryBean
+public interface ReferenceSequenceCustomRepository extends PagingAndSortingRepository<ReferenceSequence, Long>,
+        QueryDslPredicateExecutor<ReferenceSequence> {
 
-    public MetadataReferenceSequenceFinderOrPersister(ReferenceSequenceRepository referenceSequenceRepository) {
-        this.referenceSequenceRepository = referenceSequenceRepository;
-    }
+    ReferenceSequence findByAccessions(@Param("accessions") List<String> accessions);
 
-    public ReferenceSequence findOrPersistReferenceSequence(ReferenceSequence referenceSequence) {
+    default ReferenceSequence findOrSave(ReferenceSequence referenceSequence) {
         /* The below find query will make sure to return the same reference sequence when analyses sharing same
         reference sequence are imported in different runs */
-        ReferenceSequence existingReferenceSequence = referenceSequenceRepository.findByAccessions(
-                referenceSequence.getAccessions());
+        ReferenceSequence existingReferenceSequence = findByAccessions(referenceSequence.getAccessions());
         if (existingReferenceSequence != null) {
             return existingReferenceSequence;
         }
-        return persistReferenceSequence(referenceSequence);
+        return save(referenceSequence);
     }
-
-    private ReferenceSequence persistReferenceSequence(ReferenceSequence referenceSequence) {
-        return referenceSequenceRepository.save(referenceSequence);
-    }
-
 }
