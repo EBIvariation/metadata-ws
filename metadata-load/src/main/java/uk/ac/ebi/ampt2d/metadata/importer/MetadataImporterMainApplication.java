@@ -56,7 +56,7 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
     /**
      * This method executes the task of importing studies or analyses based on import source.
      * We are starting with analyses in case of objects import through database because the study xmls in database
-     * does not contain analysis accessions to import.
+     * do not contain analysis accessions to import.
      *
      * @param applicationArguments
      */
@@ -65,12 +65,10 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
         Set<String> accessions = readAccessionsFromFile(applicationArguments);
         if (objectsImporter instanceof SraObjectsImporterThroughDatabase) {
             accessions.parallelStream().forEach(accession -> objectsImporter.importAnalysis(accession));
+        } else if (objectsImporter instanceof SraObjectsImporterThroughAPI) {
+            accessions.parallelStream().forEach(accession -> objectsImporter.importStudy(accession));
         } else {
-            if (objectsImporter instanceof SraObjectsImporterThroughAPI) {
-                accessions.parallelStream().forEach(accession -> objectsImporter.importStudy(accession));
-            } else {
-                throw new RuntimeException("ObjectsImporter instance not known/supported");
-            }
+            throw new RuntimeException("ObjectsImporter instance not known/supported");
         }
     }
 

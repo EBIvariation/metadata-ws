@@ -29,7 +29,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import java.util.List;
 
 @RepositoryRestResource
-public interface StudyRepository extends StudyCustomRepository, QuerydslBinderCustomizer<QStudy> {
+public interface StudyRepository extends StudyRepositoryCustom, QuerydslBinderCustomizer<QStudy> {
 
     default void customize(QuerydslBindings bindings, QStudy study) {
         bindings.bind(study.analyses.any().referenceSequences.any().name,

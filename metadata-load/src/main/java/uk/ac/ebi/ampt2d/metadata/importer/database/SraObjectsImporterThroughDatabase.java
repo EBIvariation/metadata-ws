@@ -26,7 +26,6 @@ import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
@@ -106,7 +105,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         }
         Study study = importStudy(studyAccession);
 
-         /* The below find query will make sure to return shared study when analyses sharing same study are imported
+        /* The below find query will make sure to return shared study when analyses sharing same study are imported
           in different runs */
         study = studyRepository.findOrSave(study);
         accessionsToStudy.put(studyAccession, study);

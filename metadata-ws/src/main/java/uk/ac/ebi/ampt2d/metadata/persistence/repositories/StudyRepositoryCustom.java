@@ -25,7 +25,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 
 @NoRepositoryBean
-public interface StudyCustomRepository extends PagingAndSortingRepository<Study, Long>,
+public interface StudyRepositoryCustom extends PagingAndSortingRepository<Study, Long>,
         QueryDslPredicateExecutor<Study> {
 
     QStudy qStudy = QStudy.study;
