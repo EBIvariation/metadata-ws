@@ -21,4 +21,6 @@ package uk.ac.ebi.ampt2d.metadata.importer.database;
 public interface EnaObjectQuery {
 
     String STUDY_QUERY = "SELECT STUDY_XML FROM ERA.STUDY WHERE STUDY_ID = :accession";
+
+    String ANALYSIS_QUERY = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS WHERE ANALYSIS_ID = :accession";
 }

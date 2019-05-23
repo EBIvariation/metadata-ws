@@ -22,8 +22,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughAPI;
+import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -45,22 +45,31 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
 
     private ObjectsImporter objectsImporter;
 
-    private StudyRepository studyRepository;
-
-    public MetadataImporterMainApplication(ObjectsImporter objectsImporter, StudyRepository studyRepository) {
+    public MetadataImporterMainApplication(ObjectsImporter objectsImporter) {
         this.objectsImporter = objectsImporter;
-        this.studyRepository = studyRepository;
     }
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(MetadataImporterMainApplication.class, args);
     }
 
+    /**
+     * This method executes the task of importing studies or analyses based on import source.
+     * We are starting with analyses in case of objects import through database because the study xmls in database
+     * do not contain analysis accessions to import.
+     *
+     * @param applicationArguments
+     */
     @Override
     public void run(ApplicationArguments applicationArguments) throws Exception {
         Set<String> accessions = readAccessionsFromFile(applicationArguments);
-        List<Study> studies = objectsImporter.importStudy(accessions);
-        studyRepository.save(studies);
+        if (objectsImporter instanceof SraObjectsImporterThroughDatabase) {
+            accessions.parallelStream().forEach(accession -> objectsImporter.importAnalysis(accession));
+        } else if (objectsImporter instanceof SraObjectsImporterThroughAPI) {
+            accessions.parallelStream().forEach(accession -> objectsImporter.importStudy(accession));
+        } else {
+            throw new RuntimeException("ObjectsImporter instance not known/supported");
+        }
     }
 
     private Set<String> readAccessionsFromFile(ApplicationArguments applicationArguments) {

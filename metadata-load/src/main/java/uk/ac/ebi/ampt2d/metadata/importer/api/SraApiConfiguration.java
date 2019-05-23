@@ -16,20 +16,19 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.importer.configuration;
+package uk.ac.ebi.ampt2d.metadata.importer.api;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import uk.ac.ebi.ampt2d.metadata.importer.SraRetrieverByAccession;
-import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectRetrieverThroughApi;
+import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 
 @Configuration
 @ConditionalOnProperty(name = "import.source", havingValue = "API")
 public class SraApiConfiguration {
 
     @Bean
-    public SraRetrieverByAccession sraRetrieverByAccessionFromAPI() {
-        return new SraObjectRetrieverThroughApi();
+    public SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi() {
+        return new SraXmlRetrieverThroughApi();
     }
 }

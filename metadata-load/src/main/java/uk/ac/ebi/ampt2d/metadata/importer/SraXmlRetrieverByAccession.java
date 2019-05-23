@@ -17,7 +17,7 @@
  */
 package uk.ac.ebi.ampt2d.metadata.importer;
 
-public interface SraRetrieverByAccession {
+public interface SraXmlRetrieverByAccession {
 
     String getXml(String accession);
 

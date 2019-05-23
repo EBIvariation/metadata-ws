@@ -18,16 +18,18 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.DefaultApplicationArguments;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.database.OracleDbCategory;
+import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import static org.junit.Assert.assertEquals;
@@ -35,25 +37,36 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @TestPropertySource(value = "classpath:application.properties", properties = "import.source=DB")
 @ContextConfiguration(classes = {MetadataImporterMainApplication.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class MetadataImporterMainApplicationDBTest {
 
     @Autowired
     private MetadataImporterMainApplication metadataImporterMainApplication;
 
     @Autowired
+    private SraObjectsImporterThroughDatabase sraObjectsImporterThroughDatabase;
+
+    @Autowired
     private StudyRepository studyRepository;
 
-    @Before
-    public void setUp() {
-        studyRepository.deleteAll();
-    }
+    @Autowired
+    private AnalysisRepository analysisRepository;
 
     @Test
     @Category(OracleDbCategory.class)
     public void run() throws Exception {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
-                new String[]{"--accessions.file.path=study/EgaStudyAccessions.txt"}));
+                new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessions.txt"}));
         assertEquals(2, studyRepository.count());
+        assertEquals(6, analysisRepository.count());
+
+        sraObjectsImporterThroughDatabase.getAccessionsToStudy().clear();
+
+        // Import analysis having shared study that is already imported before
+        metadataImporterMainApplication.run(new DefaultApplicationArguments(
+                new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessionsSharedStudyPreviousImport.txt"}));
+        assertEquals(2, studyRepository.count());
+        assertEquals(11, analysisRepository.count());
     }
 
 }

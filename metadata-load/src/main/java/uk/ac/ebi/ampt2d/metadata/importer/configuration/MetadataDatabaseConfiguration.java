@@ -60,7 +60,7 @@ public class MetadataDatabaseConfiguration {
     @Bean(name = "metadataEntityManagerFactory")
     @ConfigurationProperties(prefix = "metadata")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder,
-                                                            @Qualifier("metadataDatasource") DataSource dataSource) {
+                                                                       @Qualifier("metadataDatasource") DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean localContainerEntityManagerFactoryBean =
                 builder.dataSource(dataSource)
                         .packages("uk.ac.ebi.ampt2d.metadata.persistence.entities")

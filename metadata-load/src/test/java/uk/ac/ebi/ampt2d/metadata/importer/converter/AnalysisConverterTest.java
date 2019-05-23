@@ -22,20 +22,20 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraApiConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataDatabaseConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataImporterMainApplicationConfiguration;
-import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
-import uk.ac.ebi.ena.sra.xml.StudyType;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -46,52 +46,46 @@ import static org.junit.Assert.assertNotNull;
         SraApiConfiguration.class})
 @EnableAutoConfiguration
 @TestPropertySource(locations = "classpath:application.properties", properties = {"import.source=API"})
-public class StudyConverterTest {
+public class AnalysisConverterTest {
 
-    private static final String STUDY_DOCUMENT_API_XML = "study/StudyDocumentAPI.xml";
+    private static final String ANALYSIS_DOCUMENT_API_XML = "analysis/AnalysisDocumentAPI.xml";
 
-    private static final String STUDY_DOCUMENT_DATABASE_XML = "study/StudyDocumentDB.xml";
+    private static final String ANALYSIS_DOCUMENT_DATABASE_XML = "analysis/AnalysisDocumentDB.xml";
 
-    private SraXmlParser<StudyType> xmlParser;
+    private Converter<AnalysisType, Analysis> analysisConverter;
 
-    private StudyConverter studyConverter;
+    private SraXmlParser<AnalysisType> analysisTypeSraXmlParser;
 
     @Before
     public void setUp() {
-        xmlParser = new SraStudyXmlParser();
-        studyConverter = new StudyConverter();
+        analysisTypeSraXmlParser = new SraAnalysisXmlParser();
+        analysisConverter = new AnalysisConverter();
     }
 
     @Test
     public void convertFromApiXml() throws Exception {
-        String studyAccession = "ERP015186";
-        StudyType studyType = getStudyType(STUDY_DOCUMENT_API_XML, studyAccession);
-        Study study = studyConverter.convert(studyType);
-
-        assertNotNull(study);
-        assertEquals(studyAccession, study.getAccessionVersionId().getAccession());
-        assertEquals("Whole genome resequencing of the human parasite Schistosoma mansoni reveals population history\n" +
-                "                and effects of selection", study.getName());
-        assertEquals(LocalDate.parse("2016-04-20"), study.getReleaseDate());
-        assertEquals("Wellcome Trust Sanger Institute", study.getCenter());
+        String accession = "ERZ496533";
+        AnalysisType analysisType = getAnalysisType(ANALYSIS_DOCUMENT_API_XML, accession);
+        Analysis analysis = analysisConverter.convert(analysisType);
+        assertNotNull(analysis);
+        assertEquals(accession, analysis.getAccessionVersionId().getAccession());
+        assertEquals(Analysis.Technology.EXOME_SEQUENCING, analysis.getTechnology());
     }
 
     @Test
-    public void convertFromDbXml() throws Exception {
-        String studyAccession = "ERP000332";
-        StudyType studyType = getStudyType(STUDY_DOCUMENT_DATABASE_XML, studyAccession);
-        Study study = studyConverter.convert(studyType);
-        assertNotNull(study);
-        assertEquals(studyAccession, study.getAccessionVersionId().getAccession());
-        assertEquals("Breast Cancer Follow Up Series", study.getName());
-        assertEquals(LocalDate.parse("9999-12-31"), study.getReleaseDate());
-        assertEquals("SC", study.getCenter());
+    public void convertFromDBXml() throws Exception {
+        String accession = "ERZ000011";
+        AnalysisType analysisType = getAnalysisType(ANALYSIS_DOCUMENT_DATABASE_XML, accession);
+        Analysis analysis = analysisConverter.convert(analysisType);
+        assertNotNull(analysis);
+        assertEquals(accession, analysis.getAccessionVersionId().getAccession());
+        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
     }
 
-    private StudyType getStudyType(String xml, String accession) throws Exception {
+    private AnalysisType getAnalysisType(String xml, String accession) throws Exception {
         String xmlString = new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(xml).toURI())));
-        return xmlParser.parseXml(xmlString, accession);
+        return analysisTypeSraXmlParser.parseXml(xmlString, accession);
     }
 
 }

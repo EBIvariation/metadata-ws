@@ -38,7 +38,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
@@ -57,8 +56,9 @@ public class Analysis extends Auditable<Long> {
 
         TUMOR,
 
-        MATCHED_NORMAL
+        MATCHED_NORMAL,
 
+        UNSPECIFIED
     }
 
     public enum Technology {
@@ -71,7 +71,7 @@ public class Analysis extends Auditable<Long> {
 
         ARRAY,
 
-        CURATION ,
+        CURATION,
 
         UNSPECIFIED
 
@@ -143,18 +143,14 @@ public class Analysis extends Auditable<Long> {
     public Analysis() {
     }
 
-    public Analysis(AccessionVersionId accessionVersionId, String name, String description,
-                    Study study, List<ReferenceSequence> referenceSequences, Technology technology,
-                    String platform, List<File> files, List<Sample> samples) {
+    public Analysis(AccessionVersionId accessionVersionId, String name, String description, Type type,
+                    Technology technology, String platform) {
         this.accessionVersionId = accessionVersionId;
         this.name = name;
         this.description = description;
-        this.study = study;
-        this.referenceSequences = referenceSequences;
+        this.type = type;
         this.technology = technology;
         this.platform = platform;
-        this.files = files;
-        this.samples=samples;
     }
 
     @Override
@@ -172,6 +168,7 @@ public class Analysis extends Auditable<Long> {
 
     public void setStudy(Study study) {
         this.study = study;
+        study.setAnalysis(this);
     }
 
     public Technology getTechnology() {
@@ -182,11 +179,19 @@ public class Analysis extends Auditable<Long> {
         return files;
     }
 
+    public void setFiles(List<File> files) {
+        this.files = files;
+    }
+
     public List<ReferenceSequence> getReferenceSequences() {
         return referenceSequences;
     }
 
     public void setReferenceSequences(List<ReferenceSequence> referenceSequences) {
         this.referenceSequences = referenceSequences;
+    }
+
+    public void setSamples(List<Sample> samples) {
+        this.samples = samples;
     }
 }

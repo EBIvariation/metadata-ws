@@ -21,10 +21,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.NotBlank;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -38,8 +38,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
@@ -104,7 +104,7 @@ public class Study extends Auditable<Long> {
     @OneToMany
     private List<Study> childStudies;
 
-    @OneToMany(mappedBy = "study", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "study",fetch = FetchType.EAGER)
     private List<Analysis> analyses;
 
     @OneToMany
@@ -117,14 +117,12 @@ public class Study extends Auditable<Long> {
     }
 
     public Study(AccessionVersionId accessionVersionId, String name, String description, String center,
-                 LocalDate
-                         releaseDate, Taxonomy taxonomy) {
+                 LocalDate releaseDate) {
         this.accessionVersionId = accessionVersionId;
         this.name = name;
         this.description = description;
         this.center = center;
         this.releaseDate = releaseDate;
-        this.taxonomy = taxonomy;
     }
 
     @Override
@@ -192,23 +190,25 @@ public class Study extends Auditable<Long> {
         return analyses;
     }
 
-    public void setAnalyses(List<Analysis> analyses) {
-        for (Analysis analysis : analyses) {
-            analysis.setStudy(this);
-            this.getAnalyses().add(analysis);
+    public void setAnalysis(Analysis analysis) {
+        List<Analysis> analyses = this.getAnalyses();
+        if (analyses == null) {
+            analyses = new ArrayList<>();
         }
+        analyses.add(analysis);
+        this.analyses = analyses;
     }
 
     public List<WebResource> getResources() {
         return resources;
     }
 
-    public List<Publication> getPublications() {
-        return publications;
-    }
-
     public void setResources(List<WebResource> resources) {
         this.resources = resources;
+    }
+
+    public List<Publication> getPublications() {
+        return publications;
     }
 
     public void setPublications(List<Publication> publications) {

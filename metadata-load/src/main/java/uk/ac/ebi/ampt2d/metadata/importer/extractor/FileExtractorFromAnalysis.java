@@ -19,9 +19,10 @@
 package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 
 import org.springframework.core.convert.converter.Converter;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.FileConverter;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QFile;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
@@ -36,6 +37,8 @@ public class FileExtractorFromAnalysis {
 
     private static final Logger FILE_EXTRACT_SERVICE_LOGGER = Logger.getLogger(FileExtractorFromAnalysis.class.getName());
 
+    private static final QFile qFile = QFile.file;
+
     private Converter<AnalysisFileType, File> fileConverter;
 
     private FileRepository fileRepository;
@@ -45,14 +48,21 @@ public class FileExtractorFromAnalysis {
         this.fileConverter = new FileConverter();
     }
 
-    public List<File> extractFilesFromAnalysis(AnalysisType analysisType) {
+    public List<File> getFiles(AnalysisType analysisType) {
         List<File> files = new ArrayList<>();
         try {
             files = getFilesOfAnalysis(analysisType);
-            fileRepository.save(files);
+            return files.parallelStream().map(file -> {
+                File fileInDb = fileRepository.findOne(qFile.name.eq(file.getName())
+                        .and(qFile.hash.eq(file.getHash())));
+                if (fileInDb != null) {
+                    return fileInDb;
+                }
+                return fileRepository.save(file);
+            }).collect(Collectors.toList());
         } catch (Exception exception) {
-            FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, "Encountered Exception for analysis files"
-                    + analysisType.getAccession());
+            String message = "Encountered exception when extracting files from analysis ";
+            FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, message + analysisType.getAccession());
             FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, exception.getMessage());
         }
         return files;

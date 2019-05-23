@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata.importer.configuration;
+package uk.ac.ebi.ampt2d.metadata.importer.database;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -25,8 +25,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectRetrieverThroughDatabase;
-import uk.ac.ebi.ampt2d.metadata.importer.database.EnaObjectQuery;
 
 import javax.sql.DataSource;
 
@@ -58,7 +56,7 @@ public class SraDatabaseConfiguration {
     }
 
     @Bean
-    public SraObjectRetrieverThroughDatabase sraDatabaseAnalysisRetriever() {
-        return new SraObjectRetrieverThroughDatabase(enaJdbcTemplate(), EnaObjectQuery.STUDY_QUERY);
+    public SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase() {
+        return new SraXmlRetrieverThroughDatabase(enaJdbcTemplate(), EnaObjectQuery.STUDY_QUERY);
     }
 }
