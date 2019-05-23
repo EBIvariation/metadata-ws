@@ -26,9 +26,12 @@ import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
@@ -39,6 +42,8 @@ import java.util.Map;
  * This importer is mainly used for EGA studies where Study XML doesn't have analysis accessions
  */
 public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
+
+    private static QStudy qStudy = QStudy.study;
 
     private Map<String, Study> accessionsToStudy = new HashMap<>();
 
@@ -51,11 +56,11 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                                              SraXmlParser<AnalysisType> sraAnalysisXmlParser,
                                              Converter<AnalysisType, Analysis> analysisConverter,
                                              FileExtractorFromAnalysis fileExtractorFromAnalysis,
-                                             MetadataAnalysisPersister metadataAnalysisPersister,
-                                             MetadataStudyFinderOrPersister metadataStudyFinderOrPersister) {
+                                             AnalysisRepository analysisRepository,
+                                             StudyRepository studyRepository) {
         super(sraXmlRetrieverThroughDatabase, sraStudyXmlParser, sraAnalysisXmlParser, studyConverter, analysisConverter,
                 publicationExtractorFromStudy, webResourceExtractorFromStudy, taxonomyExtractor,
-                fileExtractorFromAnalysis, metadataAnalysisPersister, metadataStudyFinderOrPersister);
+                fileExtractorFromAnalysis, analysisRepository, studyRepository);
     }
 
     @Override
@@ -86,7 +91,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     protected Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis) {
         Study study = importStudyFromAnalysis(analysisType.getSTUDYREF().getAccession());
         analysis.setStudy(study);
-        return metadataAnalysisPersister.persistAnalysis(analysis);
+        return analysisRepository.save(analysis);
     }
 
     @Override
@@ -95,12 +100,24 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     }
 
     private synchronized Study importStudyFromAnalysis(String studyAccession) {
+        /* The below get will make sure to return shared study when analyses sharing same study are imported
+          in current run */
         Study sharedStudy = accessionsToStudy.get(studyAccession);
         if (sharedStudy != null) {
             return sharedStudy;
         }
         Study study = importStudy(studyAccession);
-        study = metadataStudyFinderOrPersister.findOrPersistStudy(study);
+
+         /* The below find query will make sure to return shared study when analyses sharing same study are imported
+          in different runs */
+        sharedStudy = studyRepository.findOne(qStudy.accessionVersionId.accession.eq(study
+                .getAccessionVersionId().getAccession()).and(qStudy.accessionVersionId.version
+                .eq(study.getAccessionVersionId().getVersion())));
+        if (sharedStudy != null) {
+            accessionsToStudy.put(studyAccession, sharedStudy);
+            return sharedStudy;
+        }
+        study = studyRepository.save(study);
         accessionsToStudy.put(studyAccession, study);
         return study;
     }

@@ -19,8 +19,6 @@
 package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.springframework.core.convert.converter.Converter;
-import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataAnalysisPersister;
-import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataStudyFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
@@ -30,6 +28,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceSequenceType;
@@ -48,9 +48,9 @@ public abstract class ObjectsImporter {
 
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
 
-    protected MetadataAnalysisPersister metadataAnalysisPersister;
+    protected StudyRepository studyRepository;
 
-    protected MetadataStudyFinderOrPersister metadataStudyFinderOrPersister;
+    protected AnalysisRepository analysisRepository;
 
     private SraXmlParser<StudyType> sraStudyXmlParser;
 
@@ -76,8 +76,8 @@ public abstract class ObjectsImporter {
                            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
                            TaxonomyExtractor taxonomyExtractor,
                            FileExtractorFromAnalysis fileExtractorFromAnalysis,
-                           MetadataAnalysisPersister metadataAnalysisPersister,
-                           MetadataStudyFinderOrPersister metadataStudyFinderOrPersister) {
+                           AnalysisRepository analysisRepository,
+                           StudyRepository studyRepository) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
@@ -87,8 +87,8 @@ public abstract class ObjectsImporter {
         this.webResourceExtractorFromStudy = webResourceExtractorFromStudy;
         this.taxonomyExtractor = taxonomyExtractor;
         this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
-        this.metadataAnalysisPersister = metadataAnalysisPersister;
-        this.metadataStudyFinderOrPersister = metadataStudyFinderOrPersister;
+        this.analysisRepository = analysisRepository;
+        this.studyRepository = studyRepository;
     }
 
     public Study importStudy(String accession) {

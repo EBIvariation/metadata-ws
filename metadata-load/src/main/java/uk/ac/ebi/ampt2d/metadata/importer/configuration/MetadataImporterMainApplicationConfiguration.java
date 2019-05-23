@@ -26,8 +26,6 @@ import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughAPI;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.StudyConverter;
-import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataAnalysisPersister;
-import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataStudyFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraXmlRetrieverThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
@@ -59,7 +57,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 studyConverter(), publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository), taxonomyExtractor(taxonomyRepository),
                 sraAnalysisXmlParser(), analysisConverter(), fileExtractorFromAnalysis(fileRepository),
-                metadataAnalysisPersister(analysisRepository), metadataStudyFinderOrPersister(studyRepository));
+                analysisRepository, studyRepository);
     }
 
     @Bean
@@ -76,7 +74,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 studyConverter(), publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository), taxonomyExtractor(taxonomyRepository),
                 sraAnalysisXmlParser(), analysisConverter(), fileExtractorFromAnalysis(fileRepository),
-                metadataAnalysisPersister(analysisRepository), metadataStudyFinderOrPersister(studyRepository));
+                analysisRepository,studyRepository);
     }
 
     private StudyConverter studyConverter() {
@@ -93,14 +91,6 @@ public class MetadataImporterMainApplicationConfiguration {
 
     private SraAnalysisXmlParser sraAnalysisXmlParser() {
         return new SraAnalysisXmlParser();
-    }
-
-    private MetadataStudyFinderOrPersister metadataStudyFinderOrPersister(StudyRepository studyRepository) {
-        return new MetadataStudyFinderOrPersister(studyRepository);
-    }
-
-    private MetadataAnalysisPersister metadataAnalysisPersister(AnalysisRepository analysisRepository) {
-        return new MetadataAnalysisPersister(analysisRepository);
     }
 
     private TaxonomyExtractor taxonomyExtractor(TaxonomyRepository taxonomyRepository) {

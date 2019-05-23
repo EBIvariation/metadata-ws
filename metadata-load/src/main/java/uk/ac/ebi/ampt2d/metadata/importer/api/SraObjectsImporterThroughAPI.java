@@ -20,8 +20,6 @@ package uk.ac.ebi.ampt2d.metadata.importer.api;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
-import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataAnalysisPersister;
-import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataStudyFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
@@ -29,6 +27,8 @@ import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStud
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.LinkType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
@@ -49,20 +49,20 @@ public class SraObjectsImporterThroughAPI extends ObjectsImporter {
                                         SraXmlParser<AnalysisType> sraAnalysisXmlParser,
                                         Converter<AnalysisType, Analysis> analysisConverter,
                                         FileExtractorFromAnalysis fileExtractorFromAnalysis,
-                                        MetadataAnalysisPersister metadataAnalysisPersister,
-                                        MetadataStudyFinderOrPersister metadataStudyFinderOrPersister) {
+                                        AnalysisRepository analysisRepository,
+                                        StudyRepository studyRepository) {
         super(sraXmlRetrieverThroughApi, sraStudyXmlParser, sraAnalysisXmlParser, studyConverter, analysisConverter,
                 publicationExtractorFromStudy, webResourceExtractorFromStudy, taxonomyExtractor,
-                fileExtractorFromAnalysis, metadataAnalysisPersister, metadataStudyFinderOrPersister);
+                fileExtractorFromAnalysis, analysisRepository, studyRepository);
     }
 
     @Override
     protected Study extractAnalysisFromStudy(StudyType studyType, Study study) {
-        metadataStudyFinderOrPersister.persistStudy(study);
+        studyRepository.save(study);
         for (String analysisAccession : getAnalysisAccessions(studyType)) {
             Analysis analysis = importAnalysis(analysisAccession);
             analysis.setStudy(study);
-            metadataAnalysisPersister.persistAnalysis(analysis);
+            analysisRepository.save(analysis);
         }
         return study;
     }
