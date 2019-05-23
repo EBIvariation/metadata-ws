@@ -31,13 +31,11 @@ public interface StudyCustomRepository extends PagingAndSortingRepository<Study,
     QStudy qStudy = QStudy.study;
 
     default Study findOrSave(Study study) {
-        /* The below find query will make sure to return shared study when analyses sharing same study are imported
-          in different runs */
-        Study sharedStudy = findOne(qStudy.accessionVersionId.accession.eq(study
+        Study existingStudy = findOne(qStudy.accessionVersionId.accession.eq(study
                 .getAccessionVersionId().getAccession()).and(qStudy.accessionVersionId.version.eq(study
                 .getAccessionVersionId().getVersion())));
-        if (sharedStudy != null) {
-            return sharedStudy;
+        if (existingStudy != null) {
+            return existingStudy;
         }
         return save(study);
     }
