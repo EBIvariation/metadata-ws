@@ -21,10 +21,12 @@ package uk.ac.ebi.ampt2d.metadata.importer;
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataAnalysisPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataReferenceSequenceFinderOrPersister;
+import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataSampleFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.database.MetadataStudyFinderOrPersister;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractorFromReferenceSequence;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractorFromSample;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
@@ -36,9 +38,11 @@ import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceSequenceType;
+import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,60 +55,72 @@ public abstract class ObjectsImporter {
 
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
 
-    protected MetadataAnalysisPersister metadataAnalysisPersister;
-
-    protected MetadataStudyFinderOrPersister metadataStudyFinderOrPersister;
-
-    protected MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister;
-
     private SraXmlParser<StudyType> sraStudyXmlParser;
-
     private SraXmlParser<AnalysisType> sraAnalysisXmlParser;
-
     private SraXmlParser<AssemblyType> sraAssemblyXmlParser;
+    private SraXmlParser<SampleType> sraSampleXmlParser;
 
     private Converter<StudyType, Study> studyConverter;
-
     private Converter<AnalysisType, Analysis> analysisConverter;
-
     private Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter;
+    private Converter<SampleType, Sample> sampleConverter;
 
     private PublicationExtractorFromStudy publicationExtractorFromStudy;
-
     private WebResourceExtractorFromStudy webResourceExtractorFromStudy;
-
-    private TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence;
-
     private FileExtractorFromAnalysis fileExtractorFromAnalysis;
+    private TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence;
+    private TaxonomyExtractorFromSample taxonomyExtractorFromSample;
 
-    public ObjectsImporter(SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
-                           SraXmlParser<StudyType> sraStudyXmlParser,
-                           SraXmlParser<AnalysisType> sraAnalysisXmlParser,
-                           SraXmlParser<AssemblyType> sraAssemblyXmlParser,
-                           Converter<StudyType, Study> studyConverter,
-                           Converter<AnalysisType, Analysis> analysisConverter,
-                           Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
-                           PublicationExtractorFromStudy publicationExtractorFromStudy,
-                           WebResourceExtractorFromStudy webResourceExtractorFromStudy,
-                           TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence,
-                           FileExtractorFromAnalysis fileExtractorFromAnalysis,
-                           MetadataAnalysisPersister metadataAnalysisPersister,
-                           MetadataStudyFinderOrPersister metadataStudyFinderOrPersister,
-                           MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister) {
+    protected MetadataAnalysisPersister metadataAnalysisPersister;
+    protected MetadataStudyFinderOrPersister metadataStudyFinderOrPersister;
+    private MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister;
+    private MetadataSampleFinderOrPersister metadataSampleFinderOrPersister;
+
+    public ObjectsImporter(
+            SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
+
+            SraXmlParser<StudyType> sraStudyXmlParser,
+            SraXmlParser<AnalysisType> sraAnalysisXmlParser,
+            SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+            SraXmlParser<SampleType> sraSampleXmlParser,
+
+            Converter<StudyType, Study> studyConverter,
+            Converter<AnalysisType, Analysis> analysisConverter,
+            Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
+            Converter<SampleType, Sample> sampleConverter,
+
+            PublicationExtractorFromStudy publicationExtractorFromStudy,
+            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
+            FileExtractorFromAnalysis fileExtractorFromAnalysis,
+            TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence,
+            TaxonomyExtractorFromSample taxonomyExtractorFromSample,
+
+            MetadataStudyFinderOrPersister metadataStudyFinderOrPersister,
+            MetadataAnalysisPersister metadataAnalysisPersister,
+            MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister,
+            MetadataSampleFinderOrPersister metadataSampleFinderOrPersister) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
+
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
         this.sraAssemblyXmlParser = sraAssemblyXmlParser;
+        this.sraSampleXmlParser = sraSampleXmlParser;
+
         this.studyConverter = studyConverter;
         this.analysisConverter = analysisConverter;
         this.referenceSequenceConverter = referenceSequenceConverter;
+        this.sampleConverter = sampleConverter;
+
         this.publicationExtractorFromStudy = publicationExtractorFromStudy;
         this.webResourceExtractorFromStudy = webResourceExtractorFromStudy;
-        this.taxonomyExtractorFromReferenceSequence = taxonomyExtractorFromReferenceSequence;
         this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
-        this.metadataAnalysisPersister = metadataAnalysisPersister;
+        this.taxonomyExtractorFromReferenceSequence = taxonomyExtractorFromReferenceSequence;
+        this.taxonomyExtractorFromSample = taxonomyExtractorFromSample;
+
         this.metadataStudyFinderOrPersister = metadataStudyFinderOrPersister;
+        this.metadataAnalysisPersister = metadataAnalysisPersister;
         this.metadataReferenceSequenceFinderOrPersister = metadataReferenceSequenceFinderOrPersister;
+        this.metadataSampleFinderOrPersister = metadataSampleFinderOrPersister;
     }
 
     public Study importStudy(String accession) {
@@ -140,8 +156,7 @@ public abstract class ObjectsImporter {
             analysis.setReferenceSequences(referenceSequences);
             List<Sample> samples = new ArrayList<>();
             for (String sampleAccession : getSampleAccessions(analysisType)) {
-                //TODO Sample Import
-                //samples.add(importSample(sampleAccession));
+                samples.add(importSample(sampleAccession));
             }
             analysis.setSamples(samples);
             analysis = extractStudyFromAnalysis(analysisType, analysis);
@@ -210,7 +225,19 @@ public abstract class ObjectsImporter {
     }
 
     public Sample importSample(String accession) {
-        return null;
+        Sample sample = null;
+        try {
+            String xml = sraXmlRetrieverByAccession.getXml(accession);
+            SampleType sampleType = sraSampleXmlParser.parseXml(xml, accession);
+            sample = sampleConverter.convert(sampleType);
+            Taxonomy taxonomy = taxonomyExtractorFromSample.getTaxonomy(sampleType.getSAMPLENAME());
+            sample.setTaxonomies(Arrays.asList(taxonomy));
+            sample = metadataSampleFinderOrPersister.findOrPersistSample(sample);
+        } catch (Exception exception) {
+            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + accession);
+            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+        }
+        return sample;
     }
 
     private Set<String> getSampleAccessions(AnalysisType analysisType) {
