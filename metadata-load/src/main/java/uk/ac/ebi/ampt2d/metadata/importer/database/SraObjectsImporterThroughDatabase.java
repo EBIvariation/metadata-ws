@@ -43,8 +43,6 @@ import java.util.Map;
  */
 public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
-    private static QStudy qStudy = QStudy.study;
-
     private Map<String, Study> accessionsToStudy = new HashMap<>();
 
     public SraObjectsImporterThroughDatabase(SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
@@ -110,14 +108,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
          /* The below find query will make sure to return shared study when analyses sharing same study are imported
           in different runs */
-        sharedStudy = studyRepository.findOne(qStudy.accessionVersionId.accession.eq(study
-                .getAccessionVersionId().getAccession()).and(qStudy.accessionVersionId.version
-                .eq(study.getAccessionVersionId().getVersion())));
-        if (sharedStudy != null) {
-            accessionsToStudy.put(studyAccession, sharedStudy);
-            return sharedStudy;
-        }
-        study = studyRepository.save(study);
+        study = studyRepository.findOrSave(study);
         accessionsToStudy.put(studyAccession, study);
         return study;
     }
