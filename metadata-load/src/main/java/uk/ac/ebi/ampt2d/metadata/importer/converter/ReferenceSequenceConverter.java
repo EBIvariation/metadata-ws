@@ -25,9 +25,6 @@ import java.util.Arrays;
 
 public class ReferenceSequenceConverter implements Converter<AssemblyType, ReferenceSequence> {
 
-    public ReferenceSequenceConverter() {
-    }
-
     @Override
     public ReferenceSequence convert(AssemblyType assemblyType) {
         return new ReferenceSequence(
