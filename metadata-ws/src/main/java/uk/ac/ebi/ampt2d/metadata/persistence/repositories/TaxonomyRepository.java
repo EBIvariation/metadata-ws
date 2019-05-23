@@ -26,4 +26,5 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 public interface TaxonomyRepository extends PagingAndSortingRepository<Taxonomy, Long> {
 
     Taxonomy findByTaxonomyId(@Param("taxonomyId") long taxonomyId);
+
 }
