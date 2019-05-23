@@ -23,6 +23,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractorFromReferenceSequence;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractorFromSample;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
@@ -31,6 +32,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
+import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.util.HashMap;
@@ -46,33 +48,48 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     public SraObjectsImporterThroughDatabase(
             SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
             SraXmlParser<StudyType> sraStudyXmlParser,
+            SraXmlParser<AnalysisType> sraAnalysisXmlParser,
+            SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+            SraXmlParser<SampleType> sraSampleXmlParser,
+
             Converter<StudyType, Study> studyConverter,
+            Converter<AnalysisType, Analysis> analysisConverter,
+            Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
+            Converter<SampleType, Sample> sampleConverter,
+
             PublicationExtractorFromStudy publicationExtractorFromStudy,
             WebResourceExtractorFromStudy webResourceExtractorFromStudy,
-            TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence,
-            SraXmlParser<AnalysisType> sraAnalysisXmlParser,
-            Converter<AnalysisType, Analysis> analysisConverter,
             FileExtractorFromAnalysis fileExtractorFromAnalysis,
-            SraXmlParser<AssemblyType> sraAssemblyXmlParser,
-            Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
-            MetadataAnalysisPersister metadataAnalysisPersister,
+            TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence,
+            TaxonomyExtractorFromSample taxonomyExtractorFromSample,
+
             MetadataStudyFinderOrPersister metadataStudyFinderOrPersister,
-            MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister) {
+            MetadataAnalysisPersister metadataAnalysisPersister,
+            MetadataReferenceSequenceFinderOrPersister metadataReferenceSequenceFinderOrPersister,
+            MetadataSampleFinderOrPersister metadataSampleFinderOrPersister) {
         super(
                 sraXmlRetrieverThroughDatabase,
+
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,
                 sraAssemblyXmlParser,
+                sraSampleXmlParser,
+
                 studyConverter,
                 analysisConverter,
                 referenceSequenceConverter,
+                sampleConverter,
+
                 publicationExtractorFromStudy,
                 webResourceExtractorFromStudy,
-                taxonomyExtractorFromReferenceSequence,
                 fileExtractorFromAnalysis,
-                metadataAnalysisPersister,
+                taxonomyExtractorFromReferenceSequence,
+                taxonomyExtractorFromSample,
+
                 metadataStudyFinderOrPersister,
-                metadataReferenceSequenceFinderOrPersister
+                metadataAnalysisPersister,
+                metadataReferenceSequenceFinderOrPersister,
+                metadataSampleFinderOrPersister
         );
     }
 
@@ -97,7 +114,10 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
     @Override
     public Sample importSample(String accession) {
-        return super.importSample(accession);
+        setEnaObjectQuery(EnaObjectQuery.SAMPLE_QUERY);
+        Sample sample = super.importSample(accession);
+        setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
+        return sample;
     }
 
     @Override
