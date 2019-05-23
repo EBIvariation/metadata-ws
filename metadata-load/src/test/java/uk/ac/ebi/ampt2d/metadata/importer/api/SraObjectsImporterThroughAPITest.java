@@ -18,6 +18,7 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.api;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +28,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
@@ -39,7 +41,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 
 import java.util.Arrays;
-
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=API"})
@@ -107,8 +108,16 @@ public class SraObjectsImporterThroughAPITest {
         assertEquals("EquCab2.0", referenceSequence.getName());
         assertEquals(ReferenceSequence.Type.ASSEMBLY, referenceSequence.getType());
         Taxonomy taxonomy = referenceSequence.getTaxonomy();
-        assertEquals(9796, taxonomy.getTaxonomyId().longValue());
+        assertEquals(9796, taxonomy.getTaxonomyId());
         assertEquals("Equus caballus", taxonomy.getName());
+    }
+
+    @Test
+    public void importSampleObject() throws Exception {
+        Sample sample = sraObjectImporter.importSample("ERS000156");
+        assertNotNull(sample);
+        assertEquals("ERS000156", sample.getAccessionVersionId().getAccession());
+        assertEquals("E-TABM-722:mmu5", sample.getName());
     }
 
 }

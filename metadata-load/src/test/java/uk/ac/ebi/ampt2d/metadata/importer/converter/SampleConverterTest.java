@@ -18,26 +18,26 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.converter;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraApiConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataDatabaseConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataImporterMainApplicationConfiguration;
-import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAssemblyXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraSampleXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
-import uk.ac.ebi.ena.sra.xml.AssemblyType;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
+import uk.ac.ebi.ena.sra.xml.SampleType;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {MetadataImporterMainApplicationConfiguration.class,
@@ -45,32 +45,45 @@ import java.util.Arrays;
         SraApiConfiguration.class})
 @EnableAutoConfiguration
 @TestPropertySource(locations = "classpath:application.properties", properties = {"import.source=API"})
-public class ReferenceSequenceConverterTest {
+public class SampleConverterTest {
 
-    private static final String ASSEMBLY_DOCUMENT_API_XML = "assembly/AssemblyDocumentAPI.xml";
+    private static final String SAMPLE_DOCUMENT_API_XML = "sample/SampleDocumentAPI.xml";
 
-    private SraXmlParser<AssemblyType> xmlParser;
+    private static final String SAMPLE_DOCUMENT_DATABASE_XML = "sample/SampleDocumentDB.xml";
 
-    private Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter;
+    private SraXmlParser<SampleType> xmlParser;
+
+    private SampleConverter sampleConverter;
 
     @Before
     public void setUp() {
-        xmlParser = new SraAssemblyXmlParser();
-        referenceSequenceConverter = new ReferenceSequenceConverter();
+        xmlParser = new SraSampleXmlParser();
+        sampleConverter = new SampleConverter();
     }
 
     @Test
     public void convertFromApiXml() throws Exception {
-        String assemblyAccession = "GCA_000002305.1";
-        AssemblyType assemblyType = getAssemblyType(ASSEMBLY_DOCUMENT_API_XML, assemblyAccession);
-        ReferenceSequence referenceSequence = referenceSequenceConverter.convert(assemblyType);
-        Assert.assertNotNull(referenceSequence);
-        Assert.assertEquals(Arrays.asList(assemblyAccession), referenceSequence.getAccessions());
-        Assert.assertEquals("EquCab2.0", referenceSequence.getName());
-        Assert.assertEquals(ReferenceSequence.Type.ASSEMBLY, referenceSequence.getType());
+        String sampleAccession = "ERS000156";
+        SampleType sampleType = getSampleType(SAMPLE_DOCUMENT_API_XML, sampleAccession);
+        Sample sample = sampleConverter.convert(sampleType);
+        assertNotNull(sample);
+        assertEquals(sampleAccession, sample.getAccessionVersionId().getAccession());
+        assertEquals("E-TABM-722:mmu5", sample.getName());
+        assertEquals("ERS000156", sample.getAccessionVersionId().getAccession());
     }
 
-    private AssemblyType getAssemblyType(String xml, String accession) throws Exception {
+    @Test
+    public void convertFromDbXml() throws Exception {
+        String sampleAccession = "ERS000002";
+        SampleType sampleType = getSampleType(SAMPLE_DOCUMENT_DATABASE_XML, sampleAccession);
+        Sample sample = sampleConverter.convert(sampleType);
+        assertNotNull(sample);
+        assertEquals(sampleAccession, sample.getAccessionVersionId().getAccession());
+        assertEquals("Solexa sequencing of Saccharomyces cerevisiae strain SK1 random 200 bp library", sample.getName());
+        assertEquals("ERS000002", sample.getAccessionVersionId().getAccession());
+    }
+
+    private SampleType getSampleType(String xml, String accession) throws Exception {
         String xmlString = new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(xml).toURI())));
         return xmlParser.parseXml(xmlString, accession);

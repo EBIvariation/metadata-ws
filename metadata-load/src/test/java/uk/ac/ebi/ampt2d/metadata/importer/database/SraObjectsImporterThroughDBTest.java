@@ -18,6 +18,7 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.database;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -29,11 +30,16 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -90,6 +96,15 @@ public class SraObjectsImporterThroughDBTest {
 
         assertEquals(1, studyRepository.count());
         assertEquals(1, analysisRepository.count());
+    }
+
+    @Test
+    @Category(OracleDbCategory.class)
+    public void importSampleObject() throws Exception {
+        Sample sample = sraObjectImporter.importSample("ERS000002");
+        assertNotNull(sample);
+        assertEquals("ERS000002", sample.getAccessionVersionId().getAccession());
+        assertEquals("Solexa sequencing of Saccharomyces cerevisiae strain SK1 random 200 bp library", sample.getName());
     }
 
 }
