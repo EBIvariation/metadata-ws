@@ -183,35 +183,41 @@ public abstract class ObjectsImporter {
         // ENA records can contain a reference sequence in either of the three analysis categories:
         // REFERENCE_ALIGNMENT, SEQUENCE_VARIATION, and PROCESSED_READS. All accessions are collected and returned.
         if (analysisType1.isSetREFERENCEALIGNMENT()) {
-            referenceSequenceAccessions.add(
-                    // TODO: should we use getRefname() or getAccession()?
-                    getAccessionFromReferenceSequenceType(analysisType1.getREFERENCEALIGNMENT()));
+            String accession = getAccessionFromReferenceSequenceType(analysisType1.getREFERENCEALIGNMENT());
+            if (accession != null) {
+                referenceSequenceAccessions.add(accession);
+            }
         }
-        else if (analysisType1.isSetSEQUENCEVARIATION()) {
-            referenceSequenceAccessions.add(
-                    getAccessionFromReferenceSequenceType(analysisType1.getSEQUENCEVARIATION()));
+        if (analysisType1.isSetSEQUENCEVARIATION()) {
+            String accession = getAccessionFromReferenceSequenceType(analysisType1.getSEQUENCEVARIATION());
+            if (accession != null) {
+                referenceSequenceAccessions.add(accession);
+            }
         }
-        else if (analysisType1.isSetPROCESSEDREADS()) {
-            referenceSequenceAccessions.add(
-                    getAccessionFromReferenceSequenceType(analysisType1.getPROCESSEDREADS()));
+        if (analysisType1.isSetPROCESSEDREADS()) {
+            String accession = getAccessionFromReferenceSequenceType(analysisType1.getPROCESSEDREADS());
+            if (accession != null) {
+                referenceSequenceAccessions.add(accession);
+            }
         }
-        referenceSequenceAccessions.remove(null);
         return referenceSequenceAccessions;
     }
 
-    private String getAccessionFromReferenceSequenceType(ReferenceSequenceType referenceSequenceType){
-        if (referenceSequenceType == null) {
-            return null;
-        }
-        ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
-        if (referenceAssemblyType == null) {
-            return null;
-        }
-        ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
-        if (standard != null) {
-            return standard.getAccession();
+    private String getAccessionFromReferenceSequenceType(ReferenceSequenceType referenceSequenceType) {
+        if (referenceSequenceType != null) {
+            ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
+            if (referenceAssemblyType != null) {
+                ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
+                if (standard != null) {
+                    return getAccessionFromStandard(standard);
+                }
+            }
         }
         return null;
+    }
+
+    protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
+        return standard.getAccession();
     }
 
     public Sample importSample(String accession) {

@@ -35,6 +35,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepos
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
+import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.util.HashMap;
@@ -118,6 +119,11 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         return study;
     }
 
+    @Override
+    protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
+        return standard.getRefname();
+    }
+
     private synchronized Study importStudyFromAnalysis(String studyAccession) {
         /* The below get will make sure to return shared study when analyses sharing same study are imported
           in current run */
@@ -141,4 +147,5 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     public Map<String, Study> getAccessionsToStudy() {
         return accessionsToStudy;
     }
+
 }

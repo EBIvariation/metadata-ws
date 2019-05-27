@@ -27,14 +27,12 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import java.util.List;
 
 @NoRepositoryBean
-public interface ReferenceSequenceCustomRepository extends PagingAndSortingRepository<ReferenceSequence, Long>,
+public interface ReferenceSequenceRepositoryCustom extends PagingAndSortingRepository<ReferenceSequence, Long>,
         QueryDslPredicateExecutor<ReferenceSequence> {
 
     ReferenceSequence findByAccessions(@Param("accessions") List<String> accessions);
 
     default ReferenceSequence findOrSave(ReferenceSequence referenceSequence) {
-        /* The below find query will make sure to return the same reference sequence when analyses sharing same
-        reference sequence are imported in different runs */
         ReferenceSequence existingReferenceSequence = findByAccessions(referenceSequence.getAccessions());
         if (existingReferenceSequence != null) {
             return existingReferenceSequence;

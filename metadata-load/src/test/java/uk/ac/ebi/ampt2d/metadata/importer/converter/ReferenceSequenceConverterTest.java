@@ -18,11 +18,9 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.converter;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,13 +32,14 @@ import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataImporterMainAppl
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {MetadataImporterMainApplicationConfiguration.class,
@@ -67,10 +66,10 @@ public class ReferenceSequenceConverterTest {
         String assemblyAccession = "GCA_000002305.1";
         AssemblyType assemblyType = getAssemblyType(ASSEMBLY_DOCUMENT_API_XML, assemblyAccession);
         ReferenceSequence referenceSequence = referenceSequenceConverter.convert(assemblyType);
-        Assert.assertNotNull(referenceSequence);
-        Assert.assertEquals(Arrays.asList(assemblyAccession), referenceSequence.getAccessions());
-        Assert.assertEquals("EquCab2.0", referenceSequence.getName());
-        Assert.assertEquals(ReferenceSequence.Type.ASSEMBLY, referenceSequence.getType());
+        assertNotNull(referenceSequence);
+        assertEquals(Arrays.asList(assemblyAccession), referenceSequence.getAccessions());
+        assertEquals("EquCab2.0", referenceSequence.getName());
+        assertEquals(ReferenceSequence.Type.ASSEMBLY, referenceSequence.getType());
     }
 
     private AssemblyType getAssemblyType(String xml, String accession) throws Exception {

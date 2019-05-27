@@ -23,7 +23,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QReferenceSequence;
 
 @RepositoryRestResource(collectionResourceRel = "reference-sequences", path = "reference-sequences")
-public interface ReferenceSequenceRepository extends ReferenceSequenceCustomRepository,
+public interface ReferenceSequenceRepository extends ReferenceSequenceRepositoryCustom,
         QuerydslBinderCustomizer<QReferenceSequence> {
 
     default void customize(QuerydslBindings bindings, QReferenceSequence referenceSequence) {

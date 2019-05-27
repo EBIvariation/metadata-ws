@@ -51,13 +51,13 @@ public class MetadataImporterMainApplicationConfiguration {
     @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "API")
     public ObjectsImporter objectImporterThroughEnaApi(SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
-                                                   PublicationRepository publicationRepository,
-                                                   WebResourceRepository webResourceRepository,
-                                                   FileRepository fileRepository,
-                                                   TaxonomyRepository taxonomyRepository,
-                                                   ReferenceSequenceRepository referenceSequenceRepository,
-                                                   AnalysisRepository analysisRepository,
-                                                   StudyRepository studyRepository) {
+                                                       PublicationRepository publicationRepository,
+                                                       WebResourceRepository webResourceRepository,
+                                                       FileRepository fileRepository,
+                                                       TaxonomyRepository taxonomyRepository,
+                                                       ReferenceSequenceRepository referenceSequenceRepository,
+                                                       AnalysisRepository analysisRepository,
+                                                       StudyRepository studyRepository) {
         return new SraObjectsImporterThroughAPI(
                 sraXmlRetrieverThroughApi,
                 sraStudyXmlParser(),
@@ -79,7 +79,8 @@ public class MetadataImporterMainApplicationConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "DB")
-    public ObjectsImporter objectImporterThroughEnaDatabase(SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
+    public ObjectsImporter objectImporterThroughEnaDatabase(
+                                                SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
                                                 PublicationRepository publicationRepository,
                                                 WebResourceRepository webResourceRepository,
                                                 FileRepository fileRepository,
