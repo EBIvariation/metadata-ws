@@ -86,7 +86,7 @@ public class Study extends Auditable<Long> {
     @Column(nullable = false)
     private LocalDate releaseDate;
 
-    @ApiModelProperty(position = 7, dataType = "java.lang.String", notes = "URL to a Taxonomy")
+    @ApiModelProperty(position = 7, dataType = "java.lang.String", notes = "URL to taxonomy")
     @JsonProperty
     @ManyToOne
     @JoinFormula(value = "(SELECT DISTINCT taxonomy.id FROM taxonomy " +
