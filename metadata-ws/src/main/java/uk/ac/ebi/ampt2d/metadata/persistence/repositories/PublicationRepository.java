@@ -24,4 +24,5 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Publication;
 @RepositoryRestResource
 public interface PublicationRepository extends PagingAndSortingRepository<Publication, Long> {
 
+    Publication findByPublicationId(String publicationId);
 }

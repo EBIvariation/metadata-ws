@@ -52,10 +52,10 @@ public class PublicationExtractorFromStudy {
         return publications;
     }
 
-    private Publication findOrCreatePublication(String id) {
-        Publication publication = publicationRepository.findOne(id);
+    private Publication findOrCreatePublication(String publicationId) {
+        Publication publication = publicationRepository.findByPublicationId(publicationId);
         if (publication == null) {
-            publication = publicationRepository.save(new Publication(id));
+            publication = publicationRepository.save(new Publication(publicationId));
         }
         return publication;
     }

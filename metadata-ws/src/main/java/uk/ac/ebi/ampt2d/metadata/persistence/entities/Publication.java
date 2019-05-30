@@ -36,11 +36,18 @@ public class Publication extends Auditable<Long>{
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @ApiModelProperty(position = 2, example = "PubId123")
+    @ApiModelProperty(position = 2, example = "PubmedId")
     @NotNull
     @JsonProperty
     @Column(unique = true)
     private String publicationId;
+
+    public Publication() {
+    }
+
+    public Publication(String publicationId) {
+        this.publicationId = publicationId;
+    }
 
     @Override
     public Long getId() {
