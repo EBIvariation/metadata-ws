@@ -7,8 +7,8 @@ Feature: publication object
       "publicationId": "Publication1"
     }
     """
-    Then set the URL to PUBLICATION
-    And the response code should be 201
+    And set the URL to PUBLICATION
+    Then the response code should be 201
     And the Location header should be present with value of PUBLICATION
     When I request GET with value of PUBLICATION
     Then the response code should be 200
@@ -24,7 +24,7 @@ Feature: publication object
       "publicationId": "Publication2"
     }
     """
-    Then set the URL to PUBLICATION2
-    And the response code should be 201
+    And set the URL to PUBLICATION2
+    Then the response code should be 201
     When I request GET /publications/Publication2
     Then the response code should be 4xx
