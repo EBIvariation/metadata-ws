@@ -77,7 +77,7 @@ public class Analysis extends Auditable<Long> {
 
     }
 
-    @ApiModelProperty(position = 1, value = "Analysis auto generated id", required = true, readOnly = true)
+    @ApiModelProperty(position = 1, value = "Analysis auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ANALYSIS_SEQ")

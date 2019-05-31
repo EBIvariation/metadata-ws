@@ -49,7 +49,7 @@ public class WebResource extends Auditable<Long> {
 
     }
 
-    @ApiModelProperty(position = 1, value = "Web resource auto generated id", readOnly = true, required = true)
+    @ApiModelProperty(position = 1, value = "Web resource auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="WEB_RESOURCE_SEQ")
