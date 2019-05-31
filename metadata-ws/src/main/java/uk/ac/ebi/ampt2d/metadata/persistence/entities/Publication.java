@@ -30,7 +30,7 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class Publication extends Auditable<Long>{
 
-    @ApiModelProperty(position = 1, value = "Publication auto generated id", required = true, readOnly = true)
+    @ApiModelProperty(position = 1, value = "Publication auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
