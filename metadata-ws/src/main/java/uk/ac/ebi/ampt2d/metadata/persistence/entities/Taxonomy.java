@@ -36,7 +36,7 @@ import java.util.List;
 @SequenceGenerator(initialValue=1, allocationSize=1 , name="TAXONOMY_SEQ", sequenceName="taxonomy_sequence")
 public class Taxonomy extends Auditable<Long> {
 
-    @ApiModelProperty(position = 1, value = "Taxonomy auto generated id", required = true, readOnly = true)
+    @ApiModelProperty(position = 1, value = "Taxonomy auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="TAXONOMY_SEQ")

@@ -47,7 +47,7 @@ public class File extends Auditable<Long> {
         TSV, UNLOCALISED_LIST, VCF, VCF_AGGREGATE, WIG
     }
 
-    @ApiModelProperty(position = 1, value = "File auto generated id", required = true, readOnly = true)
+    @ApiModelProperty(position = 1, value = "File auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="FILE_SEQ")

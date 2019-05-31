@@ -20,28 +20,37 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class Publication extends Auditable<String>{
+public class Publication extends Auditable<Long>{
 
-    @ApiModelProperty(position = 1, value = "PubmedId", required = true)
-    @JsonProperty
-    @NotNull
+    @ApiModelProperty(position = 1, value = "Publication auto generated id", readOnly = true)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+
+    @ApiModelProperty(position = 2, example = "PubmedId")
+    @NotNull
+    @JsonProperty
+    @Column(unique = true)
+    private String publicationId;
 
     public Publication() {
     }
 
-    public Publication(String id) {
-        this.id = id;
+    public Publication(String publicationId) {
+        this.publicationId = publicationId;
     }
 
     @Override
-    public String getId() {
+    public Long getId() {
         return id;
     }
 }

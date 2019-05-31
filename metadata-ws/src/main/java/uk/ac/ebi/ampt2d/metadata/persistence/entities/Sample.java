@@ -41,7 +41,7 @@ import java.util.Set;
 @SequenceGenerator(initialValue=1, allocationSize=1 , name="SAMPLE_SEQ", sequenceName="sample_sequence")
 public class Sample extends Auditable<Long> {
 
-    @ApiModelProperty(position = 1, value = "Sample auto generated id", required = true, readOnly = true)
+    @ApiModelProperty(position = 1, value = "Sample auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="SAMPLE_SEQ")

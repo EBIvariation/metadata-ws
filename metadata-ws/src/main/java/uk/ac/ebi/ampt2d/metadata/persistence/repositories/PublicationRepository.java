@@ -22,5 +22,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Publication;
 
 @RepositoryRestResource
-public interface PublicationRepository extends PagingAndSortingRepository<Publication, String> {
+public interface PublicationRepository extends PagingAndSortingRepository<Publication, Long> {
+
+    Publication findByPublicationId(String publicationId);
 }
