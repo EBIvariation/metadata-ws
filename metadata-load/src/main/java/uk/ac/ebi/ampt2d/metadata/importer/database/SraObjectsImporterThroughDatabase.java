@@ -38,17 +38,48 @@ import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This importer is mainly used for EGA studies where Study XML doesn't have analysis accessions
  */
 public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
-    private static final Logger IMPORT_LOGGER = Logger.getLogger(SraObjectsImporterThroughDatabase.class.getName());
+    private static final Map<String, String> REFERENCE_MAP;
+    static {
+        Map<String, String> refMap = new HashMap<>();
+        refMap.put("grch37", "GCA_000001405.1");
+        refMap.put("grch37.p1", "GCA_000001405.2");
+        refMap.put("grch37.p2", "GCA_000001405.3");
+        refMap.put("grch37.p3", "GCA_000001405.4");
+        refMap.put("grch37.p4", "GCA_000001405.5");
+        refMap.put("grch37.p5", "GCA_000001405.6");
+        refMap.put("grch37.p6", "GCA_000001405.7");
+        refMap.put("grch37.p7", "GCA_000001405.8");
+        refMap.put("grch37.p8", "GCA_000001405.9");
+        refMap.put("grch37.p9", "GCA_000001405.10");
+        refMap.put("grch37.p10", "GCA_000001405.11");
+        refMap.put("grch37.p11", "GCA_000001405.12");
+        refMap.put("grch37.p12", "GCA_000001405.13");
+        refMap.put("grch37.p13", "GCA_000001405.14");
+        refMap.put("grch38", "GCA_000001405.15");
+        refMap.put("grch38.p1", "GCA_000001405.16");
+        refMap.put("grch38.p2", "GCA_000001405.17");
+        refMap.put("grch38.p3", "GCA_000001405.18");
+        refMap.put("grch38.p4", "GCA_000001405.19");
+        refMap.put("grch38.p5", "GCA_000001405.20");
+        refMap.put("grch38.p6", "GCA_000001405.21");
+        refMap.put("grch38.p7", "GCA_000001405.22");
+        refMap.put("grch38.p8", "GCA_000001405.23");
+        refMap.put("grch38.p9", "GCA_000001405.24");
+        refMap.put("grch38.p10", "GCA_000001405.25");
+        refMap.put("grch38.p11", "GCA_000001405.26");
+        refMap.put("grch38.p12", "GCA_000001405.27");
+        refMap.put("grch38.p13", "GCA_000001405.28");
+        REFERENCE_MAP = Collections.unmodifiableMap(refMap);
+    }
 
     private Map<String, Study> accessionsToStudy = new HashMap<>();
 
@@ -126,130 +157,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     @Override
     protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
         String refName = standard.getRefname();
-        String accession = null;
-
-        try {
-            switch (refName) {
-                case "GRCh37":
-                    accession = "GCA_000001405.1";
-                    break;
-
-                case "GRCh37.p1":
-                    accession = "GCA_000001405.2";
-                    break;
-
-                case "GRCh37.p2":
-                    accession = "GCA_000001405.3";
-                    break;
-
-                case "GRCh37.p3":
-                    accession = "GCA_000001405.4";
-                    break;
-
-                case "GRCh37.p4":
-                    accession = "GCA_000001405.5";
-                    break;
-
-                case "GRCh37.p5":
-                    accession = "GCA_000001405.6";
-                    break;
-
-                case "GRCh37.p6":
-                    accession = "GCA_000001405.7";
-                    break;
-
-                case "GRCh37.p7":
-                    accession = "GCA_000001405.8";
-                    break;
-
-                case "GRCh37.p8":
-                    accession = "GCA_000001405.9";
-                    break;
-
-                case "GRCh37.p9":
-                    accession = "GCA_000001405.10";
-                    break;
-
-                case "GRCh37.p10":
-                    accession = "GCA_000001405.11";
-                    break;
-
-                case "GRCh37.p11":
-                    accession = "GCA_000001405.12";
-                    break;
-
-                case "GRCh37.p12":
-                    accession = "GCA_000001405.13";
-                    break;
-
-                case "GRCh37.p13":
-                    accession = "GCA_000001405.14";
-                    break;
-
-                case "GRCh38":
-                    accession = "GCA_000001405.15";
-                    break;
-
-                case "GRCh38.p1":
-                    accession = "GCA_000001405.16";
-                    break;
-
-                case "GRCh38.p2":
-                    accession = "GCA_000001405.17";
-                    break;
-
-                case "GRCh38.p3":
-                    accession = "GCA_000001405.18";
-                    break;
-
-                case "GRCh38.p4":
-                    accession = "GCA_000001405.19";
-                    break;
-
-                case "GRCh38.p5":
-                    accession = "GCA_000001405.20";
-                    break;
-
-                case "GRCh38.p6":
-                    accession = "GCA_000001405.21";
-                    break;
-
-                case "GRCh38.p7":
-                    accession = "GCA_000001405.22";
-                    break;
-
-                case "GRCh38.p8":
-                    accession = "GCA_000001405.23";
-                    break;
-
-                case "GRCh38.p9":
-                    accession = "GCA_000001405.24";
-                    break;
-
-                case "GRCh38.p10":
-                    accession = "GCA_000001405.25";
-                    break;
-
-                case "GRCh38.p11":
-                    accession = "GCA_000001405.26";
-                    break;
-
-                case "GRCh38.p12":
-                    accession = "GCA_000001405.27";
-                    break;
-
-                case "GRCh38.p13":
-                    accession = "GCA_000001405.28";
-                    break;
-
-                default:
-                    throw new Exception("Encountered exception for unknown reference sequence name " + refName);
-            }
-        } catch (Exception e) {
-            IMPORT_LOGGER.log(Level.SEVERE, e.getMessage());
-        }
-
-        return accession;
+        return REFERENCE_MAP.get(refName.toLowerCase());
     }
 
     private synchronized Study importStudyFromAnalysis(String studyAccession) {
