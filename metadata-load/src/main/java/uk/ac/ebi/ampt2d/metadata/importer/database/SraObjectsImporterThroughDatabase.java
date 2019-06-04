@@ -156,8 +156,16 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
     @Override
     protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
+        //TBD: To be removed
         String refName = standard.getRefname();
-        return REFERENCE_MAP.get(refName.toLowerCase());
+        String accession = null;
+        if (refName != null) {
+            accession = REFERENCE_MAP.get(refName.toLowerCase());
+            if (accession == null) {
+                throw new IllegalArgumentException ("Encountered exception for unknown reference sequence name " + refName);
+            }
+        }
+        return accession;
     }
 
     private synchronized Study importStudyFromAnalysis(String studyAccession) {
