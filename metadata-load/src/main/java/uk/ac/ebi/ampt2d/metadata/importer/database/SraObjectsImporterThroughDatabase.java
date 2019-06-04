@@ -156,7 +156,6 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
     @Override
     protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
-        //TBD: To be removed
         String refName = standard.getRefname();
         String accession = null;
         if (refName != null) {

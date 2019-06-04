@@ -41,11 +41,8 @@ import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,40 +50,6 @@ import java.util.logging.Logger;
 public abstract class ObjectsImporter {
 
     private static final Logger IMPORT_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
-
-    private static final Map<String, String> REFERENCE_MAP;
-    static {
-        Map<String, String> refMap = new HashMap<>();
-        refMap.put("grch37", "GCA_000001405.1");
-        refMap.put("grch37.p1", "GCA_000001405.2");
-        refMap.put("grch37.p2", "GCA_000001405.3");
-        refMap.put("grch37.p3", "GCA_000001405.4");
-        refMap.put("grch37.p4", "GCA_000001405.5");
-        refMap.put("grch37.p5", "GCA_000001405.6");
-        refMap.put("grch37.p6", "GCA_000001405.7");
-        refMap.put("grch37.p7", "GCA_000001405.8");
-        refMap.put("grch37.p8", "GCA_000001405.9");
-        refMap.put("grch37.p9", "GCA_000001405.10");
-        refMap.put("grch37.p10", "GCA_000001405.11");
-        refMap.put("grch37.p11", "GCA_000001405.12");
-        refMap.put("grch37.p12", "GCA_000001405.13");
-        refMap.put("grch37.p13", "GCA_000001405.14");
-        refMap.put("grch38", "GCA_000001405.15");
-        refMap.put("grch38.p1", "GCA_000001405.16");
-        refMap.put("grch38.p2", "GCA_000001405.17");
-        refMap.put("grch38.p3", "GCA_000001405.18");
-        refMap.put("grch38.p4", "GCA_000001405.19");
-        refMap.put("grch38.p5", "GCA_000001405.20");
-        refMap.put("grch38.p6", "GCA_000001405.21");
-        refMap.put("grch38.p7", "GCA_000001405.22");
-        refMap.put("grch38.p8", "GCA_000001405.23");
-        refMap.put("grch38.p9", "GCA_000001405.24");
-        refMap.put("grch38.p10", "GCA_000001405.25");
-        refMap.put("grch38.p11", "GCA_000001405.26");
-        refMap.put("grch38.p12", "GCA_000001405.27");
-        refMap.put("grch38.p13", "GCA_000001405.28");
-        REFERENCE_MAP = Collections.unmodifiableMap(refMap);
-    }
 
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
 
@@ -177,6 +140,7 @@ public abstract class ObjectsImporter {
             AnalysisType analysisType = sraAnalysisXmlParser.parseXml(xml, accession);
             analysis = analysisConverter.convert(analysisType);
             analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
+
             List<ReferenceSequence> referenceSequences = new ArrayList<>();
             ReferenceSequence referenceSequenceSEQVAR = buildReferenceSequenceOfSEQUENCEVARIATION(analysisType);
             if (referenceSequenceSEQVAR != null) {
@@ -184,6 +148,7 @@ public abstract class ObjectsImporter {
                 referenceSequences.add(referenceSequenceSEQVAR);
             }
             analysis.setReferenceSequences(referenceSequences);
+
             List<Sample> samples = new ArrayList<>();
             for (String sampleAccession : getSampleAccessions(analysisType)) {
                 //TODO Sample Import
@@ -201,33 +166,24 @@ public abstract class ObjectsImporter {
 
     private ReferenceSequence buildReferenceSequenceOfSEQUENCEVARIATION(AnalysisType analysisType) {
         ReferenceSequence referenceSequence = null;
-
         AnalysisType.ANALYSISTYPE analysistype = analysisType.getANALYSISTYPE();
+
         if (analysistype.isSetSEQUENCEVARIATION()) {
             ReferenceSequenceType referenceSequenceType = analysistype.getSEQUENCEVARIATION();
-            if (referenceSequenceType != null) {
-                ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
-                if (referenceAssemblyType != null) {
-                    ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
-                    if (standard != null) {
-                        String refName = standard.getRefname();
-                        String accession = null;
-                        if (refName != null) {
-                            accession = REFERENCE_MAP.get(refName.toLowerCase());
-                            if (accession == null) {
-                                throw new IllegalArgumentException ("Encountered exception for unknown reference sequence name " + refName);
-                            }
-                        }
-
-                        String[] refNameSplit = refName.split(".");
-                        String patch = null;
-                        if (refNameSplit.length == 2) {
-                            patch = refNameSplit[1];
-                        }
-                        ArrayList<String> accessionList = new ArrayList<>(Arrays.asList(accession));
-                        referenceSequence = new ReferenceSequence(refName, patch, accessionList,  ReferenceSequence.Type.ASSEMBLY);
-                        referenceSequence.setTaxonomy(taxonomyExtractor.getTaxonomy());
-                    } //(standard != null)
+            ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
+            if (referenceAssemblyType != null) {
+                ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
+                if (standard != null) {
+                    String accession = getAccessionFromStandard(standard);
+                    String refName = standard.getRefname();
+                    String[] refNameSplit = refName.split("\\.", 2);
+                    String patch = null;
+                    if (refNameSplit.length == 2) {
+                        patch = refNameSplit[1];
+                    }
+                    ArrayList<String> accessionList = new ArrayList<>(Arrays.asList(accession));
+                    referenceSequence = new ReferenceSequence(refName, patch, accessionList,  ReferenceSequence.Type.ASSEMBLY);
+                    referenceSequence.setTaxonomy(taxonomyExtractor.getTaxonomy());
                 }
             }
         }
