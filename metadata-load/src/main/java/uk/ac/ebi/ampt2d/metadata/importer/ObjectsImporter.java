@@ -142,10 +142,10 @@ public abstract class ObjectsImporter {
             analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
 
             List<ReferenceSequence> referenceSequences = new ArrayList<>();
-            ReferenceSequence referenceSequenceSEQVAR = buildReferenceSequenceOfSEQUENCEVARIATION(analysisType);
-            if (referenceSequenceSEQVAR != null) {
-                referenceSequenceSEQVAR = referenceSequenceRepository.findOrSave(referenceSequenceSEQVAR);
-                referenceSequences.add(referenceSequenceSEQVAR);
+            ReferenceSequence referenceSequence = buildReferenceSequence(analysisType);
+            if (referenceSequence != null) {
+                referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
+                referenceSequences.add(referenceSequence);
             }
             analysis.setReferenceSequences(referenceSequences);
 
@@ -162,32 +162,6 @@ public abstract class ObjectsImporter {
         }
 
         return analysis;
-    }
-
-    private ReferenceSequence buildReferenceSequenceOfSEQUENCEVARIATION(AnalysisType analysisType) {
-        ReferenceSequence referenceSequence = null;
-        AnalysisType.ANALYSISTYPE analysistype = analysisType.getANALYSISTYPE();
-
-        if (analysistype.isSetSEQUENCEVARIATION()) {
-            ReferenceSequenceType referenceSequenceType = analysistype.getSEQUENCEVARIATION();
-            ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
-            if (referenceAssemblyType != null) {
-                ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
-                if (standard != null) {
-                    String accession = getAccessionFromStandard(standard);
-                    String refName = standard.getRefname();
-                    String[] refNameSplit = refName.split("\\.", 2);
-                    String patch = null;
-                    if (refNameSplit.length == 2) {
-                        patch = refNameSplit[1];
-                    }
-                    ArrayList<String> accessionList = new ArrayList<>(Arrays.asList(accession));
-                    referenceSequence = new ReferenceSequence(refName, patch, accessionList,  ReferenceSequence.Type.ASSEMBLY);
-                    referenceSequence.setTaxonomy(taxonomyExtractor.getTaxonomy());
-                }
-            }
-        }
-        return referenceSequence;
     }
 
     protected abstract Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis);
@@ -262,6 +236,40 @@ public abstract class ObjectsImporter {
             sampleAccessions.add(sampleref.getAccession());
         }
         return sampleAccessions;
+    }
+
+    private ReferenceSequence buildReferenceSequence(AnalysisType analysisType) {
+        ReferenceSequence referenceSequence = null;
+        AnalysisType.ANALYSISTYPE analysistype = analysisType.getANALYSISTYPE();
+        ReferenceSequenceType referenceSequenceType = null;
+
+        if (analysistype.isSetSEQUENCEVARIATION()) {
+            referenceSequenceType = analysistype.getSEQUENCEVARIATION();
+        } else if (analysistype.isSetREFERENCEALIGNMENT()) {
+            referenceSequenceType = analysistype.getREFERENCEALIGNMENT();
+        } else if (analysistype.isSetPROCESSEDREADS()) {
+            referenceSequenceType = analysistype.getPROCESSEDREADS();
+        }
+
+        if (referenceSequenceType != null) {
+            ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
+            if (referenceAssemblyType != null) {
+                ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
+                if (standard != null) {
+                    String accession = getAccessionFromStandard(standard);
+                    String refName = standard.getRefname();
+                    String[] refNameSplit = refName.split("\\.", 2);
+                    String patch = null;
+                    if (refNameSplit.length == 2) {
+                        patch = refNameSplit[1];
+                    }
+                    ArrayList<String> accessionList = new ArrayList<>(Arrays.asList(accession));
+                    referenceSequence = new ReferenceSequence(refName, patch, accessionList,  ReferenceSequence.Type.ASSEMBLY);
+                    referenceSequence.setTaxonomy(taxonomyExtractor.getTaxonomy());
+                }
+            }
+        }
+        return referenceSequence;
     }
 
 }
