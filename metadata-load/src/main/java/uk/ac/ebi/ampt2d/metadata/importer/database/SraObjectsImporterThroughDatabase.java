@@ -38,6 +38,8 @@ import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -134,7 +136,19 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
     @Override
     public ReferenceSequence importReferenceSequence(String accession) {
-        return super.importReferenceSequence(accession);
+        String[] accnRefNameSplit = accession.split("#", 2);
+        String refAccession = accnRefNameSplit[0];
+        String refName = accnRefNameSplit[1];
+        ArrayList<String> accessionList = new ArrayList<>(Arrays.asList(refAccession));
+        String[] refNameSplit = refName.split("\\.", 2);
+        String patch = null;
+        if (refNameSplit.length == 2) {
+            patch = refNameSplit[1];
+        }
+        ReferenceSequence referenceSequence = new ReferenceSequence(refName, patch, accessionList,  ReferenceSequence.Type.ASSEMBLY);
+        referenceSequence.setTaxonomy(taxonomyExtractor.getTaxonomy());
+        referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
+        return referenceSequence;
     }
 
     @Override
@@ -163,6 +177,9 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             if (accession == null) {
                 throw new IllegalArgumentException ("Encountered exception for unknown reference sequence name " + refName);
             }
+            // Concatenating both accession and reference name to retrieve later
+            // '#' will not be part of accession or reference name
+            accession = accession + "#" + refName;
         }
         return accession;
     }

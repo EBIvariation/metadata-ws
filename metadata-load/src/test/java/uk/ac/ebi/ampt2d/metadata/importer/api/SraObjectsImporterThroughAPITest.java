@@ -29,6 +29,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
@@ -54,6 +55,9 @@ public class SraObjectsImporterThroughAPITest {
 
     @Autowired
     private AnalysisRepository analysisRepository;
+
+    @Autowired
+    private ReferenceSequenceRepository referenceSequenceRepository;
 
     @Before
     public void setUp() {
@@ -109,6 +113,7 @@ public class SraObjectsImporterThroughAPITest {
         Taxonomy taxonomy = referenceSequence.getTaxonomy();
         assertEquals(9796, taxonomy.getTaxonomyId().longValue());
         assertEquals("Equus caballus", taxonomy.getName());
+        assertEquals(1, referenceSequenceRepository.count());
     }
 
 }

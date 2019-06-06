@@ -40,7 +40,6 @@ import uk.ac.ebi.ena.sra.xml.ReferenceSequenceType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -75,7 +74,7 @@ public abstract class ObjectsImporter {
 
     private WebResourceExtractorFromStudy webResourceExtractorFromStudy;
 
-    private TaxonomyExtractor taxonomyExtractor;
+    protected TaxonomyExtractor taxonomyExtractor;
 
     private TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence;
 
@@ -140,15 +139,11 @@ public abstract class ObjectsImporter {
             AnalysisType analysisType = sraAnalysisXmlParser.parseXml(xml, accession);
             analysis = analysisConverter.convert(analysisType);
             analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
-
             List<ReferenceSequence> referenceSequences = new ArrayList<>();
-            ReferenceSequence referenceSequence = buildReferenceSequence(analysisType);
-            if (referenceSequence != null) {
-                referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
-                referenceSequences.add(referenceSequence);
+            for (String referenceSequenceAccession : getReferenceSequenceAccessions(analysisType)) {
+                referenceSequences.add(importReferenceSequence(referenceSequenceAccession));
             }
             analysis.setReferenceSequences(referenceSequences);
-
             List<Sample> samples = new ArrayList<>();
             for (String sampleAccession : getSampleAccessions(analysisType)) {
                 //TODO Sample Import
@@ -236,40 +231,6 @@ public abstract class ObjectsImporter {
             sampleAccessions.add(sampleref.getAccession());
         }
         return sampleAccessions;
-    }
-
-    private ReferenceSequence buildReferenceSequence(AnalysisType analysisType) {
-        ReferenceSequence referenceSequence = null;
-        AnalysisType.ANALYSISTYPE analysistype = analysisType.getANALYSISTYPE();
-        ReferenceSequenceType referenceSequenceType = null;
-
-        if (analysistype.isSetSEQUENCEVARIATION()) {
-            referenceSequenceType = analysistype.getSEQUENCEVARIATION();
-        } else if (analysistype.isSetREFERENCEALIGNMENT()) {
-            referenceSequenceType = analysistype.getREFERENCEALIGNMENT();
-        } else if (analysistype.isSetPROCESSEDREADS()) {
-            referenceSequenceType = analysistype.getPROCESSEDREADS();
-        }
-
-        if (referenceSequenceType != null) {
-            ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
-            if (referenceAssemblyType != null) {
-                ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
-                if (standard != null) {
-                    String accession = getAccessionFromStandard(standard);
-                    String refName = standard.getRefname();
-                    String[] refNameSplit = refName.split("\\.", 2);
-                    String patch = null;
-                    if (refNameSplit.length == 2) {
-                        patch = refNameSplit[1];
-                    }
-                    ArrayList<String> accessionList = new ArrayList<>(Arrays.asList(accession));
-                    referenceSequence = new ReferenceSequence(refName, patch, accessionList,  ReferenceSequence.Type.ASSEMBLY);
-                    referenceSequence.setTaxonomy(taxonomyExtractor.getTaxonomy());
-                }
-            }
-        }
-        return referenceSequence;
     }
 
 }
