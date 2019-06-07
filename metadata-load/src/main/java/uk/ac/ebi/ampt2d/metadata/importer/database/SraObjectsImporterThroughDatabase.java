@@ -23,16 +23,17 @@ import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractorFromReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
@@ -92,7 +93,6 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             PublicationExtractorFromStudy publicationExtractorFromStudy,
             WebResourceExtractorFromStudy webResourceExtractorFromStudy,
             TaxonomyExtractor taxonomyExtractor,
-            TaxonomyExtractorFromReferenceSequence taxonomyExtractorFromReferenceSequence,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
             Converter<AnalysisType, Analysis> analysisConverter,
             FileExtractorFromAnalysis fileExtractorFromAnalysis,
@@ -100,7 +100,8 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
             AnalysisRepository analysisRepository,
             StudyRepository studyRepository,
-            ReferenceSequenceRepository referenceSequenceRepository) {
+            ReferenceSequenceRepository referenceSequenceRepository,
+            TaxonomyRepository taxonomyRepository) {
         super(
                 sraXmlRetrieverThroughDatabase,
                 sraStudyXmlParser,
@@ -112,11 +113,11 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                 publicationExtractorFromStudy,
                 webResourceExtractorFromStudy,
                 taxonomyExtractor,
-                taxonomyExtractorFromReferenceSequence,
                 fileExtractorFromAnalysis,
                 analysisRepository,
                 studyRepository,
-                referenceSequenceRepository
+                referenceSequenceRepository,
+                taxonomyRepository
         );
     }
 
@@ -146,7 +147,8 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             patch = refNameSplit[1];
         }
         ReferenceSequence referenceSequence = new ReferenceSequence(refName, patch, accessionList,  ReferenceSequence.Type.ASSEMBLY);
-        referenceSequence.setTaxonomy(taxonomyExtractor.getTaxonomy());
+        Taxonomy taxonomy = new Taxonomy(9606, "Homo sapiens");
+        referenceSequence.setTaxonomy(taxonomyRepository.findOrSave(taxonomy));
         referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
         return referenceSequence;
     }

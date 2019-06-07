@@ -1,6 +1,6 @@
 /*
  *
- * Copyright 2018 EMBL - European Bioinformatics Institute
+ * Copyright 2019 EMBL - European Bioinformatics Institute
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,26 @@
  * limitations under the License.
  *
  */
+
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
+import org.springframework.data.querydsl.QueryDslPredicateExecutor;
+import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QTaxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 
-@RepositoryRestResource
-public interface TaxonomyRepository extends TaxonomyRepositoryCustom, PagingAndSortingRepository<Taxonomy, Long> {
+@NoRepositoryBean
+public interface TaxonomyRepositoryCustom extends PagingAndSortingRepository<Taxonomy, Long>,
+        QueryDslPredicateExecutor<Taxonomy> {
 
-    Taxonomy findByTaxonomyId(@Param("taxonomyId") long taxonomyId);
+    QTaxonomy qTaxonomy = QTaxonomy.taxonomy;
+
+    default Taxonomy findOrSave(Taxonomy taxonomy) {
+        Taxonomy existingTaxonomy = findOne(qTaxonomy.taxonomyId.eq(taxonomy.getTaxonomyId()));
+        if (existingTaxonomy != null) {
+            return existingTaxonomy;
+        }
+        return save(taxonomy);
+    }
 }
