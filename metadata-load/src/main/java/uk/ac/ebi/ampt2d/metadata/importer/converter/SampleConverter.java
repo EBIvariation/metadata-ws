@@ -15,14 +15,21 @@
  * limitations under the License.
  *
  */
+package uk.ac.ebi.ampt2d.metadata.importer.converter;
 
-package uk.ac.ebi.ampt2d.metadata.importer.database;
+import org.springframework.core.convert.converter.Converter;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
+import uk.ac.ebi.ena.sra.xml.SampleType;
 
-public interface EnaObjectQuery {
+public class SampleConverter implements Converter<SampleType, Sample> {
 
-    String STUDY_QUERY = "SELECT STUDY_XML FROM ERA.STUDY WHERE STUDY_ID = :accession";
+    @Override
+    public Sample convert(SampleType sampleType) {
+        return new Sample(
+                new AccessionVersionId(sampleType.getAccession(), 1),
+                sampleType.getAlias()
+        );
+    }
 
-    String ANALYSIS_QUERY = "SELECT ANALYSIS_XML FROM ERA.ANALYSIS WHERE ANALYSIS_ID = :accession";
-
-    String SAMPLE_QUERY = "SELECT SAMPLE_XML FROM ERA.SAMPLE WHERE SAMPLE_ID = :accession";
 }

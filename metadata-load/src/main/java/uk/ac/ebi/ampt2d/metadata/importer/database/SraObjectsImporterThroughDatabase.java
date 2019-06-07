@@ -31,11 +31,13 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
+import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.util.ArrayList;
@@ -87,33 +89,47 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
     public SraObjectsImporterThroughDatabase(
             SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
+
             SraXmlParser<StudyType> sraStudyXmlParser,
+            SraXmlParser<AnalysisType> sraAnalysisXmlParser,
+            SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+            SraXmlParser<SampleType> sraSampleXmlParser,
+
             Converter<StudyType, Study> studyConverter,
+            Converter<AnalysisType, Analysis> analysisConverter,
+            Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
+            Converter<SampleType, Sample> sampleConverter,
+
             PublicationExtractorFromStudy publicationExtractorFromStudy,
             WebResourceExtractorFromStudy webResourceExtractorFromStudy,
-            SraXmlParser<AnalysisType> sraAnalysisXmlParser,
-            Converter<AnalysisType, Analysis> analysisConverter,
             FileExtractorFromAnalysis fileExtractorFromAnalysis,
-            SraXmlParser<AssemblyType> sraAssemblyXmlParser,
-            Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
-            AnalysisRepository analysisRepository,
+
             StudyRepository studyRepository,
+            AnalysisRepository analysisRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
+            SampleRepository sampleRepository,
             TaxonomyRepository taxonomyRepository) {
         super(
                 sraXmlRetrieverThroughDatabase,
+
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,
                 sraAssemblyXmlParser,
+                sraSampleXmlParser,
+
                 studyConverter,
                 analysisConverter,
                 referenceSequenceConverter,
+                sampleConverter,
+
                 publicationExtractorFromStudy,
                 webResourceExtractorFromStudy,
                 fileExtractorFromAnalysis,
-                analysisRepository,
+
                 studyRepository,
+                analysisRepository,
                 referenceSequenceRepository,
+                sampleRepository,
                 taxonomyRepository
         );
     }
@@ -158,7 +174,10 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
     @Override
     public Sample importSample(String accession) {
-        return super.importSample(accession);
+        setEnaObjectQuery(EnaObjectQuery.SAMPLE_QUERY);
+        Sample sample = super.importSample(accession);
+        setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
+        return sample;
     }
 
     @Override

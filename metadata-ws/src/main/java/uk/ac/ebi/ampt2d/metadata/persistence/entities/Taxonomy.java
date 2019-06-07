@@ -34,13 +34,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@SequenceGenerator(initialValue=1, allocationSize=1 , name="TAXONOMY_SEQ", sequenceName="taxonomy_sequence")
+@SequenceGenerator(allocationSize = 1, name = "TAXONOMY_SEQ", sequenceName = "taxonomy_sequence")
 public class Taxonomy extends Auditable<Long> {
 
     @ApiModelProperty(position = 1, value = "Taxonomy auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="TAXONOMY_SEQ")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TAXONOMY_SEQ")
     private long id;
 
     @ApiModelProperty(position = 2, example = "1")
@@ -72,9 +72,13 @@ public class Taxonomy extends Auditable<Long> {
         return id;
     }
 
-    public Long getTaxonomyId() { return taxonomyId; }
+    public long getTaxonomyId() {
+        return taxonomyId;
+    }
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
     /**
      * Release date control: taxonomies are always public.

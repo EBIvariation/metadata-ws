@@ -31,8 +31,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import java.util.List;
 
 @RepositoryRestResource
-public interface SampleRepository extends PagingAndSortingRepository<Sample, Long>, QueryDslPredicateExecutor<Sample>,
-        QuerydslBinderCustomizer<QSample> {
+public interface SampleRepository extends SampleCustomRepository, QuerydslBinderCustomizer<QSample> {
 
     default void customize(QuerydslBindings bindings, QSample qSample) {
         bindings.bind(qSample.taxonomies.any().name)
@@ -43,4 +42,5 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
     @RestResource(path = "/accession")
     List<Sample> findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc
             (@Param("accession") String accession);
+
 }
