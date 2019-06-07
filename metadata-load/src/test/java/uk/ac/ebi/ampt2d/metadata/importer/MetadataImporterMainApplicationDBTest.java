@@ -30,6 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.database.OracleDbCategory;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import static org.junit.Assert.assertEquals;
@@ -52,6 +53,9 @@ public class MetadataImporterMainApplicationDBTest {
     @Autowired
     private AnalysisRepository analysisRepository;
 
+    @Autowired
+    private SampleRepository sampleRepository;
+
     @Test
     @Category(OracleDbCategory.class)
     public void run() throws Exception {
@@ -59,7 +63,7 @@ public class MetadataImporterMainApplicationDBTest {
                 new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessions.txt"}));
         assertEquals(2, studyRepository.count());
         assertEquals(6, analysisRepository.count());
-
+        assertEquals(6, sampleRepository.count());
         sraObjectsImporterThroughDatabase.getAccessionsToStudy().clear();
 
         // Import analysis having shared study that is already imported before
@@ -67,6 +71,7 @@ public class MetadataImporterMainApplicationDBTest {
                 new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessionsSharedStudyPreviousImport.txt"}));
         assertEquals(2, studyRepository.count());
         assertEquals(11, analysisRepository.count());
+        assertEquals(11, sampleRepository.count());
     }
 
 }
