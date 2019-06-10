@@ -63,33 +63,36 @@ public class SraObjectsImporterThroughAPITest {
     public void setUp() {
         analysisRepository.deleteAll();
         studyRepository.deleteAll();
+        referenceSequenceRepository.deleteAll();
     }
 
     @Test
     public void importStudy() throws Exception {
-        Study study = sraObjectImporter.importStudy("ERP000054");
+        // This study contains two analyses and one reference sequence
+        Study study = sraObjectImporter.importStudy("ERP006576");
         assertNotNull(study);
-        assertEquals("ERP000054", study.getAccessionVersionId().getAccession());
-        assertEquals(LocalDate.of(2010, 04, 8), study.getReleaseDate());
-        assertEquals("CEBPA binding in five vertebrates", study.getName());
+        assertEquals("ERP006576", study.getAccessionVersionId().getAccession());
+        assertEquals(LocalDate.of(2014, 8, 4), study.getReleaseDate());
+        assertEquals("Sanger Institute Mouse Genomes Project v3", study.getName());
 
         // Below two studies doesn't have analysis associated with it
         study = sraObjectImporter.importStudy("SRP000392");
         assertNotNull(study);
         assertEquals("SRP000392", study.getAccessionVersionId().getAccession());
-        assertEquals(LocalDate.of(2010, 02, 26), study.getReleaseDate());
+        assertEquals(LocalDate.of(2010, 2, 26), study.getReleaseDate());
         assertEquals("Isolate from a patient with gastric carcinoma", study.getName());
         assertEquals(1, study.getPublications().size());
 
         study = sraObjectImporter.importStudy("SRP000118");
         assertNotNull(study);
         assertEquals("SRP000118", study.getAccessionVersionId().getAccession());
-        assertEquals(LocalDate.of(2010, 02, 26), study.getReleaseDate());
+        assertEquals(LocalDate.of(2010, 2, 26), study.getReleaseDate());
         assertEquals("Reference genome for the Human Microbiome Project", study.getName());
         assertEquals(1, study.getResources().size());
 
         assertEquals(3, studyRepository.count());
-        assertEquals(1, analysisRepository.count());
+        assertEquals(2, analysisRepository.count());
+        assertEquals(1, referenceSequenceRepository.count());
     }
 
     @Test

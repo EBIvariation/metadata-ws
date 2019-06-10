@@ -185,8 +185,9 @@ public abstract class ObjectsImporter {
     private Set<String> getReferenceSequenceAccessions(AnalysisType analysisType) {
         Set<String> referenceSequenceAccessions = new HashSet<>();
         AnalysisType.ANALYSISTYPE analysisType1 = analysisType.getANALYSISTYPE();
-        // ENA records can contain a reference sequence in either of the three analysis categories:
-        // REFERENCE_ALIGNMENT, SEQUENCE_VARIATION, and PROCESSED_READS. All accessions are collected and returned.
+        // Analysis records can contain a reference sequence in either of the three analysis categories:
+        // REFERENCE_ALIGNMENT, SEQUENCE_VARIATION, and PROCESSED_READS. It is guaranteed that each analysis contains
+        // at most one of these three types.
         if (analysisType1.isSetREFERENCEALIGNMENT()) {
             String accession = getAccessionFromReferenceSequenceType(analysisType1.getREFERENCEALIGNMENT());
             if (accession != null) {
