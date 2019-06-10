@@ -153,6 +153,8 @@ public abstract class ObjectsImporter {
         return study;
     }
 
+    protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study);
+
     public Analysis importAnalysis(String accession) {
         Analysis analysis = null;
         try {
@@ -179,6 +181,8 @@ public abstract class ObjectsImporter {
         return analysis;
     }
 
+    protected abstract Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis);
+
     public ReferenceSequence importReferenceSequence(String accession) {
         ReferenceSequence referenceSequence = null;
         try {
@@ -194,26 +198,6 @@ public abstract class ObjectsImporter {
         }
         return referenceSequence;
     }
-
-    public Sample importSample(String accession) {
-        Sample sample = null;
-        try {
-            String xml = sraXmlRetrieverByAccession.getXml(accession);
-            SampleType sampleType = sraSampleXmlParser.parseXml(xml, accession);
-            sample = sampleConverter.convert(sampleType);
-            Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(sampleType));
-            sample.setTaxonomies(Arrays.asList(taxonomy));
-            sample = sampleRepository.findOrSave(sample);
-        } catch (Exception exception) {
-            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + accession);
-            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
-        }
-        return sample;
-    }
-
-    protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study);
-
-    protected abstract Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis);
 
     protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
         return standard.getAccession();
@@ -262,6 +246,22 @@ public abstract class ObjectsImporter {
             }
         }
         return null;
+    }
+
+    public Sample importSample(String accession) {
+        Sample sample = null;
+        try {
+            String xml = sraXmlRetrieverByAccession.getXml(accession);
+            SampleType sampleType = sraSampleXmlParser.parseXml(xml, accession);
+            sample = sampleConverter.convert(sampleType);
+            Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(sampleType));
+            sample.setTaxonomies(Arrays.asList(taxonomy));
+            sample = sampleRepository.findOrSave(sample);
+        } catch (Exception exception) {
+            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + accession);
+            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+        }
+        return sample;
     }
 
     private Taxonomy extractTaxonomyFromSample(SampleType sampleType) {
