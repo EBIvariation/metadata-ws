@@ -1,19 +1,32 @@
 Feature: study object
 
-  Scenario: register a study successfully
-    When I request POST /taxonomies with JSON payload:
-    """
-    {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens"
-    }
-    """
+  Scenario: register a study successfully and check its fields
+    # Create a taxonomy
+    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for ancestors
     Then set the URL to TAXONOMY
+    # Create a reference sequence
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh37",
+      "patch": "p2",
+      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "type": "ASSEMBLY",
+      "taxonomy": "TAXONOMY"
+    """
+    Then set the URL to REFERENCE_SEQUENCE
+    # Create a study
     When I create a study
     Then set the URL to STUDY
+    # Create analyses to link study to taxonomy
+    When I create an analysis with Analysis for accession, REFERENCE_SEQUENCE for reference sequence and STUDY for study
+    Then set the URL to ANALYSIS
+    # Check that the study is retrievable and contains the correct accession
     When I request GET with value of STUDY
     Then the response code should be 200
     And the response should contain field accessionVersionId.accession with value EGAS0001
+    # Check that the study contains the correct taxonomy
+    When I request GET for taxonomy of STUDY
+    And the href of the class taxonomy should be TAXONOMY
 
 
   Scenario Outline: search various study by taxonomy name and id
