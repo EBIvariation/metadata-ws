@@ -135,6 +135,10 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         return super.importAnalysis(accession);
     }
 
+    /**
+     * Import reference sequence from the EGA database. See getAccessionFromStandard() documentation for details on
+     * accession name format.
+     */
     @Override
     public ReferenceSequence importReferenceSequence(String accession) {
         String[] accnRefNameSplit = accession.split("#", 2);
@@ -146,7 +150,9 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         if (refNameSplit.length == 2) {
             patch = refNameSplit[1];
         }
-        ReferenceSequence referenceSequence = new ReferenceSequence(refName, patch, accessionList,  ReferenceSequence.Type.ASSEMBLY);
+        ReferenceSequence referenceSequence = new ReferenceSequence(
+                refName, patch, accessionList, ReferenceSequence.Type.ASSEMBLY
+        );
         Taxonomy taxonomy = new Taxonomy(9606, "Homo sapiens");
         referenceSequence.setTaxonomy(taxonomyRepository.findOrSave(taxonomy));
         referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
@@ -170,6 +176,14 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         return study;
     }
 
+    /**
+     * Retrieve accession and refname from the EGA database. Contrary to the API flow (extract accession, retrieve
+     * AssemblyType, extract refname and other fields), EGA stores only refname, which is used to determine an
+     * accession. To make this possible, refname is appended to accession using a '#' symbol. This is later split and
+     * stored appropriately.
+     *
+     * @return combined accession and refname. Example: "GCA_000001405.1#GRCh37"
+     */
     @Override
     protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
         String refName = standard.getRefname();

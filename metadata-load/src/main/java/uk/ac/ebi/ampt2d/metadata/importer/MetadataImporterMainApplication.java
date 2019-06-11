@@ -52,6 +52,7 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
     public static void main(String[] args) throws Exception {
         SpringApplication.run(MetadataImporterMainApplication.class, args);
     }
+
     /**
      * This method executes the task of importing studies or analyses based on import source.
      * We are starting with analyses in case of objects import through database because the study xmls in database
