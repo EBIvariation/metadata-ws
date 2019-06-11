@@ -396,5 +396,3 @@ Feature: analysis object
        | query |
        | type=UNKNOWN |
        | technology=UNKNOWN |
-
-

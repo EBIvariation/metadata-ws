@@ -112,7 +112,7 @@ public class Study extends Auditable<Long> {
     @OneToMany(mappedBy = "study",fetch = FetchType.EAGER)
     private List<Analysis> analyses;
 
-    @OneToMany
+    @ManyToMany
     private List<WebResource> resources;
 
 
@@ -140,10 +140,6 @@ public class Study extends Auditable<Long> {
 
     public boolean isDeprecated() {
         return deprecated;
-    }
-
-    public LocalDate getReleaseDate() {
-        return releaseDate;
     }
 
     public void setReleaseDate(LocalDate releaseDate) {
@@ -218,4 +214,14 @@ public class Study extends Auditable<Long> {
     public void setPublications(List<Publication> publications) {
         this.publications = publications;
     }
+
+    /**
+     * Release date control for Study.
+     * @return the date at which Study should become available.
+     */
+    @Override
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
 }

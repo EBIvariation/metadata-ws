@@ -43,7 +43,14 @@ public class StudySteps {
 
     @When("I create a study with (.*) for taxonomy$")
     public void createTestStudy(String testTaxonomyKey) throws Exception {
-        CommonStates.setResultActions(postTestStudy("EGAS0001", 1, "test_human_study", false, LocalDate.now(), testTaxonomyKey));
+        createTestStudyWithTaxonomyAndAccession(testTaxonomyKey, "EGAS0001");
+    }
+
+    @When("I create a study with (.*) for taxonomy and (.*) for accession$")
+    public void createTestStudyWithTaxonomyAndAccession(String testTaxonomyKey, String accession) throws Exception {
+        CommonStates.setResultActions(postTestStudy(
+                accession, 1, "test_human_study", false, LocalDate.now(), testTaxonomyKey
+        ));
     }
 
     @When("^I request POST /studies with JSON-like payload:$")
@@ -89,25 +96,6 @@ public class StudySteps {
             CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(content)));
-    }
-
-    @When("^I request PATCH (.*) with patch and day (.*)")
-    public void performPatchedPatchOnResourceWithDay(String urlKey, String day) throws Exception {
-        int intDay = 0;
-        if (day.equals("today")) {
-            intDay = 0;
-        } else if (day.equals("yesterday")) {
-            intDay = -1;
-        } else if (day.equals("tomorrow")) {
-            intDay = 1;
-        }
-        String content = "{ \"releaseDate\" : \"";
-        content += LocalDate.now().plusDays(intDay);
-        content += "\" }";
-
-        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content)));
     }
 
     @When("^I request search studies having release (.*) today")

@@ -48,6 +48,14 @@ public class AnalysisSteps {
                 Analysis.Type.CASE_CONTROL, "Illumina");
     }
 
+    @When("I create an analysis with (.*) for accession, (.*) for reference sequence and (.*) for study")
+    public void createTestAnalysisAccession(String accession, String referenceSequenceUrlKey, String studyUrlKey) throws Exception {
+        createTestAnalysisParam(
+                accession, referenceSequenceUrlKey, studyUrlKey, Analysis.Technology.EXOME_SEQUENCING,
+                Analysis.Type.CASE_CONTROL, "Illumina"
+        );
+    }
+
     @When("I create an analysis with (.*) for accession, (.*) for reference sequence, (.*) for study, (.*) for technology, (.*) for type and (.*) for platform")
     public void createTestAnalysisParam(String accession, String referenceSequenceUrlKey, String studyUrlKey,
                                         Analysis.Technology technology, Analysis.Type type, String platform)

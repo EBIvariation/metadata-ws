@@ -30,6 +30,7 @@ import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -74,5 +75,13 @@ public class Taxonomy extends Auditable<Long> {
     public Long getTaxonomyId() { return taxonomyId; }
 
     public String getName() { return name; }
+
+    /**
+     * Release date control: taxonomies are always public.
+     */
+    @Override
+    public LocalDate getReleaseDate() {
+        return null;
+    }
 
 }

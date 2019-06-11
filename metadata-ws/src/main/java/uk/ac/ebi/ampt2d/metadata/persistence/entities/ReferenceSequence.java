@@ -35,9 +35,9 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name","patch"}))
@@ -124,6 +124,14 @@ public class ReferenceSequence extends Auditable<Long> {
 
     public void setTaxonomy(Taxonomy taxonomy) {
         this.taxonomy = taxonomy;
+    }
+
+    /**
+     * Release date control: reference sequences are always public.
+     */
+    @Override
+    public LocalDate getReleaseDate() {
+        return null;
     }
 
 }

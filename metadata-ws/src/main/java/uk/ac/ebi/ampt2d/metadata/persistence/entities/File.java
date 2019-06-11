@@ -17,8 +17,10 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -34,6 +36,7 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
@@ -123,4 +126,20 @@ public class File extends Auditable<Long> {
     public Type getType() {
         return type;
     }
+
+    /**
+     * Release date control: get the *earliest* release date from all studies which link to this file.
+     */
+    @Formula("(SELECT min(study.release_date) FROM file " +
+             "INNER JOIN analysis_files on file.id = analysis_files.files_id " +
+             "INNER JOIN analysis on analysis_files.analysis_id = analysis.id " +
+             "INNER JOIN study on analysis.study_id = study.id " +
+             "WHERE file.id=id)")
+    @JsonIgnore
+    private LocalDate releaseDate;
+
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
 }

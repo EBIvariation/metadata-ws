@@ -17,8 +17,10 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.annotations.Formula;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Column;
@@ -33,6 +35,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import java.time.LocalDate;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"type","resourceUrl"}))
@@ -80,4 +83,19 @@ public class WebResource extends Auditable<Long> {
     public Long getId() {
         return id;
     }
+
+    /**
+     * Release date control: get the *earliest* release date from all studies which link to this web resource.
+     */
+    @Formula("(SELECT min(study.release_date) FROM study_resources " +
+            "INNER JOIN study on study_resources.study_id = study.id " +
+            "WHERE study_resources.resources_id=id)")
+    @JsonIgnore
+    private LocalDate releaseDate;
+
+    @Override
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
 }

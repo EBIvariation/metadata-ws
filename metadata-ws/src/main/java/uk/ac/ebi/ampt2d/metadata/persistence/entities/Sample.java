@@ -17,8 +17,10 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -33,8 +35,8 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
@@ -88,4 +90,20 @@ public class Sample extends Auditable<Long> {
     public List<Taxonomy> getTaxonomies() {
         return taxonomies;
     }
+
+    /**
+     * Release date control: get the *earliest* release date from all studies which link to this sample.
+     */
+    @Formula("(SELECT min(study.release_date) FROM sample " +
+            "INNER JOIN analysis_samples on sample.id = analysis_samples.samples_id " +
+            "INNER JOIN analysis on analysis_samples.analysis_id = analysis.id " +
+            "INNER JOIN study on analysis.study_id = study.id " +
+            "WHERE sample.id=id)")
+    @JsonIgnore
+    private LocalDate releaseDate;
+
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
 }

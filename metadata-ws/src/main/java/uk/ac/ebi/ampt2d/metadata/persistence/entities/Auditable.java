@@ -23,6 +23,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
 @MappedSuperclass
@@ -42,4 +43,7 @@ public abstract class Auditable<ID> {
     }
 
     public abstract ID getId();
+
+    public abstract LocalDate getReleaseDate();
+
 }
