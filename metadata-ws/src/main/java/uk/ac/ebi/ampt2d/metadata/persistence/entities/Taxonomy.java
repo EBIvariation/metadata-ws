@@ -71,4 +71,8 @@ public class Taxonomy extends Auditable<Long> {
         return id;
     }
 
+    public Long getTaxonomyId() { return taxonomyId; }
+
+    public String getName() { return name; }
+
 }

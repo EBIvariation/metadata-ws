@@ -31,6 +31,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
@@ -51,6 +52,9 @@ public class SraObjectsImporterThroughDBTest {
 
     @Autowired
     private AnalysisRepository analysisRepository;
+
+    @Autowired
+    private ReferenceSequenceRepository referenceSequenceRepository;
 
     @Before
     public void setUp() {
@@ -87,9 +91,12 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
         assertEquals(1, analysis.getFiles().size());
         assertEquals("ERP000860", analysis.getStudy().getAccessionVersionId().getAccession());
+        assertEquals("GCA_000001405.1", analysis.getReferenceSequences().get(0).getAccessions().get(0));
+        assertEquals("GRCh37", analysis.getReferenceSequences().get(0).getName());
 
         assertEquals(1, studyRepository.count());
         assertEquals(1, analysisRepository.count());
+        assertEquals(1, referenceSequenceRepository.count());
     }
 
 }

@@ -29,8 +29,12 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
+import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceSequenceType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
@@ -52,43 +56,60 @@ public abstract class ObjectsImporter {
 
     protected AnalysisRepository analysisRepository;
 
+    protected ReferenceSequenceRepository referenceSequenceRepository;
+
+    protected TaxonomyRepository taxonomyRepository;
+
     private SraXmlParser<StudyType> sraStudyXmlParser;
 
     private SraXmlParser<AnalysisType> sraAnalysisXmlParser;
+
+    private SraXmlParser<AssemblyType> sraAssemblyXmlParser;
 
     private Converter<StudyType, Study> studyConverter;
 
     private Converter<AnalysisType, Analysis> analysisConverter;
 
+    private Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter;
+
     private PublicationExtractorFromStudy publicationExtractorFromStudy;
 
     private WebResourceExtractorFromStudy webResourceExtractorFromStudy;
 
-    private TaxonomyExtractor taxonomyExtractor;
+    protected TaxonomyExtractor taxonomyExtractor;
 
     private FileExtractorFromAnalysis fileExtractorFromAnalysis;
 
     public ObjectsImporter(SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
-                           SraXmlParser<StudyType> sraStudyXmlParser, SraXmlParser<AnalysisType> sraAnalysisXmlParser,
+                           SraXmlParser<StudyType> sraStudyXmlParser,
+                           SraXmlParser<AnalysisType> sraAnalysisXmlParser,
+                           SraXmlParser<AssemblyType> sraAssemblyXmlParser,
                            Converter<StudyType, Study> studyConverter,
                            Converter<AnalysisType, Analysis> analysisConverter,
+                           Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
                            PublicationExtractorFromStudy publicationExtractorFromStudy,
                            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
                            TaxonomyExtractor taxonomyExtractor,
                            FileExtractorFromAnalysis fileExtractorFromAnalysis,
                            AnalysisRepository analysisRepository,
-                           StudyRepository studyRepository) {
+                           StudyRepository studyRepository,
+                           ReferenceSequenceRepository referenceSequenceRepository,
+                           TaxonomyRepository taxonomyRepository) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
+        this.sraAssemblyXmlParser = sraAssemblyXmlParser;
         this.studyConverter = studyConverter;
         this.analysisConverter = analysisConverter;
+        this.referenceSequenceConverter = referenceSequenceConverter;
         this.publicationExtractorFromStudy = publicationExtractorFromStudy;
         this.webResourceExtractorFromStudy = webResourceExtractorFromStudy;
         this.taxonomyExtractor = taxonomyExtractor;
         this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
         this.analysisRepository = analysisRepository;
         this.studyRepository = studyRepository;
+        this.referenceSequenceRepository = referenceSequenceRepository;
+        this.taxonomyRepository = taxonomyRepository;
     }
 
     public Study importStudy(String accession) {
@@ -120,8 +141,7 @@ public abstract class ObjectsImporter {
             analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
             List<ReferenceSequence> referenceSequences = new ArrayList<>();
             for (String referenceSequenceAccession : getReferenceSequenceAccessions(analysisType)) {
-                //TODO ReferenceSequence Import
-                //referenceSequences.add(importReferenceSequence(referenceSequenceAccession));
+                referenceSequences.add(importReferenceSequence(referenceSequenceAccession));
             }
             analysis.setReferenceSequences(referenceSequences);
             List<Sample> samples = new ArrayList<>();
@@ -142,7 +162,68 @@ public abstract class ObjectsImporter {
     protected abstract Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis);
 
     public ReferenceSequence importReferenceSequence(String accession) {
+        ReferenceSequence referenceSequence = null;
+        try {
+            String assemblyXml = sraXmlRetrieverByAccession.getXml(accession);
+            AssemblyType assembly = sraAssemblyXmlParser.parseXml(assemblyXml, accession);
+            referenceSequence = referenceSequenceConverter.convert(assembly);
+            Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromAssembly(assembly));
+            referenceSequence.setTaxonomy(taxonomy);
+            referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
+        } catch (Exception exception) {
+            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for ReferenceSequence accession " + accession);
+            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+        }
+        return referenceSequence;
+    }
+
+    private Taxonomy extractTaxonomyFromAssembly(AssemblyType assemblyType) {
+        AssemblyType.TAXON taxon = assemblyType.getTAXON();
+        return new Taxonomy(taxon.getTAXONID(), taxon.getSCIENTIFICNAME());
+    }
+
+    private Set<String> getReferenceSequenceAccessions(AnalysisType analysisType) {
+        Set<String> referenceSequenceAccessions = new HashSet<>();
+        AnalysisType.ANALYSISTYPE analysisType1 = analysisType.getANALYSISTYPE();
+        // Analysis records can contain a reference sequence in either of the three analysis categories:
+        // REFERENCE_ALIGNMENT, SEQUENCE_VARIATION, and PROCESSED_READS. It is guaranteed that each analysis contains
+        // at most one of these three types.
+        if (analysisType1.isSetREFERENCEALIGNMENT()) {
+            String accession = getAccessionFromReferenceSequenceType(analysisType1.getREFERENCEALIGNMENT());
+            if (accession != null) {
+                referenceSequenceAccessions.add(accession);
+            }
+        }
+        if (analysisType1.isSetSEQUENCEVARIATION()) {
+            String accession = getAccessionFromReferenceSequenceType(analysisType1.getSEQUENCEVARIATION());
+            if (accession != null) {
+                referenceSequenceAccessions.add(accession);
+            }
+        }
+        if (analysisType1.isSetPROCESSEDREADS()) {
+            String accession = getAccessionFromReferenceSequenceType(analysisType1.getPROCESSEDREADS());
+            if (accession != null) {
+                referenceSequenceAccessions.add(accession);
+            }
+        }
+        return referenceSequenceAccessions;
+    }
+
+    private String getAccessionFromReferenceSequenceType(ReferenceSequenceType referenceSequenceType) {
+        if (referenceSequenceType != null) {
+            ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
+            if (referenceAssemblyType != null) {
+                ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
+                if (standard != null) {
+                    return getAccessionFromStandard(standard);
+                }
+            }
+        }
         return null;
+    }
+
+    protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
+        return standard.getAccession();
     }
 
     public Sample importSample(String accession) {
@@ -158,20 +239,4 @@ public abstract class ObjectsImporter {
         return sampleAccessions;
     }
 
-    private Set<String> getReferenceSequenceAccessions(AnalysisType analysisType) {
-        Set<String> referenceSequenceAccessions = new HashSet<>();
-        ReferenceSequenceType referenceSequenceType = analysisType.getANALYSISTYPE().getREFERENCEALIGNMENT();
-        if (referenceSequenceType == null) {
-            return referenceSequenceAccessions;
-        }
-        ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
-        if (referenceAssemblyType == null) {
-            return referenceSequenceAccessions;
-        }
-        ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
-        if (standard != null) {
-            referenceSequenceAccessions.add(standard.getAccession());
-        }
-        return referenceSequenceAccessions;
-    }
 }

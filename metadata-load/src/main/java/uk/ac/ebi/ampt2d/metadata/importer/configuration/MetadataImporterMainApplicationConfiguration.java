@@ -25,6 +25,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughAPI;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
+import uk.ac.ebi.ampt2d.metadata.importer.converter.ReferenceSequenceConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.StudyConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraXmlRetrieverThroughDatabase;
@@ -33,11 +34,13 @@ import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStud
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.TaxonomyExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
@@ -51,30 +54,56 @@ public class MetadataImporterMainApplicationConfiguration {
                                                        WebResourceRepository webResourceRepository,
                                                        FileRepository fileRepository,
                                                        TaxonomyRepository taxonomyRepository,
+                                                       ReferenceSequenceRepository referenceSequenceRepository,
                                                        AnalysisRepository analysisRepository,
                                                        StudyRepository studyRepository) {
-        return new SraObjectsImporterThroughAPI(sraXmlRetrieverThroughApi, sraStudyXmlParser(),
-                studyConverter(), publicationExtractorFromStudy(publicationRepository),
-                webResourceExtractorFromStudy(webResourceRepository), taxonomyExtractor(taxonomyRepository),
-                sraAnalysisXmlParser(), analysisConverter(), fileExtractorFromAnalysis(fileRepository),
-                analysisRepository, studyRepository);
+        return new SraObjectsImporterThroughAPI(
+                sraXmlRetrieverThroughApi,
+                sraStudyXmlParser(),
+                studyConverter(),
+                publicationExtractorFromStudy(publicationRepository),
+                webResourceExtractorFromStudy(webResourceRepository),
+                taxonomyExtractor(taxonomyRepository),
+                sraAnalysisXmlParser(),
+                analysisConverter(),
+                fileExtractorFromAnalysis(fileRepository),
+                sraAssemblyXmlParser(),
+                referenceSequenceConverter(),
+                analysisRepository,
+                studyRepository,
+                referenceSequenceRepository,
+                taxonomyRepository
+        );
     }
 
     @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "DB")
     public ObjectsImporter objectImporterThroughEnaDatabase(
-            SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
-            PublicationRepository publicationRepository,
-            WebResourceRepository webResourceRepository,
-            FileRepository fileRepository,
-            TaxonomyRepository taxonomyRepository,
-            AnalysisRepository analysisRepository,
-            StudyRepository studyRepository) {
-        return new SraObjectsImporterThroughDatabase(sraXmlRetrieverThroughDatabase, sraStudyXmlParser(),
-                studyConverter(), publicationExtractorFromStudy(publicationRepository),
-                webResourceExtractorFromStudy(webResourceRepository), taxonomyExtractor(taxonomyRepository),
-                sraAnalysisXmlParser(), analysisConverter(), fileExtractorFromAnalysis(fileRepository),
-                analysisRepository,studyRepository);
+                                                SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
+                                                PublicationRepository publicationRepository,
+                                                WebResourceRepository webResourceRepository,
+                                                FileRepository fileRepository,
+                                                TaxonomyRepository taxonomyRepository,
+                                                ReferenceSequenceRepository referenceSequenceRepository,
+                                                AnalysisRepository analysisRepository,
+                                                StudyRepository studyRepository) {
+        return new SraObjectsImporterThroughDatabase(
+                sraXmlRetrieverThroughDatabase,
+                sraStudyXmlParser(),
+                studyConverter(),
+                publicationExtractorFromStudy(publicationRepository),
+                webResourceExtractorFromStudy(webResourceRepository),
+                taxonomyExtractor(taxonomyRepository),
+                sraAnalysisXmlParser(),
+                analysisConverter(),
+                fileExtractorFromAnalysis(fileRepository),
+                sraAssemblyXmlParser(),
+                referenceSequenceConverter(),
+                analysisRepository,
+                studyRepository,
+                referenceSequenceRepository,
+                taxonomyRepository
+        );
     }
 
     private StudyConverter studyConverter() {
@@ -101,11 +130,19 @@ public class MetadataImporterMainApplicationConfiguration {
         return new FileExtractorFromAnalysis(fileRepository);
     }
 
+    private SraAssemblyXmlParser sraAssemblyXmlParser() {
+        return new SraAssemblyXmlParser();
+    }
+
     private PublicationExtractorFromStudy publicationExtractorFromStudy(PublicationRepository publicationRepository) {
         return new PublicationExtractorFromStudy(publicationRepository);
     }
 
     private WebResourceExtractorFromStudy webResourceExtractorFromStudy(WebResourceRepository webResourceRepository) {
         return new WebResourceExtractorFromStudy(webResourceRepository);
+    }
+
+    private ReferenceSequenceConverter referenceSequenceConverter() {
+        return new ReferenceSequenceConverter();
     }
 }

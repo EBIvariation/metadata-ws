@@ -17,17 +17,14 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QReferenceSequence;
 
 @RepositoryRestResource(collectionResourceRel = "reference-sequences", path = "reference-sequences")
-public interface ReferenceSequenceRepository extends PagingAndSortingRepository<ReferenceSequence, Long>,
-        QueryDslPredicateExecutor<ReferenceSequence>, QuerydslBinderCustomizer<QReferenceSequence> {
+public interface ReferenceSequenceRepository extends ReferenceSequenceRepositoryCustom,
+        QuerydslBinderCustomizer<QReferenceSequence> {
 
     default void customize(QuerydslBindings bindings, QReferenceSequence referenceSequence) {
         bindings.bind(referenceSequence.name, referenceSequence.patch)

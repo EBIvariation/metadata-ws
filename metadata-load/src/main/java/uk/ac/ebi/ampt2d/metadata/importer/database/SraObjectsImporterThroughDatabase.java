@@ -29,11 +29,19 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
+import uk.ac.ebi.ena.sra.xml.AssemblyType;
+import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,22 +50,75 @@ import java.util.Map;
  */
 public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
+    private static final Map<String, String> REFERENCE_MAP;
+    static {
+        Map<String, String> refMap = new HashMap<>();
+        refMap.put("grch37", "GCA_000001405.1");
+        refMap.put("grch37.p1", "GCA_000001405.2");
+        refMap.put("grch37.p2", "GCA_000001405.3");
+        refMap.put("grch37.p3", "GCA_000001405.4");
+        refMap.put("grch37.p4", "GCA_000001405.5");
+        refMap.put("grch37.p5", "GCA_000001405.6");
+        refMap.put("grch37.p6", "GCA_000001405.7");
+        refMap.put("grch37.p7", "GCA_000001405.8");
+        refMap.put("grch37.p8", "GCA_000001405.9");
+        refMap.put("grch37.p9", "GCA_000001405.10");
+        refMap.put("grch37.p10", "GCA_000001405.11");
+        refMap.put("grch37.p11", "GCA_000001405.12");
+        refMap.put("grch37.p12", "GCA_000001405.13");
+        refMap.put("grch37.p13", "GCA_000001405.14");
+        refMap.put("grch38", "GCA_000001405.15");
+        refMap.put("grch38.p1", "GCA_000001405.16");
+        refMap.put("grch38.p2", "GCA_000001405.17");
+        refMap.put("grch38.p3", "GCA_000001405.18");
+        refMap.put("grch38.p4", "GCA_000001405.19");
+        refMap.put("grch38.p5", "GCA_000001405.20");
+        refMap.put("grch38.p6", "GCA_000001405.21");
+        refMap.put("grch38.p7", "GCA_000001405.22");
+        refMap.put("grch38.p8", "GCA_000001405.23");
+        refMap.put("grch38.p9", "GCA_000001405.24");
+        refMap.put("grch38.p10", "GCA_000001405.25");
+        refMap.put("grch38.p11", "GCA_000001405.26");
+        refMap.put("grch38.p12", "GCA_000001405.27");
+        refMap.put("grch38.p13", "GCA_000001405.28");
+        REFERENCE_MAP = Collections.unmodifiableMap(refMap);
+    }
+
     private Map<String, Study> accessionsToStudy = new HashMap<>();
 
-    public SraObjectsImporterThroughDatabase(SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
-                                             SraXmlParser<StudyType> sraStudyXmlParser,
-                                             Converter<StudyType, Study> studyConverter,
-                                             PublicationExtractorFromStudy publicationExtractorFromStudy,
-                                             WebResourceExtractorFromStudy webResourceExtractorFromStudy,
-                                             TaxonomyExtractor taxonomyExtractor,
-                                             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
-                                             Converter<AnalysisType, Analysis> analysisConverter,
-                                             FileExtractorFromAnalysis fileExtractorFromAnalysis,
-                                             AnalysisRepository analysisRepository,
-                                             StudyRepository studyRepository) {
-        super(sraXmlRetrieverThroughDatabase, sraStudyXmlParser, sraAnalysisXmlParser, studyConverter, analysisConverter,
-                publicationExtractorFromStudy, webResourceExtractorFromStudy, taxonomyExtractor,
-                fileExtractorFromAnalysis, analysisRepository, studyRepository);
+    public SraObjectsImporterThroughDatabase(
+            SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
+            SraXmlParser<StudyType> sraStudyXmlParser,
+            Converter<StudyType, Study> studyConverter,
+            PublicationExtractorFromStudy publicationExtractorFromStudy,
+            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
+            TaxonomyExtractor taxonomyExtractor,
+            SraXmlParser<AnalysisType> sraAnalysisXmlParser,
+            Converter<AnalysisType, Analysis> analysisConverter,
+            FileExtractorFromAnalysis fileExtractorFromAnalysis,
+            SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+            Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
+            AnalysisRepository analysisRepository,
+            StudyRepository studyRepository,
+            ReferenceSequenceRepository referenceSequenceRepository,
+            TaxonomyRepository taxonomyRepository) {
+        super(
+                sraXmlRetrieverThroughDatabase,
+                sraStudyXmlParser,
+                sraAnalysisXmlParser,
+                sraAssemblyXmlParser,
+                studyConverter,
+                analysisConverter,
+                referenceSequenceConverter,
+                publicationExtractorFromStudy,
+                webResourceExtractorFromStudy,
+                taxonomyExtractor,
+                fileExtractorFromAnalysis,
+                analysisRepository,
+                studyRepository,
+                referenceSequenceRepository,
+                taxonomyRepository
+        );
     }
 
     @Override
@@ -74,9 +135,28 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         return super.importAnalysis(accession);
     }
 
+    /**
+     * Import reference sequence from the EGA database. See getAccessionFromStandard() documentation for details on
+     * accession name format.
+     */
     @Override
     public ReferenceSequence importReferenceSequence(String accession) {
-        return super.importReferenceSequence(accession);
+        String[] accnRefNameSplit = accession.split("#", 2);
+        String refAccession = accnRefNameSplit[0];
+        String refName = accnRefNameSplit[1];
+        ArrayList<String> accessionList = new ArrayList<>(Arrays.asList(refAccession));
+        String[] refNameSplit = refName.split("\\.", 2);
+        String patch = null;
+        if (refNameSplit.length == 2) {
+            patch = refNameSplit[1];
+        }
+        ReferenceSequence referenceSequence = new ReferenceSequence(
+                refName, patch, accessionList, ReferenceSequence.Type.ASSEMBLY
+        );
+        Taxonomy taxonomy = new Taxonomy(9606, "Homo sapiens");
+        referenceSequence.setTaxonomy(taxonomyRepository.findOrSave(taxonomy));
+        referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
+        return referenceSequence;
     }
 
     @Override
@@ -94,6 +174,30 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     @Override
     protected Study extractAnalysisFromStudy(StudyType studyType, Study study) {
         return study;
+    }
+
+    /**
+     * Retrieve accession and refname from the EGA database. Contrary to the API flow (extract accession, retrieve
+     * AssemblyType, extract refname and other fields), EGA stores only refname, which is used to determine an
+     * accession. To make this possible, refname is appended to accession using a '#' symbol. This is later split and
+     * stored appropriately.
+     *
+     * @return combined accession and refname. Example: "GCA_000001405.1#GRCh37"
+     */
+    @Override
+    protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
+        String refName = standard.getRefname();
+        String accession = null;
+        if (refName != null) {
+            accession = REFERENCE_MAP.get(refName.toLowerCase());
+            if (accession == null) {
+                throw new IllegalArgumentException ("Encountered exception for unknown reference sequence name " + refName);
+            }
+            // Concatenating both accession and reference name to retrieve later
+            // '#' will not be part of accession or reference name
+            accession = accession + "#" + refName;
+        }
+        return accession;
     }
 
     private synchronized Study importStudyFromAnalysis(String studyAccession) {
@@ -119,4 +223,5 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     public Map<String, Study> getAccessionsToStudy() {
         return accessionsToStudy;
     }
+
 }
