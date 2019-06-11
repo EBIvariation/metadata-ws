@@ -47,7 +47,7 @@ public class ReleaseDateAspect {
         Iterator<Object> i = results.iterator();
         while (i.hasNext()) {
             Object result = i.next();
-            if (processReleaseControlledObject(result) == null) {
+            if (getObjectUnlessBeforeReleaseDate(result) == null) {
                 i.remove();
             }
         }
@@ -68,10 +68,10 @@ public class ReleaseDateAspect {
     @Around("execution(* org.springframework.data.repository.CrudRepository.findOne(java.io.Serializable))")
     public Object filterOnReleaseDateAdviceFindOne(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object result = proceedingJoinPoint.proceed();
-        return processReleaseControlledObject(result);
+        return getObjectUnlessBeforeReleaseDate(result);
     }
 
-    private Object processReleaseControlledObject(Object result) {
+    private Object getObjectUnlessBeforeReleaseDate(Object result) {
         if (result instanceof Auditable) {
             LocalDate releaseDate = ((Auditable) result).getReleaseDate();
             if (releaseDate != null && releaseDate.isAfter(LocalDate.now())) {

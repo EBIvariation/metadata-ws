@@ -17,10 +17,8 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -40,7 +38,6 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name","patch"}))
@@ -127,6 +124,14 @@ public class ReferenceSequence extends Auditable<Long> {
 
     public void setTaxonomy(Taxonomy taxonomy) {
         this.taxonomy = taxonomy;
+    }
+
+    /**
+     * Release date control: reference sequences are always public.
+     */
+    @Override
+    public LocalDate getReleaseDate() {
+        return null;
     }
 
 }

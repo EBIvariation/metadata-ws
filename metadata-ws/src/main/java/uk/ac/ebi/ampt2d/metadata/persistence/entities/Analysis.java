@@ -204,4 +204,5 @@ public class Analysis extends Auditable<Long> {
     public LocalDate getReleaseDate() {
         return getStudy().getReleaseDate();
     }
+
 }

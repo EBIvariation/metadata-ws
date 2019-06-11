@@ -81,8 +81,8 @@ Feature: Transitive release date control for child objects of a Study
       "type": "TSV"
     }
     """
-    Then the response code should be 201
     And set the URL to FILE3
+    Then the response code should be 201
 
     # Assign files to analyses: Analysis1 → File1, Analysis2 → File2, Analysis1,2 → File3
     When I request PATCH ANALYSIS1 with list FILE1,FILE3 of files

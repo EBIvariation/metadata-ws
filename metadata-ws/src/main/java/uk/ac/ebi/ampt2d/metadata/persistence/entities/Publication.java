@@ -69,4 +69,5 @@ public class Publication extends Auditable<Long>{
     public LocalDate getReleaseDate() {
         return releaseDate;
     }
+
 }
