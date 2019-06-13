@@ -10,7 +10,7 @@ Feature: Miscellaneous functions
 
 
   Scenario Outline: verify metadata objects are auditable
-    Given current time as START_TIME1
+    Given current date as TODAY
     Given I request POST /taxonomies with JSON payload:
     """
     {
@@ -84,25 +84,22 @@ Feature: Miscellaneous functions
       """
     Then set the URL to WEB_RESOURCE
 
-    Given current time as END_TIME1
     When I request GET with value of <url>
     Then the response code should be 200
 
     And the href of the class <class> should be <url>
     And the response should contain field lastModifiedDate with a non-empty value
-    And the lastModifiedDate should be after START_TIME1 and before END_TIME1
+    And the lastModifiedDate should equal TODAY
 
-    Given current time as START_TIME2
     When I request PATCH <url> with content <content> and patch false
     Then the response code should be 2xx
 
-    Given current time as END_TIME2
     When I request GET with value of <url>
     Then the response code should be 200
 
     And the href of the class <class> should be <url>
     And the response should contain field lastModifiedDate with a non-empty value
-    And the lastModifiedDate should be after START_TIME2 and before END_TIME2
+    And the lastModifiedDate should equal TODAY
 
     Examples:
       | url                | class             | content                                         |
