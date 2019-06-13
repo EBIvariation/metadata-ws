@@ -41,15 +41,15 @@ public class StudySteps {
     @Autowired
     private MockMvc mockMvc;
 
-    @When("I create a study with (.*) for taxonomy$")
-    public void createTestStudy(String testTaxonomyKey) throws Exception {
-        createTestStudyWithTaxonomyAndAccession(testTaxonomyKey, "EGAS0001");
+    @When("I create a study$")
+    public void createTestStudy() throws Exception {
+        createTestStudyWithAccession("EGAS0001");
     }
 
-    @When("I create a study with (.*) for taxonomy and (.*) for accession$")
-    public void createTestStudyWithTaxonomyAndAccession(String testTaxonomyKey, String accession) throws Exception {
+    @When("I create a study with (.*) for accession$")
+    public void createTestStudyWithAccession(String accession) throws Exception {
         CommonStates.setResultActions(postTestStudy(
-                accession, 1, "test_human_study", false, LocalDate.now(), testTaxonomyKey
+                accession, 1, "test_human_study", false, LocalDate.now()
         ));
     }
 
@@ -68,12 +68,6 @@ public class StudySteps {
                     json += LocalDate.now().plusDays(+1);
                 }
                 json += "\",";
-                continue;
-            } else if (value.contains("taxonomy")) {
-                String taxonomyKey = value.substring(value.indexOf(":") + 1);
-                taxonomyKey = taxonomyKey.replace("\"", "").trim();
-                String taxonomyUrl = CommonStates.getUrl(taxonomyKey);
-                json += "\"taxonomy\": \"" + taxonomyUrl + "\",";
                 continue;
             }
             json += value + ",";
@@ -139,7 +133,7 @@ public class StudySteps {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).doesNotExist());
     }
 
-    private ResultActions postTestStudy(String accession, int version, String name, boolean deprecated, LocalDate releaseDate, String testTaxonomyKey) throws Exception {
+    private ResultActions postTestStudy(String accession, int version, String name, boolean deprecated, LocalDate releaseDate) throws Exception {
         String jsonContent = "{" +
                 "      \"accessionVersionId\": {" +
                 "       \"accession\": \"" + accession +  "\"," +
@@ -149,8 +143,7 @@ public class StudySteps {
                 "      \"description\": \"Nothing important\"," +
                 "      \"center\": \"EBI\"," +
                 "      \"deprecated\": \"" + deprecated + "\"," +
-                "      \"releaseDate\": \"" + releaseDate + "\"," +
-                "      \"taxonomy\": \"" + CommonStates.getUrl(testTaxonomyKey) + "\"" +
+                "      \"releaseDate\": \"" + releaseDate + "\"" +
                 "    }";
 
         return mockMvc.perform(post("/studies")
