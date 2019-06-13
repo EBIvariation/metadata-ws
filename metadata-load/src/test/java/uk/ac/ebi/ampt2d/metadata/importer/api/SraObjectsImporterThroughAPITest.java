@@ -32,6 +32,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
@@ -60,11 +61,15 @@ public class SraObjectsImporterThroughAPITest {
     @Autowired
     private ReferenceSequenceRepository referenceSequenceRepository;
 
+    @Autowired
+    private SampleRepository sampleRepository;
+
     @Before
     public void setUp() {
         analysisRepository.deleteAll();
         studyRepository.deleteAll();
         referenceSequenceRepository.deleteAll();
+        sampleRepository.deleteAll();
     }
 
     @Test
@@ -94,6 +99,7 @@ public class SraObjectsImporterThroughAPITest {
         assertEquals(3, studyRepository.count());
         assertEquals(2, analysisRepository.count());
         assertEquals(1, referenceSequenceRepository.count());
+        assertEquals(25, sampleRepository.count());
     }
 
     @Test
