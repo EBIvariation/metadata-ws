@@ -2,7 +2,7 @@ Feature: study object
 
   Scenario: register a study successfully and check its fields
     # Create a taxonomy
-    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for ancestors
+    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and NONE for ancestors
     Then set the URL to TAXONOMY
     # Create a reference sequence
     When I request POST /reference-sequences with JSON-like payload:
