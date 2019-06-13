@@ -64,9 +64,9 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
     public void run(ApplicationArguments applicationArguments) throws Exception {
         Set<String> accessions = readAccessionsFromFile(applicationArguments);
         if (objectsImporter instanceof SraObjectsImporterThroughDatabase) {
-            accessions.parallelStream().forEach(accession -> objectsImporter.importAnalysis(accession));
+            accessions.forEach(accession -> objectsImporter.importAnalysis(accession));
         } else if (objectsImporter instanceof SraObjectsImporterThroughAPI) {
-            accessions.parallelStream().forEach(accession -> objectsImporter.importStudy(accession));
+            accessions.forEach(accession -> objectsImporter.importStudy(accession));
         } else {
             throw new RuntimeException("ObjectsImporter instance not known/supported");
         }
