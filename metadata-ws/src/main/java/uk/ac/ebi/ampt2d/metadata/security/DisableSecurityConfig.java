@@ -15,7 +15,6 @@
  * limitations under the License.
  *
  */
-
 package uk.ac.ebi.ampt2d.metadata.security;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
