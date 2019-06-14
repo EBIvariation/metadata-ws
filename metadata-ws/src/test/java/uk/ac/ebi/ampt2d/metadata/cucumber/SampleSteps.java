@@ -32,7 +32,7 @@ import java.util.List;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@Ignore
+
 @AutoConfigureMockMvc
 public class SampleSteps {
 

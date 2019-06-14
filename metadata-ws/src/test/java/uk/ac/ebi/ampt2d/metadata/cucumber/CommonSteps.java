@@ -24,7 +24,6 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.json.JSONObject;
-import org.junit.Ignore;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -32,8 +31,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
@@ -43,7 +40,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -60,7 +56,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -135,7 +130,7 @@ public class CommonSteps {
 
     @When("^I request PATCH (.*) with list (.*) of (.*)")
     public void performPatchOnResourceWithLinkedObjectList(String urlKey, String linkedObjectUrlKeys,
-                                                       String linkedObjectClassName) throws Exception {
+                                                           String linkedObjectClassName) throws Exception {
         List<String> newUrls = null;
         if (!linkedObjectUrlKeys.equals("NONE")) {
             newUrls = Arrays.stream(linkedObjectUrlKeys.split(","))
@@ -209,7 +204,7 @@ public class CommonSteps {
 
     @When("^I request elaborate search for the (.*) base (.*) and with the parameters: (.*)$")
     public void performSearchOnResourcesWithBaseAndParameters(String className, String base, String parameters) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "/search/"+base+"?"+parameters)));
+        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "/search/" + base + "?" + parameters)));
     }
 
     @And("^set the URL to (.*)$")
@@ -349,17 +344,16 @@ public class CommonSteps {
                 .andExpect(jsonPath("$.." + className + "[" + index + "]." + field + "[*]", hasItems(fieldValue)));
     }
 
-    @Given("^current time as (.*)$")
+    @Given("^current date as (.*)$")
     public void setTime(String timeKey) {
-        CommonStates.setTime(timeKey, ZonedDateTime.now());
+        CommonStates.setTime(timeKey, LocalDate.now());
     }
 
-    @Then("^the (.*) should be after (.*) and before (.*)$")
-    public void checkDateTimeBetween(String dateTime, String afterKey, String beforeKey) throws Exception {
+    @Then("^the (.*) should equal (.*)$")
+    public void checkDateTimeBetween(String date, String today) throws Exception {
         JSONObject jsonObject = new JSONObject(CommonStates.getResultActions().andReturn().getResponse().getContentAsString());
-        ZonedDateTime lastModifiedDate = ZonedDateTime.parse(jsonObject.getString(dateTime));
-        assert lastModifiedDate.isAfter(CommonStates.getTime(afterKey));
-        assert lastModifiedDate.isBefore(CommonStates.getTime(beforeKey));
+        LocalDate lastModifiedDate = LocalDate.parse(jsonObject.getString(date));
+        assert lastModifiedDate.isEqual(CommonStates.getTime(today));
     }
 
     @Given("^there is an URL (.*) with key (.*)$")
