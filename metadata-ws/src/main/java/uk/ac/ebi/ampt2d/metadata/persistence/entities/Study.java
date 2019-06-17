@@ -19,7 +19,6 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
-import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.JoinFormula;
 import org.hibernate.validator.constraints.NotBlank;
 

@@ -19,7 +19,6 @@ package uk.ac.ebi.ampt2d.metadata.cucumber;
 
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import org.junit.Ignore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;

@@ -18,7 +18,6 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.database;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -37,10 +36,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepos
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
