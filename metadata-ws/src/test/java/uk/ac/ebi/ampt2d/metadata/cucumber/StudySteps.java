@@ -24,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import uk.ac.ebi.ampt2d.metadata.AuthorizationServerHelper;
 
 import java.time.LocalDate;
 
@@ -39,6 +40,9 @@ public class StudySteps {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private AuthorizationServerHelper authorizationServerHelper;
 
     @When("I create a study$")
     public void createTestStudy() throws Exception {
@@ -75,40 +79,47 @@ public class StudySteps {
                 "\"center\": \"EBI\"}";
 
         CommonStates.setResultActions(mockMvc.perform(post("/studies")
+                .with(authorizationServerHelper.bearerToken("operator"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.getBytes())));
     }
 
     @When("^I request GET for the studies with query parameter (.*)")
     public void performGetOnResourcesQuery(String param) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/studies" + "?" + param)));
+        CommonStates.setResultActions(mockMvc.perform(get("/studies" + "?" + param)
+                .with(authorizationServerHelper.bearerToken("ampuser"))));
     }
 
     @When("^I request PATCH (.*) with patch and content (.*)")
     public void performPatchOnResourceWithContent(String urlKey, String content) throws Exception {
             CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
+                    .with(authorizationServerHelper.bearerToken("operator"))
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(content)));
     }
 
     @When("^I request search studies having release (.*) today")
     public void performSearchOnResourcesWithBaseAndParametersAndDay(String parameter) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/release-date?"+parameter+"="+LocalDate.now())));
+        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/release-date?"+parameter+"="+LocalDate.now())
+                .with(authorizationServerHelper.bearerToken("ampuser"))));
     }
 
     @When("^I request elaborate search with date range for the studies base (.*) and with the parameters: (\\d*)$")
     public void performSearchOnResourcesWithBaseAndParametersAndDayRange(String base, int day) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base+"?"+"from="+LocalDate.now().plusDays(day)+"&to="+LocalDate.now().plusDays(day))));
+        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base+"?"+"from="+LocalDate.now().plusDays(day)+"&to="+LocalDate.now().plusDays(day))
+                .with(authorizationServerHelper.bearerToken("ampuser"))));
     }
 
     @When("^I request search for the studies with base (.*) and name (.*) value (.*)$")
     public void performSearchOnResourcesWithParameters(String base, String name, String value) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base).param(name, value)));
+        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/"+base).param(name, value)
+                .with(authorizationServerHelper.bearerToken("ampuser"))));
     }
 
     @When("^I request search for studies that have been released")
     public void performSearchOnResources() throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/release-date")));
+        CommonStates.setResultActions(mockMvc.perform(get("/studies/search/release-date")
+                .with(authorizationServerHelper.bearerToken("ampuser"))));
     }
 
     @Then("^the response should contain one study$")
@@ -146,6 +157,7 @@ public class StudySteps {
                 "    }";
 
         return mockMvc.perform(post("/studies")
+                .with(authorizationServerHelper.bearerToken("operator"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent))
                 .andExpect(status().isCreated());

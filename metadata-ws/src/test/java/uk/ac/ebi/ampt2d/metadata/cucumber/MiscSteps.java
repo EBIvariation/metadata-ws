@@ -21,6 +21,7 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.ac.ebi.ampt2d.metadata.AuthorizationServerHelper;
 
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
@@ -30,9 +31,13 @@ public class MiscSteps {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private AuthorizationServerHelper authorizationServerHelper;
+
     @When("^I request OPTIONS / with GET for Access-Control-Request-Method header and http://www.evil-url.com for Origin header$")
     public void performOptionsWithData() throws Exception {
         CommonStates.setResultActions(mockMvc.perform(options("/")
+                .with(authorizationServerHelper.bearerToken("ampuser"))
                 .header("Access-Control-Request-Method", "GET")
                 .header("Origin", "http://www.evil-url.com")));
     }

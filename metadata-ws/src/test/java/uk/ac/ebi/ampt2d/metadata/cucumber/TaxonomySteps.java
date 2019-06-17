@@ -23,6 +23,7 @@ import cucumber.api.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.ac.ebi.ampt2d.metadata.AuthorizationServerHelper;
 
 import java.util.List;
 
@@ -36,6 +37,9 @@ public class TaxonomySteps {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private AuthorizationServerHelper authorizationServerHelper;
 
     @Then("^the response should contain no taxonomy$")
     public void checkTaxonomyResponseSize() throws Exception {
@@ -53,6 +57,7 @@ public class TaxonomySteps {
                 "}";
 
         CommonStates.setResultActions(mockMvc.perform(post("/taxonomies")
+                .with(authorizationServerHelper.bearerToken("operator"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent.getBytes())));
     }

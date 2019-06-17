@@ -22,6 +22,7 @@ import cucumber.api.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.ac.ebi.ampt2d.metadata.AuthorizationServerHelper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -30,6 +31,9 @@ public class ReferenceSequenceSteps {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private AuthorizationServerHelper authorizationServerHelper;
 
     @Then("^the response should contain one reference sequence$")
     public void checkResponseListSize() throws Exception {
@@ -53,6 +57,7 @@ public class ReferenceSequenceSteps {
         }
         json += "}";
         CommonStates.setResultActions(mockMvc.perform(post("/reference-sequences")
+                .with(authorizationServerHelper.bearerToken("operator"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.getBytes())));
     }
