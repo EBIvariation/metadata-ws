@@ -110,3 +110,9 @@ Feature: Miscellaneous functions
       | FILE               | file              | {"name": "nothing important"}                   |
       | SAMPLE             | sample            | {"name": "nothing important"}                   |
       | WEB_RESOURCE       | webResource       | {"resourceUrl": "http://nothing.important.com"} |
+
+  Scenario: access security disabled links
+    When I request non-secure GET /
+    Then the response code should be 200
+    When I request non-secure GET /swagger-ui.html
+    Then the response code should be 200

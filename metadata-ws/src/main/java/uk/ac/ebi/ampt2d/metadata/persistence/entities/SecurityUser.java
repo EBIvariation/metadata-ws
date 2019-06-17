@@ -32,6 +32,7 @@ public class SecurityUser {
         ROLE_DATA_SUBMITTER,
 
         ROLE_SERVICE_OPERATOR
+
     }
 
     @Id

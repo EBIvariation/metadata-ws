@@ -15,7 +15,7 @@
  * limitations under the License.
  *
  */
-package uk.ac.ebi.ampt2d.metadata;
+package uk.ac.ebi.ampt2d.metadata.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.AuthoritiesExtractor;
@@ -93,8 +93,8 @@ public class AuthorizationServerHelper extends AuthorizationServerConfigurerAdap
     @Override
     public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
-                .withClient("operator").and()
-                .withClient("ampuser");
+                .withClient("testOperator").and()
+                .withClient("testUser");
     }
 
     @Bean

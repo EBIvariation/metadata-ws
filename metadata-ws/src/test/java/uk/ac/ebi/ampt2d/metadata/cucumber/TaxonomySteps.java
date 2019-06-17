@@ -23,7 +23,7 @@ import cucumber.api.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.ac.ebi.ampt2d.metadata.AuthorizationServerHelper;
+import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class TaxonomySteps {
                 "}";
 
         CommonStates.setResultActions(mockMvc.perform(post("/taxonomies")
-                .with(authorizationServerHelper.bearerToken("operator"))
+                .with(authorizationServerHelper.bearerToken("testOperator"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent.getBytes())));
     }

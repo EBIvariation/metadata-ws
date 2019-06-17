@@ -31,7 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.ac.ebi.ampt2d.metadata.AuthorizationServerHelper;
+import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
@@ -113,26 +113,31 @@ public class CommonSteps {
     @When("^I request GET ([\\S]*)$")
     public void performGetOnResourceUri(String resourceUri) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get(resourceUri)
-                .with(authorizationServerHelper.bearerToken("ampuser")))
+                .with(authorizationServerHelper.bearerToken("testUser")))
         );
+    }
+
+    @When("^I request non-secure GET ([\\S]*)$")
+    public void performGetOnResourceUriNonSecure(String resourceUri) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get(resourceUri)));
     }
 
     @When("^I request GET with value of (.*)$")
     public void performGetWithResourceUriKey(String resourceUriKey) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get(CommonStates.getUrl(resourceUriKey))
-                .with(authorizationServerHelper.bearerToken("ampuser"))));
+                .with(authorizationServerHelper.bearerToken("testUser"))));
     }
 
     @When("^I request GET for (.*) of (.*)$")
     public void performGetForLinkedObjects(String className, String resourceUriKey) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get(CommonStates.getUrl(resourceUriKey) + "/" + className)
-                .with(authorizationServerHelper.bearerToken("ampuser"))));
+                .with(authorizationServerHelper.bearerToken("testUser"))));
     }
 
     @When("^I request POST (.*) with JSON payload:$")
     public void performPostOnResourceUriWithJsonData(String resourceUri, String jsonData) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(post(resourceUri)
-                .with(authorizationServerHelper.bearerToken("operator"))
+                .with(authorizationServerHelper.bearerToken("testOperator"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData.getBytes())));
     }
@@ -151,7 +156,7 @@ public class CommonSteps {
                 + "}";
 
         CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
-                .with(authorizationServerHelper.bearerToken("operator"))
+                .with(authorizationServerHelper.bearerToken("testOperator"))
                 .content(jsonContent)));
     }
 
@@ -161,14 +166,14 @@ public class CommonSteps {
                 + "\"taxonomy\": \"" + CommonStates.getUrl(linkedObjectUrlKey)
                 + "\"}";
         CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
-                .with(authorizationServerHelper.bearerToken("operator"))
+                .with(authorizationServerHelper.bearerToken("testOperator"))
                 .content(jsonContent)));
     }
 
     @When("^I request PATCH (.*) with content (.*)")
     public void performPatchOnResourceWithContent(String urlKey, String content) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
-                .with(authorizationServerHelper.bearerToken("operator"))
+                .with(authorizationServerHelper.bearerToken("testOperator"))
                 .content(content)));
     }
 
@@ -187,7 +192,7 @@ public class CommonSteps {
         content += "\" }";
 
         CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
-                .with(authorizationServerHelper.bearerToken("operator"))
+                .with(authorizationServerHelper.bearerToken("testOperator"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content)));
     }
@@ -203,25 +208,25 @@ public class CommonSteps {
 
         String idStr = linkedObjectUrl.substring(linkedObjectUrl.lastIndexOf('/') + 1);
         CommonStates.setResultActions(mockMvc.perform(delete(resourceUrl + "/" + className + "/" + idStr)
-                .with(authorizationServerHelper.bearerToken("operator"))));
+                .with(authorizationServerHelper.bearerToken("testOperator"))));
     }
 
     @When("^I request search for the (.*) with the parameters: (.*)$")
     public void performSearchOnResourcesWithParameters(String className, String parameters) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/" + className + "/search?" + parameters)
-                .with(authorizationServerHelper.bearerToken("ampuser"))));
+                .with(authorizationServerHelper.bearerToken("testUser"))));
     }
 
     @When("^I request elaborate find for the (.*) with the parameters: (.*)$")
     public void performFindOnResourcesWithParameters(String className, String parameters) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/" + className + "?" + parameters)
-                .with(authorizationServerHelper.bearerToken("ampuser"))));
+                .with(authorizationServerHelper.bearerToken("testUser"))));
     }
 
     @When("^I request elaborate search for the (.*) base (.*) and with the parameters: (.*)$")
     public void performSearchOnResourcesWithBaseAndParameters(String className, String base, String parameters) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get("/" + className + "/search/" + base + "?" + parameters)
-                .with(authorizationServerHelper.bearerToken("ampuser"))));
+                .with(authorizationServerHelper.bearerToken("testUser"))));
     }
 
     @And("^set the URL to (.*)$")

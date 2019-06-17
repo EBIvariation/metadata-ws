@@ -25,7 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import uk.ac.ebi.ampt2d.metadata.AuthorizationServerHelper;
+import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
 
 import java.util.List;
 
@@ -87,7 +87,7 @@ public class SampleSteps {
         jsonContent = jsonContent + "}";
 
         return mockMvc.perform(post("/samples")
-                .with(authorizationServerHelper.bearerToken("operator"))
+                .with(authorizationServerHelper.bearerToken("testOperator"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent));
     }
@@ -106,7 +106,7 @@ public class SampleSteps {
         jsonContent = jsonContent + "}";
 
         return mockMvc.perform(post("/samples")
-                .with(authorizationServerHelper.bearerToken("operator"))
+                .with(authorizationServerHelper.bearerToken("testOperator"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent));
     }
