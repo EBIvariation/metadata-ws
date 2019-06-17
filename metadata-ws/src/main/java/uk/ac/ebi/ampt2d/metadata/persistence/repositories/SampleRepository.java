@@ -29,7 +29,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import java.util.List;
 
 @RepositoryRestResource
-public interface SampleRepository extends SampleCustomRepository, QuerydslBinderCustomizer<QSample> {
+public interface SampleRepository extends SampleRepositoryCustom, QuerydslBinderCustomizer<QSample> {
 
     default void customize(QuerydslBindings bindings, QSample qSample) {
         bindings.bind(qSample.taxonomies.any().name)
