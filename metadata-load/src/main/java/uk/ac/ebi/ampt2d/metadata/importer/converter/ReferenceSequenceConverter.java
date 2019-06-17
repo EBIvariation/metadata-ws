@@ -27,9 +27,18 @@ public class ReferenceSequenceConverter implements Converter<AssemblyType, Refer
 
     @Override
     public ReferenceSequence convert(AssemblyType assemblyType) {
+        String refName = assemblyType.getNAME();
+        String patch = null;
+        if (refName != null) {  // Attempt to extract patch from refName (split by dot)
+            String[] refNameSplit = assemblyType.getNAME().split("\\.", 2);
+            refName = refNameSplit[0];
+            if (refNameSplit.length == 2) {
+                patch = refNameSplit[1];
+            }
+        }
         return new ReferenceSequence(
-                assemblyType.getNAME(),
-                "NOT_SPECIFIED",  // ENA only specifies accession+version, not the patch
+                refName,
+                patch,
                 Arrays.asList(assemblyType.getAccession()),
                 ReferenceSequence.Type.ASSEMBLY  // ENA data model only has ASSEMBLY type
         );
