@@ -27,7 +27,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 @NoRepositoryBean
 public interface SampleRepositoryCustom extends PagingAndSortingRepository<Sample, Long>,
         QueryDslPredicateExecutor<Sample> {
-
     QSample qSample = QSample.sample;
 
     default Sample findOrSave(Sample sample) {

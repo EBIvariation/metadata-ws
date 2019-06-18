@@ -61,6 +61,11 @@ public class SampleConverterTest {
         sampleConverter = new SampleConverter();
     }
 
+    @Test
+    public void convertFromApiXml() throws Exception {
+        testSample("ERS000156", SAMPLE_DOCUMENT_API_XML, "E-TABM-722:mmu5");
+    }
+
     private void testSample(String sampleAccession, String sampleDocumentXmlPath,
                             String expectedSampleName) throws Exception {
         SampleType sampleType = getSampleType(sampleDocumentXmlPath, sampleAccession);
@@ -68,11 +73,6 @@ public class SampleConverterTest {
         assertNotNull(sample);
         assertEquals(sampleAccession, sample.getAccessionVersionId().getAccession());
         assertEquals(expectedSampleName, sample.getName());
-    }
-
-    @Test
-    public void convertFromApiXml() throws Exception {
-        testSample("ERS000156", SAMPLE_DOCUMENT_API_XML, "E-TABM-722:mmu5");
     }
 
     @Test
