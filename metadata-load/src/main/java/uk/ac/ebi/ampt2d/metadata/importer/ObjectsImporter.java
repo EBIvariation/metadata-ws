@@ -29,6 +29,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
@@ -36,9 +37,11 @@ import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceSequenceType;
+import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -49,62 +52,88 @@ public abstract class ObjectsImporter {
 
     private static final Logger IMPORT_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
 
+    // Common XML retriever for all entities
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
 
+    // Entity repositories
     protected StudyRepository studyRepository;
 
     protected AnalysisRepository analysisRepository;
 
     protected ReferenceSequenceRepository referenceSequenceRepository;
 
+    protected SampleRepository sampleRepository;
+
     protected TaxonomyRepository taxonomyRepository;
 
+    // Entity XML parsers
     private SraXmlParser<StudyType> sraStudyXmlParser;
 
     private SraXmlParser<AnalysisType> sraAnalysisXmlParser;
 
     private SraXmlParser<AssemblyType> sraAssemblyXmlParser;
 
+    private SraXmlParser<SampleType> sraSampleXmlParser;
+
+    // Entity converters
     private Converter<StudyType, Study> studyConverter;
 
     private Converter<AnalysisType, Analysis> analysisConverter;
 
     private Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter;
 
+    private Converter<SampleType, Sample> sampleConverter;
+
+    // Extractors
     private PublicationExtractorFromStudy publicationExtractorFromStudy;
 
     private WebResourceExtractorFromStudy webResourceExtractorFromStudy;
 
     private FileExtractorFromAnalysis fileExtractorFromAnalysis;
 
-    public ObjectsImporter(SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
-                           SraXmlParser<StudyType> sraStudyXmlParser,
-                           SraXmlParser<AnalysisType> sraAnalysisXmlParser,
-                           SraXmlParser<AssemblyType> sraAssemblyXmlParser,
-                           Converter<StudyType, Study> studyConverter,
-                           Converter<AnalysisType, Analysis> analysisConverter,
-                           Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
-                           PublicationExtractorFromStudy publicationExtractorFromStudy,
-                           WebResourceExtractorFromStudy webResourceExtractorFromStudy,
-                           FileExtractorFromAnalysis fileExtractorFromAnalysis,
-                           AnalysisRepository analysisRepository,
-                           StudyRepository studyRepository,
-                           ReferenceSequenceRepository referenceSequenceRepository,
-                           TaxonomyRepository taxonomyRepository) {
+    public ObjectsImporter(
+            SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
+
+            SraXmlParser<StudyType> sraStudyXmlParser,
+            SraXmlParser<AnalysisType> sraAnalysisXmlParser,
+            SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+            SraXmlParser<SampleType> sraSampleXmlParser,
+
+            Converter<StudyType, Study> studyConverter,
+            Converter<AnalysisType, Analysis> analysisConverter,
+            Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
+            Converter<SampleType, Sample> sampleConverter,
+
+            PublicationExtractorFromStudy publicationExtractorFromStudy,
+            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
+            FileExtractorFromAnalysis fileExtractorFromAnalysis,
+
+            StudyRepository studyRepository,
+            AnalysisRepository analysisRepository,
+            ReferenceSequenceRepository referenceSequenceRepository,
+            SampleRepository sampleRepository,
+            TaxonomyRepository taxonomyRepository) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
+
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
         this.sraAssemblyXmlParser = sraAssemblyXmlParser;
+        this.sraSampleXmlParser = sraSampleXmlParser;
+
         this.studyConverter = studyConverter;
         this.analysisConverter = analysisConverter;
         this.referenceSequenceConverter = referenceSequenceConverter;
+        this.sampleConverter = sampleConverter;
+
         this.publicationExtractorFromStudy = publicationExtractorFromStudy;
         this.webResourceExtractorFromStudy = webResourceExtractorFromStudy;
         this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
-        this.analysisRepository = analysisRepository;
+
         this.studyRepository = studyRepository;
+        this.analysisRepository = analysisRepository;
         this.referenceSequenceRepository = referenceSequenceRepository;
         this.taxonomyRepository = taxonomyRepository;
+        this.sampleRepository = sampleRepository;
     }
 
     public Study importStudy(String accession) {
@@ -140,8 +169,7 @@ public abstract class ObjectsImporter {
             analysis.setReferenceSequences(referenceSequences);
             List<Sample> samples = new ArrayList<>();
             for (String sampleAccession : getSampleAccessions(analysisType)) {
-                //TODO Sample Import
-                //samples.add(importSample(sampleAccession));
+                samples.add(importSample(sampleAccession));
             }
             analysis.setSamples(samples);
             analysis = extractStudyFromAnalysis(analysisType, analysis);
@@ -169,6 +197,10 @@ public abstract class ObjectsImporter {
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
         }
         return referenceSequence;
+    }
+
+    protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
+        return standard.getAccession();
     }
 
     private Taxonomy extractTaxonomyFromAssembly(AssemblyType assemblyType) {
@@ -216,12 +248,25 @@ public abstract class ObjectsImporter {
         return null;
     }
 
-    protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
-        return standard.getAccession();
+    public Sample importSample(String accession) {
+        Sample sample = null;
+        try {
+            String xml = sraXmlRetrieverByAccession.getXml(accession);
+            SampleType sampleType = sraSampleXmlParser.parseXml(xml, accession);
+            sample = sampleConverter.convert(sampleType);
+            Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(sampleType));
+            sample.setTaxonomies(Arrays.asList(taxonomy));
+            sample = sampleRepository.findOrSave(sample);
+        } catch (Exception exception) {
+            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + accession);
+            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+        }
+        return sample;
     }
 
-    public Sample importSample(String accession) {
-        return null;
+    private Taxonomy extractTaxonomyFromSample(SampleType sampleType) {
+        SampleType.SAMPLENAME sampleName = sampleType.getSAMPLENAME();
+        return new Taxonomy(sampleName.getTAXONID(), sampleName.getSCIENTIFICNAME());
     }
 
     private Set<String> getSampleAccessions(AnalysisType analysisType) {

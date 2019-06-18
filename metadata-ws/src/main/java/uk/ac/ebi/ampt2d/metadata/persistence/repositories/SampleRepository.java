@@ -18,10 +18,8 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
 import io.swagger.annotations.ApiOperation;
-import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
@@ -31,8 +29,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import java.util.List;
 
 @RepositoryRestResource
-public interface SampleRepository extends PagingAndSortingRepository<Sample, Long>, QueryDslPredicateExecutor<Sample>,
-        QuerydslBinderCustomizer<QSample> {
+public interface SampleRepository extends SampleRepositoryCustom, QuerydslBinderCustomizer<QSample> {
 
     default void customize(QuerydslBindings bindings, QSample qSample) {
         bindings.bind(qSample.taxonomies.any().name)
@@ -43,4 +40,5 @@ public interface SampleRepository extends PagingAndSortingRepository<Sample, Lon
     @RestResource(path = "/accession")
     List<Sample> findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc
             (@Param("accession") String accession);
+
 }

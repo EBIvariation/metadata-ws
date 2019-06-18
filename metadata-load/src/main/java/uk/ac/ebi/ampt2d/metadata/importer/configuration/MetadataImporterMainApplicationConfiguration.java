@@ -26,6 +26,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughAPI;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.ReferenceSequenceConverter;
+import uk.ac.ebi.ampt2d.metadata.importer.converter.SampleConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.StudyConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraXmlRetrieverThroughDatabase;
@@ -34,10 +35,12 @@ import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStud
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAssemblyXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraSampleXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
@@ -55,21 +58,29 @@ public class MetadataImporterMainApplicationConfiguration {
                                                        TaxonomyRepository taxonomyRepository,
                                                        ReferenceSequenceRepository referenceSequenceRepository,
                                                        AnalysisRepository analysisRepository,
-                                                       StudyRepository studyRepository) {
+                                                       StudyRepository studyRepository,
+                                                       SampleRepository sampleRepository) {
         return new SraObjectsImporterThroughAPI(
                 sraXmlRetrieverThroughApi,
+
                 sraStudyXmlParser(),
+                sraAnalysisXmlParser(),
+                sraAssemblyXmlParser(),
+                sraSampleXmlParser(),
+
                 studyConverter(),
+                analysisConverter(),
+                referenceSequenceConverter(),
+                sampleConverter(),
+
                 publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository),
-                sraAnalysisXmlParser(),
-                analysisConverter(),
                 fileExtractorFromAnalysis(fileRepository),
-                sraAssemblyXmlParser(),
-                referenceSequenceConverter(),
-                analysisRepository,
+
                 studyRepository,
+                analysisRepository,
                 referenceSequenceRepository,
+                sampleRepository,
                 taxonomyRepository
         );
     }
@@ -84,32 +95,34 @@ public class MetadataImporterMainApplicationConfiguration {
                                                 TaxonomyRepository taxonomyRepository,
                                                 ReferenceSequenceRepository referenceSequenceRepository,
                                                 AnalysisRepository analysisRepository,
-                                                StudyRepository studyRepository) {
+                                                StudyRepository studyRepository,
+                                                SampleRepository sampleRepository) {
         return new SraObjectsImporterThroughDatabase(
                 sraXmlRetrieverThroughDatabase,
+
                 sraStudyXmlParser(),
+                sraAnalysisXmlParser(),
+                sraAssemblyXmlParser(),
+                sraSampleXmlParser(),
+
                 studyConverter(),
+                analysisConverter(),
+                referenceSequenceConverter(),
+                sampleConverter(),
+
                 publicationExtractorFromStudy(publicationRepository),
                 webResourceExtractorFromStudy(webResourceRepository),
-                sraAnalysisXmlParser(),
-                analysisConverter(),
                 fileExtractorFromAnalysis(fileRepository),
-                sraAssemblyXmlParser(),
-                referenceSequenceConverter(),
-                analysisRepository,
+
                 studyRepository,
+                analysisRepository,
                 referenceSequenceRepository,
+                sampleRepository,
                 taxonomyRepository
         );
     }
 
-    private StudyConverter studyConverter() {
-        return new StudyConverter();
-    }
-
-    private AnalysisConverter analysisConverter() {
-        return new AnalysisConverter();
-    }
+    // Parser factories
 
     private SraStudyXmlParser sraStudyXmlParser() {
         return new SraStudyXmlParser();
@@ -119,13 +132,33 @@ public class MetadataImporterMainApplicationConfiguration {
         return new SraAnalysisXmlParser();
     }
 
-    private FileExtractorFromAnalysis fileExtractorFromAnalysis(FileRepository fileRepository) {
-        return new FileExtractorFromAnalysis(fileRepository);
+    private SraSampleXmlParser sraSampleXmlParser() {
+        return new SraSampleXmlParser();
     }
 
     private SraAssemblyXmlParser sraAssemblyXmlParser() {
         return new SraAssemblyXmlParser();
     }
+
+    // Converter factories
+
+    private StudyConverter studyConverter() {
+        return new StudyConverter();
+    }
+
+    private AnalysisConverter analysisConverter() {
+        return new AnalysisConverter();
+    }
+
+    private SampleConverter sampleConverter() {
+        return new SampleConverter();
+    }
+
+    private ReferenceSequenceConverter referenceSequenceConverter() {
+        return new ReferenceSequenceConverter();
+    }
+
+    // Extractor factories
 
     private PublicationExtractorFromStudy publicationExtractorFromStudy(PublicationRepository publicationRepository) {
         return new PublicationExtractorFromStudy(publicationRepository);
@@ -135,7 +168,8 @@ public class MetadataImporterMainApplicationConfiguration {
         return new WebResourceExtractorFromStudy(webResourceRepository);
     }
 
-    private ReferenceSequenceConverter referenceSequenceConverter() {
-        return new ReferenceSequenceConverter();
+    private FileExtractorFromAnalysis fileExtractorFromAnalysis(FileRepository fileRepository) {
+        return new FileExtractorFromAnalysis(fileRepository);
     }
+
 }

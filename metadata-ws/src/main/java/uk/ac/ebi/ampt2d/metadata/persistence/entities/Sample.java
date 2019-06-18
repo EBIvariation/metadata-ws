@@ -25,10 +25,10 @@ import org.hibernate.annotations.Formula;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -40,13 +40,13 @@ import java.util.List;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
-@SequenceGenerator(initialValue=1, allocationSize=1 , name="SAMPLE_SEQ", sequenceName="sample_sequence")
+@SequenceGenerator(initialValue = 1, allocationSize = 1, name = "SAMPLE_SEQ", sequenceName = "sample_sequence")
 public class Sample extends Auditable<Long> {
 
     @ApiModelProperty(position = 1, value = "Sample auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="SAMPLE_SEQ")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SAMPLE_SEQ")
     private long id;
 
     @ApiModelProperty(position = 2)
@@ -69,7 +69,11 @@ public class Sample extends Auditable<Long> {
     @Size(min = 1)
     private List<Taxonomy> taxonomies;
 
-    Sample() {
+    public Sample() {}
+
+    public Sample(AccessionVersionId accessionVersionId, String name) {
+        this.accessionVersionId = accessionVersionId;
+        this.name = name;
     }
 
     public Sample(AccessionVersionId accessionVersionId, String name, List<Taxonomy> taxonomies) {
@@ -87,8 +91,16 @@ public class Sample extends Auditable<Long> {
         return accessionVersionId;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public List<Taxonomy> getTaxonomies() {
         return taxonomies;
+    }
+
+    public void setTaxonomies(List<Taxonomy> taxonomies) {
+        this.taxonomies = taxonomies;
     }
 
     /**

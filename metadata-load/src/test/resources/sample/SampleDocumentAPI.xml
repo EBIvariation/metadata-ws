@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ROOT request="ERS000156&amp;display=xml">
+    <SAMPLE accession="ERS000156" alias="E-TABM-722:mmu5" broker_name="ArrayExpress" center_name="CRUK-CRI">
+        <IDENTIFIERS>
+            <PRIMARY_ID>ERS000156</PRIMARY_ID>
+            <EXTERNAL_ID namespace="BioSample">SAMEA907007</EXTERNAL_ID>
+            <SUBMITTER_ID namespace="CRUK-CRI">E-TABM-722:mmu5</SUBMITTER_ID>
+        </IDENTIFIERS>
+        <TITLE>Mus musculus</TITLE>
+        <SAMPLE_NAME>
+            <TAXON_ID>10090</TAXON_ID>
+            <COMMON_NAME>house mouse</COMMON_NAME>
+            <SCIENTIFIC_NAME>Mus musculus</SCIENTIFIC_NAME>
+        </SAMPLE_NAME>
+        <SAMPLE_LINKS>
+            <SAMPLE_LINK>
+                <XREF_LINK>
+                    <DB>ENA-STUDY</DB>
+                    <ID>ERP000054</ID>
+                </XREF_LINK>
+            </SAMPLE_LINK>
+            <SAMPLE_LINK>
+                <XREF_LINK>
+                    <DB>ENA-EXPERIMENT</DB>
+                    <ID>ERX000527</ID>
+                </XREF_LINK>
+            </SAMPLE_LINK>
+            <SAMPLE_LINK>
+                <XREF_LINK>
+                    <DB>ENA-RUN</DB>
+                    <ID>ERR005109</ID>
+                </XREF_LINK>
+            </SAMPLE_LINK>
+            <SAMPLE_LINK>
+                <XREF_LINK>
+                    <DB>ENA-SUBMISSION</DB>
+                    <ID>ERA000098</ID>
+                </XREF_LINK>
+            </SAMPLE_LINK>
+            <SAMPLE_LINK>
+                <XREF_LINK>
+                    <DB>ENA-FASTQ-FILES</DB>
+                    <ID><![CDATA[http://www.ebi.ac.uk/ena/data/warehouse/filereport?accession=ERS000156&result=read_run&fields=run_accession,fastq_ftp,fastq_md5,fastq_bytes]]></ID>
+                </XREF_LINK>
+            </SAMPLE_LINK>
+            <SAMPLE_LINK>
+                <XREF_LINK>
+                    <DB>ENA-SUBMITTED-FILES</DB>
+                    <ID><![CDATA[http://www.ebi.ac.uk/ena/data/warehouse/filereport?accession=ERS000156&result=read_run&fields=run_accession,submitted_ftp,submitted_md5,submitted_bytes,submitted_format]]></ID>
+                </XREF_LINK>
+            </SAMPLE_LINK>
+        </SAMPLE_LINKS>
+        <SAMPLE_ATTRIBUTES>
+            <SAMPLE_ATTRIBUTE>
+                <TAG>OrganismPart</TAG>
+                <VALUE>liver</VALUE>
+            </SAMPLE_ATTRIBUTE>
+            <SAMPLE_ATTRIBUTE>
+                <TAG>DevelopmentalStage</TAG>
+                <VALUE>adult</VALUE>
+            </SAMPLE_ATTRIBUTE>
+            <SAMPLE_ATTRIBUTE>
+                <TAG>Experimental Factor: ORGANISMPART</TAG>
+                <VALUE>OrganismPart: liver</VALUE>
+            </SAMPLE_ATTRIBUTE>
+            <SAMPLE_ATTRIBUTE>
+                <TAG>Organism</TAG>
+                <VALUE>Mus musculus</VALUE>
+            </SAMPLE_ATTRIBUTE>
+            <SAMPLE_ATTRIBUTE>
+                <TAG>Individual</TAG>
+                <VALUE>mmu5</VALUE>
+            </SAMPLE_ATTRIBUTE>
+            <SAMPLE_ATTRIBUTE>
+                <TAG>Sex</TAG>
+                <VALUE>male</VALUE>
+            </SAMPLE_ATTRIBUTE>
+            <SAMPLE_ATTRIBUTE>
+                <TAG>Experimental Factor: ORGANISM</TAG>
+                <VALUE>Organism: Mus musculus</VALUE>
+            </SAMPLE_ATTRIBUTE>
+            <SAMPLE_ATTRIBUTE>
+                <TAG>ENA-SPOT-COUNT</TAG>
+                <VALUE>16253687</VALUE>
+            </SAMPLE_ATTRIBUTE>
+            <SAMPLE_ATTRIBUTE>
+                <TAG>ENA-BASE-COUNT</TAG>
+                <VALUE>731415915</VALUE>
+            </SAMPLE_ATTRIBUTE>
+            <SAMPLE_ATTRIBUTE>
+                <TAG>ENA-FIRST-PUBLIC</TAG>
+                <VALUE>2010-04-09</VALUE>
+            </SAMPLE_ATTRIBUTE>
+            <SAMPLE_ATTRIBUTE>
+                <TAG>ENA-LAST-UPDATE</TAG>
+                <VALUE>2018-03-08</VALUE>
+            </SAMPLE_ATTRIBUTE>
+        </SAMPLE_ATTRIBUTES>
+    </SAMPLE>
+</ROOT>

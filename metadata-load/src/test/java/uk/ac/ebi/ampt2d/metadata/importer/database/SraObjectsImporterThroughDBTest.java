@@ -29,6 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
@@ -97,6 +98,15 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals(1, studyRepository.count());
         assertEquals(1, analysisRepository.count());
         assertEquals(1, referenceSequenceRepository.count());
+    }
+
+    @Test
+    @Category(OracleDbCategory.class)
+    public void importSampleObject() throws Exception {
+        Sample sample = sraObjectImporter.importSample("ERS000002");
+        assertNotNull(sample);
+        assertEquals("ERS000002", sample.getAccessionVersionId().getAccession());
+        assertEquals("Solexa sequencing of Saccharomyces cerevisiae strain SK1 random 200 bp library", sample.getName());
     }
 
 }
