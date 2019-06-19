@@ -29,7 +29,7 @@ import java.util.List;
 
 public class PublicationExtractorFromStudy {
 
-    private static final String PUB_MED = "pubmed";
+    private static final String PUBMED = "pubmed";
 
     private PublicationRepository publicationRepository;
 
@@ -45,7 +45,7 @@ public class PublicationExtractorFromStudy {
         LinkType[] studyLinksArray = studylinks.getSTUDYLINKArray();
         for (int i = 0; i < studyLinksArray.length; i++) {
             XRefType xRefType = studyLinksArray[i].getXREFLINK();
-            if (xRefType != null && xRefType.getDB().equals(PUB_MED)) {
+            if (xRefType != null && xRefType.getDB().equalsIgnoreCase(PUBMED)) {
                 publications.add(findOrCreatePublication(xRefType.getID()));
             }
         }
