@@ -35,7 +35,6 @@ import org.springframework.security.oauth2.provider.token.AuthorizationServerTok
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SecurityUserRepository;
-import uk.ac.ebi.ampt2d.metadata.security.MetadataAuthoritiesExtractor;
 
 import java.io.Serializable;
 import java.util.Collection;

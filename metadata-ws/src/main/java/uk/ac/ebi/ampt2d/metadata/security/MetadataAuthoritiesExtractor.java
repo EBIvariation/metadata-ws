@@ -40,10 +40,10 @@ public class MetadataAuthoritiesExtractor implements AuthoritiesExtractor {
         String preferredUsername = (String) map.get("preferred_username");
         SecurityUser securityUser = securityUserRepository.findByPreferredUsername(preferredUsername);
         if (securityUser == null) {
-            securityUser = new SecurityUser(preferredUsername, SecurityUser.Role.ROLE_USER);
-            securityUserRepository.save(securityUser);
-            return Arrays.asList(new SimpleGrantedAuthority(securityUser.getRole().name()));
+            // allow all users including unauthorized users to read
+            return Arrays.asList(new SimpleGrantedAuthority(SecurityUser.Role.ROLE_USER.name()));
         }
         return Arrays.asList(new SimpleGrantedAuthority(securityUser.getRole().name()));
     }
+
 }

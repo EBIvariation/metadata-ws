@@ -32,4 +32,5 @@ public class DisableSecurityConfig extends ResourceServerConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().anyRequest().permitAll();
     }
+
 }

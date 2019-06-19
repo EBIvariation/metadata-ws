@@ -26,5 +26,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.SecurityUser;
 public interface SecurityUserRepository extends PagingAndSortingRepository<SecurityUser, String> {
 
     SecurityUser findByPreferredUsername(@Param("preferredUsername") String preferredUsername);
+
 }
 
