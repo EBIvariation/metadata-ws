@@ -45,7 +45,7 @@ public class PublicationExtractorFromStudy {
         LinkType[] studyLinksArray = studylinks.getSTUDYLINKArray();
         for (int i = 0; i < studyLinksArray.length; i++) {
             XRefType xRefType = studyLinksArray[i].getXREFLINK();
-            if (xRefType != null && xRefType.getDB().equals(PUB_MED)) {
+            if (xRefType != null && xRefType.getDB().equalsIgnoreCase(PUB_MED)) {
                 publications.add(findOrCreatePublication(xRefType.getID()));
             }
         }
