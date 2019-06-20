@@ -52,7 +52,7 @@ public class WebResourceExtractorFromStudy {
     private WebResource findOrCreateWebResource(String url) {
         WebResource webResource = webResourceRepository.findByResourceUrl(url);
         if (webResource == null) {
-            webResource = webResourceRepository.save(new WebResource(WebResource.Type.STUDY_WEB, url));
+            webResource = webResourceRepository.save(new WebResource(url));
         }
         return webResource;
     }

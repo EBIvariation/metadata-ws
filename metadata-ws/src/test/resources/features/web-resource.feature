@@ -4,7 +4,6 @@ Feature: Web resource object
     When I request POST /webResources with JSON payload:
     """
     {
-      "type": "CENTER_WEB",
       "resourceUrl": "http://www.ebi.ac.uk"
     }
     """
@@ -13,7 +12,6 @@ Feature: Web resource object
 
     When I request GET with value of WEB_RESOURCE
     Then the response code should be 200
-    And the response should contain field type with value CENTER_WEB
     And the response should contain field resourceUrl with value http://www.ebi.ac.uk
 
 
@@ -21,7 +19,6 @@ Feature: Web resource object
     When I request POST /webResources with JSON payload:
     """
     {
-      "type": "CENTER_WEB",
       "resourceUrl": "<url>"
     }
     """
@@ -39,7 +36,6 @@ Feature: Web resource object
     When I request POST /webResources with JSON payload:
     """
     {
-      "type": "CENTER_WEB",
       "resourceUrl": "<malformed_url>"
     }
     """
