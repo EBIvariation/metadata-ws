@@ -116,3 +116,26 @@ Feature: Miscellaneous functions
     Then the response code should be 200
     When I request non-secure GET /swagger-ui.html
     Then the response code should be 200
+
+  Scenario: access security enabled links and fail
+    When I request non-secure POST /publications with JSON payload:
+    """
+    {
+      "publicationId": "Publication4"
+    }
+    """
+    Then the response code should be 401
+
+    When I request POST /publications with JSON payload:
+    """
+    {
+      "publicationId": "Publication5"
+    }
+    """
+    And set the URL to PUBLICATION5
+    Then the response code should be 201
+
+    When I request non-secure DELETE with value of PUBLICATION5
+    Then the response code should be 401
+
+

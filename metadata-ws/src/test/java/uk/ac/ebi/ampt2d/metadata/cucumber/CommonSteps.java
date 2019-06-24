@@ -31,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
 import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
@@ -90,6 +91,9 @@ public class CommonSteps {
     private WebResourceRepository webResourceRepository;
 
     @Autowired
+    private PublicationRepository publicationRepository;
+
+    @Autowired
     private AuthorizationServerHelper authorizationServerHelper;
 
     @Before
@@ -101,6 +105,7 @@ public class CommonSteps {
         studyRepository.deleteAll();
         taxonomyRepository.deleteAll();
         webResourceRepository.deleteAll();
+        publicationRepository.deleteAll();
     }
 
     @Before
@@ -138,6 +143,13 @@ public class CommonSteps {
     public void performPostOnResourceUriWithJsonData(String resourceUri, String jsonData) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(post(resourceUri)
                 .with(authorizationServerHelper.bearerToken("testOperator"))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonData.getBytes())));
+    }
+
+    @When("^I request non-secure POST (.*) with JSON payload:$")
+    public void performPostOnResourceUriWithJsonDataNonSecure(String resourceUri, String jsonData) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(post(resourceUri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData.getBytes())));
     }
@@ -209,6 +221,11 @@ public class CommonSteps {
         String idStr = linkedObjectUrl.substring(linkedObjectUrl.lastIndexOf('/') + 1);
         CommonStates.setResultActions(mockMvc.perform(delete(resourceUrl + "/" + className + "/" + idStr)
                 .with(authorizationServerHelper.bearerToken("testOperator"))));
+    }
+
+    @When("^I request non-secure DELETE with value of ([\\S]*)$")
+    public void performDeleteOnResourceUriNonSecure(String resourceUrlKey) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(delete(CommonStates.getUrl(resourceUrlKey))));
     }
 
     @When("^I request search for the (.*) with the parameters: (.*)$")
