@@ -68,8 +68,7 @@ public class ReferenceSequenceConverterTest {
         ReferenceSequence referenceSequence = referenceSequenceConverter.convert(assemblyType);
         assertNotNull(referenceSequence);
         assertEquals(Arrays.asList(assemblyAccession), referenceSequence.getAccessions());
-        assertEquals("EquCab2", referenceSequence.getName());
-        assertEquals("0", referenceSequence.getPatch());
+        assertEquals("EquCab2.0", referenceSequence.getName());
         assertEquals(ReferenceSequence.Type.ASSEMBLY, referenceSequence.getType());
     }
 

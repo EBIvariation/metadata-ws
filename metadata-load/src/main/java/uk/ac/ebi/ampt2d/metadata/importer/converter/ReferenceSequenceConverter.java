@@ -29,12 +29,11 @@ public class ReferenceSequenceConverter implements Converter<AssemblyType, Refer
     public ReferenceSequence convert(AssemblyType assemblyType) {
         String refName = assemblyType.getNAME();
         String patch = null;
-        if (refName != null) {  // Attempt to extract patch from refName (split by dot)
+        // Attempt to extract patch from refName (only for GRC human or mouse assembly names)
+        if (refName != null && refName.matches("^GRC[hm]\\d+\\.p\\d+$")) {
             String[] refNameSplit = assemblyType.getNAME().split("\\.", 2);
             refName = refNameSplit[0];
-            if (refNameSplit.length == 2) {
-                patch = refNameSplit[1];
-            }
+            patch = refNameSplit[1];
         }
         return new ReferenceSequence(
                 refName,
