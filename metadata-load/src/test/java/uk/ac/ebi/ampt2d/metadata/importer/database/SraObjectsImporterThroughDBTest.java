@@ -39,6 +39,7 @@ import java.time.LocalDate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=DB"})
@@ -61,6 +62,7 @@ public class SraObjectsImporterThroughDBTest {
     public void setUp() {
         analysisRepository.deleteAll();
         studyRepository.deleteAll();
+        referenceSequenceRepository.deleteAll();
     }
 
     @Test
@@ -95,10 +97,24 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals("GCA_000001405.14", analysis.getReferenceSequences().get(0).getAccessions().get(0));
         assertEquals("GRCh37", analysis.getReferenceSequences().get(0).getName());
         assertEquals("p13", analysis.getReferenceSequences().get(0).getPatch());
-
         assertEquals(1, studyRepository.count());
         assertEquals(1, analysisRepository.count());
         assertEquals(1, referenceSequenceRepository.count());
+    }
+
+    @Test
+    @Category(OracleDbCategory.class)
+    public void importAnalysisObjectWithEmptyReferenceSequenceAccession() throws Exception {
+        Analysis analysis = sraObjectImporter.importAnalysis("ERZ000011");
+        assertNotNull(analysis);
+        assertEquals("ERZ000011", analysis.getAccessionVersionId().getAccession());
+        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
+        assertEquals(1, analysis.getFiles().size());
+        assertEquals("ERP000860", analysis.getStudy().getAccessionVersionId().getAccession());
+        assertTrue(analysis.getReferenceSequences().isEmpty());
+        assertEquals(1, studyRepository.count());
+        assertEquals(1, analysisRepository.count());
+        assertEquals(0, referenceSequenceRepository.count());
     }
 
     @Test
