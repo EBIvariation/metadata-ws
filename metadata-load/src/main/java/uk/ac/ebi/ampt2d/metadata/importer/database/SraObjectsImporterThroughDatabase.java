@@ -133,15 +133,6 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         return study;
     }
 
-    /**
-     * Retrieve accession and refname from the EGA database. Contrary to the API flow (extract accession, retrieve
-     * AssemblyType, extract refname and other fields), EGA stores only refname, which is used to determine an
-     * accession. To make this possible, refname is appended to accession using a '#' symbol. This is later split and
-     * stored appropriately.
-     *
-     * @return combined accession and refname. Example: "GCA_000001405.1#GRCh37"
-     */
-
     private synchronized Study importStudyFromAnalysis(String studyAccession) {
         /* The below get will make sure to return shared study when analyses sharing same study are imported
           in current run */
