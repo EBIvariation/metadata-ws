@@ -69,6 +69,8 @@ public class SraObjectsImporterThroughAPI extends ObjectsImporter {
             SampleRepository sampleRepository,
             TaxonomyRepository taxonomyRepository) {
         super(
+                // For API import, default and "force API" retrievers are the same
+                sraXmlRetrieverThroughApi,
                 sraXmlRetrieverThroughApi,
 
                 sraStudyXmlParser,

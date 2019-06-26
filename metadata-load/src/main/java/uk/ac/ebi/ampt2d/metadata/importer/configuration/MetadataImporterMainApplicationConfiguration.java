@@ -89,6 +89,7 @@ public class MetadataImporterMainApplicationConfiguration {
     @ConditionalOnProperty(name = "import.source", havingValue = "DB")
     public ObjectsImporter objectImporterThroughEnaDatabase(
                                                 SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
+                                                SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
                                                 PublicationRepository publicationRepository,
                                                 WebResourceRepository webResourceRepository,
                                                 FileRepository fileRepository,
@@ -98,7 +99,10 @@ public class MetadataImporterMainApplicationConfiguration {
                                                 StudyRepository studyRepository,
                                                 SampleRepository sampleRepository) {
         return new SraObjectsImporterThroughDatabase(
+                // For database import we need two importers
+                // Most entries are imported from the database, but reference sequences can only be imported via API
                 sraXmlRetrieverThroughDatabase,
+                sraXmlRetrieverThroughApi,
 
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),

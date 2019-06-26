@@ -19,6 +19,7 @@
 package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.springframework.core.convert.converter.Converter;
+import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
@@ -52,8 +53,10 @@ public abstract class ObjectsImporter {
 
     private static final Logger IMPORT_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
 
-    // Common XML retriever for all entities
+    // XML retrievers. First is used as default, second for cases where API retrieval mode must be forced
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
+
+    protected SraXmlRetrieverThroughApi sraxmlRetrieverByAccessionForceApi;
 
     // Entity repositories
     protected StudyRepository studyRepository;
@@ -93,6 +96,7 @@ public abstract class ObjectsImporter {
 
     public ObjectsImporter(
             SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
+            SraXmlRetrieverThroughApi sraxmlRetrieverByAccessionForceApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
@@ -114,6 +118,7 @@ public abstract class ObjectsImporter {
             SampleRepository sampleRepository,
             TaxonomyRepository taxonomyRepository) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
+        this.sraxmlRetrieverByAccessionForceApi = sraxmlRetrieverByAccessionForceApi;
 
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
@@ -186,7 +191,8 @@ public abstract class ObjectsImporter {
     public ReferenceSequence importReferenceSequence(String accession) {
         ReferenceSequence referenceSequence = null;
         try {
-            String assemblyXml = sraXmlRetrieverByAccession.getXml(accession);
+            // Reference sequences must always be imported through API, even with import mode = DB
+            String assemblyXml = sraxmlRetrieverByAccessionForceApi.getXml(accession);
             AssemblyType assembly = sraAssemblyXmlParser.parseXml(assemblyXml, accession);
             referenceSequence = referenceSequenceConverter.convert(assembly);
             Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromAssembly(assembly));
