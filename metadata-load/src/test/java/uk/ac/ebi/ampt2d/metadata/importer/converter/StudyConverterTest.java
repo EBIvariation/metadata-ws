@@ -25,7 +25,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import uk.ac.ebi.ampt2d.metadata.importer.api.SraApiConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataDatabaseConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.configuration.MetadataImporterMainApplicationConfiguration;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
@@ -42,8 +41,7 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {MetadataImporterMainApplicationConfiguration.class,
-        MetadataDatabaseConfiguration.class,
-        SraApiConfiguration.class})
+        MetadataDatabaseConfiguration.class})
 @EnableAutoConfiguration
 @TestPropertySource(locations = "classpath:application.properties", properties = {"import.source=API"})
 public class StudyConverterTest {

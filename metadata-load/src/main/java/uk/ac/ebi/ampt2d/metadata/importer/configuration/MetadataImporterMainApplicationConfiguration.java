@@ -50,6 +50,11 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 public class MetadataImporterMainApplicationConfiguration {
 
     @Bean
+    public SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi() {
+        return new SraXmlRetrieverThroughApi();
+    }
+
+    @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "API")
     public ObjectsImporter objectImporterThroughEnaApi(SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
                                                        PublicationRepository publicationRepository,
