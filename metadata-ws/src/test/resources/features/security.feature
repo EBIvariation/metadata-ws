@@ -1,21 +1,21 @@
 Feature: Security related tests
 
   Scenario: access security disabled links
-    When I request unauthorized GET /
+    When I request ananymous GET /
     Then the response code should be 200
-    When I request unauthorized GET /swagger-ui.html
+    When I request ananymous GET /swagger-ui.html
     Then the response code should be 200
 
 
   Scenario: update security enabled links
-    When I request POST /publications with JSON payload:
+    Given I request POST /publications with JSON payload:
     """
     {
       "publicationId": "Publication5"
     }
     """
-    And set the URL to PUBLICATION5
-    Then the response code should be 201
+    Then set the URL to PUBLICATION5
+    And the response code should be 201
 
     When I request PUT PUBLICATION5 with JSON payload:
     """
@@ -49,7 +49,7 @@ Feature: Security related tests
     """
     Then the response code should be 403
 
-    When I request POST /publications with JSON payload:
+    Given I request POST /publications with JSON payload:
     """
     {
       "publicationId": "Publication5"
@@ -79,4 +79,3 @@ Feature: Security related tests
 
     When I request authorized DELETE having lesser privileges and with value of PUBLICATION5
     Then the response code should be 403
-

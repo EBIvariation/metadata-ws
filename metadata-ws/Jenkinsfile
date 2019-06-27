@@ -14,7 +14,6 @@ pipeline {
     stagingHost = credentials('STAGINGHOST')
     fallbackHost = credentials('FALLBACKHOST')
     productionHost = credentials('PRODUCTIONHOST')
-    userInfoUri = credentials('USERINFOURI')
     jwtKey = credentials('JWTKEY')
   }
   parameters {
@@ -30,7 +29,6 @@ pipeline {
         -Dmetadata-dbUrl=${stagingPostgresDbUrl} \
         -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword} \
         -Dmetadata-ddlBehaviour=${ddlBehaviour} \
-        -Dmetadata-userInfoUri=${userInfoUri} \
         -Dmetadata-jwtKey=${jwtKey}"
       }
     }
@@ -46,13 +44,11 @@ pipeline {
         -Dmetadata-dbUrl=${fallBackPostgresDbUrl} \
         -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword}  \
         -Dmetadata-ddlBehaviour=validate \
-        -Dmetadata-userInfoUri=${userInfoUri} \
         -Dmetadata-jwtKey=${jwtKey}"
         echo 'Build pointing to Production DB'
         sh "mvn clean package -DskipTests -pl metadata-ws -DbuildDirectory=production/target \
         -Dmetadata-dbUrl=${productionPostgresDbUrl} -Dmetadata-dbUsername=${postgresDBUserName} \
         -Dmetadata-dbPassword=${postgresDBPassword} -Dmetadata-ddlBehaviour=validate \
-        -Dmetadata-userInfoUri=${userInfoUri} \
         -Dmetadata-jwtKey=${jwtKey}"
       }
     }

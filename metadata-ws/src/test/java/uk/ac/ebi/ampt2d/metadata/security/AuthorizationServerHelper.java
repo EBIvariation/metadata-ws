@@ -58,7 +58,7 @@ public class AuthorizationServerHelper extends AuthorizationServerConfigurerAdap
         clientNameMap.put("exp", 1561536742L);
         clientNameMap.put("nbf", 0);
         clientNameMap.put("iat", 1561536442);
-        clientNameMap.put("iss", "http://localhost:8080/ampt2d/auth/realms/securemetadata");
+        clientNameMap.put("iss", "http://localhost:8085/ampt2d/auth/realms/securemetadata");
         clientNameMap.put("aud", "secure-client");
         clientNameMap.put("sub", "77dfbb1a-f998-4477-8276-f7a3ef5893b0");
         clientNameMap.put("typ", "Bearer");
