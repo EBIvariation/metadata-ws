@@ -100,7 +100,7 @@ public class AnalysisSteps {
                 "\"platform\": \"" + platform + "\"" +
                 "}";
         return mockMvc.perform(post("/analyses")
-                .with(authorizationServerHelper.bearerToken("testOperator"))
+                .with(authorizationServerHelper.bearerToken("testoperator"))
                 .content(jsonContent));
     }
 }

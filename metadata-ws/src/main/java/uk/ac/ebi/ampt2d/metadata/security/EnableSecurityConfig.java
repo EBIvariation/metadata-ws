@@ -17,20 +17,23 @@
  */
 package uk.ac.ebi.ampt2d.metadata.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.AuthoritiesExtractor;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SecurityUserRepository;
+import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
 
 @ConditionalOnProperty(value = "security.enabled", havingValue = "true")
 @Configuration
 @EnableResourceServer
-public class EnableSecurityConfig  extends ResourceServerConfigurerAdapter {
+public class EnableSecurityConfig extends ResourceServerConfigurerAdapter {
+
+    private ResourceServerProperties resourceServerProperties;
 
     private static final String[] AUTH_WHITELIST = {
             "/",
@@ -41,6 +44,10 @@ public class EnableSecurityConfig  extends ResourceServerConfigurerAdapter {
             "/swagger-ui.html",
             "/webjars/**"
     };
+
+    public EnableSecurityConfig(ResourceServerProperties resourceServerProperties) {
+        this.resourceServerProperties = resourceServerProperties;
+    }
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
@@ -53,9 +60,14 @@ public class EnableSecurityConfig  extends ResourceServerConfigurerAdapter {
                 .anyRequest().authenticated();
     }
 
+    @Override
+    public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+        resources.resourceId(resourceServerProperties.getResourceId());
+    }
+
     @Bean
-    public AuthoritiesExtractor authoritiesExtractor(SecurityUserRepository securityUserRepository) {
-        return new MetadataAuthoritiesExtractor(securityUserRepository);
+    public JwtAccessTokenCustomizer jwtAccessTokenCustomizer(ObjectMapper mapper) {
+        return new JwtAccessTokenCustomizer(mapper);
     }
 
 }

@@ -37,7 +37,7 @@ public class MiscSteps {
     @When("^I request OPTIONS / with GET for Access-Control-Request-Method header and http://www.evil-url.com for Origin header$")
     public void performOptionsWithData() throws Exception {
         CommonStates.setResultActions(mockMvc.perform(options("/")
-                .with(authorizationServerHelper.bearerToken("testUser"))
+                .with(authorizationServerHelper.bearerToken("testuser"))
                 .header("Access-Control-Request-Method", "GET")
                 .header("Origin", "http://www.evil-url.com")));
     }

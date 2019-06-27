@@ -17,31 +17,22 @@
  */
 package uk.ac.ebi.ampt2d.metadata.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.AuthoritiesExtractor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
-import org.springframework.security.oauth2.provider.ClientDetails;
-import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.OAuth2Request;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.stereotype.Component;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SecurityUserRepository;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 @EnableAuthorizationServer
@@ -51,10 +42,7 @@ public class AuthorizationServerHelper extends AuthorizationServerConfigurerAdap
     private AuthorizationServerTokenServices tokenservice;
 
     @Autowired
-    private ClientDetailsService clientDetailsService;
-
-    @Autowired
-    private SecurityUserRepository securityUserRepository;
+    private ObjectMapper mapper;
 
     public RequestPostProcessor bearerToken(final String clientid) {
         return mockRequest -> {
@@ -65,40 +53,62 @@ public class AuthorizationServerHelper extends AuthorizationServerConfigurerAdap
     }
 
     private OAuth2AccessToken createAccessToken(final String clientId) {
-        ClientDetails client = clientDetailsService.loadClientByClientId(clientId);
-        Map<String, Object> clientNameMap = new HashMap<>();
+        Map<String, Object> clientNameMap = new LinkedHashMap<>();
+        clientNameMap.put("jti", "7ac94e65-119e-471e-abb9-4e1fb5cc79d2");
+        clientNameMap.put("exp", 1561536742L);
+        clientNameMap.put("nbf", 0);
+        clientNameMap.put("iat", 1561536442);
+        clientNameMap.put("iss", "http://localhost:8080/ampt2d/auth/realms/securemetadata");
+        clientNameMap.put("aud", "secure-client");
+        clientNameMap.put("sub", "77dfbb1a-f998-4477-8276-f7a3ef5893b0");
+        clientNameMap.put("typ", "Bearer");
+        clientNameMap.put("azp", "secure-client");
+        clientNameMap.put("auth_time", 1561536442);
+        clientNameMap.put("session_state", "4a75616f-810c-40ed-beb7-875867b0accc");
+        clientNameMap.put("acr", "1");
+        clientNameMap.put("allowed-origins", new ArrayList<>());
+
+        ArrayList<String> rolesValueRealmList = new ArrayList<>(Arrays.asList("offline_access", "uma_authorization"));
+        Map<String, Object> rolesMap = new LinkedHashMap<>();
+        rolesMap.put("roles", rolesValueRealmList);
+        clientNameMap.put("realm_access", rolesMap);
+
+        ArrayList<String> rolesValueList = new ArrayList<>(Arrays.asList("manage_account", "manage_account-links", "view-profile"));
+        Map<String, Object> accountMap = new LinkedHashMap<>();
+        Map<String, Object> resourceAccessMap = new LinkedHashMap<>();
+        accountMap.put("roles", rolesValueList);
+        resourceAccessMap.put("account", accountMap);
+        if (clientId.equals("testoperator")) {
+            ArrayList<String> rolesValueOpList = new ArrayList<>(Arrays.asList("SERVICE_OPERATOR"));
+            Map<String, Object> secureClientMap = new LinkedHashMap<>();
+            secureClientMap.put("roles", rolesValueOpList);
+            resourceAccessMap.put("secure-client", secureClientMap);
+        }
+        clientNameMap.put("resource_access", resourceAccessMap);
+
+        clientNameMap.put("scope", "openid profile email");
+        clientNameMap.put("email_verified", false);
+        clientNameMap.put("user_name", clientId);
         clientNameMap.put("preferred_username", clientId);
-        Collection<GrantedAuthority> authorities = authoritiesExtractor(securityUserRepository).extractAuthorities(clientNameMap);
-        Set<String> resourceIds = client.getResourceIds();
-        Set<String> scopes = client.getScope();
+        clientNameMap.put("client_id", clientId);
 
-        Map<String, String> requestParameters = Collections.emptyMap();
-        boolean approved = true;
-        String redirectUrl = null;
-        Set<String> responseTypes = Collections.emptySet();
-        Map<String, Serializable> extensionProperties = Collections.emptyMap();
-
-        OAuth2Request oAuth2Request = new OAuth2Request(requestParameters, clientId, authorities,
-                approved, scopes, resourceIds, redirectUrl, responseTypes, extensionProperties);
-
-        User userPrincipal = new User("user", "", true, true, true, true, authorities);
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(userPrincipal, null, authorities);
-        OAuth2Authentication auth = new OAuth2Authentication(oAuth2Request, authenticationToken);
-
-        return tokenservice.createAccessToken(auth);
+        OAuth2Authentication auth = jwtAccessTokenCustomizer(mapper).extractAuthentication(clientNameMap);
+        OAuth2AccessToken auth2AccessToken = tokenservice.createAccessToken(auth);
+        return auth2AccessToken;
     }
 
     @Override
     public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()
-                .withClient("testOperator").and()
-                .withClient("testUser");
+                .withClient("testoperator")
+                .authorities("ROLE_SERVICE_OPERATOR")
+                .and()
+                .withClient("testuser");
     }
 
     @Bean
-    public AuthoritiesExtractor authoritiesExtractor(SecurityUserRepository securityUserRepository) {
-        return new MetadataAuthoritiesExtractor(securityUserRepository);
+    public JwtAccessTokenCustomizer jwtAccessTokenCustomizer(ObjectMapper mapper) {
+        return new JwtAccessTokenCustomizer(mapper);
     }
 
 }

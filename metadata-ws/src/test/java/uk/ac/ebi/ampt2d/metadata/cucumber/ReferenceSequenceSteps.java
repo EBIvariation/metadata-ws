@@ -57,7 +57,7 @@ public class ReferenceSequenceSteps {
         }
         json += "}";
         CommonStates.setResultActions(mockMvc.perform(post("/reference-sequences")
-                .with(authorizationServerHelper.bearerToken("testOperator"))
+                .with(authorizationServerHelper.bearerToken("testoperator"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.getBytes())));
     }

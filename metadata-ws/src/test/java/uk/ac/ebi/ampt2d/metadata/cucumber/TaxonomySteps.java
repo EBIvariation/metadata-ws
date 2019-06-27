@@ -57,7 +57,7 @@ public class TaxonomySteps {
                 "}";
 
         CommonStates.setResultActions(mockMvc.perform(post("/taxonomies")
-                .with(authorizationServerHelper.bearerToken("testOperator"))
+                .with(authorizationServerHelper.bearerToken("testoperator"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent.getBytes())));
     }
