@@ -110,6 +110,10 @@ public class ReferenceSequence extends Auditable<Long> {
         return name;
     }
 
+    public String getPatch() {
+        return patch;
+    }
+
     public List<String> getAccessions() {
         return accessions;
     }

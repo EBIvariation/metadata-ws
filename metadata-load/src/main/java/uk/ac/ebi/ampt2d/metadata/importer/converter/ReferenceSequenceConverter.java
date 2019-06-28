@@ -27,9 +27,17 @@ public class ReferenceSequenceConverter implements Converter<AssemblyType, Refer
 
     @Override
     public ReferenceSequence convert(AssemblyType assemblyType) {
+        String refName = assemblyType.getNAME();
+        String patch = null;
+        // Attempt to extract patch from refName (only for GRC human or mouse assembly names)
+        if (refName != null && refName.matches("^GRC[hm]\\d+\\.p\\d+$")) {
+            String[] refNameSplit = assemblyType.getNAME().split("\\.", 2);
+            refName = refNameSplit[0];
+            patch = refNameSplit[1];
+        }
         return new ReferenceSequence(
-                assemblyType.getNAME(),
-                "NOT_SPECIFIED",  // ENA only specifies accession+version, not the patch
+                refName,
+                patch,
                 Arrays.asList(assemblyType.getAccession()),
                 ReferenceSequence.Type.ASSEMBLY  // ENA data model only has ASSEMBLY type
         );
