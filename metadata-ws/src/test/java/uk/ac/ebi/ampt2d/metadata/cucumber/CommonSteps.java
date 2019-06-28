@@ -31,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
 import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
@@ -148,17 +149,10 @@ public class CommonSteps {
                 .content(jsonData.getBytes())));
     }
 
-    @When("^I request unauthorized POST (.*) with JSON payload:$")
-    public void performPostOnResourceUriWithJsonDataNonSecure(String resourceUri, String jsonData) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(post(resourceUri)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonData.getBytes())));
-    }
-
-    @When("^I request authorized POST (.*) having lesser privileges and with JSON payload:$")
+    @When("^I request authority set POST (.*) with JSON payload:$")
     public void performPostOnResourceUriWithJsonDataLowPrivileges(String resourceUri, String jsonData) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(post(resourceUri)
-                .with(authorizationServerHelper.bearerToken("testuser"))
+                .with(CommonStates.getRequestPostProcessor())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData.getBytes())));
     }
@@ -171,17 +165,10 @@ public class CommonSteps {
                 .content(jsonData.getBytes())));
     }
 
-    @When("^I request unauthorized PUT (.*) with JSON payload:$")
+    @When("^I request authority set PUT with value of (.*) having JSON payload:$")
     public void performPutOnResourceUriWithJsonDataUnauthorized(String resourceUrlKey, String jsonData) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(put(CommonStates.getUrl(resourceUrlKey))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonData.getBytes())));
-    }
-
-    @When("^I request authorized PUT (.*) having lesser privileges and with JSON payload:$")
-    public void performPutOnResourceUriWithJsonDataLowPrivileges(String resourceUrlKey, String jsonData) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(put(CommonStates.getUrl(resourceUrlKey))
-                .with(authorizationServerHelper.bearerToken("testuser"))
+                .with(CommonStates.getRequestPostProcessor())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData.getBytes())));
     }
@@ -255,21 +242,21 @@ public class CommonSteps {
                 .with(authorizationServerHelper.bearerToken("testoperator"))));
     }
 
-    @When("^I request DELETE with value of ([\\S]*)$")
+    @When("^I request DELETE with value of (.*)$")
     public void performDeleteOnResourceUri(String resourceUrlKey) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(delete(CommonStates.getUrl(resourceUrlKey))
                 .with(authorizationServerHelper.bearerToken("testoperator"))));
     }
 
-    @When("^I request unauthorized DELETE with value of ([\\S]*)$")
+    @When("^I request no authority DELETE with value of (.*)$")
     public void performDeleteOnResourceUriNonSecure(String resourceUrlKey) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(delete(CommonStates.getUrl(resourceUrlKey))));
     }
 
-    @When("^I request authorized DELETE having lesser privileges and with value of ([\\S]*)$")
+    @When("^I request authority set DELETE with value of (.*)$")
     public void performDeleteOnResourceUriSecureLowPrivileges(String resourceUrlKey) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(delete(CommonStates.getUrl(resourceUrlKey))
-                .with(authorizationServerHelper.bearerToken("testuser"))));
+                .with(CommonStates.getRequestPostProcessor())));
     }
 
     @When("^I request search for the (.*) with the parameters: (.*)$")
@@ -442,6 +429,16 @@ public class CommonSteps {
     @Given("^there is an URL (.*) with key (.*)$")
     public void setUrlWithKey(String url, String key) {
         CommonStates.setUrl(key, url);
+    }
+
+    @When("^I set authorization with testuser having default role$")
+    public void setAuthorizationWithDefaultRole() {
+        CommonStates.setRequestPostProcessor(authorizationServerHelper.bearerToken("testuser"));
+    }
+
+    @When("^I set authorization with testoperator having SERVICE_OPERATOR role$")
+    public void setAuthorizationWithServiceOperatorRole() {
+        CommonStates.setRequestPostProcessor(authorizationServerHelper.bearerToken("testoperator"));
     }
 
 }
