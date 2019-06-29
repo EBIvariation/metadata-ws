@@ -1,4 +1,3 @@
-f
 ## Security
 
 Metadata application uses Spring OAuth2 and Keycloak authorization to secure REST APIs. W.r.t OAuth2 standards mappings are
