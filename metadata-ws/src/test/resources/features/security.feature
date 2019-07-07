@@ -1,9 +1,9 @@
 Feature: Security related tests
 
   Scenario: access security disabled links
-    When I request ananymous GET /
+    When I request anonymous GET /
     Then the response code should be 200
-    When I request ananymous GET /swagger-ui.html
+    When I request anonymous GET /swagger-ui.html
     Then the response code should be 200
 
 

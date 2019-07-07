@@ -124,7 +124,7 @@ public class CommonSteps {
         );
     }
 
-    @When("^I request ananymous GET ([\\S]*)$")
+    @When("^I request anonymous GET ([\\S]*)$")
     public void performGetOnResourceUriNonSecure(String resourceUri) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get(resourceUri)));
     }
