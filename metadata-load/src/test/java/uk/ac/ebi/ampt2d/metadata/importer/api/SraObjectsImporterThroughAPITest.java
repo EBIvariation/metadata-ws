@@ -108,6 +108,12 @@ public class SraObjectsImporterThroughAPITest {
         assertEquals(Analysis.Technology.EXOME_SEQUENCING, analysis.getTechnology());
         assertEquals(2, analysis.getFiles().size());
 
+        analysis = sraObjectImporter.importAnalysis("ERZ015345");
+        assertEquals("ERZ015345", analysis.getAccessionVersionId().getAccession());
+        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
+        assertEquals(7, analysis.getFiles().size());
+
+
         //studies and analysis aren't imported when source is API and if we start with importAnalysis
         assertEquals(0, studyRepository.count());
         assertEquals(0, analysisRepository.count());
