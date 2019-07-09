@@ -1,7 +1,7 @@
 Feature: Transitive release date control for child objects of a Study
 
   Scenario Outline: Objects to which at least released study links should be accessible, and vice versa
-
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create the common taxonomy
     When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and NONE for ancestors
     And set the URL to TAXONOMY
@@ -158,7 +158,7 @@ Feature: Transitive release date control for child objects of a Study
 
 
   Scenario Outline: patching Study between released and unreleased states must work both ways
-
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create the study
     When I create a study
     And set the URL to STUDY

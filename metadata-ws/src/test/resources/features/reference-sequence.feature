@@ -1,7 +1,8 @@
 Feature: reference sequence
 
   Scenario: register a reference sequence successfully
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -37,7 +38,8 @@ Feature: reference sequence
 
 
   Scenario Outline: find one reference sequence by name
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -83,7 +85,8 @@ Feature: reference sequence
 
 
   Scenario Outline: find one reference sequence by accession
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -126,7 +129,8 @@ Feature: reference sequence
 
 
   Scenario Outline: find one reference sequence by type
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -168,7 +172,8 @@ Feature: reference sequence
 
 
   Scenario Outline: find zero reference sequence
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -215,12 +220,14 @@ Feature: reference sequence
 
 
   Scenario: find reference sequence by invalid type should fail
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request search for the reference-sequences with the parameters: type=UNKNOWN
     Then the response code should be 4xx
 
 
   Scenario: register a reference sequence and update taxonomy successfully
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 1,
@@ -263,6 +270,7 @@ Feature: reference sequence
 
 
   Scenario: register a reference sequence without taxonomy and fail
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /reference-sequences with JSON payload:
     """
     {
@@ -275,7 +283,8 @@ Feature: reference sequence
     And the response should contain error message A reference sequence must have one valid URL to taxonomy
     Then the response code should be 4xx
 
-  Scenario: register a reference sequence with invalid taxonomy and fail
+    Scenario: register a reference sequence with invalid taxonomy and fail
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /reference-sequences with JSON payload:
     """
     {
@@ -291,7 +300,8 @@ Feature: reference sequence
 
 
   Scenario: update a reference sequence with invalid taxonomy and fail
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 1,
@@ -318,6 +328,7 @@ Feature: reference sequence
 
 
   Scenario Outline: search various reference sequences by taxonomy name and id
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST taxonomies with 207598 for ID, Homininae for name and NONE for ancestors
     Then set the URL to TAXONOMY_1
     When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for ancestors

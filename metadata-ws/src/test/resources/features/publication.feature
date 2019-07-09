@@ -1,6 +1,7 @@
 Feature: publication object
 
   Scenario: register a publication successfully
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /publications with JSON payload:
     """
     {
@@ -18,6 +19,7 @@ Feature: publication object
 
 
   Scenario: retrieve publication with accession id should fail
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /publications with JSON payload:
     """
     {

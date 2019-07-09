@@ -1,6 +1,7 @@
 Feature: Miscellaneous functions
 
   Scenario: verify cross origin resource sharing
+    Given I set authorization with testuser having default role
     When I request OPTIONS / with GET for Access-Control-Request-Method header and http://www.evil-url.com for Origin header
     Then the response code should be 200
 
@@ -10,8 +11,9 @@ Feature: Miscellaneous functions
 
 
   Scenario Outline: verify metadata objects are auditable
-    Given current date as TODAY
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    And current date as TODAY
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,

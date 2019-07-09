@@ -87,7 +87,7 @@ public class SampleSteps {
         jsonContent = jsonContent + "}";
 
         return mockMvc.perform(post("/samples")
-                .with(authorizationServerHelper.bearerToken("testoperator"))
+                .with(CommonStates.getRequestPostProcessor())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent));
     }
@@ -106,7 +106,7 @@ public class SampleSteps {
         jsonContent = jsonContent + "}";
 
         return mockMvc.perform(post("/samples")
-                .with(authorizationServerHelper.bearerToken("testoperator"))
+                .with(CommonStates.getRequestPostProcessor())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent));
     }

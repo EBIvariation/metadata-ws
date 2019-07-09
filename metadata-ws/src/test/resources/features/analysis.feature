@@ -1,7 +1,8 @@
 Feature: analysis object
 
   Scenario: register an analysis successfully
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -30,7 +31,8 @@ Feature: analysis object
 
 
   Scenario: update an analysis successfully
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -83,7 +85,8 @@ Feature: analysis object
 
 
   Scenario Outline: update an analysis with invalid reference sequences list should fail
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -148,7 +151,8 @@ Feature: analysis object
 
 
   Scenario: delete all of an analysis's reference sequences should fail
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -197,7 +201,8 @@ Feature: analysis object
 
 
   Scenario: register an analysis with multiple gene reference sequences successfully
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -239,7 +244,8 @@ Feature: analysis object
 
 
   Scenario Outline: register an analysis with multiple non-gene reference sequences should fail
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
@@ -275,8 +281,9 @@ Feature: analysis object
       | "name": "BRCA1","patch": "3","accessions": ["NM_007294.3"],"type": "SEQUENCE","taxonomy": "TAXONOMY"                                       | "name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY" |
 
 
-  Scenario Outline: find one analysis by type, technology or platform
-    Given I request POST /taxonomies with JSON payload:
+   Scenario Outline: find one analysis by type, technology or platform
+     Given I set authorization with testoperator having SERVICE_OPERATOR role
+     When I request POST /taxonomies with JSON payload:
      """
      {
        "taxonomyId": 9606,
@@ -320,8 +327,9 @@ Feature: analysis object
       | technology=ARRAY&type=TUMOR | ANALYSIS_2   |
 
 
-  Scenario Outline: find zero analysis by type, technology or platform
-    Given I request POST /taxonomies with JSON payload:
+   Scenario Outline: find zero analysis by type, technology or platform
+     Given I set authorization with testoperator having SERVICE_OPERATOR role
+     When I request POST /taxonomies with JSON payload:
      """
      {
        "taxonomyId": 9606,
@@ -360,8 +368,9 @@ Feature: analysis object
       | technology=CURATION |
 
 
-  Scenario Outline: find analysis by invalid type or technology should fail
-    Given I request POST /taxonomies with JSON payload:
+   Scenario Outline: find analysis by invalid type or technology should fail
+     Given I set authorization with testoperator having SERVICE_OPERATOR role
+     When I request POST /taxonomies with JSON payload:
      """
      {
        "taxonomyId": 9606,

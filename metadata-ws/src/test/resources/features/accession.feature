@@ -1,6 +1,7 @@
 Feature: accession object
 
   Scenario: validation of accession and version
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -39,6 +40,7 @@ Feature: accession object
 
 
   Scenario: find study by accession and version
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -65,7 +67,8 @@ Feature: accession object
 
 
   Scenario: find file by accession and version
-    And I request POST /files with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /files with JSON payload:
     """
     {
       "accessionVersionId": {
@@ -87,6 +90,7 @@ Feature: accession object
 
 
   Scenario: find sample by accession and version
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -114,7 +118,8 @@ Feature: accession object
 
 
   Scenario: find analysis by accession and version
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,

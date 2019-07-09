@@ -1,6 +1,7 @@
 Feature: sample object
 
   Scenario: register a sample successfully
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -23,6 +24,7 @@ Feature: sample object
 
 
   Scenario: update a sample successfully
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -60,6 +62,7 @@ Feature: sample object
 
 
   Scenario Outline: post a sample with invalid taxonomy list should fail
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I create a sample with <list> for taxonomy
     Then the response code should be 4xx
     And the response should contain field exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException
@@ -71,6 +74,7 @@ Feature: sample object
 
 
   Scenario: delete all of a sample's taxonomies should fail
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -108,6 +112,7 @@ Feature: sample object
 
 
   Scenario Outline: update a sample with invalid taxonomies should fail
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -140,6 +145,7 @@ Feature: sample object
 
 
   Scenario Outline: find two samples by taxonomy
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -196,6 +202,7 @@ Feature: sample object
 
 
   Scenario Outline: find one sample by taxonomy
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -249,6 +256,7 @@ Feature: sample object
 
 
   Scenario Outline: find no sample by non-existing taxonomy
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -299,6 +307,7 @@ Feature: sample object
 
 
   Scenario Outline: verify various accession version with samples
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {

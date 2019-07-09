@@ -1,6 +1,7 @@
 Feature: study object
 
   Scenario: register a study successfully and check its fields
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create a taxonomy
     When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and NONE for ancestors
     Then set the URL to TAXONOMY
@@ -30,6 +31,7 @@ Feature: study object
 
 
   Scenario Outline: search various study by taxonomy name and id
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create taxonomies
     When I request POST taxonomies with 207598 for ID, Homininae for name and NONE for ancestors
     Then set the URL to TAXONOMY_1
@@ -130,6 +132,7 @@ Feature: study object
 
 
   Scenario Outline: search various studies by release date
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -184,6 +187,7 @@ Feature: study object
 
 
   Scenario: find various studies by release date range
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -233,6 +237,7 @@ Feature: study object
 
 
   Scenario Outline: find various studies by analysis
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -310,6 +315,7 @@ Feature: study object
 
 
   Scenario: search various studies by name value pair for accession
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -369,6 +375,7 @@ Feature: study object
 
 
   Scenario Outline: search various studies by name value pair
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -434,6 +441,7 @@ Feature: study object
 
 
   Scenario Outline: search various studies by paging and sorting
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -488,6 +496,7 @@ Feature: study object
 
 
   Scenario Outline: search various public studies
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create a common taxonomy
     When I request POST /taxonomies with JSON payload:
     """
@@ -596,6 +605,7 @@ Feature: study object
 
 
   Scenario Outline: search various undeprecated studies
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create common taxonomy
     When I request POST /taxonomies with JSON payload:
     """
@@ -683,6 +693,7 @@ Feature: study object
 
 
   Scenario: search various yet to publish studies
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -711,6 +722,7 @@ Feature: study object
 
 
   Scenario: search studies invalid dates
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request search for studies that have been released
     Then the response code should be 4xx
     And the response should contain field exception with value java.lang.IllegalArgumentException
@@ -722,6 +734,7 @@ Feature: study object
 
 
   Scenario: search various deprecated studies
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -750,6 +763,7 @@ Feature: study object
 
 
   Scenario: search studies on various deprecated fields
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -784,7 +798,8 @@ Feature: study object
 
 
   Scenario Outline: find linked studies
-    Given there is an URL https://nohost//studies/999 with key STUDY_NON_EXISTING
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    And there is an URL https://nohost//studies/999 with key STUDY_NON_EXISTING
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -865,6 +880,7 @@ Feature: study object
 
 
   Scenario: deprecate to undeprecate studies
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -905,6 +921,7 @@ Feature: study object
 
 
   Scenario: verify browsable is a property of study
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -943,6 +960,7 @@ Feature: study object
 
 
   Scenario: verify study release date could be changed
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -987,12 +1005,14 @@ Feature: study object
 
 
   Scenario: verify non-existing study with patch
-    Given there is an URL https://nohost//studies/999 with key STUDY_NON_EXISTING
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    And there is an URL https://nohost//studies/999 with key STUDY_NON_EXISTING
     When I request PATCH STUDY_NON_EXISTING with patch and day today
     Then the response code should be 4xx
 
 
   Scenario: patch study with invalid request
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {

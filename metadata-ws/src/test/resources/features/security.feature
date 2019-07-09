@@ -8,7 +8,8 @@ Feature: Security related tests
 
 
   Scenario: update security enabled links
-    Given I request POST /publications with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /publications with JSON payload:
     """
     {
       "publicationId": "Publication5"
@@ -34,7 +35,7 @@ Feature: Security related tests
 
   Scenario: access security enabled links and fail
     Given I set authorization with testuser having default role
-    When I request authority set POST /publications with JSON payload:
+    When I request POST /publications with JSON payload:
     """
     {
       "publicationId": "Publication4"
@@ -43,7 +44,7 @@ Feature: Security related tests
     Then the response code should be 403
 
     Given I set authorization with testoperator having SERVICE_OPERATOR role
-    When I request authority set POST /publications with JSON payload:
+    When I request POST /publications with JSON payload:
     """
     {
       "publicationId": "Publication5"
@@ -53,7 +54,7 @@ Feature: Security related tests
     Then the response code should be 201
 
     Given I set authorization with testuser having default role
-    When I request authority set PUT with value of PUBLICATION5 having JSON payload:
+    When I request PUT PUBLICATION5 with JSON payload:
     """
     {
       "publicationId": "Publication7"
@@ -62,7 +63,7 @@ Feature: Security related tests
     Then the response code should be 403
 
     Given I set authorization with testoperator having SERVICE_OPERATOR role
-    When I request authority set PUT with value of PUBLICATION5 having JSON payload:
+    When I request PUT PUBLICATION5 with JSON payload:
     """
     {
       "publicationId": "Publication7"
@@ -74,5 +75,13 @@ Feature: Security related tests
     Then the response code should be 401
 
     Given I set authorization with testuser having default role
-    When I request authority set DELETE with value of PUBLICATION5
+    When I request DELETE with value of PUBLICATION5
     Then the response code should be 403
+
+  Scenario: verify only authorized read should succeed
+    When I request anonymous GET /publications
+    Then the response code should be 401
+
+    When I set authorization with testuser having default role
+    And I request GET /publications
+    Then the response code should be 200
