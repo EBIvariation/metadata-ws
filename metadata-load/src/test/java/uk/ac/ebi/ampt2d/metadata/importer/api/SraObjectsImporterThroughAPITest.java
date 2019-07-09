@@ -132,6 +132,15 @@ public class SraObjectsImporterThroughAPITest {
     }
 
     @Test
+    public void importAnalysisObjectWithoutReferenceSequence() throws Exception {
+        Analysis analysis = sraObjectImporter.importAnalysis("ERZ748187");
+        assertEquals("ERZ748187", analysis.getAccessionVersionId().getAccession());
+        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
+        assertEquals(2, analysis.getFiles().size());
+        assertEquals(0, analysis.getReferenceSequences().size());
+    }
+
+    @Test
     public void importReferenceSequenceObject() throws Exception {
         ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GCA_000002305.1");
         assertEquals(Arrays.asList("GCA_000002305.1"), referenceSequence.getAccessions());
