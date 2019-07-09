@@ -110,21 +110,13 @@ public class SraObjectsImporterThroughAPITest {
         assertEquals(Analysis.Technology.EXOME_SEQUENCING, analysis.getTechnology());
         assertEquals(2, analysis.getFiles().size());
 
-        analysis = sraObjectImporter.importAnalysis("ERZ015345");
-        assertEquals("ERZ015345", analysis.getAccessionVersionId().getAccession());
+        analysis = sraObjectImporter.importAnalysis("ERZ094050");
+        assertEquals("ERZ094050", analysis.getAccessionVersionId().getAccession());
         assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
-        assertEquals(7, analysis.getFiles().size());
+        assertEquals(5, analysis.getFiles().size());
         List<ReferenceSequence> referenceSequences = analysis.getReferenceSequences();
-        assertEquals(2, referenceSequences.size());
-        ReferenceSequence referenceSequence = referenceSequences.get(0);
-        assertEquals("CM000673", referenceSequence.getAccessions().get(0));
-        assertEquals("Homo sapiens chromosome 11, GRCh38 reference primary assembly.", referenceSequence.getName());
-        assertEquals(ReferenceSequence.Type.GENE, referenceSequence.getType());
-        referenceSequence = referenceSequences.get(1);
-        assertEquals("GCA_000001405.1", referenceSequence.getAccessions().get(0));
-        assertEquals("GRCh37", referenceSequence.getName());
-        assertEquals(ReferenceSequence.Type.ASSEMBLY, referenceSequence.getType());
-        assertEquals(1092, analysis.getSamples().size());
+        assertEquals(24, referenceSequences.size());
+        assertEquals(1, analysis.getSamples().size());
 
         //studies and analysis aren't imported when source is API and if we start with importAnalysis
         assertEquals(0, studyRepository.count());

@@ -37,6 +37,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepos
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -113,12 +114,9 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
         assertEquals(1, analysis.getFiles().size());
         assertEquals("ERP001373", analysis.getStudy().getAccessionVersionId().getAccession());
-        ReferenceSequence referenceSequence = analysis.getReferenceSequences().get(0);
-        assertEquals("CM000682", referenceSequence.getAccessions().get(0));
-        assertEquals("Homo sapiens chromosome 20, GRCh38 reference primary assembly.",
-                referenceSequence.getName());
-        assertNull(referenceSequence.getPatch());
-        assertEquals(ReferenceSequence.Type.GENE, referenceSequence.getType());
+        List<ReferenceSequence> referenceSequences = analysis.getReferenceSequences();
+        referenceSequences.parallelStream().allMatch(referenceSequence -> referenceSequence.getType().equals
+                (ReferenceSequence.Type.GENE));
         assertEquals(1, studyRepository.count());
         assertEquals(1, analysisRepository.count());
         assertEquals(25, referenceSequenceRepository.count());
