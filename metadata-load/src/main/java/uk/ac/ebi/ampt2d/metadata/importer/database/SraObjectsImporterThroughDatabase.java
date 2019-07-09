@@ -57,6 +57,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
             SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+            SraXmlParser<ReferenceSequence> sraEntryXmlParser,
             SraXmlParser<SampleType> sraSampleXmlParser,
 
             Converter<StudyType, Study> studyConverter,
@@ -80,6 +81,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,
                 sraAssemblyXmlParser,
+                sraEntryXmlParser,
                 sraSampleXmlParser,
 
                 studyConverter,

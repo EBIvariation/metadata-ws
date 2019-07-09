@@ -19,8 +19,6 @@
 package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.springframework.core.convert.converter.Converter;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
@@ -43,12 +41,6 @@ import uk.ac.ebi.ena.sra.xml.ReferenceSequenceType;
 import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -59,11 +51,11 @@ import java.util.logging.Logger;
 
 public abstract class ObjectsImporter {
 
-    private static final Logger IMPORT_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
-
     public static final String ASSEMBLY_END_TAG = "</ASSEMBLY>";
 
     public static final String ENTRY_END_TAG = "</entry";
+
+    private static final Logger IMPORT_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
 
     // XML retrievers. First is used as default, second for cases where API retrieval mode must be forced
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
@@ -87,6 +79,8 @@ public abstract class ObjectsImporter {
     private SraXmlParser<AnalysisType> sraAnalysisXmlParser;
 
     private SraXmlParser<AssemblyType> sraAssemblyXmlParser;
+
+    private SraXmlParser<ReferenceSequence> sraEntryXmlParser;
 
     private SraXmlParser<SampleType> sraSampleXmlParser;
 
@@ -113,6 +107,7 @@ public abstract class ObjectsImporter {
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
             SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+            SraXmlParser<ReferenceSequence> sraEntryXmlParser,
             SraXmlParser<SampleType> sraSampleXmlParser,
 
             Converter<StudyType, Study> studyConverter,
@@ -135,6 +130,7 @@ public abstract class ObjectsImporter {
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
         this.sraAssemblyXmlParser = sraAssemblyXmlParser;
+        this.sraEntryXmlParser = sraEntryXmlParser;
         this.sraSampleXmlParser = sraSampleXmlParser;
 
         this.studyConverter = studyConverter;
@@ -202,17 +198,21 @@ public abstract class ObjectsImporter {
 
     public ReferenceSequence importReferenceSequence(String accession) {
         ReferenceSequence referenceSequence = null;
+        Taxonomy taxonomy;
         try {
             // Reference sequences must always be imported through API, even with import mode = DB
             String referenceSequenceXml = sraxmlRetrieverByAccessionForceApi.getXml(accession);
             if (referenceSequenceXml.contains(ASSEMBLY_END_TAG)) {
                 AssemblyType assembly = sraAssemblyXmlParser.parseXml(referenceSequenceXml, accession);
                 referenceSequence = referenceSequenceConverter.convert(assembly);
-                Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromAssembly(assembly));
-                referenceSequence.setTaxonomy(taxonomy);
+                taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromAssembly(assembly));
             } else if (referenceSequenceXml.contains(ENTRY_END_TAG)) {
-                referenceSequence = getReferenceSequenceFromEntryXml(referenceSequenceXml);
+                referenceSequence = sraEntryXmlParser.parseXml(referenceSequenceXml, accession);
+                taxonomy = taxonomyRepository.findOrSave(referenceSequence.getTaxonomy());
+            } else {
+                return referenceSequence;
             }
+            referenceSequence.setTaxonomy(taxonomy);
             referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
         } catch (Exception exception) {
             IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for ReferenceSequence accession " + accession);
@@ -223,34 +223,6 @@ public abstract class ObjectsImporter {
 
     protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
         return standard.getAccession();
-    }
-
-    private ReferenceSequence getReferenceSequenceFromEntryXml(String referenceSequenceXml) throws Exception {
-        String tsa = "Transcriptome Shotgun Assembly";
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(new InputSource(new StringReader(referenceSequenceXml)));
-        XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath();
-        String referenceSequenceAccession = (String) xpath.evaluate("/ROOT/entry/@accession", document,
-                XPathConstants.STRING);
-        String referenceSequenceName = (String) xpath.evaluate("/ROOT/entry/description", document,
-                XPathConstants.STRING);
-        ReferenceSequence.Type referenceSequenceType1 = ReferenceSequence.Type.GENE;
-        String referenceSequenceType = (String) xpath.evaluate("/ROOT/entry/keyword", document,
-                XPathConstants.STRING);
-        if (referenceSequenceType != null && referenceSequenceType.contains(tsa)) {
-            referenceSequenceType1 = ReferenceSequence.Type.TRANSCRIPTOME;
-        }
-        ReferenceSequence referenceSequence = new ReferenceSequence(referenceSequenceName, null, Arrays.asList
-                (referenceSequenceAccession), referenceSequenceType1);
-        String taxonomyName = (String) xpath.evaluate("/ROOT/entry/feature/taxon/@scientificName", document,
-                XPathConstants.STRING);
-        long taxonomyId = Long.parseLong((String) xpath.evaluate("/ROOT/entry/feature/taxon/@taxId", document,
-                XPathConstants.STRING));
-        Taxonomy taxonomy = taxonomyRepository.findOrSave(new Taxonomy(taxonomyId, taxonomyName));
-        referenceSequence.setTaxonomy(taxonomy);
-        return referenceSequence;
     }
 
     private Taxonomy extractTaxonomyFromAssembly(AssemblyType assemblyType) {

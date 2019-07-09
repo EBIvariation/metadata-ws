@@ -35,6 +35,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStud
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAssemblyXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraEntryXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraSampleXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
@@ -71,6 +72,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
                 sraAssemblyXmlParser(),
+                sraEntryXmlParser(),
                 sraSampleXmlParser(),
 
                 studyConverter(),
@@ -112,6 +114,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
                 sraAssemblyXmlParser(),
+                sraEntryXmlParser(),
                 sraSampleXmlParser(),
 
                 studyConverter(),
@@ -147,6 +150,10 @@ public class MetadataImporterMainApplicationConfiguration {
 
     private SraAssemblyXmlParser sraAssemblyXmlParser() {
         return new SraAssemblyXmlParser();
+    }
+
+    private SraEntryXmlParser sraEntryXmlParser() {
+        return new SraEntryXmlParser();
     }
 
     // Converter factories

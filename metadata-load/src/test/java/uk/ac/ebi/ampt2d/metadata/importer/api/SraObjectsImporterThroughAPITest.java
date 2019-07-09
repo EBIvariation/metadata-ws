@@ -22,30 +22,32 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
-
-import java.util.Arrays;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=API"})
 @ContextConfiguration(classes = {MetadataImporterMainApplication.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class SraObjectsImporterThroughAPITest {
 
     @Autowired
@@ -97,7 +99,7 @@ public class SraObjectsImporterThroughAPITest {
 
         assertEquals(3, studyRepository.count());
         assertEquals(2, analysisRepository.count());
-        assertEquals(1, referenceSequenceRepository.count());
+        assertEquals(21, referenceSequenceRepository.count());
         assertEquals(25, sampleRepository.count());
     }
 
@@ -112,7 +114,17 @@ public class SraObjectsImporterThroughAPITest {
         assertEquals("ERZ015345", analysis.getAccessionVersionId().getAccession());
         assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
         assertEquals(7, analysis.getFiles().size());
-
+        List<ReferenceSequence> referenceSequences = analysis.getReferenceSequences();
+        assertEquals(2, referenceSequences.size());
+        ReferenceSequence referenceSequence = referenceSequences.get(0);
+        assertEquals("CM000673", referenceSequence.getAccessions().get(0));
+        assertEquals("EquCab2.0", referenceSequence.getName());
+        assertEquals(ReferenceSequence.Type.GENE, referenceSequence.getType());
+        referenceSequence = referenceSequences.get(1);
+        assertEquals("GCA_000001405.1", referenceSequence.getAccessions().get(0));
+        assertEquals("GRCh37", referenceSequence.getName());
+        assertEquals(ReferenceSequence.Type.ASSEMBLY, referenceSequence.getType());
+        assertEquals(1092, analysis.getSamples().size());
 
         //studies and analysis aren't imported when source is API and if we start with importAnalysis
         assertEquals(0, studyRepository.count());

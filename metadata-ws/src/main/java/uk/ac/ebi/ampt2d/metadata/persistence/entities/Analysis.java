@@ -192,6 +192,10 @@ public class Analysis extends Auditable<Long> {
         this.referenceSequences = referenceSequences;
     }
 
+    public List<Sample> getSamples() {
+        return samples;
+    }
+
     public void setSamples(List<Sample> samples) {
         this.samples = samples;
     }

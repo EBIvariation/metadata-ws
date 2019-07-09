@@ -52,6 +52,7 @@ public class SraObjectsImporterThroughAPI extends ObjectsImporter {
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
             SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+            SraXmlParser<ReferenceSequence> sraEntryXmlParser,
             SraXmlParser<SampleType> sraSampleXmlParser,
 
             Converter<StudyType, Study> studyConverter,
@@ -76,6 +77,7 @@ public class SraObjectsImporterThroughAPI extends ObjectsImporter {
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,
                 sraAssemblyXmlParser,
+                sraEntryXmlParser,
                 sraSampleXmlParser,
 
                 studyConverter,
