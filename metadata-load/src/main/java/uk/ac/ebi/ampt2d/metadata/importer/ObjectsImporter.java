@@ -237,22 +237,23 @@ public abstract class ObjectsImporter {
         // REFERENCE_ALIGNMENT, SEQUENCE_VARIATION, and PROCESSED_READS. It is guaranteed that each analysis contains
         // at most one of these three types.
         if (analysisType1.isSetREFERENCEALIGNMENT()) {
-            String accession = getAccessionFromReferenceSequenceType(analysisType1.getREFERENCEALIGNMENT());
+            ReferenceSequenceType referenceSequenceType = analysisType1.getREFERENCEALIGNMENT();
+            referenceSequenceAccessions.addAll(getSequenceOrTsaAccessions(referenceSequenceType.getSEQUENCEArray()));
+            String accession = getAssemblyAccession(referenceSequenceType);
             if (accession != null) {
                 referenceSequenceAccessions.add(accession);
             }
         }
         if (analysisType1.isSetSEQUENCEVARIATION()) {
             AnalysisType.ANALYSISTYPE.SEQUENCEVARIATION sequencevariation = analysisType1.getSEQUENCEVARIATION();
-            Set<String> accessions = getSequenceOrTsaAccessions(sequencevariation);
-            referenceSequenceAccessions.addAll(accessions);
-            String accession = getAccessionFromReferenceSequenceType(sequencevariation);
+            referenceSequenceAccessions.addAll(getSequenceOrTsaAccessions(sequencevariation.getSEQUENCEArray()));
+            String accession = getAssemblyAccession(sequencevariation);
             if (accession != null) {
                 referenceSequenceAccessions.add(accession);
             }
         }
         if (analysisType1.isSetPROCESSEDREADS()) {
-            String accession = getAccessionFromReferenceSequenceType(analysisType1.getPROCESSEDREADS());
+            String accession = getAssemblyAccession(analysisType1.getPROCESSEDREADS());
             if (accession != null) {
                 referenceSequenceAccessions.add(accession);
             }
@@ -260,9 +261,8 @@ public abstract class ObjectsImporter {
         return referenceSequenceAccessions;
     }
 
-    private Set<String> getSequenceOrTsaAccessions(AnalysisType.ANALYSISTYPE.SEQUENCEVARIATION sequencevariation) {
+    private Set<String> getSequenceOrTsaAccessions(ReferenceSequenceType.SEQUENCE[] sequences) {
         Set<String> sequenceOrTsaAccessions = new HashSet<>();
-        ReferenceSequenceType.SEQUENCE[] sequences = sequencevariation.getSEQUENCEArray();
         if (sequences == null || sequences.length == 0) {
             return sequenceOrTsaAccessions;
         }
@@ -272,7 +272,7 @@ public abstract class ObjectsImporter {
         return sequenceOrTsaAccessions;
     }
 
-    private String getAccessionFromReferenceSequenceType(ReferenceSequenceType referenceSequenceType) {
+    private String getAssemblyAccession(ReferenceSequenceType referenceSequenceType) {
         if (referenceSequenceType != null) {
             ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
             if (referenceAssemblyType != null) {

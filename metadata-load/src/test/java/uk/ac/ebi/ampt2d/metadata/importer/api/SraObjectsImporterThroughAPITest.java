@@ -144,6 +144,18 @@ public class SraObjectsImporterThroughAPITest {
     }
 
     @Test
+    public void importReferenceSequenceTranscriptome() throws Exception {
+        ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GAAA01000000");
+        assertEquals(Arrays.asList("GAAA01000000"), referenceSequence.getAccessions());
+        assertEquals("Latimeria chalumnae, TSA project GAAA01000000 data", referenceSequence.getName());
+        assertEquals(ReferenceSequence.Type.TRANSCRIPTOME, referenceSequence.getType());
+        Taxonomy taxonomy = referenceSequence.getTaxonomy();
+        assertEquals(7897, taxonomy.getTaxonomyId());
+        assertEquals("Latimeria chalumnae", taxonomy.getName());
+        assertEquals(1, referenceSequenceRepository.count());
+    }
+
+    @Test
     public void importSampleObject() throws Exception {
         Sample sample = sraObjectImporter.importSample("ERS000156");
         assertNotNull(sample);
