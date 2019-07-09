@@ -118,7 +118,7 @@ public class SraObjectsImporterThroughAPITest {
         assertEquals(2, referenceSequences.size());
         ReferenceSequence referenceSequence = referenceSequences.get(0);
         assertEquals("CM000673", referenceSequence.getAccessions().get(0));
-        assertEquals("EquCab2.0", referenceSequence.getName());
+        assertEquals("Homo sapiens chromosome 11, GRCh38 reference primary assembly.", referenceSequence.getName());
         assertEquals(ReferenceSequence.Type.GENE, referenceSequence.getType());
         referenceSequence = referenceSequences.get(1);
         assertEquals("GCA_000001405.1", referenceSequence.getAccessions().get(0));
