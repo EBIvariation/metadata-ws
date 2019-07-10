@@ -53,6 +53,7 @@ public class EnableSecurityConfig extends ResourceServerConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers(AUTH_WHITELIST).permitAll()
+                .antMatchers(HttpMethod.GET).permitAll()
                 .antMatchers(HttpMethod.POST).hasRole("SERVICE_OPERATOR")
                 .antMatchers(HttpMethod.PUT).hasRole("SERVICE_OPERATOR")
                 .antMatchers(HttpMethod.PATCH).hasRole("SERVICE_OPERATOR")

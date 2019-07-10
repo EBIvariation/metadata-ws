@@ -10,7 +10,7 @@ Endpoints
 
 - No restrictions are applied on the `/` and `/swagger-ui.html` endpoints, which can be accessed by anonymous users, for example via http://localhost:8085/ and http://localhost:8085/swagger-ui.html
 - Among all other endpoints:
-     - Read-only (GET) operations can be issued by any user authenticated with Keycloak. The user can have any role assigned.
+     - Read-only (GET) operations can be issued by anonymous user.
      - Update operations (POST, PUT, PATCH, DELETE) can be performed only by users with the "SERVICE_OPERATOR" role (described below).
 
 
