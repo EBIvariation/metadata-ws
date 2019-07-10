@@ -24,6 +24,8 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
+import org.springframework.security.oauth2.provider.ClientDetails;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.stereotype.Component;
@@ -44,6 +46,9 @@ public class AuthorizationServerHelper extends AuthorizationServerConfigurerAdap
     @Autowired
     private ObjectMapper mapper;
 
+    @Autowired
+    private ClientDetailsService clientDetailsService;
+
     public RequestPostProcessor bearerToken(final String clientid) {
         return mockRequest -> {
             OAuth2AccessToken token = createAccessToken(clientid);
@@ -53,6 +58,33 @@ public class AuthorizationServerHelper extends AuthorizationServerConfigurerAdap
     }
 
     private OAuth2AccessToken createAccessToken(final String clientId) {
+        ClientDetails client = clientDetailsService.loadClientByClientId(clientId);
+        Map<String, Object> clientNameMap = client.getAdditionalInformation();
+
+        OAuth2Authentication auth = jwtAccessTokenCustomizer(mapper).extractAuthentication(clientNameMap);
+        OAuth2AccessToken auth2AccessToken = tokenservice.createAccessToken(auth);
+        return auth2AccessToken;
+    }
+
+    @Override
+    public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
+        Map<String, Object> testuserMap = getClientInfo("testuser");
+        Map<String, Object> testoperatorMap = getClientInfo("testoperator");
+        clients.inMemory()
+                .withClient("testoperator")
+                .authorities("ROLE_SERVICE_OPERATOR")
+                .additionalInformation(testoperatorMap)
+                .and()
+                .withClient("testuser")
+                .additionalInformation(testuserMap);
+    }
+
+    @Bean
+    public JwtAccessTokenCustomizer jwtAccessTokenCustomizer(ObjectMapper mapper) {
+        return new JwtAccessTokenCustomizer(mapper);
+    }
+
+    private static Map<String, Object> getClientInfo(String clientId) {
         Map<String, Object> clientNameMap = new LinkedHashMap<>();
         clientNameMap.put("jti", "7ac94e65-119e-471e-abb9-4e1fb5cc79d2");
         clientNameMap.put("exp", 1561536742L);
@@ -91,24 +123,7 @@ public class AuthorizationServerHelper extends AuthorizationServerConfigurerAdap
         clientNameMap.put("user_name", clientId);
         clientNameMap.put("preferred_username", clientId);
         clientNameMap.put("client_id", clientId);
-
-        OAuth2Authentication auth = jwtAccessTokenCustomizer(mapper).extractAuthentication(clientNameMap);
-        OAuth2AccessToken auth2AccessToken = tokenservice.createAccessToken(auth);
-        return auth2AccessToken;
-    }
-
-    @Override
-    public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory()
-                .withClient("testoperator")
-                .authorities("ROLE_SERVICE_OPERATOR")
-                .and()
-                .withClient("testuser");
-    }
-
-    @Bean
-    public JwtAccessTokenCustomizer jwtAccessTokenCustomizer(ObjectMapper mapper) {
-        return new JwtAccessTokenCustomizer(mapper);
+        return clientNameMap;
     }
 
 }
