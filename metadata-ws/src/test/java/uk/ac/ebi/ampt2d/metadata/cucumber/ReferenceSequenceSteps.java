@@ -32,9 +32,6 @@ public class ReferenceSequenceSteps {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private AuthorizationServerHelper authorizationServerHelper;
-
     @Then("^the response should contain one reference sequence$")
     public void checkResponseListSize() throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$..reference-sequences").isArray())

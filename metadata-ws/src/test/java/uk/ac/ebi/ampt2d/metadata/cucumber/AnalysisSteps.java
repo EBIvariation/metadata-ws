@@ -42,9 +42,6 @@ public class AnalysisSteps {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private AuthorizationServerHelper authorizationServerHelper;
-
     @When("I create an analysis with (.*) for study and (.*) for reference sequence")
     public void createTestAnalysis(String studyUrlKey, String referenceSequenceUrlKey) throws Exception {
         createTestAnalysisParam("EGAA0001", referenceSequenceUrlKey, studyUrlKey, Analysis.Technology.EXOME_SEQUENCING,

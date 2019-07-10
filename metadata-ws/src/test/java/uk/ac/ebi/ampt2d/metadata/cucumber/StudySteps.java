@@ -41,9 +41,6 @@ public class StudySteps {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private AuthorizationServerHelper authorizationServerHelper;
-
     @When("I create a study$")
     public void createTestStudy() throws Exception {
         createTestStudyWithAccession("EGAS0001");

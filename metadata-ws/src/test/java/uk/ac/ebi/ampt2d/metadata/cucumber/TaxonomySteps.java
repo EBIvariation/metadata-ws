@@ -38,9 +38,6 @@ public class TaxonomySteps {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private AuthorizationServerHelper authorizationServerHelper;
-
     @Then("^the response should contain no taxonomy$")
     public void checkTaxonomyResponseSize() throws Exception {
         CommonStates.getResultActions().andExpect(jsonPath("$..taxonomies").isArray())

@@ -42,9 +42,6 @@ public class SampleSteps {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private AuthorizationServerHelper authorizationServerHelper;
-
     @When("I create a sample with (.*) for taxonomy")
     public void createTestSample(String testTaxonomyKeys) throws Exception {
         createTestSampleParameterized("EGAS0001", 1, "test_human_sample", testTaxonomyKeys);
