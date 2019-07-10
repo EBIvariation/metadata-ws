@@ -20,16 +20,13 @@ Endpoints
    - This can be obtained from Keycloak Realm settings -> Keys -> Public key, at the right-most column.
   
  
-##Configuring keycloak
+##Configuring Keycloak
   
-1. Setup and configure keycloak server with realm, client, role, mapper and user [as described in the official documentation](https://www.keycloak.org/docs/latest/getting_started/index.html)
-2. Consider following are configured in keycloak as an example
-     - Keycloak server running at: “http://localhost:8080” 
-     - Relam: “securemetadata”
-     - Client id: “secure-client”
+1. Setup and configure Keycloak server with realm, client, role, mapper and user [as described in the official documentation](https://www.keycloak.org/docs/latest/getting_started/index.html)
+2. Consider following are configured in Keycloak as an example
      - Role: “SERVICE_OPERATOR”. This role name is mandatory. It could be either client role or realm role.
      - User name Mapper: Keycloak returns access token in JWT. Logged in username is returned in claim “preferred\_username” in access token. Spring Security OAuth2 resource Server expects username in claim “user\_name”. Hence a mapper to map logged in username to a new claim named user_name is required
-     - 'Redirect URL' in client settings: “http://localhost:8085” (Metadata application)
+     - 'Redirect URL' in client settings should point to where the metadata API is running
 
 
 ## Testing Keycloak

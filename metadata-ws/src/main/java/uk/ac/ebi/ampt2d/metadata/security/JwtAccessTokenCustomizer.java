@@ -65,10 +65,11 @@ public class JwtAccessTokenCustomizer extends DefaultAccessTokenConverter implem
         OAuth2Request oAuth2Request = authentication.getOAuth2Request();
 
         OAuth2Request request =
-                new OAuth2Request(oAuth2Request.getRequestParameters(), oAuth2Request.getClientId(), authorities, true, oAuth2Request.getScope(),
-                        audienceList, null, null, null);
+                new OAuth2Request(oAuth2Request.getRequestParameters(), oAuth2Request.getClientId(), authorities,
+                        true, oAuth2Request.getScope(), audienceList, null, null, null);
 
-        Authentication usernamePasswordAuthentication = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), "N/A", authorities);
+        Authentication usernamePasswordAuthentication = new UsernamePasswordAuthenticationToken(
+                authentication.getPrincipal(), "N/A", authorities);
         return new OAuth2Authentication(request, usernamePasswordAuthentication);
     }
 
