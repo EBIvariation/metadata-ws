@@ -230,30 +230,28 @@ public abstract class ObjectsImporter {
         return new Taxonomy(taxon.getTAXONID(), taxon.getSCIENTIFICNAME());
     }
 
-    private Set<String> getReferenceSequenceAccessions(AnalysisType analysisType) {
+    private Set<String> getReferenceSequenceAccessions(AnalysisType analysisObjectType) {
         Set<String> referenceSequenceAccessions = new HashSet<>();
-        AnalysisType.ANALYSISTYPE analysisType1 = analysisType.getANALYSISTYPE();
+        AnalysisType.ANALYSISTYPE analysisType = analysisObjectType.getANALYSISTYPE();
         // Analysis records can contain a reference sequence in either of the three analysis categories:
         // REFERENCE_ALIGNMENT, SEQUENCE_VARIATION, and PROCESSED_READS. It is guaranteed that each analysis contains
         // at most one of these three types.
-        if (analysisType1.isSetREFERENCEALIGNMENT()) {
-            ReferenceSequenceType referenceSequenceType = analysisType1.getREFERENCEALIGNMENT();
+        if (analysisType.isSetREFERENCEALIGNMENT()) {
+            ReferenceSequenceType referenceSequenceType = analysisType.getREFERENCEALIGNMENT();
             referenceSequenceAccessions.addAll(getSequenceOrTsaAccessions(referenceSequenceType.getSEQUENCEArray()));
             String accession = getAssemblyAccession(referenceSequenceType);
             if (accession != null) {
                 referenceSequenceAccessions.add(accession);
             }
-        }
-        if (analysisType1.isSetSEQUENCEVARIATION()) {
-            AnalysisType.ANALYSISTYPE.SEQUENCEVARIATION sequencevariation = analysisType1.getSEQUENCEVARIATION();
+        } else if (analysisType.isSetSEQUENCEVARIATION()) {
+            AnalysisType.ANALYSISTYPE.SEQUENCEVARIATION sequencevariation = analysisType.getSEQUENCEVARIATION();
             referenceSequenceAccessions.addAll(getSequenceOrTsaAccessions(sequencevariation.getSEQUENCEArray()));
             String accession = getAssemblyAccession(sequencevariation);
             if (accession != null) {
                 referenceSequenceAccessions.add(accession);
             }
-        }
-        if (analysisType1.isSetPROCESSEDREADS()) {
-            String accession = getAssemblyAccession(analysisType1.getPROCESSEDREADS());
+        } else if (analysisType.isSetPROCESSEDREADS()) {
+            String accession = getAssemblyAccession(analysisType.getPROCESSEDREADS());
             if (accession != null) {
                 referenceSequenceAccessions.add(accession);
             }
