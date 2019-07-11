@@ -22,7 +22,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughAPI;
+import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 
 import java.io.IOException;
@@ -65,7 +65,7 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
         Set<String> accessions = readAccessionsFromFile(applicationArguments);
         if (objectsImporter instanceof SraObjectsImporterThroughDatabase) {
             accessions.forEach(accession -> objectsImporter.importAnalysis(accession));
-        } else if (objectsImporter instanceof SraObjectsImporterThroughAPI) {
+        } else if (objectsImporter instanceof SraObjectsImporterThroughApi) {
             accessions.forEach(accession -> objectsImporter.importStudy(accession));
         } else {
             throw new RuntimeException("ObjectsImporter instance not known/supported");

@@ -43,13 +43,13 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=API"})
 @ContextConfiguration(classes = {MetadataImporterMainApplication.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public class SraObjectsImporterThroughAPIMockTest {
+public class SraObjectsImporterThroughApiMockTest {
 
     private static final String ANALYSIS_DOCUMENT_API_XML = "analysis/AnalysisWithTranscriptome.xml";
 
     @InjectMocks
     @Autowired
-    private SraObjectsImporterThroughAPI sraObjectImporter;
+    private SraObjectsImporterThroughApi sraObjectImporter;
 
     @Mock
     private SraXmlRetrieverByAccession sraXmlRetrieverByAccession;

@@ -48,10 +48,10 @@ import static org.junit.Assert.assertNotNull;
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=API"})
 @ContextConfiguration(classes = {MetadataImporterMainApplication.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public class SraObjectsImporterThroughAPITest {
+public class SraObjectsImporterThroughApiTest {
 
     @Autowired
-    private SraObjectsImporterThroughAPI sraObjectImporter;
+    private SraObjectsImporterThroughApi sraObjectImporter;
 
     @Autowired
     private StudyRepository studyRepository;

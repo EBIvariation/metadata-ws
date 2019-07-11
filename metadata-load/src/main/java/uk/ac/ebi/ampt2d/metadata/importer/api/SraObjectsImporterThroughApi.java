@@ -44,9 +44,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class SraObjectsImporterThroughAPI extends ObjectsImporter {
+public class SraObjectsImporterThroughApi extends ObjectsImporter {
 
-    public SraObjectsImporterThroughAPI(
+    public SraObjectsImporterThroughApi(
             SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,

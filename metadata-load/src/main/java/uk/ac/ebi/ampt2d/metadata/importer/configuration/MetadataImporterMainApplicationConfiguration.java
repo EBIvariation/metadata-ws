@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
-import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughAPI;
+import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.ReferenceSequenceConverter;
@@ -66,7 +66,7 @@ public class MetadataImporterMainApplicationConfiguration {
                                                        AnalysisRepository analysisRepository,
                                                        StudyRepository studyRepository,
                                                        SampleRepository sampleRepository) {
-        return new SraObjectsImporterThroughAPI(
+        return new SraObjectsImporterThroughApi(
                 sraXmlRetrieverThroughApi,
 
                 sraStudyXmlParser(),
