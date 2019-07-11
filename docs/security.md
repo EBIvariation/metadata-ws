@@ -6,21 +6,17 @@ This application uses Spring OAuth2 and Keycloak authorization to secure its RES
    - Resource owner: Keycloak users with allowed role
    - Client: Application calling Metadata REST APIs
 
-Endpoints
 
-- No restrictions are applied on the `/` and `/swagger-ui.html` endpoints, which can be accessed by anonymous users, for example via http://localhost:8085/ and http://localhost:8085/swagger-ui.html
-- Among all other endpoints:
-     - Read-only (GET) operations can be issued by anonymous user.
-     - Update operations (POST, PUT, PATCH, DELETE) can be performed only by users with the "SERVICE_OPERATOR" role (described below).
+No restrictions are applied on the `/` and `/swagger-ui.html` endpoints, which can be accessed by anonymous users, for example via http://localhost:8085/ and http://localhost:8085/swagger-ui.html. Among all other endpoints, Read-only (GET) operation can be issued by anonymous users and Update operations (POST, PUT, PATCH, DELETE) can be performed only by users with the "SERVICE_OPERATOR" role (described below).
 
 
-##Setup
+## Setup
 
    - Enter the Keycloak public key value in the `application.properties` file, property _security.oauth2.resource.jwt.key-value_. It should have a value similar to `-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9wxxxxxxxxxxxxxxxxxxxffjZs/D+e9A56XuRJSQ9QIDAQAB\n-----END PUBLIC KEY-----`
    - This can be obtained from Keycloak Realm settings -> Keys -> Public key, at the right-most column.
   
  
-##Configuring Keycloak
+## Configuring Keycloak
   
 1. Setup and configure Keycloak server with realm, client, role, mapper and user [as described in the official documentation](https://www.keycloak.org/docs/latest/getting_started/index.html)
 2. Consider following are configured in Keycloak as an example
