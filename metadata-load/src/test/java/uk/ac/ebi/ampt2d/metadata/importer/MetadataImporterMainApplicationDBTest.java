@@ -67,7 +67,7 @@ public class MetadataImporterMainApplicationDBTest {
                 new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessions.txt"}));
         assertEquals(2, studyRepository.count());
         assertEquals(6, analysisRepository.count());
-        assertEquals(0,referenceSequenceRepository.count()); // No analysis has a proper refSeq accession
+        assertEquals(0, referenceSequenceRepository.count()); // No analysis has a proper refSeq accession
         assertEquals(6, sampleRepository.count());
         sraObjectsImporterThroughDatabase.getAccessionsToStudy().clear();
 

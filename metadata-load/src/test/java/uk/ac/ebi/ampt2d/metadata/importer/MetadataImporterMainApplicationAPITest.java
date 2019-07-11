@@ -53,7 +53,6 @@ public class MetadataImporterMainApplicationAPITest {
     @Autowired
     private ReferenceSequenceRepository referenceSequenceRepository;
 
-
     @Before
     public void setUp() {
         analysisRepository.deleteAll();
@@ -67,7 +66,7 @@ public class MetadataImporterMainApplicationAPITest {
                 new String[]{"--accessions.file.path=study/StudyAccessions.txt"}));
         assertEquals(2, studyRepository.count());
         assertEquals(3, analysisRepository.count());
-        assertEquals(24,referenceSequenceRepository.count());
+        assertEquals(24, referenceSequenceRepository.count());
         assertEquals(3, sampleRepository.count());
     }
 
