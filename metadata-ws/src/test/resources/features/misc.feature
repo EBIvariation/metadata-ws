@@ -1,7 +1,6 @@
 Feature: Miscellaneous functions
 
   Scenario: verify cross origin resource sharing
-    Given I set authorization with testuser having default role
     When I request OPTIONS / with GET for Access-Control-Request-Method header and http://www.evil-url.com for Origin header
     Then the response code should be 200
 
