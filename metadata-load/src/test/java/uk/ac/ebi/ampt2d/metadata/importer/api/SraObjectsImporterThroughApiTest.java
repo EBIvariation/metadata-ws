@@ -157,6 +157,18 @@ public class SraObjectsImporterThroughApiTest {
     }
 
     @Test
+    public void importReferenceSequenceGcfAssemblyAccession() throws Exception {
+        ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GCF_000001405.12");
+        assertEquals(Arrays.asList("GCF_000001405.12"), referenceSequence.getAccessions());
+        assertEquals("NCBI36", referenceSequence.getName());
+        assertEquals(ReferenceSequence.Type.GENOME_ASSEMBLY, referenceSequence.getType());
+        Taxonomy taxonomy = referenceSequence.getTaxonomy();
+        assertEquals(9606, taxonomy.getTaxonomyId());
+        assertEquals("Homo sapiens", taxonomy.getName());
+        assertEquals(1, referenceSequenceRepository.count());
+    }
+
+    @Test
     public void importSampleObject() throws Exception {
         Sample sample = sraObjectImporter.importSample("ERS000156");
         assertNotNull(sample);

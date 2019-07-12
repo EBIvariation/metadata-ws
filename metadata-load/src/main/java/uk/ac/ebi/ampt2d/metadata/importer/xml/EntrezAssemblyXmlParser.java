@@ -18,7 +18,6 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.xml;
 
-import org.apache.xmlbeans.XmlException;
 import org.w3c.dom.Document;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
@@ -29,44 +28,38 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SraEntryXmlParser extends SraXmlParser<ReferenceSequence>  {
+public class EntrezAssemblyXmlParser {
 
-    private static final Logger LOGGER = Logger.getLogger(SraEntryXmlParser.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(EntrezAssemblyXmlParser.class.getName());
 
-    private static final String TSA = "Transcriptome Shotgun Assembly";
-    
     private DomQueryUsingXPath domQueryUsingXPath;
 
-    public SraEntryXmlParser(DomQueryUsingXPath domQueryUsingXPath) {
+    public EntrezAssemblyXmlParser(DomQueryUsingXPath domQueryUsingXPath) {
         this.domQueryUsingXPath = domQueryUsingXPath;
     }
 
-    @Override
-    public ReferenceSequence parseXml(String xmlString, String accession) throws XmlException {
+    public ReferenceSequence parseXml(String xmlString, String accession) throws Exception {
         try {
             Document document = domQueryUsingXPath.buildDom(xmlString);
             XPath xPath = domQueryUsingXPath.getXpath();
-            String referenceSequenceAccession = (String)  xPath.evaluate("/ROOT/entry/@accession", document,
-                    XPathConstants.STRING);
-            String referenceSequenceName = (String)  xPath.evaluate("/ROOT/entry/description", document,
-                    XPathConstants.STRING);
-            ReferenceSequence.Type referenceSequenceType = ReferenceSequence.Type.SEQUENCE;
-            if ((boolean)  xPath.evaluate("boolean(/ROOT/entry[keyword='" + TSA + "'])",
-                    document, XPathConstants.BOOLEAN)) {
-                referenceSequenceType = ReferenceSequence.Type.TRANSCRIPTOME_SHOTGUN_ASSEMBLY;
-            }
+            String documentSummary = "/eSummaryResult/DocumentSummarySet/DocumentSummary/";
+            String referenceSequenceAccession = (String) xPath.evaluate(documentSummary + "AssemblyAccession",
+                    document, XPathConstants.STRING);
+            String referenceSequenceName = (String) xPath.evaluate(documentSummary + "AssemblyName",
+                    document, XPathConstants.STRING);
             ReferenceSequence referenceSequence = new ReferenceSequence(referenceSequenceName, null, Arrays.asList
-                    (referenceSequenceAccession), referenceSequenceType);
-            String taxonomyName = (String)  xPath.evaluate("/ROOT/entry/feature/taxon/@scientificName", document,
-                    XPathConstants.STRING);
-            long taxonomyId = Long.parseLong((String)  xPath.evaluate("/ROOT/entry/feature/taxon/@taxId", document,
+                    (referenceSequenceAccession), ReferenceSequence.Type.GENOME_ASSEMBLY);
+            long taxonomyId = Long.parseLong((String) xPath.evaluate(documentSummary + "Taxid", document,
                     XPathConstants.STRING));
+            String taxonomyName = (String) xPath.evaluate(documentSummary + "SpeciesName", document,
+                    XPathConstants.STRING);
             Taxonomy taxonomy = new Taxonomy(taxonomyId, taxonomyName);
             referenceSequence.setTaxonomy(taxonomy);
             return referenceSequence;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "An error occurred while parsing XML for accession " + accession);
-            throw new XmlException(e.getMessage(), e);
+            throw e;
         }
     }
+
 }

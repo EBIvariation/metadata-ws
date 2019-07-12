@@ -50,7 +50,14 @@ The sequence or transcriptome type reference sequence accession is represented i
 The reference sequence XML is retrieved via ENA API like other objects
  
 ### GENOME_ASSEMBLY XML
-The genome_assembly accession returns an assembly XML which can be parsed via the _ASSEMBLYDocument_ factory parser.
+**For accessions starting with "GCF_"** the genome_assembly XML is retrieved with the following 2 endpoints from the 
+NBCI's Entrez API, We can search by the GCF accession, then retrieve its associated metadata.                        
+                                    
+To obtain the internal ID based on the GCF:https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=assembly&term=GCF_000442705.1                                                                 
+
+To query based on said internal ID:https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=assembly&id=49321
+
+**For all other accessions** the genome_assembly XML is retrieved via ENA API which can be parsed via the _ASSEMBLYDocument_ factory parser.
 A reference sequence is created by parsing the accession, name, patch and taxonomy. 
 Patch numbers are calculated only for GRC assemblies for human (GRCh) and mouse (GRCm).
 
