@@ -221,10 +221,6 @@ public abstract class ObjectsImporter {
         return referenceSequence;
     }
 
-    protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
-        return standard.getAccession();
-    }
-
     private Taxonomy extractTaxonomyFromAssembly(AssemblyType assemblyType) {
         AssemblyType.TAXON taxon = assemblyType.getTAXON();
         return new Taxonomy(taxon.getTAXONID(), taxon.getSCIENTIFICNAME());
@@ -236,25 +232,20 @@ public abstract class ObjectsImporter {
         // Analysis records can contain a reference sequence in either of the three analysis categories:
         // REFERENCE_ALIGNMENT, SEQUENCE_VARIATION, and PROCESSED_READS. It is guaranteed that each analysis contains
         // at most one of these three types.
+        ReferenceSequenceType referenceSequenceType;
         if (analysisType.isSetREFERENCEALIGNMENT()) {
-            ReferenceSequenceType referenceSequenceType = analysisType.getREFERENCEALIGNMENT();
-            referenceSequenceAccessions.addAll(getSequenceOrTsaAccessions(referenceSequenceType.getSEQUENCEArray()));
-            String accession = getAssemblyAccession(referenceSequenceType);
-            if (accession != null) {
-                referenceSequenceAccessions.add(accession);
-            }
+            referenceSequenceType = analysisType.getREFERENCEALIGNMENT();
         } else if (analysisType.isSetSEQUENCEVARIATION()) {
-            AnalysisType.ANALYSISTYPE.SEQUENCEVARIATION sequencevariation = analysisType.getSEQUENCEVARIATION();
-            referenceSequenceAccessions.addAll(getSequenceOrTsaAccessions(sequencevariation.getSEQUENCEArray()));
-            String accession = getAssemblyAccession(sequencevariation);
-            if (accession != null) {
-                referenceSequenceAccessions.add(accession);
-            }
+            referenceSequenceType = analysisType.getSEQUENCEVARIATION();
         } else if (analysisType.isSetPROCESSEDREADS()) {
-            String accession = getAssemblyAccession(analysisType.getPROCESSEDREADS());
-            if (accession != null) {
-                referenceSequenceAccessions.add(accession);
-            }
+            referenceSequenceType = analysisType.getPROCESSEDREADS();
+        } else {
+            return referenceSequenceAccessions;
+        }
+        referenceSequenceAccessions.addAll(getSequenceOrTsaAccessions(referenceSequenceType.getSEQUENCEArray()));
+        String accession = getAssemblyAccession(referenceSequenceType);
+        if (accession != null) {
+            referenceSequenceAccessions.add(accession);
         }
         return referenceSequenceAccessions;
     }
@@ -276,7 +267,7 @@ public abstract class ObjectsImporter {
             if (referenceAssemblyType != null) {
                 ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
                 if (standard != null) {
-                    return getAccessionFromStandard(standard);
+                    return standard.getAccession();
                 }
             }
         }
