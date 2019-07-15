@@ -33,6 +33,8 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 @EnableResourceServer
 public class EnableSecurityConfig extends ResourceServerConfigurerAdapter {
 
+    public static final String ROLE_SERVICE_OPERATOR = "SERVICE_OPERATOR";
+
     private ResourceServerProperties resourceServerProperties;
 
     private static final String[] AUTH_WHITELIST = {
@@ -55,10 +57,10 @@ public class EnableSecurityConfig extends ResourceServerConfigurerAdapter {
                 .antMatchers(AUTH_WHITELIST).permitAll()
                 .antMatchers(HttpMethod.GET).permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
-                .antMatchers(HttpMethod.POST).hasRole("SERVICE_OPERATOR")
-                .antMatchers(HttpMethod.PUT).hasRole("SERVICE_OPERATOR")
-                .antMatchers(HttpMethod.PATCH).hasRole("SERVICE_OPERATOR")
-                .antMatchers(HttpMethod.DELETE).hasRole("SERVICE_OPERATOR")
+                .antMatchers(HttpMethod.POST).hasRole(ROLE_SERVICE_OPERATOR)
+                .antMatchers(HttpMethod.PUT).hasRole(ROLE_SERVICE_OPERATOR)
+                .antMatchers(HttpMethod.PATCH).hasRole(ROLE_SERVICE_OPERATOR)
+                .antMatchers(HttpMethod.DELETE).hasRole(ROLE_SERVICE_OPERATOR)
                 .anyRequest().authenticated();
     }
 

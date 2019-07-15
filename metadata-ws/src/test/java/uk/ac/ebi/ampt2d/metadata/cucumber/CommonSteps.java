@@ -158,7 +158,7 @@ public class CommonSteps {
 
     @When("^I request PATCH (.*) with list (.*) of (.*)")
     public void performPatchOnResourceWithLinkedObjectList(String urlKey, String linkedObjectUrlKeys,
-                                                       String linkedObjectClassName) throws Exception {
+                                                           String linkedObjectClassName) throws Exception {
         List<String> newUrls = null;
         if (!linkedObjectUrlKeys.equals("NONE")) {
             newUrls = Arrays.stream(linkedObjectUrlKeys.split(","))

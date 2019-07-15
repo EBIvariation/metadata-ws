@@ -68,11 +68,11 @@ public class AuthorizationServerHelper extends AuthorizationServerConfigurerAdap
 
     @Override
     public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
-        Map<String, Object> testuserMap = getClientInfo("testuser");
-        Map<String, Object> testoperatorMap = getClientInfo("testoperator");
+        Map<String, Object> testuserMap = getClientInfo("testuser", "DEFAULT");
+        Map<String, Object> testoperatorMap = getClientInfo("testoperator", EnableSecurityConfig.ROLE_SERVICE_OPERATOR);
         clients.inMemory()
                 .withClient("testoperator")
-                .authorities("ROLE_SERVICE_OPERATOR")
+                .authorities("ROLE_" + EnableSecurityConfig.ROLE_SERVICE_OPERATOR)
                 .additionalInformation(testoperatorMap)
                 .and()
                 .withClient("testuser")
@@ -84,7 +84,7 @@ public class AuthorizationServerHelper extends AuthorizationServerConfigurerAdap
         return new JwtAccessTokenCustomizer(mapper);
     }
 
-    private static Map<String, Object> getClientInfo(String clientId) {
+    private static Map<String, Object> getClientInfo(String clientId, String role) {
         Map<String, Object> clientNameMap = new LinkedHashMap<>();
         clientNameMap.put("jti", "7ac94e65-119e-471e-abb9-4e1fb5cc79d2");
         clientNameMap.put("exp", 1561536742L);
@@ -110,8 +110,8 @@ public class AuthorizationServerHelper extends AuthorizationServerConfigurerAdap
         Map<String, Object> resourceAccessMap = new LinkedHashMap<>();
         accountMap.put("roles", rolesValueList);
         resourceAccessMap.put("account", accountMap);
-        if (clientId.equals("testoperator")) {
-            ArrayList<String> rolesValueOpList = new ArrayList<>(Arrays.asList("SERVICE_OPERATOR"));
+        if (clientId.equals("testoperator") && role.equals(EnableSecurityConfig.ROLE_SERVICE_OPERATOR)) {
+            ArrayList<String> rolesValueOpList = new ArrayList<>(Arrays.asList(EnableSecurityConfig.ROLE_SERVICE_OPERATOR));
             Map<String, Object> secureClientMap = new LinkedHashMap<>();
             secureClientMap.put("roles", rolesValueOpList);
             resourceAccessMap.put("secure-client", secureClientMap);
