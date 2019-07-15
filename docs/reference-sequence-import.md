@@ -16,7 +16,7 @@
    * PROCESSED_READS. 
    
  It is guaranteed that each analysis contains at most one of these three types.
- Example xml below which is parsed to java object ,
+ Example XML below which is parsed into a Java object:
  
  ```
  <SEQUENCE_VARIATION>
