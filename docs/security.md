@@ -20,8 +20,8 @@ No restrictions are applied on the `/` and `/swagger-ui.html` endpoints, which c
   
 1. Setup and configure Keycloak server with realm, client, role, mapper and user [as described in the official documentation](https://www.keycloak.org/docs/latest/getting_started/index.html)
 2. Ensure that the following Keycloak settings are configured as described:
-     - Role: “SERVICE_OPERATOR”. This role name is mandatory. It could be either client role or realm role.
-     - User name Mapper: Keycloak returns access token in JWT. Logged in username is returned in claim “preferred\_username” in access token. Spring Security OAuth2 resource Server expects username in claim “user\_name”. Hence a mapper to map logged in username to a new claim named user_name is required
+     - Role "SERVICE_OPERATOR": This role name is mandatory. It could be either client role or realm role.
+     - User name Mapper: Keycloak returns access token in JWT. The logged in username is returned in claim "preferred\_username" in said access token, but Spring Security OAuth2 expects the username in claim "user\_name". Hence a mapper to a new claim named "user\_name" is required.
      - 'Redirect URL' in client settings should point to where the metadata API is running
 
 
