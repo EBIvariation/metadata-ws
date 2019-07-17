@@ -130,6 +130,7 @@ Feature: analysis object
 
 
   Scenario Outline: register an analysis with invalid reference sequence should fail
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -281,26 +282,26 @@ Feature: analysis object
       | "name": "BRCA1","patch": "3","accessions": ["NM_007294.3"],"type": "SEQUENCE","taxonomy": "TAXONOMY"                                       | "name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY" |
 
 
-   Scenario Outline: find one analysis by type, technology or platform
-     Given I set authorization with testoperator having SERVICE_OPERATOR role
-     When I request POST /taxonomies with JSON payload:
-     """
-     {
-       "taxonomyId": 9606,
-       "name": "Homo Sapiens"
-     }
-     """
+  Scenario Outline: find one analysis by type, technology or platform
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
+    """
+    {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
     Then set the URL to TAXONOMY
     And the response code should be 201
 
     When I request POST /reference-sequences with JSON-like payload:
-     """
-       "name": "GRCh37",
-       "patch": "p2",
-       "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
-       "type": "GENOME_ASSEMBLY",
-       "taxonomy": "TAXONOMY"
-     """
+    """
+      "name": "GRCh37",
+      "patch": "p2",
+      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "type": "GENOME_ASSEMBLY",
+      "taxonomy": "TAXONOMY"
+    """
     Then set the URL to REFERENCE_SEQUENCE
     When I create a study
     Then set the URL to STUDY
@@ -327,26 +328,26 @@ Feature: analysis object
       | technology=ARRAY&type=TUMOR | ANALYSIS_2   |
 
 
-   Scenario Outline: find zero analysis by type, technology or platform
-     Given I set authorization with testoperator having SERVICE_OPERATOR role
-     When I request POST /taxonomies with JSON payload:
-     """
-     {
-       "taxonomyId": 9606,
-       "name": "Homo Sapiens"
-     }
-     """
+  Scenario Outline: find zero analysis by type, technology or platform
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
+    """
+    {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
     Then set the URL to TAXONOMY
     And the response code should be 201
 
     When I request POST /reference-sequences with JSON-like payload:
-     """
-       "name": "GRCh37",
-       "patch": "p2",
-       "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
-       "type": "GENOME_ASSEMBLY",
-       "taxonomy": "TAXONOMY"
-     """
+    """
+      "name": "GRCh37",
+      "patch": "p2",
+      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "type": "GENOME_ASSEMBLY",
+      "taxonomy": "TAXONOMY"
+    """
     Then set the URL to REFERENCE_SEQUENCE
     When I create a study
     Then set the URL to STUDY
@@ -368,26 +369,26 @@ Feature: analysis object
       | technology=CURATION |
 
 
-   Scenario Outline: find analysis by invalid type or technology should fail
-     Given I set authorization with testoperator having SERVICE_OPERATOR role
-     When I request POST /taxonomies with JSON payload:
-     """
-     {
-       "taxonomyId": 9606,
-       "name": "Homo Sapiens"
-     }
-     """
+  Scenario Outline: find analysis by invalid type or technology should fail
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST /taxonomies with JSON payload:
+    """
+    {
+      "taxonomyId": 9606,
+      "name": "Homo Sapiens"
+    }
+    """
     Then set the URL to TAXONOMY
     And the response code should be 201
 
     When I request POST /reference-sequences with JSON-like payload:
-     """
-       "name": "GRCh37",
-       "patch": "p2",
-       "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
-       "type": "GENOME_ASSEMBLY",
-       "taxonomy": "TAXONOMY"
-     """
+    """
+      "name": "GRCh37",
+      "patch": "p2",
+      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "type": "GENOME_ASSEMBLY",
+      "taxonomy": "TAXONOMY"
+    """
     Then set the URL to REFERENCE_SEQUENCE
     When I create a study
     Then set the URL to STUDY
