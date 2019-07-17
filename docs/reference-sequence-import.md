@@ -18,7 +18,7 @@ SRA Analysis records can contain a reference sequence in either of the three ana
 It is guaranteed that each analysis belong to at most one of these three types.
 Example XML below which is parsed into a Java object:
  
-```
+```xml
 <SEQUENCE_VARIATION>
      <ASSEMBLY>
          <STANDARD accession="GCA_000001405.1"/>
@@ -30,7 +30,7 @@ Example XML below which is parsed into a Java object:
 
 ### Retrieving ASSEMBLY accession
 The Assembly type reference sequence accession is represented in the XML as shown below:
-``` 
+```xml
 <ASSEMBLY>
    <STANDARD accession="GCA_000001405.1"/>
 </ASSEMBLY>
@@ -38,9 +38,11 @@ The Assembly type reference sequence accession is represented in the XML as show
   
 ### Retrieving SEQUENCE OR TRANSCRIPTOME_SHOTGUN_ASSEMBLY accession
 The SEQUENCE or TRANSCRIPTOME_SHOTGUN_ASSEMBLY type reference sequence accession is represented in the XML as shown below:
-```
-<SEQUENCE accession="GBRU01" label="GBRU01"/>
-<SEQUENCE accession="JQ739518.1" label="JQ739518.1"/>
+```xml
+<SEQUENCE_VARIATION>
+    <SEQUENCE accession="GBRU01" label="GBRU01"/>
+    <SEQUENCE accession="JQ739518.1" label="JQ739518.1"/>
+</SEQUENCE_VARIATION>
 ```
    
 ## Retrieving Reference Sequence XMLs from accessions
@@ -53,7 +55,7 @@ A reference sequence is created by parsing the accession, name, patch and taxono
 Patch numbers are calculated only for GRC assemblies for human (GRCh) and mouse (GRCm).
 
 Example of assembly XML below,
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <ROOT request="GCA_000001405.1&amp;display=xml">
  <ASSEMBLY accession="GCA_000001405.2" alias="GRCh37.p1" center_name="Genome Reference Consortium">
@@ -82,7 +84,7 @@ sequence and transcriptome XML is that all transcriptome XML will contain a keyw
 value "Transcriptome shotgun assembly" where the other doesn't contain it.
  
 Example of Sequence XML,
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <ROOT request="JQ739518.1&amp;display=xml">
   <entry accession="JQ739518" version="1" entryVersion="1" dataClass="STD" taxonomicDivision="PLN" moleculeType="mRNA" sequenceLength="1558" topology="linear" firstPublic="2012-05-29" firstPublicRelease="112" lastUpdated="2012-05-29" lastUpdatedRelease="112">
@@ -97,7 +99,7 @@ Example of Sequence XML,
 ```
 
 Example of Transcriptome XML,
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <ROOT request="GBRU01&amp;display=xml">
  <entry accession="GBRU01000000" version="1" entryVersion="4" dataClass="SET" taxonomicDivision="PLN" 
