@@ -29,7 +29,7 @@ Example XML below which is parsed into a Java object:
 ```
 
 ##### Retrieving ASSEMBLY accession
-The Assembly type reference sequence accession is represented in below part of the XML.
+The Assembly type reference sequence accession is represented in the XML as shown below:
 ``` 
 <ASSEMBLY>
    <STANDARD accession="GCA_000001405.1"/>
