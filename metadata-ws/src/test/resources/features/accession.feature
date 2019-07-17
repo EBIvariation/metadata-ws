@@ -128,7 +128,7 @@ Feature: accession object
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE

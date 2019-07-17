@@ -115,7 +115,7 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals("ERP001373", analysis.getStudy().getAccessionVersionId().getAccession());
         List<ReferenceSequence> referenceSequences = analysis.getReferenceSequences();
         referenceSequences.parallelStream().allMatch(referenceSequence -> referenceSequence.getType().equals
-                (ReferenceSequence.Type.GENE));
+                (ReferenceSequence.Type.SEQUENCE));
         assertEquals(1, studyRepository.count());
         assertEquals(1, analysisRepository.count());
         assertEquals(25, referenceSequenceRepository.count());

@@ -48,7 +48,7 @@ public class AnalysisEventHandler {
         } else if (analysis.getReferenceSequences().contains(null)) {
             throw new InvalidReferenceSequenceException();
         } else if (analysis.getReferenceSequences().size() > 1) {
-            boolean invalidRefSeq = analysis.getReferenceSequences().stream().anyMatch(r -> !r.getType().equals(ReferenceSequence.Type.GENE));
+            boolean invalidRefSeq = analysis.getReferenceSequences().stream().anyMatch(r -> !r.getType().equals(ReferenceSequence.Type.SEQUENCE));
             if (invalidRefSeq) {
                 throw new InvalidReferenceSequenceException("Invalid type of reference sequences. " +
                         "When multiple reference sequence URLs are provided, all of them should point to gene sequences");

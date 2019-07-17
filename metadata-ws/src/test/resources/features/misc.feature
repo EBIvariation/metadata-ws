@@ -25,7 +25,7 @@ Feature: Miscellaneous functions
         "name": "GRCh37",
         "patch": "p2",
         "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-        "type": "ASSEMBLY",
+        "type": "GENOME_ASSEMBLY",
         "taxonomy": "TAXONOMY"
       """
     Then set the URL to REFERENCE_SEQUENCE

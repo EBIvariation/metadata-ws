@@ -137,7 +137,7 @@ public class SraObjectsImporterThroughApiTest {
         ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GCA_000002305.1");
         assertEquals(Arrays.asList("GCA_000002305.1"), referenceSequence.getAccessions());
         assertEquals("EquCab2.0", referenceSequence.getName());
-        assertEquals(ReferenceSequence.Type.ASSEMBLY, referenceSequence.getType());
+        assertEquals(ReferenceSequence.Type.GENOME_ASSEMBLY, referenceSequence.getType());
         Taxonomy taxonomy = referenceSequence.getTaxonomy();
         assertEquals(9796, taxonomy.getTaxonomyId());
         assertEquals("Equus caballus", taxonomy.getName());
@@ -149,7 +149,7 @@ public class SraObjectsImporterThroughApiTest {
         ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GAAA01000000");
         assertEquals(Arrays.asList("GAAA01000000"), referenceSequence.getAccessions());
         assertEquals("Latimeria chalumnae, TSA project GAAA01000000 data", referenceSequence.getName());
-        assertEquals(ReferenceSequence.Type.TRANSCRIPTOME, referenceSequence.getType());
+        assertEquals(ReferenceSequence.Type.TRANSCRIPTOME_SHOTGUN_ASSEMBLY, referenceSequence.getType());
         Taxonomy taxonomy = referenceSequence.getTaxonomy();
         assertEquals(7897, taxonomy.getTaxonomyId());
         assertEquals("Latimeria chalumnae", taxonomy.getName());

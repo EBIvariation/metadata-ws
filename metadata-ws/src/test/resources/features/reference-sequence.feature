@@ -15,7 +15,7 @@ Feature: reference sequence
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE
@@ -29,7 +29,7 @@ Feature: reference sequence
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY"
+      "type": "GENOME_ASSEMBLY"
     }
     """
     When I request GET /reference-sequences
@@ -51,7 +51,7 @@ Feature: reference sequence
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
@@ -61,7 +61,7 @@ Feature: reference sequence
       "name": "GRCh38",
       "patch": "p2",
       "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
@@ -97,7 +97,7 @@ Feature: reference sequence
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
@@ -107,7 +107,7 @@ Feature: reference sequence
       "name": "GRCh38",
       "patch": "p2",
       "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
@@ -140,7 +140,7 @@ Feature: reference sequence
       "name": "BRCA1",
       "patch": "3",
       "accessions": ["NM_007294.3"],
-      "type": "GENE",
+      "type": "SEQUENCE",
       "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
@@ -150,7 +150,7 @@ Feature: reference sequence
       "name": "GRCh38",
       "patch": "p2",
       "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
@@ -162,9 +162,9 @@ Feature: reference sequence
     And the type field of reference-sequences 0 should be <type>
 
     Examples:
-      | query         | url                  | type     |
-      | type=GENE     | REFERENCE_SEQUENCE_1 | GENE     |
-      | type=ASSEMBLY | REFERENCE_SEQUENCE_2 | ASSEMBLY |
+      | query                | url                  | type            |
+      | type=SEQUENCE        | REFERENCE_SEQUENCE_1 | SEQUENCE        |
+      | type=GENOME_ASSEMBLY | REFERENCE_SEQUENCE_2 | GENOME_ASSEMBLY |
 
 
   Scenario Outline: find zero reference sequence
@@ -182,7 +182,7 @@ Feature: reference sequence
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
@@ -192,7 +192,7 @@ Feature: reference sequence
       "name": "GRCh38",
       "patch": "p2",
       "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
@@ -210,8 +210,8 @@ Feature: reference sequence
       | name=GRCh38&patch=p3                            |
       | accessions=GCA_000001405.2                      |
       | name=GRCh37&patch=p3&accessions=GCA_000001405.3 |
-      | type=GENE                                       |
-      | type=TRANSCRIPTOME                              |
+      | type=SEQUENCE                                   |
+      | type=TRANSCRIPTOME_SHOTGUN_ASSEMBLY             |
 
 
   Scenario: find reference sequence by invalid type should fail
@@ -235,7 +235,7 @@ Feature: reference sequence
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY1"
     """
     Then set the URL to REFERENCE_SEQUENCE
@@ -269,20 +269,20 @@ Feature: reference sequence
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY"
+      "type": "GENOME_ASSEMBLY"
     }
     """
     And the response should contain error message A reference sequence must have one valid URL to taxonomy
     Then the response code should be 4xx
 
-    Scenario: register a reference sequence with invalid taxonomy and fail
+  Scenario: register a reference sequence with invalid taxonomy and fail
     When I request POST /reference-sequences with JSON payload:
     """
     {
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "http://nohost/taxonomy/999"
     }
     """
@@ -306,7 +306,7 @@ Feature: reference sequence
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY1"
     """
     Then set the URL to REFERENCE_SEQUENCE
@@ -334,7 +334,7 @@ Feature: reference sequence
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_2"
     """
     Then set the URL to REFERENCE_SEQUENCE1
@@ -344,7 +344,7 @@ Feature: reference sequence
       "name": "GRCh38",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_4"
     """
     Then set the URL to REFERENCE_SEQUENCE2
@@ -354,7 +354,7 @@ Feature: reference sequence
       "name": "GRCh39",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_5"
     """
     Then set the URL to REFERENCE_SEQUENCE3

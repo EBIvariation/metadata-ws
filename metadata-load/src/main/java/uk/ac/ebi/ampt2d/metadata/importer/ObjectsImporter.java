@@ -51,7 +51,7 @@ import java.util.logging.Logger;
 
 public abstract class ObjectsImporter {
 
-    public static final String ASSEMBLY_END_TAG = "</ASSEMBLY>";
+    public static final String ASSEMBLY_END_TAG = "</GENOME_ASSEMBLY>";
 
     public static final String ENTRY_END_TAG = "</entry";
 

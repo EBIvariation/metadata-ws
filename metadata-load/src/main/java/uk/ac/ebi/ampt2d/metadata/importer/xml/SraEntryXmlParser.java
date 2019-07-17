@@ -52,10 +52,10 @@ public class SraEntryXmlParser extends SraXmlParser<ReferenceSequence> {
                     XPathConstants.STRING);
             String referenceSequenceName = (String) xpath.evaluate("/ROOT/entry/description", document,
                     XPathConstants.STRING);
-            ReferenceSequence.Type referenceSequenceType = ReferenceSequence.Type.GENE;
+            ReferenceSequence.Type referenceSequenceType = ReferenceSequence.Type.SEQUENCE;
             if ((boolean) xpath.evaluate("boolean(/ROOT/entry[keyword='" + TSA + "'])",
                     document, XPathConstants.BOOLEAN)) {
-                referenceSequenceType = ReferenceSequence.Type.TRANSCRIPTOME;
+                referenceSequenceType = ReferenceSequence.Type.TRANSCRIPTOME_SHOTGUN_ASSEMBLY;
             }
             ReferenceSequence referenceSequence = new ReferenceSequence(referenceSequenceName, null, Arrays.asList
                     (referenceSequenceAccession), referenceSequenceType);

@@ -39,7 +39,7 @@ public class ReferenceSequenceConverter implements Converter<AssemblyType, Refer
                 refName,
                 patch,
                 Arrays.asList(assemblyType.getAccession()),
-                ReferenceSequence.Type.ASSEMBLY  // ENA data model only has ASSEMBLY type
+                ReferenceSequence.Type.GENOME_ASSEMBLY
         );
     }
 
