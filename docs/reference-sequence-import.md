@@ -28,8 +28,8 @@ Example XML below which is parsed into a Java object:
 </SEQUENCE_VARIATION>
 ```
 
-### Retrieving ASSEMBLY accession
-The Assembly type reference sequence accession is represented in the XML as shown below:
+### Retrieving GENOME_ASSEMBLY accession
+The genome_assembly type reference sequence accession is represented in the XML as shown below:
 ```xml
 <ASSEMBLY>
    <STANDARD accession="GCA_000001405.1"/>
@@ -37,7 +37,7 @@ The Assembly type reference sequence accession is represented in the XML as show
 ```
   
 ### Retrieving SEQUENCE OR TRANSCRIPTOME_SHOTGUN_ASSEMBLY accession
-The SEQUENCE or TRANSCRIPTOME_SHOTGUN_ASSEMBLY type reference sequence accession is represented in the XML as shown below:
+The sequence or transcriptome type reference sequence accession is represented in the XML as shown below:
 ```xml
 <SEQUENCE_VARIATION>
     <SEQUENCE accession="GBRU01" label="GBRU01"/>
@@ -50,7 +50,7 @@ The SEQUENCE or TRANSCRIPTOME_SHOTGUN_ASSEMBLY type reference sequence accession
 The reference sequence XML is retrieved via ENA API like other objects
  
 ### GENOME_ASSEMBLY XML
-The assembly accession returns an assembly XML which can be parsed via the _ASSEMBLYDocument_ factory parser.
+The genome_assembly accession returns an assembly XML which can be parsed via the _ASSEMBLYDocument_ factory parser.
 A reference sequence is created by parsing the accession, name, patch and taxonomy. 
 Patch numbers are calculated only for GRC assemblies for human (GRCh) and mouse (GRCm).
 
@@ -79,11 +79,11 @@ Example of assembly XML below,
 ```
    
 ### SEQUENCE or TRANSCRIPTOME_SHOTGUN_ASSEMBLY XML
-The Sequence or Transcriptome accession returns an entry XML which is then parsed manually. The difference between 
+The sequence or transcriptome accession returns an entry XML which is then parsed manually. The difference between 
 sequence and transcriptome XML is that all transcriptome XML will contain a keyword element with 
 value "Transcriptome shotgun assembly" where the other doesn't contain it.
  
-Example of Sequence XML,
+Example of sequence XML,
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <ROOT request="JQ739518.1&amp;display=xml">
@@ -98,7 +98,7 @@ Example of Sequence XML,
 </ROOT>     		
 ```
 
-Example of Transcriptome XML,
+Example of transcriptome XML,
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <ROOT request="GBRU01&amp;display=xml">
