@@ -48,7 +48,7 @@ The GENE or TRANSCRIPTOME type reference sequence accession is represented in th
 The reference sequence XML is retrieved via ENA API like other objects
  
 ##### ASSEMBLY XML
-The assembly accession returns an assembly XML which can be parsed via ASSEMBLYDocument factory parser.
+The assembly accession returns an assembly XML which can be parsed via the _ASSEMBLYDocument_ factory parser.
 The patches are calculated only for GRch| GRcm from the alias name. A reference sequence is created by parsing the
 accession, name, patch and taxon details.
 
