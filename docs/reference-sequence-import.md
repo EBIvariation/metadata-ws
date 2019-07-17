@@ -15,7 +15,7 @@ SRA Analysis records can contain a reference sequence in either of the three ana
 * SEQUENCE_VARIATION 
 * PROCESSED_READS
 
-It is guaranteed that each analysis contains at most one of these three types.
+It is guaranteed that each analysis belong to at most one of these three types.
 Example XML below which is parsed into a Java object:
  
 ```
