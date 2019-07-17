@@ -37,7 +37,7 @@ The Assembly type reference sequence accession is represented in the XML as show
 ```
   
 ##### Retrieving GENE OR TRANSCRIPTOME accession
-The GENE or TRANSCRIPTOME type reference sequence accession is represented in below part of the XML.
+The GENE or TRANSCRIPTOME type reference sequence accession is represented in the XML as shown below:
 ```
 <SEQUENCE accession="GBRU01" label="GBRU01"/>
 <SEQUENCE accession="JQ739518.1" label="JQ739518.1"/>
