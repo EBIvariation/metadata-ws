@@ -226,9 +226,9 @@ public abstract class ObjectsImporter {
         return new Taxonomy(taxon.getTAXONID(), taxon.getSCIENTIFICNAME());
     }
 
-    private Set<String> getReferenceSequenceAccessions(AnalysisType analysisObjectType) {
+    private Set<String> getReferenceSequenceAccessions(AnalysisType analysis) {
         Set<String> referenceSequenceAccessions = new HashSet<>();
-        AnalysisType.ANALYSISTYPE analysisType = analysisObjectType.getANALYSISTYPE();
+        AnalysisType.ANALYSISTYPE analysisType = analysis.getANALYSISTYPE();
         // Analysis records can contain a reference sequence in either of the three analysis categories:
         // REFERENCE_ALIGNMENT, SEQUENCE_VARIATION, and PROCESSED_READS. It is guaranteed that each analysis contains
         // at most one of these three types.

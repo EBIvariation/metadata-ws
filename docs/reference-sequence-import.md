@@ -4,9 +4,9 @@ This document shows the flow of how different types of ReferenceSequences are ex
 
 ## Types of Reference Sequence to import
    
-* ASEMBLY
-* GENE
-* TRANSCRIPTOME
+* GENOME_ASSEMBLY
+* SEQUENCE
+* TRANSCRIPTOME_SHOTGUN_ASSEMBLY
  
 ## Retrieving Reference Sequence Accessions
 
@@ -28,7 +28,7 @@ Example XML below which is parsed into a Java object:
 </SEQUENCE_VARIATION>
 ```
 
-##### Retrieving ASSEMBLY accession
+### Retrieving ASSEMBLY accession
 The Assembly type reference sequence accession is represented in the XML as shown below:
 ``` 
 <ASSEMBLY>
@@ -36,8 +36,8 @@ The Assembly type reference sequence accession is represented in the XML as show
 </ASSEMBLY>
 ```
   
-##### Retrieving GENE OR TRANSCRIPTOME accession
-The GENE or TRANSCRIPTOME type reference sequence accession is represented in the XML as shown below:
+### Retrieving SEQUENCE OR TRANSCRIPTOME_SHOTGUN_ASSEMBLY accession
+The SEQUENCE or TRANSCRIPTOME_SHOTGUN_ASSEMBLY type reference sequence accession is represented in the XML as shown below:
 ```
 <SEQUENCE accession="GBRU01" label="GBRU01"/>
 <SEQUENCE accession="JQ739518.1" label="JQ739518.1"/>
@@ -47,10 +47,10 @@ The GENE or TRANSCRIPTOME type reference sequence accession is represented in th
  
 The reference sequence XML is retrieved via ENA API like other objects
  
-##### ASSEMBLY XML
+### GENOME_ASSEMBLY XML
 The assembly accession returns an assembly XML which can be parsed via the _ASSEMBLYDocument_ factory parser.
-The patches are calculated only for GRch| GRcm from the alias name. A reference sequence is created by parsing the
-accession, name, patch and taxon details.
+A reference sequence is created by parsing the accession, name, patch and taxonomy. 
+Patch numbers are calculated only for GRC assemblies for human (GRCh) and mouse (GRCm).
 
 Example of assembly XML below,
 ```
@@ -76,12 +76,12 @@ Example of assembly XML below,
 </ROOT>
 ```
    
-##### GENE or TRANSCRIPTOME XML
-The Gene or Transcriptome accession returns an entry XML which is then parsed manually. The difference between 
-transcriptome and gene sequence XML is that all transcriptome XML will contain a keyword element with value 
-"Transcriptome shotgun assembly" where the other doesn't contain it.
+### SEQUENCE or TRANSCRIPTOME_SHOTGUN_ASSEMBLY XML
+The Sequence or Transcriptome accession returns an entry XML which is then parsed manually. The difference between 
+sequence and transcriptome XML is that all transcriptome XML will contain a keyword element with 
+value "Transcriptome shotgun assembly" where the other doesn't contain it.
  
-Example of Gene sequence XML,
+Example of Sequence XML,
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <ROOT request="JQ739518.1&amp;display=xml">
