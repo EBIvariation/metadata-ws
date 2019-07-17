@@ -30,6 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.database.OracleDbCategory;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
@@ -56,6 +57,9 @@ public class MetadataImporterMainApplicationDBTest {
     @Autowired
     private SampleRepository sampleRepository;
 
+    @Autowired
+    private ReferenceSequenceRepository referenceSequenceRepository;
+
     @Test
     @Category(OracleDbCategory.class)
     public void run() throws Exception {
@@ -63,6 +67,10 @@ public class MetadataImporterMainApplicationDBTest {
                 new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessions.txt"}));
         assertEquals(2, studyRepository.count());
         assertEquals(6, analysisRepository.count());
+
+        /* No analysis has a proper ReferenceSequence accession this should be fixed. An analysis shouldn't be imported
+         without a ReferenceSequence */
+        assertEquals(0, referenceSequenceRepository.count());
         assertEquals(6, sampleRepository.count());
         sraObjectsImporterThroughDatabase.getAccessionsToStudy().clear();
 

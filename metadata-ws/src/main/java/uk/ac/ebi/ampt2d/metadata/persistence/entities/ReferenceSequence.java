@@ -47,11 +47,11 @@ public class ReferenceSequence extends Auditable<Long> {
 
     public enum Type {
 
-        ASSEMBLY,
+        GENOME_ASSEMBLY,
 
-        GENE,
+        SEQUENCE,
 
-        TRANSCRIPTOME
+        TRANSCRIPTOME_SHOTGUN_ASSEMBLY
 
     }
 

@@ -22,34 +22,36 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
-
-import java.util.Arrays;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=API"})
 @ContextConfiguration(classes = {MetadataImporterMainApplication.class})
-public class SraObjectsImporterThroughAPITest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+public class SraObjectsImporterThroughApiTest {
 
     @Autowired
-    private SraObjectsImporterThroughAPI sraObjectImporter;
+    private SraObjectsImporterThroughApi sraObjectImporter;
 
     @Autowired
     private StudyRepository studyRepository;
@@ -97,7 +99,7 @@ public class SraObjectsImporterThroughAPITest {
 
         assertEquals(3, studyRepository.count());
         assertEquals(2, analysisRepository.count());
-        assertEquals(1, referenceSequenceRepository.count());
+        assertEquals(21, referenceSequenceRepository.count());
         assertEquals(25, sampleRepository.count());
     }
 
@@ -108,9 +110,26 @@ public class SraObjectsImporterThroughAPITest {
         assertEquals(Analysis.Technology.EXOME_SEQUENCING, analysis.getTechnology());
         assertEquals(2, analysis.getFiles().size());
 
+        analysis = sraObjectImporter.importAnalysis("ERZ094050");
+        assertEquals("ERZ094050", analysis.getAccessionVersionId().getAccession());
+        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
+        assertEquals(5, analysis.getFiles().size());
+        List<ReferenceSequence> referenceSequences = analysis.getReferenceSequences();
+        assertEquals(24, referenceSequences.size());
+        assertEquals(1, analysis.getSamples().size());
+
         //studies and analysis aren't imported when source is API and if we start with importAnalysis
         assertEquals(0, studyRepository.count());
         assertEquals(0, analysisRepository.count());
+    }
+
+    @Test
+    public void importAnalysisObjectWithoutReferenceSequence() throws Exception {
+        Analysis analysis = sraObjectImporter.importAnalysis("ERZ748187");
+        assertEquals("ERZ748187", analysis.getAccessionVersionId().getAccession());
+        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
+        assertEquals(2, analysis.getFiles().size());
+        assertEquals(0, analysis.getReferenceSequences().size());
     }
 
     @Test
@@ -118,10 +137,22 @@ public class SraObjectsImporterThroughAPITest {
         ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GCA_000002305.1");
         assertEquals(Arrays.asList("GCA_000002305.1"), referenceSequence.getAccessions());
         assertEquals("EquCab2.0", referenceSequence.getName());
-        assertEquals(ReferenceSequence.Type.ASSEMBLY, referenceSequence.getType());
+        assertEquals(ReferenceSequence.Type.GENOME_ASSEMBLY, referenceSequence.getType());
         Taxonomy taxonomy = referenceSequence.getTaxonomy();
         assertEquals(9796, taxonomy.getTaxonomyId());
         assertEquals("Equus caballus", taxonomy.getName());
+        assertEquals(1, referenceSequenceRepository.count());
+    }
+
+    @Test
+    public void importReferenceSequenceTranscriptome() throws Exception {
+        ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GAAA01000000");
+        assertEquals(Arrays.asList("GAAA01000000"), referenceSequence.getAccessions());
+        assertEquals("Latimeria chalumnae, TSA project GAAA01000000 data", referenceSequence.getName());
+        assertEquals(ReferenceSequence.Type.TRANSCRIPTOME_SHOTGUN_ASSEMBLY, referenceSequence.getType());
+        Taxonomy taxonomy = referenceSequence.getTaxonomy();
+        assertEquals(7897, taxonomy.getTaxonomyId());
+        assertEquals("Latimeria chalumnae", taxonomy.getName());
         assertEquals(1, referenceSequenceRepository.count());
     }
 

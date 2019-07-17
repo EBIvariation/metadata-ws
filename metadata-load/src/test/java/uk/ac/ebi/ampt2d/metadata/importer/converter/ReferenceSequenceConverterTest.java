@@ -67,7 +67,7 @@ public class ReferenceSequenceConverterTest {
         assertNotNull(referenceSequence);
         assertEquals(Arrays.asList(assemblyAccession), referenceSequence.getAccessions());
         assertEquals("EquCab2.0", referenceSequence.getName());
-        assertEquals(ReferenceSequence.Type.ASSEMBLY, referenceSequence.getType());
+        assertEquals(ReferenceSequence.Type.GENOME_ASSEMBLY, referenceSequence.getType());
     }
 
     private AssemblyType getAssemblyType(String xml, String accession) throws Exception {

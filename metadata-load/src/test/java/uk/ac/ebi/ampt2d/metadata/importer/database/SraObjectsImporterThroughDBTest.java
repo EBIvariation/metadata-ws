@@ -29,6 +29,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
@@ -36,6 +37,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepos
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -100,6 +102,23 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals(1, studyRepository.count());
         assertEquals(1, analysisRepository.count());
         assertEquals(1, referenceSequenceRepository.count());
+    }
+
+    @Test
+    @Category(OracleDbCategory.class)
+    public void importAnalysisObjectWithReferenceAlignmentType() throws Exception {
+        Analysis analysis = sraObjectImporter.importAnalysis("ERZ000275");
+        assertNotNull(analysis);
+        assertEquals("ERZ000275", analysis.getAccessionVersionId().getAccession());
+        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
+        assertEquals(1, analysis.getFiles().size());
+        assertEquals("ERP001373", analysis.getStudy().getAccessionVersionId().getAccession());
+        List<ReferenceSequence> referenceSequences = analysis.getReferenceSequences();
+        referenceSequences.parallelStream().allMatch(referenceSequence -> referenceSequence.getType().equals
+                (ReferenceSequence.Type.SEQUENCE));
+        assertEquals(1, studyRepository.count());
+        assertEquals(1, analysisRepository.count());
+        assertEquals(25, referenceSequenceRepository.count());
     }
 
     @Test

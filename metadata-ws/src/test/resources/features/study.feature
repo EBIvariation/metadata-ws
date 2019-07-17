@@ -10,7 +10,7 @@ Feature: study object
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE
@@ -48,7 +48,7 @@ Feature: study object
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_2"
     """
     Then set the URL to REFERENCE_SEQUENCE1
@@ -57,7 +57,7 @@ Feature: study object
       "name": "GRCh38",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_4"
     """
     Then set the URL to REFERENCE_SEQUENCE2
@@ -66,7 +66,7 @@ Feature: study object
       "name": "GRCh39",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_5"
     """
     Then set the URL to REFERENCE_SEQUENCE3
@@ -246,7 +246,7 @@ Feature: study object
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE_1
@@ -255,7 +255,7 @@ Feature: study object
       "name": "GRCh38",
       "patch": "p2",
       "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE_2
@@ -504,7 +504,7 @@ Feature: study object
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then the response code should be 201
@@ -588,11 +588,11 @@ Feature: study object
     And the response should contain 2 studies
     And the href of the study of studies has items <url>
 
-  Examples:
-    | base          | query             | url           |
-    | taxonomy-id   | id=9606           | STUDY1,STUDY2 |
-    | taxonomy-name | name=Homo sapiens | STUDY1,STUDY2 |
-    | text          | searchTerm=1kg    | STUDY1,STUDY2 |
+    Examples:
+      | base          | query             | url           |
+      | taxonomy-id   | id=9606           | STUDY1,STUDY2 |
+      | taxonomy-name | name=Homo sapiens | STUDY1,STUDY2 |
+      | text          | searchTerm=1kg    | STUDY1,STUDY2 |
 
 
   Scenario Outline: search various undeprecated studies
@@ -612,7 +612,7 @@ Feature: study object
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
-      "type": "ASSEMBLY",
+      "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
     Then set the URL to REFERENCE_SEQUENCE

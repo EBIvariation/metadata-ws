@@ -27,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
@@ -49,10 +50,14 @@ public class MetadataImporterMainApplicationAPITest {
     @Autowired
     private SampleRepository sampleRepository;
 
+    @Autowired
+    private ReferenceSequenceRepository referenceSequenceRepository;
+
     @Before
     public void setUp() {
         analysisRepository.deleteAll();
         studyRepository.deleteAll();
+        referenceSequenceRepository.deleteAll();
     }
 
     @Test
@@ -60,8 +65,9 @@ public class MetadataImporterMainApplicationAPITest {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
                 new String[]{"--accessions.file.path=study/StudyAccessions.txt"}));
         assertEquals(2, studyRepository.count());
-        assertEquals(8, analysisRepository.count());
-        assertEquals(4, sampleRepository.count());
+        assertEquals(3, analysisRepository.count());
+        assertEquals(24, referenceSequenceRepository.count());
+        assertEquals(3, sampleRepository.count());
     }
 
     @Test(expected = RuntimeException.class)

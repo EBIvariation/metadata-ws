@@ -28,11 +28,11 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
@@ -50,6 +50,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public abstract class ObjectsImporter {
+
+    public static final String ASSEMBLY_END_TAG = "</ASSEMBLY>";
+
+    public static final String ENTRY_END_TAG = "</entry>";
 
     private static final Logger IMPORT_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
 
@@ -76,6 +80,8 @@ public abstract class ObjectsImporter {
 
     private SraXmlParser<AssemblyType> sraAssemblyXmlParser;
 
+    private SraXmlParser<ReferenceSequence> sraEntryXmlParser;
+
     private SraXmlParser<SampleType> sraSampleXmlParser;
 
     // Entity converters
@@ -101,6 +107,7 @@ public abstract class ObjectsImporter {
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
             SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+            SraXmlParser<ReferenceSequence> sraEntryXmlParser,
             SraXmlParser<SampleType> sraSampleXmlParser,
 
             Converter<StudyType, Study> studyConverter,
@@ -123,6 +130,7 @@ public abstract class ObjectsImporter {
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
         this.sraAssemblyXmlParser = sraAssemblyXmlParser;
+        this.sraEntryXmlParser = sraEntryXmlParser;
         this.sraSampleXmlParser = sraSampleXmlParser;
 
         this.studyConverter = studyConverter;
@@ -190,12 +198,20 @@ public abstract class ObjectsImporter {
 
     public ReferenceSequence importReferenceSequence(String accession) {
         ReferenceSequence referenceSequence = null;
+        Taxonomy taxonomy;
         try {
             // Reference sequences must always be imported through API, even with import mode = DB
-            String assemblyXml = sraxmlRetrieverByAccessionForceApi.getXml(accession);
-            AssemblyType assembly = sraAssemblyXmlParser.parseXml(assemblyXml, accession);
-            referenceSequence = referenceSequenceConverter.convert(assembly);
-            Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromAssembly(assembly));
+            String referenceSequenceXml = sraxmlRetrieverByAccessionForceApi.getXml(accession);
+            if (referenceSequenceXml.contains(ASSEMBLY_END_TAG)) {
+                AssemblyType assembly = sraAssemblyXmlParser.parseXml(referenceSequenceXml, accession);
+                referenceSequence = referenceSequenceConverter.convert(assembly);
+                taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromAssembly(assembly));
+            } else if (referenceSequenceXml.contains(ENTRY_END_TAG)) {
+                referenceSequence = sraEntryXmlParser.parseXml(referenceSequenceXml, accession);
+                taxonomy = taxonomyRepository.findOrSave(referenceSequence.getTaxonomy());
+            } else {
+                return referenceSequence;
+            }
             referenceSequence.setTaxonomy(taxonomy);
             referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
         } catch (Exception exception) {
@@ -205,49 +221,53 @@ public abstract class ObjectsImporter {
         return referenceSequence;
     }
 
-    protected String getAccessionFromStandard(ReferenceAssemblyType.STANDARD standard) {
-        return standard.getAccession();
-    }
-
     private Taxonomy extractTaxonomyFromAssembly(AssemblyType assemblyType) {
         AssemblyType.TAXON taxon = assemblyType.getTAXON();
         return new Taxonomy(taxon.getTAXONID(), taxon.getSCIENTIFICNAME());
     }
 
-    private Set<String> getReferenceSequenceAccessions(AnalysisType analysisType) {
+    private Set<String> getReferenceSequenceAccessions(AnalysisType analysis) {
         Set<String> referenceSequenceAccessions = new HashSet<>();
-        AnalysisType.ANALYSISTYPE analysisType1 = analysisType.getANALYSISTYPE();
+        AnalysisType.ANALYSISTYPE analysisType = analysis.getANALYSISTYPE();
         // Analysis records can contain a reference sequence in either of the three analysis categories:
         // REFERENCE_ALIGNMENT, SEQUENCE_VARIATION, and PROCESSED_READS. It is guaranteed that each analysis contains
         // at most one of these three types.
-        if (analysisType1.isSetREFERENCEALIGNMENT()) {
-            String accession = getAccessionFromReferenceSequenceType(analysisType1.getREFERENCEALIGNMENT());
-            if (accession != null) {
-                referenceSequenceAccessions.add(accession);
-            }
+        ReferenceSequenceType referenceSequenceType;
+        if (analysisType.isSetREFERENCEALIGNMENT()) {
+            referenceSequenceType = analysisType.getREFERENCEALIGNMENT();
+        } else if (analysisType.isSetSEQUENCEVARIATION()) {
+            referenceSequenceType = analysisType.getSEQUENCEVARIATION();
+        } else if (analysisType.isSetPROCESSEDREADS()) {
+            referenceSequenceType = analysisType.getPROCESSEDREADS();
+        } else {
+            return referenceSequenceAccessions;
         }
-        if (analysisType1.isSetSEQUENCEVARIATION()) {
-            String accession = getAccessionFromReferenceSequenceType(analysisType1.getSEQUENCEVARIATION());
-            if (accession != null) {
-                referenceSequenceAccessions.add(accession);
-            }
-        }
-        if (analysisType1.isSetPROCESSEDREADS()) {
-            String accession = getAccessionFromReferenceSequenceType(analysisType1.getPROCESSEDREADS());
-            if (accession != null) {
-                referenceSequenceAccessions.add(accession);
-            }
+        referenceSequenceAccessions.addAll(getSequenceOrTsaAccessions(referenceSequenceType.getSEQUENCEArray()));
+        String accession = getAssemblyAccession(referenceSequenceType);
+        if (accession != null) {
+            referenceSequenceAccessions.add(accession);
         }
         return referenceSequenceAccessions;
     }
 
-    private String getAccessionFromReferenceSequenceType(ReferenceSequenceType referenceSequenceType) {
+    private Set<String> getSequenceOrTsaAccessions(ReferenceSequenceType.SEQUENCE[] sequences) {
+        Set<String> sequenceOrTsaAccessions = new HashSet<>();
+        if (sequences == null || sequences.length == 0) {
+            return sequenceOrTsaAccessions;
+        }
+        for (ReferenceSequenceType.SEQUENCE sequence : sequences) {
+            sequenceOrTsaAccessions.add(sequence.getAccession());
+        }
+        return sequenceOrTsaAccessions;
+    }
+
+    private String getAssemblyAccession(ReferenceSequenceType referenceSequenceType) {
         if (referenceSequenceType != null) {
             ReferenceAssemblyType referenceAssemblyType = referenceSequenceType.getASSEMBLY();
             if (referenceAssemblyType != null) {
                 ReferenceAssemblyType.STANDARD standard = referenceAssemblyType.getSTANDARD();
                 if (standard != null) {
-                    return getAccessionFromStandard(standard);
+                    return standard.getAccession();
                 }
             }
         }

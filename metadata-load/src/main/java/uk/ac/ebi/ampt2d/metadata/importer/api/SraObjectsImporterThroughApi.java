@@ -44,14 +44,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public class SraObjectsImporterThroughAPI extends ObjectsImporter {
+public class SraObjectsImporterThroughApi extends ObjectsImporter {
 
-    public SraObjectsImporterThroughAPI(
+    public SraObjectsImporterThroughApi(
             SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
             SraXmlParser<AssemblyType> sraAssemblyXmlParser,
+            SraXmlParser<ReferenceSequence> sraEntryXmlParser,
             SraXmlParser<SampleType> sraSampleXmlParser,
 
             Converter<StudyType, Study> studyConverter,
@@ -76,6 +77,7 @@ public class SraObjectsImporterThroughAPI extends ObjectsImporter {
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,
                 sraAssemblyXmlParser,
+                sraEntryXmlParser,
                 sraSampleXmlParser,
 
                 studyConverter,
