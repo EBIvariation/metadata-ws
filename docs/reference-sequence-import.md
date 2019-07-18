@@ -50,7 +50,7 @@ The sequence or transcriptome type reference sequence accession is represented i
 The reference sequence XML is retrieved via ENA API like other objects
  
 ### GENOME_ASSEMBLY XML
-**For accessions starting with "GCF_"** the genome_assembly XML is retrieved with the following 2 endpoints from the 
+**For accessions starting with "GCF_"** (issued by NCBI RefSeq) the genome_assembly XML is retrieved with the following 2 endpoints from the 
 NBCI's Entrez API, We can search by the GCF accession, then retrieve its associated metadata.                        
                                     
 To obtain the internal ID based on the GCF:https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=assembly&term=GCF_000442705.1                                                                 
