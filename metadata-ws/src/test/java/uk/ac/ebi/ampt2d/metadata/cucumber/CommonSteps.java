@@ -31,6 +31,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
+import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
@@ -52,6 +54,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -88,6 +91,12 @@ public class CommonSteps {
     @Autowired
     private WebResourceRepository webResourceRepository;
 
+    @Autowired
+    private PublicationRepository publicationRepository;
+
+    @Autowired
+    private AuthorizationServerHelper authorizationServerHelper;
+
     @Before
     public void cleanDatabases() {
         analysisRepository.deleteAll();
@@ -97,6 +106,7 @@ public class CommonSteps {
         studyRepository.deleteAll();
         taxonomyRepository.deleteAll();
         webResourceRepository.deleteAll();
+        publicationRepository.deleteAll();
     }
 
     @Before
@@ -108,22 +118,40 @@ public class CommonSteps {
 
     @When("^I request GET ([\\S]*)$")
     public void performGetOnResourceUri(String resourceUri) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(get(resourceUri)
+                .with(CommonStates.getRequestPostProcessor()))
+        );
+    }
+
+    @When("^I request anonymous GET ([\\S]*)$")
+    public void performGetOnResourceUriNonSecure(String resourceUri) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(get(resourceUri)));
     }
 
     @When("^I request GET with value of (.*)$")
     public void performGetWithResourceUriKey(String resourceUriKey) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get(CommonStates.getUrl(resourceUriKey))));
+        CommonStates.setResultActions(mockMvc.perform(get(CommonStates.getUrl(resourceUriKey))
+                .with(CommonStates.getRequestPostProcessor())));
     }
 
     @When("^I request GET for (.*) of (.*)$")
     public void performGetForLinkedObjects(String className, String resourceUriKey) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get(CommonStates.getUrl(resourceUriKey) + "/" + className)));
+        CommonStates.setResultActions(mockMvc.perform(get(CommonStates.getUrl(resourceUriKey) + "/" + className)
+                .with(CommonStates.getRequestPostProcessor())));
     }
 
     @When("^I request POST (.*) with JSON payload:$")
     public void performPostOnResourceUriWithJsonData(String resourceUri, String jsonData) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(post(resourceUri)
+                .with(CommonStates.getRequestPostProcessor())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonData.getBytes())));
+    }
+
+    @When("^I request PUT (.*) with JSON payload:$")
+    public void performPutOnResourceUriWithJsonData(String resourceUrlKey, String jsonData) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(put(CommonStates.getUrl(resourceUrlKey))
+                .with(CommonStates.getRequestPostProcessor())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonData.getBytes())));
     }
@@ -142,6 +170,7 @@ public class CommonSteps {
                 + "}";
 
         CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
+                .with(CommonStates.getRequestPostProcessor())
                 .content(jsonContent)));
     }
 
@@ -151,12 +180,14 @@ public class CommonSteps {
                 + "\"taxonomy\": \"" + CommonStates.getUrl(linkedObjectUrlKey)
                 + "\"}";
         CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
+                .with(CommonStates.getRequestPostProcessor())
                 .content(jsonContent)));
     }
 
     @When("^I request PATCH (.*) with content (.*)")
     public void performPatchOnResourceWithContent(String urlKey, String content) throws Exception {
         CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
+                .with(CommonStates.getRequestPostProcessor())
                 .content(content)));
     }
 
@@ -175,6 +206,7 @@ public class CommonSteps {
         content += "\" }";
 
         CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
+                .with(CommonStates.getRequestPostProcessor())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content)));
     }
@@ -189,22 +221,37 @@ public class CommonSteps {
         }
 
         String idStr = linkedObjectUrl.substring(linkedObjectUrl.lastIndexOf('/') + 1);
-        CommonStates.setResultActions(mockMvc.perform(delete(resourceUrl + "/" + className + "/" + idStr)));
+        CommonStates.setResultActions(mockMvc.perform(delete(resourceUrl + "/" + className + "/" + idStr)
+                .with(CommonStates.getRequestPostProcessor())));
+    }
+
+    @When("^I request DELETE with value of (.*)$")
+    public void performDeleteOnResourceUri(String resourceUrlKey) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(delete(CommonStates.getUrl(resourceUrlKey))
+                .with(CommonStates.getRequestPostProcessor())));
+    }
+
+    @When("^I request no authority DELETE with value of (.*)$")
+    public void performDeleteOnResourceUriNonSecure(String resourceUrlKey) throws Exception {
+        CommonStates.setResultActions(mockMvc.perform(delete(CommonStates.getUrl(resourceUrlKey))));
     }
 
     @When("^I request search for the (.*) with the parameters: (.*)$")
     public void performSearchOnResourcesWithParameters(String className, String parameters) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "/search?" + parameters)));
+        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "/search?" + parameters)
+                .with(CommonStates.getRequestPostProcessor())));
     }
 
     @When("^I request elaborate find for the (.*) with the parameters: (.*)$")
     public void performFindOnResourcesWithParameters(String className, String parameters) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "?" + parameters)));
+        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "?" + parameters)
+                .with(CommonStates.getRequestPostProcessor())));
     }
 
     @When("^I request elaborate search for the (.*) base (.*) and with the parameters: (.*)$")
     public void performSearchOnResourcesWithBaseAndParameters(String className, String base, String parameters) throws Exception {
-        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "/search/" + base + "?" + parameters)));
+        CommonStates.setResultActions(mockMvc.perform(get("/" + className + "/search/" + base + "?" + parameters)
+                .with(CommonStates.getRequestPostProcessor())));
     }
 
     @And("^set the URL to (.*)$")
@@ -359,6 +406,16 @@ public class CommonSteps {
     @Given("^there is an URL (.*) with key (.*)$")
     public void setUrlWithKey(String url, String key) {
         CommonStates.setUrl(key, url);
+    }
+
+    @When("^I set authorization with testuser having default role$")
+    public void setAuthorizationWithDefaultRole() {
+        CommonStates.setRequestPostProcessor(authorizationServerHelper.bearerToken("testuser"));
+    }
+
+    @When("^I set authorization with testoperator having SERVICE_OPERATOR role$")
+    public void setAuthorizationWithServiceOperatorRole() {
+        CommonStates.setRequestPostProcessor(authorizationServerHelper.bearerToken("testoperator"));
     }
 
 }

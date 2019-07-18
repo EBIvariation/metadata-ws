@@ -1,6 +1,7 @@
 Feature: Web resource object
 
   Scenario: register a web resource successfully
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /webResources with JSON payload:
     """
     {
@@ -16,6 +17,7 @@ Feature: Web resource object
 
 
   Scenario Outline: register a web resource with valid URL should succeed
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /webResources with JSON payload:
     """
     {
@@ -33,6 +35,7 @@ Feature: Web resource object
 
 
   Scenario Outline: register a web resource with invalid URL should fail
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /webResources with JSON payload:
     """
     {

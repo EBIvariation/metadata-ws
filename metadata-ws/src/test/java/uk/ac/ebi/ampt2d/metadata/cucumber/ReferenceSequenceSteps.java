@@ -22,6 +22,7 @@ import cucumber.api.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -53,6 +54,7 @@ public class ReferenceSequenceSteps {
         }
         json += "}";
         CommonStates.setResultActions(mockMvc.perform(post("/reference-sequences")
+                .with(CommonStates.getRequestPostProcessor())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json.getBytes())));
     }

@@ -1,6 +1,7 @@
 Feature: file object
 
   Scenario: register a file successfully
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /files with JSON payload:
     """
     {

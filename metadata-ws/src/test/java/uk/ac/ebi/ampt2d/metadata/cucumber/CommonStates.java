@@ -18,6 +18,7 @@
 package uk.ac.ebi.ampt2d.metadata.cucumber;
 
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -35,10 +36,13 @@ public class CommonStates {
 
     private static ResultActions resultActions;
 
+    private static RequestPostProcessor requestPostProcessor;
+
     public static void clear() {
         urlMap.clear();
         timeMap.clear();
         resultActions = null;
+        requestPostProcessor = null;
     }
 
     public static String getUrl(String key) {
@@ -75,4 +79,13 @@ public class CommonStates {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
+
+    public static RequestPostProcessor getRequestPostProcessor() {
+        return requestPostProcessor;
+    }
+
+    public static void setRequestPostProcessor(RequestPostProcessor requestPostProcessor) {
+        CommonStates.requestPostProcessor = requestPostProcessor;
+    }
+
 }

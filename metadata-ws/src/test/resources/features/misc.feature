@@ -10,8 +10,9 @@ Feature: Miscellaneous functions
 
 
   Scenario Outline: verify metadata objects are auditable
-    Given current date as TODAY
-    Given I request POST /taxonomies with JSON payload:
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    And current date as TODAY
+    When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,

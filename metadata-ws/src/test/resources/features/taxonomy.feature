@@ -1,6 +1,7 @@
 Feature: taxonomy object
 
   Scenario: register a taxonomy successfully
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
@@ -25,6 +26,7 @@ Feature: taxonomy object
 
 
   Scenario: register a taxonomy with taxonomyId less than 1 should fail
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
