@@ -19,6 +19,7 @@
 package uk.ac.ebi.ampt2d.metadata.importer.xml;
 
 import org.w3c.dom.Document;
+import uk.ac.ebi.ampt2d.metadata.importer.converter.ReferenceSequenceConverter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 
@@ -45,9 +46,11 @@ public class EntrezAssemblyXmlParser {
             String documentSummary = "/eSummaryResult/DocumentSummarySet/DocumentSummary/";
             String referenceSequenceAccession = (String) xPath.evaluate(documentSummary + "AssemblyAccession",
                     document, XPathConstants.STRING);
-            String referenceSequenceName = (String) xPath.evaluate(documentSummary + "AssemblyName",
-                    document, XPathConstants.STRING);
-            ReferenceSequence referenceSequence = new ReferenceSequence(referenceSequenceName, null, Arrays.asList
+            StringBuilder referenceSequenceName = new StringBuilder();
+            referenceSequenceName.append((String) xPath.evaluate(documentSummary +
+                    "AssemblyName", document, XPathConstants.STRING));
+            String patch = ReferenceSequenceConverter.getPatch(referenceSequenceName);
+            ReferenceSequence referenceSequence = new ReferenceSequence(referenceSequenceName.toString(), patch, Arrays.asList
                     (referenceSequenceAccession), ReferenceSequence.Type.GENOME_ASSEMBLY);
             long taxonomyId = Long.parseLong((String) xPath.evaluate(documentSummary + "Taxid", document,
                     XPathConstants.STRING));

@@ -18,6 +18,7 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,6 +52,9 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
 @Configuration
 public class MetadataImporterMainApplicationConfiguration {
+
+    @Value("${entrez.api.key:}")
+    private String entrezApiKey;
 
     @Bean
     public SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi() {
@@ -91,7 +95,9 @@ public class MetadataImporterMainApplicationConfiguration {
                 analysisRepository,
                 referenceSequenceRepository,
                 sampleRepository,
-                taxonomyRepository
+                taxonomyRepository,
+
+                entrezApiKey
         );
     }
 
@@ -134,7 +140,9 @@ public class MetadataImporterMainApplicationConfiguration {
                 analysisRepository,
                 referenceSequenceRepository,
                 sampleRepository,
-                taxonomyRepository
+                taxonomyRepository,
+
+                entrezApiKey
         );
     }
 

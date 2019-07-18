@@ -44,8 +44,10 @@ import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,6 +59,8 @@ public abstract class ObjectsImporter {
     public static final String ENTRY_END_TAG = "</entry>";
 
     private static final Logger IMPORT_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
+
+    private final String entrezApiKey;
 
     // XML retrievers. First is used as default, second for cases where API retrieval mode must be forced
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
@@ -127,7 +131,8 @@ public abstract class ObjectsImporter {
             AnalysisRepository analysisRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
             SampleRepository sampleRepository,
-            TaxonomyRepository taxonomyRepository) {
+            TaxonomyRepository taxonomyRepository,
+            String entrezApiKey) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
         this.sraxmlRetrieverByAccessionForceApi = sraxmlRetrieverByAccessionForceApi;
 
@@ -152,6 +157,9 @@ public abstract class ObjectsImporter {
         this.referenceSequenceRepository = referenceSequenceRepository;
         this.taxonomyRepository = taxonomyRepository;
         this.sampleRepository = sampleRepository;
+
+        this.entrezApiKey = entrezApiKey;
+
     }
 
     public Study importStudy(String accession) {
@@ -206,22 +214,21 @@ public abstract class ObjectsImporter {
         Taxonomy taxonomy;
         try {
             // Reference sequences must always be imported through API, even with import mode = DB
-            if (accession.matches("^GCF_.*")) {
+            final String gcfAccessionPattern = "GCF_[\\d]*\\.?[\\d]*";
+            if (accession.matches(gcfAccessionPattern)) {
                 referenceSequence = retrieveReferenceSequenceFromEntrez(accession);
-                taxonomy = taxonomyRepository.findOrSave(referenceSequence.getTaxonomy());
             } else {
                 String referenceSequenceXml = sraxmlRetrieverByAccessionForceApi.getXml(accession);
                 if (referenceSequenceXml.contains(ASSEMBLY_END_TAG)) {
                     AssemblyType assembly = sraAssemblyXmlParser.parseXml(referenceSequenceXml, accession);
                     referenceSequence = referenceSequenceConverter.convert(assembly);
-                    taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromAssembly(assembly));
                 } else if (referenceSequenceXml.contains(ENTRY_END_TAG)) {
                     referenceSequence = sraEntryXmlParser.parseXml(referenceSequenceXml, accession);
-                    taxonomy = taxonomyRepository.findOrSave(referenceSequence.getTaxonomy());
                 } else {
                     return referenceSequence;
                 }
             }
+            taxonomy = taxonomyRepository.findOrSave(referenceSequence.getTaxonomy());
             referenceSequence.setTaxonomy(taxonomy);
             referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
         } catch (Exception exception) {
@@ -232,21 +239,27 @@ public abstract class ObjectsImporter {
     }
 
     private ReferenceSequence retrieveReferenceSequenceFromEntrez(String accession) throws Exception {
-        final String idRetrievalUrl = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch" +
+        String idRetrievalUrl = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch" +
                 ".fcgi?db=assembly&term={accession}";
-        final String assemblyRetrivalFromIdUrl = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary" +
+        String assemblyRetrievalFromIdUrl = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary" +
                 ".fcgi?db=assembly&id={id}";
         final String idStartTag = "<Id>";
         final String idEndTag = "</Id";
-        String idXml = sraxmlRetrieverByAccessionForceApi.getXml(accession, idRetrievalUrl);
-        String id = idXml.substring(idXml.indexOf(idStartTag) + 4, idXml.indexOf(idEndTag));
-        String assemblyXml = sraxmlRetrieverByAccessionForceApi.getXml(id, assemblyRetrivalFromIdUrl);
-        return entrezAssemblyXmlParser.parseXml(assemblyXml, accession);
-    }
+        Map<String, String> uriVariables = new HashMap<>();
+        uriVariables.put("accession", accession);
 
-    private Taxonomy extractTaxonomyFromAssembly(AssemblyType assemblyType) {
-        AssemblyType.TAXON taxon = assemblyType.getTAXON();
-        return new Taxonomy(taxon.getTAXONID(), taxon.getSCIENTIFICNAME());
+        if (entrezApiKey != null && !entrezApiKey.equals("")) {
+            final String apiKeyQueryString = "&api_key={entrezApiKey}";
+            uriVariables.put("entrezApiKey", entrezApiKey);
+            idRetrievalUrl = idRetrievalUrl + apiKeyQueryString;
+            assemblyRetrievalFromIdUrl = assemblyRetrievalFromIdUrl + apiKeyQueryString;
+        }
+
+        String idXml = sraxmlRetrieverByAccessionForceApi.getXml(idRetrievalUrl, uriVariables);
+        String id = idXml.substring(idXml.indexOf(idStartTag) + 4, idXml.indexOf(idEndTag));
+        uriVariables.put("id", id);
+        String assemblyXml = sraxmlRetrieverByAccessionForceApi.getXml(assemblyRetrievalFromIdUrl, uriVariables);
+        return entrezAssemblyXmlParser.parseXml(assemblyXml, accession);
     }
 
     private Set<String> getReferenceSequenceAccessions(AnalysisType analysis) {

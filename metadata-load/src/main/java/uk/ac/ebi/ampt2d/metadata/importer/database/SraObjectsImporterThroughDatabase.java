@@ -74,7 +74,9 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             AnalysisRepository analysisRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
             SampleRepository sampleRepository,
-            TaxonomyRepository taxonomyRepository) {
+            TaxonomyRepository taxonomyRepository,
+
+            String entrezApiKey) {
         super(
                 sraXmlRetrieverThroughDatabase,
                 sraXmlRetrieverThroughApi,
@@ -99,7 +101,9 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                 analysisRepository,
                 referenceSequenceRepository,
                 sampleRepository,
-                taxonomyRepository
+                taxonomyRepository,
+
+                entrezApiKey
         );
     }
 
