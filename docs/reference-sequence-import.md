@@ -55,7 +55,7 @@ NBCI's Entrez API. The first one searches by the GCF accession, and the second o
                                     
 To obtain the internal ID based on the GCF: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=assembly&term=GCF_000442705.1                                                                 
 
-To query based on said internal ID:https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=assembly&id=49321
+To query based on said internal ID: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=assembly&id=49321
 
 **For all other accessions** the genome_assembly XML is retrieved via ENA API which can be parsed via the _ASSEMBLYDocument_ factory parser.
 A reference sequence is created by parsing the accession, name, patch and taxonomy. 
