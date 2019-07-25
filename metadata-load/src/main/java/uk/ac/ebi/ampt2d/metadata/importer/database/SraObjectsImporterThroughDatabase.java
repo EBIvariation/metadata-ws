@@ -31,6 +31,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.events.AnalysisEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
@@ -133,6 +134,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     protected Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis) {
         Study study = importStudyFromAnalysis(analysisType.getSTUDYREF().getAccession());
         analysis.setStudy(study);
+        AnalysisEventHandler.validateReferenceSequenceLink(analysis);
         return analysisRepository.save(analysis);
     }
 

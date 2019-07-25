@@ -132,8 +132,9 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals(1, analysis.getFiles().size());
         assertEquals("ERP000860", analysis.getStudy().getAccessionVersionId().getAccession());
         assertTrue(analysis.getReferenceSequences().isEmpty());
-        assertEquals(1, studyRepository.count());
-        assertEquals(1, analysisRepository.count());
+
+        // Analysis is not saved to database as it doesn't have a referenceSequence.
+        assertEquals(0, analysisRepository.count());
         assertEquals(0, referenceSequenceRepository.count());
     }
 
