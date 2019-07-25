@@ -126,8 +126,8 @@ public class SraObjectsImporterThroughApiTest {
 
     @Test
     public void importAnalysisObjectWithoutReferenceSequence() throws Exception {
-        Analysis analysis = sraObjectImporter.importAnalysis("ERZ748187");
-        assertEquals("ERZ748187", analysis.getAccessionVersionId().getAccession());
+        Analysis analysis = sraObjectImporter.importAnalysis("ERZ000001");
+        assertEquals("ERZ000001", analysis.getAccessionVersionId().getAccession());
         assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
         assertEquals(2, analysis.getFiles().size());
         assertEquals(0, analysis.getReferenceSequences().size());
