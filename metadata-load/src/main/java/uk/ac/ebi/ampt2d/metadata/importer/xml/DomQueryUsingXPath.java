@@ -28,6 +28,7 @@ import javax.xml.xpath.XPathFactory;
 import java.io.StringReader;
 
 public class DomQueryUsingXPath {
+
     private final XPath xpath = XPathFactory.newInstance().newXPath();
 
     public Document buildDom(String xml) throws Exception {

@@ -50,8 +50,8 @@ public class EntrezAssemblyXmlParser {
             referenceSequenceName.append((String) xPath.evaluate(documentSummary +
                     "AssemblyName", document, XPathConstants.STRING));
             String patch = ReferenceSequenceConverter.getPatch(referenceSequenceName);
-            ReferenceSequence referenceSequence = new ReferenceSequence(referenceSequenceName.toString(), patch, Arrays.asList
-                    (referenceSequenceAccession), ReferenceSequence.Type.GENOME_ASSEMBLY);
+            ReferenceSequence referenceSequence = new ReferenceSequence(referenceSequenceName.toString(), patch,
+                    Arrays.asList(referenceSequenceAccession), ReferenceSequence.Type.GENOME_ASSEMBLY);
             long taxonomyId = Long.parseLong((String) xPath.evaluate(documentSummary + "Taxid", document,
                     XPathConstants.STRING));
             String taxonomyName = (String) xPath.evaluate(documentSummary + "SpeciesName", document,

@@ -248,7 +248,7 @@ public abstract class ObjectsImporter {
         Map<String, String> uriVariables = new HashMap<>();
         uriVariables.put("accession", accession);
 
-        if (entrezApiKey != null && !entrezApiKey.equals("")) {
+        if (entrezApiKey != null && !entrezApiKey.isEmpty()) {
             final String apiKeyQueryString = "&api_key={entrezApiKey}";
             uriVariables.put("entrezApiKey", entrezApiKey);
             idRetrievalUrl = idRetrievalUrl + apiKeyQueryString;

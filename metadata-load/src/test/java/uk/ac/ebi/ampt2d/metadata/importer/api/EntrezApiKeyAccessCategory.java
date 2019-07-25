@@ -19,4 +19,5 @@
 package uk.ac.ebi.ampt2d.metadata.importer.api;
 
 public interface EntrezApiKeyAccessCategory {
+
 }
