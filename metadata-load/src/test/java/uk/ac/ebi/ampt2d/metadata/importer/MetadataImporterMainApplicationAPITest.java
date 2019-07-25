@@ -65,7 +65,8 @@ public class MetadataImporterMainApplicationAPITest {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
                 new String[]{"--accessions.file.path=study/StudyAccessions.txt"}));
         assertEquals(2, studyRepository.count());
-        assertEquals(3, analysisRepository.count());
+        // Actual count should be 3 but ERZ000001 Analysis has a CUSTOM assembly so not imported
+        assertEquals(2, analysisRepository.count());
         assertEquals(24, referenceSequenceRepository.count());
         assertEquals(3, sampleRepository.count());
     }

@@ -65,21 +65,23 @@ public class MetadataImporterMainApplicationDBTest {
     public void run() throws Exception {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
                 new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessions.txt"}));
-        assertEquals(2, studyRepository.count());
-        assertEquals(6, analysisRepository.count());
 
-        /* No analysis has a proper ReferenceSequence accession this should be fixed. An analysis shouldn't be imported
-         without a ReferenceSequence */
-        assertEquals(0, referenceSequenceRepository.count());
-        assertEquals(6, sampleRepository.count());
+        // Two of the analysis hasn't got a proper ReferenceSequence so they are not imported
+        assertEquals(1, analysisRepository.count());
+
+        //TODO Analysis is not imported but dependent study being imported.Need a fix.
+        assertEquals(3, studyRepository.count());
+        assertEquals(13, referenceSequenceRepository.count());
+        assertEquals(3, sampleRepository.count());
+
         sraObjectsImporterThroughDatabase.getAccessionsToStudy().clear();
 
         // Import additional analyses into already imported study
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
                 new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessionsSharedStudyPreviousImport.txt"}));
-        assertEquals(2, studyRepository.count());
-        assertEquals(11, analysisRepository.count());
-        assertEquals(11, sampleRepository.count());
+        assertEquals(3, studyRepository.count());
+        assertEquals(3, analysisRepository.count());
+        assertEquals(5, sampleRepository.count());
     }
 
 }

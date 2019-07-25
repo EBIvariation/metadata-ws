@@ -271,9 +271,7 @@ Feature: analysis object
     When I create a study
     Then set the URL to STUDY
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE_1,REFERENCE_SEQUENCE_2 for reference sequence
-    Then the response code should be 4xx
-    And the response should contain field exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException
-    And the response should contain field message with value Invalid type of reference sequences. When multiple reference sequence URLs are provided, all of them should point to gene sequences
+    Then the response code should be 2xx
 
     Examples:
       | test_reference_sequence_1_json                                                                                                             | test_reference_sequence_2_json                                                                                                             |
@@ -282,15 +280,60 @@ Feature: analysis object
       | "name": "BRCA1","patch": "3","accessions": ["NM_007294.3"],"type": "SEQUENCE","taxonomy": "TAXONOMY"                                       | "name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY" |
 
 
-  Scenario Outline: find one analysis by type, technology or platform
+  Scenario Outline: register an analysis with multiple reference sequences having different taxonomy should fail
     Given I set authorization with testoperator having SERVICE_OPERATOR role
-    When I request POST /taxonomies with JSON payload:
+    And I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens"
     }
     """
+    Then set the URL to TAXONOMY_HUMAN
+    And the response code should be 201
+    And I request POST /taxonomies with JSON payload:
+    """
+    {
+      "taxonomyId": 10090,
+      "name": "Mus musculus"
+    }
+    """
+    Then set the URL to TAXONOMY_MOUSE
+    And the response code should be 201
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+    <test_reference_sequence_1_json>
+    """
+    Then the response code should be 201
+    And set the URL to REFERENCE_SEQUENCE_1
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+    <test_reference_sequence_2_json>
+    """
+    Then the response code should be 201
+    And set the URL to REFERENCE_SEQUENCE_2
+
+    When I create a study
+    Then set the URL to STUDY
+    When I create an analysis with STUDY for study and REFERENCE_SEQUENCE_1,REFERENCE_SEQUENCE_2 for reference sequence
+    Then the response code should be 4xx
+    And the response should contain field exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException
+    And the response should contain field message with value Invalid type of reference sequences. When multiple reference sequences are associated with an analysis all of them should point to same Taxonomy
+
+    Examples:
+      | test_reference_sequence_1_json                                                                                                                   | test_reference_sequence_2_json                                                                                                                     |
+      | "name": "GRCh37","patch": "p2","accessions": ["GCA_000001407.3", "GCF_000001407.14"], "type":"GENOME_ASSEMBLY","taxonomy": "TAXONOMY_HUMAN"      | "name": "GRCh37","patch": "p3","accessions":   ["GCA_000001407.4","GCF_000001407.15"],"type": "GENOME_ASSEMBLY","taxonomy": "TAXONOMY_MOUSE"       |
+      | "name": "FOXP2","patch": "nothing important","accessions": ["NM_014491.3"],"type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY_MOUSE" | "name": "BRCA2","patch": "nothing important",  "accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY_HUMAN" |
+
+  Scenario Outline: find one analysis by type, technology or platform
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    And I request POST /taxonomies with JSON payload:
+     """
+     {
+       "taxonomyId": 9606,
+       "name": "Homo Sapiens"
+     }
+     """
     Then set the URL to TAXONOMY
     And the response code should be 201
 

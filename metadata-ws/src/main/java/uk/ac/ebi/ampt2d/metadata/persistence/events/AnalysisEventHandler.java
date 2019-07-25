@@ -25,7 +25,7 @@ import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException;
 import uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 
 @RepositoryEventHandler(Analysis.class)
 public class AnalysisEventHandler {
@@ -42,16 +42,20 @@ public class AnalysisEventHandler {
         validateReferenceSequenceLink(analysis);
     }
 
-    private void validateReferenceSequenceLink(Analysis analysis) {
+    public static void validateReferenceSequenceLink(Analysis analysis) {
         if (analysis.getReferenceSequences() == null || analysis.getReferenceSequences().size() == 0) {
             throw new AnalysisWithoutReferenceSequenceException();
         } else if (analysis.getReferenceSequences().contains(null)) {
             throw new InvalidReferenceSequenceException();
-        } else if (analysis.getReferenceSequences().size() > 1) {
-            boolean invalidRefSeq = analysis.getReferenceSequences().stream().anyMatch(r -> !r.getType().equals(ReferenceSequence.Type.SEQUENCE));
+        } else {
+            Taxonomy taxonomy = analysis.getReferenceSequences().get(0).getTaxonomy();
+            boolean invalidRefSeq = analysis.getReferenceSequences().stream()
+                    .anyMatch(referenceSequence -> referenceSequence.getTaxonomy().getTaxonomyId()
+                            != taxonomy.getTaxonomyId());
             if (invalidRefSeq) {
                 throw new InvalidReferenceSequenceException("Invalid type of reference sequences. " +
-                        "When multiple reference sequence URLs are provided, all of them should point to gene sequences");
+                        "When multiple reference sequences are associated with an analysis all of them should point " +
+                        "to same Taxonomy");
             }
         }
     }
