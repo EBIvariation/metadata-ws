@@ -58,7 +58,7 @@ To obtain the internal ID based on the GCF: https://eutils.ncbi.nlm.nih.gov/entr
 To query based on said internal ID: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=assembly&id=49321
 
 The above endpoints are rate limited by max 3 requests per second, to use the endpoints seamlessly we have obtained an 
-apiKey as suggested here https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/
+API key as suggested here https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/
 
 **For all other accessions** the genome_assembly XML is retrieved via ENA API which can be parsed via the _ASSEMBLYDocument_ factory parser.
 A reference sequence is created by parsing the accession, name, patch and taxonomy. 
