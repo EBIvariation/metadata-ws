@@ -24,19 +24,27 @@ import org.xml.sax.InputSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.StringReader;
 
 public class DomQueryUsingXPath {
 
-    private final XPath xpath = XPathFactory.newInstance().newXPath();
+    private final XPath xPath = XPathFactory.newInstance().newXPath();
 
-    public Document buildDom(String xml) throws Exception {
+    private Document document;
+
+    public void buildDom(String xml) throws Exception {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        return builder.parse(new InputSource(new StringReader(xml)));
+        this.document = builder.parse(new InputSource(new StringReader(xml)));
     }
 
-    public XPath getXpath() {
-        return xpath;
+    public String findInDom(String expression) throws XPathExpressionException {
+        return (String) xPath.evaluate(expression, document, XPathConstants.STRING);
+    }
+
+    public boolean isExpressionExists(String expression) throws XPathExpressionException {
+        return (boolean) xPath.evaluate("boolean(" + expression + ")", document, XPathConstants.BOOLEAN);
     }
 }

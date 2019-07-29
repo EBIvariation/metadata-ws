@@ -59,8 +59,6 @@ public abstract class ObjectsImporter {
 
     private static final Logger IMPORT_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
 
-    private final String entrezApiKey;
-
     // XML retrievers. First is used as default, second for cases where API retrieval mode must be forced
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
 
@@ -133,8 +131,7 @@ public abstract class ObjectsImporter {
             AnalysisRepository analysisRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
             SampleRepository sampleRepository,
-            TaxonomyRepository taxonomyRepository,
-            String entrezApiKey) {
+            TaxonomyRepository taxonomyRepository) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
         this.sraxmlRetrieverByAccessionForceApi = sraxmlRetrieverByAccessionForceApi;
         this.assemblyXmlRetrieverThroughEntrezApi = assemblyXmlRetrieverThroughEntrezApi;
@@ -160,8 +157,6 @@ public abstract class ObjectsImporter {
         this.referenceSequenceRepository = referenceSequenceRepository;
         this.taxonomyRepository = taxonomyRepository;
         this.sampleRepository = sampleRepository;
-
-        this.entrezApiKey = entrezApiKey;
     }
 
     public Study importStudy(String accession) {
@@ -218,7 +213,8 @@ public abstract class ObjectsImporter {
             // Reference sequences must always be imported through API, even with import mode = DB
             final String gcfAccessionPattern = "GCF_[\\d]*\\.?[\\d]*";
             if (accession.matches(gcfAccessionPattern)) {
-                referenceSequence = retrieveReferenceSequenceFromEntrez(accession);
+                String assemblyXml = assemblyXmlRetrieverThroughEntrezApi.getXml(accession);
+                referenceSequence = entrezAssemblyXmlParser.parseXml(assemblyXml, accession);
             } else {
                 String referenceSequenceXml = sraxmlRetrieverByAccessionForceApi.getXml(accession);
                 if (referenceSequenceXml.contains(ASSEMBLY_END_TAG)) {
@@ -238,11 +234,6 @@ public abstract class ObjectsImporter {
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
         }
         return referenceSequence;
-    }
-
-    private ReferenceSequence retrieveReferenceSequenceFromEntrez(String accession) throws Exception {
-        String assemblyXml = assemblyXmlRetrieverThroughEntrezApi.getXml(accession);
-        return entrezAssemblyXmlParser.parseXml(assemblyXml, accession);
     }
 
     private Set<String> getReferenceSequenceAccessions(AnalysisType analysis) {

@@ -54,9 +54,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 @Configuration
 public class MetadataImporterMainApplicationConfiguration {
 
-    @Value("${entrez.api.key:}")
-    private String entrezApiKey;
-
     @Bean
     public SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi() {
         return new SraXmlRetrieverThroughApi();
@@ -72,10 +69,11 @@ public class MetadataImporterMainApplicationConfiguration {
                                                        ReferenceSequenceRepository referenceSequenceRepository,
                                                        AnalysisRepository analysisRepository,
                                                        StudyRepository studyRepository,
-                                                       SampleRepository sampleRepository) {
+                                                       SampleRepository sampleRepository,
+                                                       @Value("${entrez.api.key:}") String entrezApiKey) {
         return new SraObjectsImporterThroughApi(
                 sraXmlRetrieverThroughApi,
-                assemblyXmlRetrieverThroughEntrezApi(),
+                assemblyXmlRetrieverThroughEntrezApi(entrezApiKey),
 
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
@@ -97,9 +95,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 analysisRepository,
                 referenceSequenceRepository,
                 sampleRepository,
-                taxonomyRepository,
-
-                entrezApiKey
+                taxonomyRepository
         );
     }
 
@@ -115,13 +111,14 @@ public class MetadataImporterMainApplicationConfiguration {
             ReferenceSequenceRepository referenceSequenceRepository,
             AnalysisRepository analysisRepository,
             StudyRepository studyRepository,
-            SampleRepository sampleRepository) {
+            SampleRepository sampleRepository,
+            @Value("${entrez.api.key:}") String entrezApiKey) {
         return new SraObjectsImporterThroughDatabase(
                 // For database import we need two importers
                 // Most entries are imported from the database, but reference sequences can only be imported via API
                 sraXmlRetrieverThroughDatabase,
                 sraXmlRetrieverThroughApi,
-                assemblyXmlRetrieverThroughEntrezApi(),
+                assemblyXmlRetrieverThroughEntrezApi(entrezApiKey),
 
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
@@ -143,9 +140,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 analysisRepository,
                 referenceSequenceRepository,
                 sampleRepository,
-                taxonomyRepository,
-
-                entrezApiKey
+                taxonomyRepository
         );
     }
 
@@ -171,7 +166,7 @@ public class MetadataImporterMainApplicationConfiguration {
         return new SraEntryXmlParser(domQueryUsingXPath());
     }
 
-    private AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi() {
+    private AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi(String entrezApiKey) {
         return new AssemblyXmlRetrieverThroughEntrezApi(entrezApiKey);
     }
 

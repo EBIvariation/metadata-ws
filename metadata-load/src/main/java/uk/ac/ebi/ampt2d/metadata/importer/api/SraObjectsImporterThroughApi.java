@@ -71,9 +71,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
             AnalysisRepository analysisRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
             SampleRepository sampleRepository,
-            TaxonomyRepository taxonomyRepository,
-
-            String entrezApiKey) {
+            TaxonomyRepository taxonomyRepository) {
         super(
                 // For API import, default and "force API" retrievers are the same
                 sraXmlRetrieverThroughApi,
@@ -100,9 +98,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
                 analysisRepository,
                 referenceSequenceRepository,
                 sampleRepository,
-                taxonomyRepository,
-
-                entrezApiKey
+                taxonomyRepository
         );
     }
 

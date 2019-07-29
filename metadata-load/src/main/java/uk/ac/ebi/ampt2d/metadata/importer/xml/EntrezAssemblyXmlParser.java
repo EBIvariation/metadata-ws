@@ -18,13 +18,10 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.xml;
 
-import org.w3c.dom.Document;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.ReferenceSequenceConverter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,20 +38,17 @@ public class EntrezAssemblyXmlParser {
 
     public ReferenceSequence parseXml(String xmlString, String accession) throws Exception {
         try {
-            Document document = domQueryUsingXPath.buildDom(xmlString);
-            XPath xPath = domQueryUsingXPath.getXpath();
+            domQueryUsingXPath.buildDom(xmlString);
             String documentSummary = "/eSummaryResult/DocumentSummarySet/DocumentSummary/";
-            String referenceSequenceAccession = (String) xPath.evaluate(documentSummary + "AssemblyAccession",
-                    document, XPathConstants.STRING);
-            StringBuilder referenceSequenceName = new StringBuilder((String) xPath.evaluate(documentSummary +
-                    "AssemblyName", document, XPathConstants.STRING));
+            String referenceSequenceAccession = domQueryUsingXPath.findInDom(documentSummary + "AssemblyAccession");
+            StringBuilder referenceSequenceName = new StringBuilder(domQueryUsingXPath
+                    .findInDom(documentSummary + "AssemblyName"));
             String patch = ReferenceSequenceConverter.getPatch(referenceSequenceName);
             ReferenceSequence referenceSequence = new ReferenceSequence(referenceSequenceName.toString(), patch,
                     Arrays.asList(referenceSequenceAccession), ReferenceSequence.Type.GENOME_ASSEMBLY);
-            long taxonomyId = Long.parseLong((String) xPath.evaluate(documentSummary + "Taxid", document,
-                    XPathConstants.STRING));
-            String taxonomyName = (String) xPath.evaluate(documentSummary + "SpeciesName", document,
-                    XPathConstants.STRING);
+            long taxonomyId = Long.parseLong(domQueryUsingXPath
+                    .findInDom(documentSummary + "Taxid"));
+            String taxonomyName = domQueryUsingXPath.findInDom(documentSummary + "SpeciesName");
             Taxonomy taxonomy = new Taxonomy(taxonomyId, taxonomyName);
             referenceSequence.setTaxonomy(taxonomy);
             return referenceSequence;

@@ -29,10 +29,12 @@ public class AssemblyXmlRetrieverThroughEntrezApi {
 
     private static final String ENTREZ_API_KEY_QUERY = "&api_key={entrezApiKey}";
 
-    private static String entrezApiIdRetrievalUrl =
+    // URL to obtain an internal Entrez ID from, given a GCF assembly accession.
+    private String entrezApiIdRetrievalUrl =
             "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=assembly&term={accession}";
 
-    private static String entrezApiAssemblyRetrievalUrl =
+    // URL to obtain assembly metadata from, given its internal Entrez ID.
+    private String entrezApiAssemblyRetrievalUrl =
             "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=assembly&id={id}";
 
     private RestTemplate restTemplate = new RestTemplate();
@@ -53,6 +55,5 @@ public class AssemblyXmlRetrieverThroughEntrezApi {
         String id = idXml.substring(idXml.indexOf(ID_START_TAG) + 4, idXml.indexOf(ID_END_TAG));
         return restTemplate.exchange(entrezApiAssemblyRetrievalUrl, HttpMethod.GET, null, String.class,
                 id, entrezApiKey).getBody();
-
     }
 }
