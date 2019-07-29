@@ -49,6 +49,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
 
     public SraObjectsImporterThroughApi(
             SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
+            AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
@@ -77,6 +78,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
                 // For API import, default and "force API" retrievers are the same
                 sraXmlRetrieverThroughApi,
                 sraXmlRetrieverThroughApi,
+                assemblyXmlRetrieverThroughEntrezApi,
 
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,

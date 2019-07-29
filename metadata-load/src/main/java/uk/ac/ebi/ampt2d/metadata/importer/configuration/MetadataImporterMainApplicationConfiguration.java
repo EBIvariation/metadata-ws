@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.importer.api.AssemblyXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
@@ -74,6 +75,7 @@ public class MetadataImporterMainApplicationConfiguration {
                                                        SampleRepository sampleRepository) {
         return new SraObjectsImporterThroughApi(
                 sraXmlRetrieverThroughApi,
+                assemblyXmlRetrieverThroughEntrezApi(),
 
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
@@ -119,6 +121,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 // Most entries are imported from the database, but reference sequences can only be imported via API
                 sraXmlRetrieverThroughDatabase,
                 sraXmlRetrieverThroughApi,
+                assemblyXmlRetrieverThroughEntrezApi(),
 
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
@@ -166,6 +169,10 @@ public class MetadataImporterMainApplicationConfiguration {
 
     private SraEntryXmlParser sraEntryXmlParser() {
         return new SraEntryXmlParser(domQueryUsingXPath());
+    }
+
+    private AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi() {
+        return new AssemblyXmlRetrieverThroughEntrezApi(entrezApiKey);
     }
 
     private EntrezAssemblyXmlParser entrezAssemblyXmlParser() {

@@ -46,8 +46,7 @@ public class EntrezAssemblyXmlParser {
             String documentSummary = "/eSummaryResult/DocumentSummarySet/DocumentSummary/";
             String referenceSequenceAccession = (String) xPath.evaluate(documentSummary + "AssemblyAccession",
                     document, XPathConstants.STRING);
-            StringBuilder referenceSequenceName = new StringBuilder();
-            referenceSequenceName.append((String) xPath.evaluate(documentSummary +
+            StringBuilder referenceSequenceName = new StringBuilder((String) xPath.evaluate(documentSummary +
                     "AssemblyName", document, XPathConstants.STRING));
             String patch = ReferenceSequenceConverter.getPatch(referenceSequenceName);
             ReferenceSequence referenceSequence = new ReferenceSequence(referenceSequenceName.toString(), patch,

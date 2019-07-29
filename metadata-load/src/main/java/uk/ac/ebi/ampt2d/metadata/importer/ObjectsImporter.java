@@ -19,6 +19,7 @@
 package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.springframework.core.convert.converter.Converter;
+import uk.ac.ebi.ampt2d.metadata.importer.api.AssemblyXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
@@ -44,10 +45,8 @@ import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -66,6 +65,8 @@ public abstract class ObjectsImporter {
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
 
     protected SraXmlRetrieverThroughApi sraxmlRetrieverByAccessionForceApi;
+
+    protected AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi;
 
     // Entity repositories
     protected StudyRepository studyRepository;
@@ -110,6 +111,7 @@ public abstract class ObjectsImporter {
     public ObjectsImporter(
             SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
             SraXmlRetrieverThroughApi sraxmlRetrieverByAccessionForceApi,
+            AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
@@ -135,6 +137,7 @@ public abstract class ObjectsImporter {
             String entrezApiKey) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
         this.sraxmlRetrieverByAccessionForceApi = sraxmlRetrieverByAccessionForceApi;
+        this.assemblyXmlRetrieverThroughEntrezApi = assemblyXmlRetrieverThroughEntrezApi;
 
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
@@ -159,7 +162,6 @@ public abstract class ObjectsImporter {
         this.sampleRepository = sampleRepository;
 
         this.entrezApiKey = entrezApiKey;
-
     }
 
     public Study importStudy(String accession) {
@@ -239,26 +241,7 @@ public abstract class ObjectsImporter {
     }
 
     private ReferenceSequence retrieveReferenceSequenceFromEntrez(String accession) throws Exception {
-        String idRetrievalUrl = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch" +
-                ".fcgi?db=assembly&term={accession}";
-        String assemblyRetrievalFromIdUrl = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary" +
-                ".fcgi?db=assembly&id={id}";
-        final String idStartTag = "<Id>";
-        final String idEndTag = "</Id";
-        Map<String, String> uriVariables = new HashMap<>();
-        uriVariables.put("accession", accession);
-
-        if (entrezApiKey != null && !entrezApiKey.isEmpty()) {
-            final String apiKeyQueryString = "&api_key={entrezApiKey}";
-            uriVariables.put("entrezApiKey", entrezApiKey);
-            idRetrievalUrl = idRetrievalUrl + apiKeyQueryString;
-            assemblyRetrievalFromIdUrl = assemblyRetrievalFromIdUrl + apiKeyQueryString;
-        }
-
-        String idXml = sraxmlRetrieverByAccessionForceApi.getXml(idRetrievalUrl, uriVariables);
-        String id = idXml.substring(idXml.indexOf(idStartTag) + 4, idXml.indexOf(idEndTag));
-        uriVariables.put("id", id);
-        String assemblyXml = sraxmlRetrieverByAccessionForceApi.getXml(assemblyRetrievalFromIdUrl, uriVariables);
+        String assemblyXml = assemblyXmlRetrieverThroughEntrezApi.getXml(accession);
         return entrezAssemblyXmlParser.parseXml(assemblyXml, accession);
     }
 

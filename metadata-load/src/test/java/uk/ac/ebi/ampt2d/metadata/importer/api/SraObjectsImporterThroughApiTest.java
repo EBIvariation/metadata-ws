@@ -158,7 +158,7 @@ public class SraObjectsImporterThroughApiTest {
     }
 
     @Test
-    public void importReferenceSequenceGcfAssemblyAccession() throws Exception {
+    public void importReferenceSequenceGcfAssemblyAccessionWithoutApiKey() throws Exception {
         ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GCF_000001405.39");
         assertEquals(Arrays.asList("GCF_000001405.39"), referenceSequence.getAccessions());
         assertEquals("GRCh38", referenceSequence.getName());

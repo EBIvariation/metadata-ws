@@ -28,8 +28,7 @@ public class ReferenceSequenceConverter implements Converter<AssemblyType, Refer
 
     @Override
     public ReferenceSequence convert(AssemblyType assemblyType) {
-        StringBuilder refName = new StringBuilder();
-        refName.append(assemblyType.getNAME());
+        StringBuilder refName = new StringBuilder(assemblyType.getNAME());
         String patch = getPatch(refName);
         ReferenceSequence referenceSequence = new ReferenceSequence(
                 refName.toString(),

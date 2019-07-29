@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.importer.database;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.importer.api.AssemblyXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
@@ -53,6 +54,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     public SraObjectsImporterThroughDatabase(
             SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
             SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
+            AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
@@ -80,6 +82,8 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         super(
                 sraXmlRetrieverThroughDatabase,
                 sraXmlRetrieverThroughApi,
+                assemblyXmlRetrieverThroughEntrezApi,
+
 
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,
