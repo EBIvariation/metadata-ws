@@ -28,7 +28,7 @@ pipeline {
         sh "mvn clean package -DskipTests -pl metadata-ws -DbuildDirectory=staging/target \
         -Dmetadata-dbUrl=${stagingPostgresDbUrl} \
         -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword} \
-        -Dmetadata-ddlBehaviour=${ddlBehaviour} \
+        -Dmetadata-ddlBehaviour=${params.ddlBehaviour} \
         -Dmetadata-jwtKey=${jwtKey}"
       }
     }
