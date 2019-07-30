@@ -36,16 +36,10 @@ public class SraEntryXmlParser extends SraXmlParser<ReferenceSequence> {
 
     private static final String SLASH = "/";
 
-    private DomQueryUsingXPath domQueryUsingXPath;
-
-    public SraEntryXmlParser(DomQueryUsingXPath domQueryUsingXPath) {
-        this.domQueryUsingXPath = domQueryUsingXPath;
-    }
-
     @Override
     public ReferenceSequence parseXml(String xmlString, String accession) throws XmlException {
         try {
-            domQueryUsingXPath.buildDom(xmlString);
+            DomQueryUsingXPath domQueryUsingXPath = new DomQueryUsingXPath(xmlString);
             String referenceSequenceAccession = domQueryUsingXPath.findInDom(ENTRY_PATH + SLASH + "@accession");
             String referenceSequenceName = domQueryUsingXPath.findInDom(ENTRY_PATH + SLASH + "description");
             ReferenceSequence.Type referenceSequenceType = ReferenceSequence.Type.SEQUENCE;

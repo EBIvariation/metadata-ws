@@ -163,7 +163,7 @@ public class MetadataImporterMainApplicationConfiguration {
     }
 
     private SraEntryXmlParser sraEntryXmlParser() {
-        return new SraEntryXmlParser(domQueryUsingXPath());
+        return new SraEntryXmlParser();
     }
 
     private AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi(String entrezApiKey) {
@@ -171,11 +171,7 @@ public class MetadataImporterMainApplicationConfiguration {
     }
 
     private EntrezAssemblyXmlParser entrezAssemblyXmlParser() {
-        return new EntrezAssemblyXmlParser(domQueryUsingXPath());
-    }
-
-    private DomQueryUsingXPath domQueryUsingXPath() {
-        return new DomQueryUsingXPath();
+        return new EntrezAssemblyXmlParser();
     }
 
     // Converter factories

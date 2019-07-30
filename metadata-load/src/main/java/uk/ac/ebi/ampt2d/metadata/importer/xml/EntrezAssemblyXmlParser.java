@@ -30,15 +30,9 @@ public class EntrezAssemblyXmlParser {
 
     private static final Logger LOGGER = Logger.getLogger(EntrezAssemblyXmlParser.class.getName());
 
-    private DomQueryUsingXPath domQueryUsingXPath;
-
-    public EntrezAssemblyXmlParser(DomQueryUsingXPath domQueryUsingXPath) {
-        this.domQueryUsingXPath = domQueryUsingXPath;
-    }
-
     public ReferenceSequence parseXml(String xmlString, String accession) throws Exception {
         try {
-            domQueryUsingXPath.buildDom(xmlString);
+            DomQueryUsingXPath domQueryUsingXPath = new DomQueryUsingXPath(xmlString);
             String documentSummary = "/eSummaryResult/DocumentSummarySet/DocumentSummary/";
             String referenceSequenceAccession = domQueryUsingXPath.findInDom(documentSummary + "AssemblyAccession");
             StringBuilder referenceSequenceName = new StringBuilder(domQueryUsingXPath

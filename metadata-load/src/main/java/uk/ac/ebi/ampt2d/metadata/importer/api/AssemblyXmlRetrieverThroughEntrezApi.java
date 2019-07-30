@@ -29,11 +29,15 @@ public class AssemblyXmlRetrieverThroughEntrezApi {
 
     private static final String ENTREZ_API_KEY_QUERY = "&api_key={entrezApiKey}";
 
-    // URL to obtain an internal Entrez ID from, given a GCF assembly accession.
+    /*
+     *  URL to obtain an internal Entrez ID from, given a GCF assembly accession.
+    */
     private String entrezApiIdRetrievalUrl =
             "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=assembly&term={accession}";
 
-    // URL to obtain assembly metadata from, given its internal Entrez ID.
+    /*
+     *  URL to obtain assembly metadata from, given its internal Entrez ID.
+    */
     private String entrezApiAssemblyRetrievalUrl =
             "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=assembly&id={id}";
 
