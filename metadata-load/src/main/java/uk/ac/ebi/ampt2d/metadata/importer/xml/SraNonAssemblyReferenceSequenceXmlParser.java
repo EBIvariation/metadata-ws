@@ -26,9 +26,9 @@ import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SraEntryXmlParser extends SraXmlParser<ReferenceSequence> {
+public class SraNonAssemblyReferenceSequenceXmlParser extends SraXmlParser<ReferenceSequence> {
 
-    private static final Logger LOGGER = Logger.getLogger(SraEntryXmlParser.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SraNonAssemblyReferenceSequenceXmlParser.class.getName());
 
     private static final String TSA = "Transcriptome Shotgun Assembly";
 
