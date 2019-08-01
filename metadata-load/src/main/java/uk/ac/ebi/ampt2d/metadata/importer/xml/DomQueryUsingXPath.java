@@ -35,7 +35,7 @@ public class DomQueryUsingXPath {
 
     private Document document;
 
-    public DomQueryUsingXPath(String xml) throws Exception{
+    public DomQueryUsingXPath(String xml) throws Exception {
         DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         this.document = builder.parse(new InputSource(new StringReader(xml)));
     }

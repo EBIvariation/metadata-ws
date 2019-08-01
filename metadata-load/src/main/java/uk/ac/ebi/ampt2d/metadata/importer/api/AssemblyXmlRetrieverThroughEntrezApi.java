@@ -29,6 +29,8 @@ public class AssemblyXmlRetrieverThroughEntrezApi {
 
     private static final String ENTREZ_API_KEY_QUERY = "&api_key={entrezApiKey}";
 
+    public static final int ID_START_TAG_LENGTH = 4;
+
     /*
      *  URL to obtain an internal Entrez ID from, given a GCF assembly accession.
     */
@@ -56,7 +58,7 @@ public class AssemblyXmlRetrieverThroughEntrezApi {
     public String getXml(String accession) {
         String idXml = restTemplate.exchange(entrezApiIdRetrievalUrl, HttpMethod.GET, null, String.class,
                 accession, entrezApiKey).getBody();
-        String id = idXml.substring(idXml.indexOf(ID_START_TAG) + 4, idXml.indexOf(ID_END_TAG));
+        String id = idXml.substring(idXml.indexOf(ID_START_TAG) + ID_START_TAG_LENGTH, idXml.indexOf(ID_END_TAG));
         return restTemplate.exchange(entrezApiAssemblyRetrievalUrl, HttpMethod.GET, null, String.class,
                 id, entrezApiKey).getBody();
     }

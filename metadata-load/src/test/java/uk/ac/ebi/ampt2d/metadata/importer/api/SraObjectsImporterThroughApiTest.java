@@ -170,6 +170,11 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals(1, referenceSequenceRepository.count());
     }
 
+    /**
+     * Please provide the apiKey in the application.properties as entrez.api.key=xxx to run this test method else
+     * the test will fail due to Entrez-API rate limit.
+     * @throws Exception
+     */
     @Test
     @Category(EntrezApiKeyAccessCategory.class)
     public void importReferenceSequenceGcfAssemblyAccessionWithApiKey() throws Exception {
