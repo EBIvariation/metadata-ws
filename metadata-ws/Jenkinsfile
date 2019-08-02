@@ -28,8 +28,7 @@ pipeline {
         sh "mvn clean package -DskipTests -pl metadata-ws -DbuildDirectory=staging/target \
         -Dmetadata-dbUrl=${stagingPostgresDbUrl} \
         -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword} \
-        -Dmetadata-ddlBehaviour=${params.ddlBehaviour} \
-        -Dmetadata-jwtKey=${jwtKey}"
+        -Dmetadata-ddlBehaviour=${params.ddlBehaviour}
       }
     }
     stage('Build For FallBack And Production') {
@@ -42,14 +41,12 @@ pipeline {
         echo 'Build pointing to FallBack DB'
         sh "mvn clean package -DskipTests -pl metadata-ws -DbuildDirectory=fallback/target \
         -Dmetadata-dbUrl=${fallBackPostgresDbUrl} \
-        -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword}  \
-        -Dmetadata-ddlBehaviour=validate \
-        -Dmetadata-jwtKey=${jwtKey}"
+         -Dmetadata-dbUsername=${postgresDBUserName} -Dmetadata-dbPassword=${postgresDBPassword}  \
+        -Dmetadata-ddlBehaviour=validate"
         echo 'Build pointing to Production DB'
         sh "mvn clean package -DskipTests -pl metadata-ws -DbuildDirectory=production/target \
         -Dmetadata-dbUrl=${productionPostgresDbUrl} -Dmetadata-dbUsername=${postgresDBUserName} \
-        -Dmetadata-dbPassword=${postgresDBPassword} -Dmetadata-ddlBehaviour=validate \
-        -Dmetadata-jwtKey=${jwtKey}"
+        -Dmetadata-dbPassword=${postgresDBPassword} -Dmetadata-ddlBehaviour=validate"
       }
     }
     stage('Deploy To Staging') {
