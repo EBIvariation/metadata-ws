@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.importer.api;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -125,8 +126,8 @@ public class SraObjectsImporterThroughApiTest {
 
     @Test
     public void importAnalysisObjectWithoutReferenceSequence() throws Exception {
-        Analysis analysis = sraObjectImporter.importAnalysis("ERZ748187");
-        assertEquals("ERZ748187", analysis.getAccessionVersionId().getAccession());
+        Analysis analysis = sraObjectImporter.importAnalysis("ERZ000001");
+        assertEquals("ERZ000001", analysis.getAccessionVersionId().getAccession());
         assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
         assertEquals(2, analysis.getFiles().size());
         assertEquals(0, analysis.getReferenceSequences().size());
@@ -154,6 +155,47 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals(7897, taxonomy.getTaxonomyId());
         assertEquals("Latimeria chalumnae", taxonomy.getName());
         assertEquals(1, referenceSequenceRepository.count());
+    }
+
+    @Test
+    public void importReferenceSequenceGcfAssemblyAccessionWithoutApiKey() throws Exception {
+        ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GCF_000001405.39");
+        assertEquals(Arrays.asList("GCF_000001405.39"), referenceSequence.getAccessions());
+        assertEquals("GRCh38", referenceSequence.getName());
+        assertEquals("p13", referenceSequence.getPatch());
+        assertEquals(ReferenceSequence.Type.GENOME_ASSEMBLY, referenceSequence.getType());
+        Taxonomy  taxonomy = referenceSequence.getTaxonomy();
+        assertEquals(9606, taxonomy.getTaxonomyId());
+        assertEquals("Homo sapiens", taxonomy.getName());
+        assertEquals(1, referenceSequenceRepository.count());
+    }
+
+    /**
+     * Please provide the apiKey in the application.properties as entrez.api.key=xxx to run this test method else
+     * the test will fail due to Entrez-API rate limit.
+     * @throws Exception
+     */
+    @Test
+    @Category(EntrezApiKeyAccessCategory.class)
+    public void importReferenceSequenceGcfAssemblyAccessionWithApiKey() throws Exception {
+        ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GCF_000001405.12");
+        assertEquals(Arrays.asList("GCF_000001405.12"), referenceSequence.getAccessions());
+        assertEquals("NCBI36", referenceSequence.getName());
+        assertEquals(ReferenceSequence.Type.GENOME_ASSEMBLY, referenceSequence.getType());
+        Taxonomy taxonomy = referenceSequence.getTaxonomy();
+        assertEquals(9606, taxonomy.getTaxonomyId());
+        assertEquals("Homo sapiens", taxonomy.getName());
+        assertEquals(1, referenceSequenceRepository.count());
+
+        referenceSequence = sraObjectImporter.importReferenceSequence("GCF_000001405.39");
+        assertEquals(Arrays.asList("GCF_000001405.39"), referenceSequence.getAccessions());
+        assertEquals("GRCh38", referenceSequence.getName());
+        assertEquals("p13", referenceSequence.getPatch());
+        assertEquals(ReferenceSequence.Type.GENOME_ASSEMBLY, referenceSequence.getType());
+        taxonomy = referenceSequence.getTaxonomy();
+        assertEquals(9606, taxonomy.getTaxonomyId());
+        assertEquals("Homo sapiens", taxonomy.getName());
+        assertEquals(2, referenceSequenceRepository.count());
     }
 
     @Test

@@ -18,10 +18,12 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.configuration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.importer.api.AssemblyXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
@@ -33,17 +35,18 @@ import uk.ac.ebi.ampt2d.metadata.importer.database.SraXmlRetrieverThroughDatabas
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAssemblyXmlParser;
-import uk.ac.ebi.ampt2d.metadata.importer.xml.SraEntryXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraNonAssemblyReferenceSequenceXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraSampleXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 
@@ -65,14 +68,17 @@ public class MetadataImporterMainApplicationConfiguration {
                                                        ReferenceSequenceRepository referenceSequenceRepository,
                                                        AnalysisRepository analysisRepository,
                                                        StudyRepository studyRepository,
-                                                       SampleRepository sampleRepository) {
+                                                       SampleRepository sampleRepository,
+                                                       @Value("${entrez.api.key:}") String entrezApiKey) {
         return new SraObjectsImporterThroughApi(
                 sraXmlRetrieverThroughApi,
+                assemblyXmlRetrieverThroughEntrezApi(entrezApiKey),
 
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
                 sraAssemblyXmlParser(),
                 sraEntryXmlParser(),
+                entrezAssemblyXmlParser(),
                 sraSampleXmlParser(),
 
                 studyConverter(),
@@ -95,26 +101,29 @@ public class MetadataImporterMainApplicationConfiguration {
     @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "DB")
     public ObjectsImporter objectImporterThroughEnaDatabase(
-                                                SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
-                                                SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
-                                                PublicationRepository publicationRepository,
-                                                WebResourceRepository webResourceRepository,
-                                                FileRepository fileRepository,
-                                                TaxonomyRepository taxonomyRepository,
-                                                ReferenceSequenceRepository referenceSequenceRepository,
-                                                AnalysisRepository analysisRepository,
-                                                StudyRepository studyRepository,
-                                                SampleRepository sampleRepository) {
+            SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
+            SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
+            PublicationRepository publicationRepository,
+            WebResourceRepository webResourceRepository,
+            FileRepository fileRepository,
+            TaxonomyRepository taxonomyRepository,
+            ReferenceSequenceRepository referenceSequenceRepository,
+            AnalysisRepository analysisRepository,
+            StudyRepository studyRepository,
+            SampleRepository sampleRepository,
+            @Value("${entrez.api.key:}") String entrezApiKey) {
         return new SraObjectsImporterThroughDatabase(
                 // For database import we need two importers
                 // Most entries are imported from the database, but reference sequences can only be imported via API
                 sraXmlRetrieverThroughDatabase,
                 sraXmlRetrieverThroughApi,
+                assemblyXmlRetrieverThroughEntrezApi(entrezApiKey),
 
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
                 sraAssemblyXmlParser(),
                 sraEntryXmlParser(),
+                entrezAssemblyXmlParser(),
                 sraSampleXmlParser(),
 
                 studyConverter(),
@@ -152,8 +161,16 @@ public class MetadataImporterMainApplicationConfiguration {
         return new SraAssemblyXmlParser();
     }
 
-    private SraEntryXmlParser sraEntryXmlParser() {
-        return new SraEntryXmlParser();
+    private SraNonAssemblyReferenceSequenceXmlParser sraEntryXmlParser() {
+        return new SraNonAssemblyReferenceSequenceXmlParser();
+    }
+
+    private AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi(String entrezApiKey) {
+        return new AssemblyXmlRetrieverThroughEntrezApi(entrezApiKey);
+    }
+
+    private EntrezAssemblyXmlParser entrezAssemblyXmlParser() {
+        return new EntrezAssemblyXmlParser();
     }
 
     // Converter factories

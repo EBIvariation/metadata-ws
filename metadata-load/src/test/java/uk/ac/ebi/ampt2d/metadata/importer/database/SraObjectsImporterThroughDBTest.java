@@ -96,9 +96,10 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
         assertEquals(1, analysis.getFiles().size());
         assertEquals("ERP005147", analysis.getStudy().getAccessionVersionId().getAccession());
-        assertEquals("GCA_000001405.14", analysis.getReferenceSequences().get(0).getAccessions().get(0));
-        assertEquals("GRCh37", analysis.getReferenceSequences().get(0).getName());
-        assertEquals("p13", analysis.getReferenceSequences().get(0).getPatch());
+        ReferenceSequence referenceSequence = analysis.getReferenceSequences().get(0);
+        assertEquals("GCA_000001405.14", referenceSequence.getAccessions().get(0));
+        assertEquals("GRCh37", referenceSequence.getName());
+        assertEquals("p13", referenceSequence.getPatch());
         assertEquals(1, studyRepository.count());
         assertEquals(1, analysisRepository.count());
         assertEquals(1, referenceSequenceRepository.count());

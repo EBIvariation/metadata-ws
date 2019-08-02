@@ -19,50 +19,38 @@
 package uk.ac.ebi.ampt2d.metadata.importer.xml;
 
 import org.apache.xmlbeans.XmlException;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class SraEntryXmlParser extends SraXmlParser<ReferenceSequence> {
+public class SraNonAssemblyReferenceSequenceXmlParser extends SraXmlParser<ReferenceSequence> {
 
-    private static final Logger LOGGER = Logger.getLogger(SraEntryXmlParser.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SraNonAssemblyReferenceSequenceXmlParser.class.getName());
 
     private static final String TSA = "Transcriptome Shotgun Assembly";
+
+    private static final String ENTRY_PATH = "/ROOT/entry";
+
+    private static final String SLASH = "/";
 
     @Override
     public ReferenceSequence parseXml(String xmlString, String accession) throws XmlException {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(new InputSource(new StringReader(xmlString)));
-            XPathFactory xPathfactory = XPathFactory.newInstance();
-            XPath xpath = xPathfactory.newXPath();
-            String referenceSequenceAccession = (String) xpath.evaluate("/ROOT/entry/@accession", document,
-                    XPathConstants.STRING);
-            String referenceSequenceName = (String) xpath.evaluate("/ROOT/entry/description", document,
-                    XPathConstants.STRING);
+            DomQueryUsingXPath domQueryUsingXPath = new DomQueryUsingXPath(xmlString);
+            String referenceSequenceAccession = domQueryUsingXPath.findInDom(ENTRY_PATH + SLASH + "@accession");
+            String referenceSequenceName = domQueryUsingXPath.findInDom(ENTRY_PATH + SLASH + "description");
             ReferenceSequence.Type referenceSequenceType = ReferenceSequence.Type.SEQUENCE;
-            if ((boolean) xpath.evaluate("boolean(/ROOT/entry[keyword='" + TSA + "'])",
-                    document, XPathConstants.BOOLEAN)) {
+            if (domQueryUsingXPath.isExpressionExists(ENTRY_PATH + "[keyword='" + TSA + "']")) {
                 referenceSequenceType = ReferenceSequence.Type.TRANSCRIPTOME_SHOTGUN_ASSEMBLY;
             }
             ReferenceSequence referenceSequence = new ReferenceSequence(referenceSequenceName, null, Arrays.asList
                     (referenceSequenceAccession), referenceSequenceType);
-            String taxonomyName = (String) xpath.evaluate("/ROOT/entry/feature/taxon/@scientificName", document,
-                    XPathConstants.STRING);
-            long taxonomyId = Long.parseLong((String) xpath.evaluate("/ROOT/entry/feature/taxon/@taxId", document,
-                    XPathConstants.STRING));
+            String taxonomyName = domQueryUsingXPath.findInDom(ENTRY_PATH + SLASH + "feature/taxon/@scientificName");
+            long taxonomyId = Long.parseLong(domQueryUsingXPath.findInDom(ENTRY_PATH + SLASH +
+                    "feature/taxon/@taxId"));
             Taxonomy taxonomy = new Taxonomy(taxonomyId, taxonomyName);
             referenceSequence.setTaxonomy(taxonomy);
             return referenceSequence;

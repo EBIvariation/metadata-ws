@@ -19,6 +19,7 @@ package uk.ac.ebi.ampt2d.metadata.importer.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
 
 import java.util.Arrays;
@@ -27,20 +28,32 @@ public class ReferenceSequenceConverter implements Converter<AssemblyType, Refer
 
     @Override
     public ReferenceSequence convert(AssemblyType assemblyType) {
-        String refName = assemblyType.getNAME();
-        String patch = null;
-        // Attempt to extract patch from refName (only for GRC human or mouse assembly names)
-        if (refName != null && refName.matches("^GRC[hm]\\d+\\.p\\d+$")) {
-            String[] refNameSplit = assemblyType.getNAME().split("\\.", 2);
-            refName = refNameSplit[0];
-            patch = refNameSplit[1];
-        }
-        return new ReferenceSequence(
-                refName,
+        StringBuilder refName = new StringBuilder(assemblyType.getNAME());
+        String patch = getPatch(refName);
+        ReferenceSequence referenceSequence = new ReferenceSequence(
+                refName.toString(),
                 patch,
                 Arrays.asList(assemblyType.getAccession()),
                 ReferenceSequence.Type.GENOME_ASSEMBLY
         );
+        referenceSequence.setTaxonomy(extractTaxonomyFromAssembly(assemblyType));
+        return referenceSequence;
     }
 
+    public static String getPatch(StringBuilder refName) {
+        String refNameStr = refName.toString();
+        String patch = null;
+        // Attempt to extract patch from refName (only for GRC human or mouse assembly names)
+        if (refNameStr != null && refNameStr.matches("^GRC[hm]\\d+\\.p\\d+$")) {
+            String[] refNameSplit = refNameStr.split("\\.", 2);
+            refName.replace(refName.indexOf("."), refName.length(), "");
+            patch = refNameSplit[1];
+        }
+        return patch;
+    }
+
+    private Taxonomy extractTaxonomyFromAssembly(AssemblyType assemblyType) {
+        AssemblyType.TAXON taxon = assemblyType.getTAXON();
+        return new Taxonomy(taxon.getTAXONID(), taxon.getSCIENTIFICNAME());
+    }
 }

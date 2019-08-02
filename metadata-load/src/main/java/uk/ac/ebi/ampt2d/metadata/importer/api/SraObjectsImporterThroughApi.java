@@ -23,6 +23,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
@@ -48,11 +49,13 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
 
     public SraObjectsImporterThroughApi(
             SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
+            AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
             SraXmlParser<AssemblyType> sraAssemblyXmlParser,
             SraXmlParser<ReferenceSequence> sraEntryXmlParser,
+            EntrezAssemblyXmlParser entrezAssemblyXmlParser,
             SraXmlParser<SampleType> sraSampleXmlParser,
 
             Converter<StudyType, Study> studyConverter,
@@ -73,11 +76,13 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
                 // For API import, default and "force API" retrievers are the same
                 sraXmlRetrieverThroughApi,
                 sraXmlRetrieverThroughApi,
+                assemblyXmlRetrieverThroughEntrezApi,
 
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,
                 sraAssemblyXmlParser,
                 sraEntryXmlParser,
+                entrezAssemblyXmlParser,
                 sraSampleXmlParser,
 
                 studyConverter,

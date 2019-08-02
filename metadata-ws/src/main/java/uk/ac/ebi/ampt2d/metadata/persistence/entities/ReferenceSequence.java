@@ -138,4 +138,19 @@ public class ReferenceSequence extends Auditable<Long> {
         return null;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPatch(String patch) {
+        this.patch = patch;
+    }
+
+    public void setAccessions(List<String> accessions) {
+        this.accessions = accessions;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
 }
