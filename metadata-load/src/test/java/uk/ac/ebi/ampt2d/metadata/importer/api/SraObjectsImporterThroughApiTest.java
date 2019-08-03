@@ -130,7 +130,7 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals("ERZ000001", analysis.getAccessionVersionId().getAccession());
         assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
         assertEquals(2, analysis.getFiles().size());
-//        assertEquals(0, analysis.getReferenceSequences().size());
+        assertEquals(0, analysis.getReferenceSequences().size());
     }
 
     @Test
