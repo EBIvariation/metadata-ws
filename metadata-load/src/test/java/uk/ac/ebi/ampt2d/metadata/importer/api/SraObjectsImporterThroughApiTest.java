@@ -91,7 +91,7 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals(LocalDate.of(2018, 9, 28), study.getReleaseDate());
         assertEquals("Genetic diversity at LPL gene in river buffalo", study.getName());
 
-        //The analysis of the study does not contain a ReferenceSequence so it isn't imported.
+        // The analysis in the study is not imported because it is not linked to a ReferenceSequence
         assertNull(study.getAnalyses());
 
         // Below two studies doesn't have analysis associated with it
