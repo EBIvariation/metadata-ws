@@ -318,7 +318,7 @@ Feature: analysis object
     When I create an analysis with STUDY for study and REFERENCE_SEQUENCE_1,REFERENCE_SEQUENCE_2 for reference sequence
     Then the response code should be 4xx
     And the response should contain field exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException
-    And the response should contain field message with value Invalid type of reference sequences. When multiple reference sequences are associated with an analysis all of them should point to same Taxonomy
+    And the response should contain field message with value Invalid type of reference sequences. When multiple reference sequences are associated with an analysis all of them should point to the same taxonomy
 
     Examples:
       | test_reference_sequence_1_json                                                                                                                   | test_reference_sequence_2_json                                                                                                                     |
