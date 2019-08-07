@@ -42,6 +42,15 @@ public class AnalysisEventHandler {
         validateReferenceSequenceLink(analysis);
     }
 
+    /**
+     * Checks that an analysis is linked to at least one reference sequence, and that all of them are linked to the
+     * same taxonomy.
+     *
+     * @throws AnalysisWithoutReferenceSequenceException
+     *         If no sequences are linked to the analysis
+     * @throws InvalidReferenceSequenceException
+     *         If one of the sequences is null, or they are linked to multiple taxonomies
+     */
     public static void validateReferenceSequenceLink(Analysis analysis) {
         if (analysis.getReferenceSequences() == null || analysis.getReferenceSequences().size() == 0) {
             throw new AnalysisWithoutReferenceSequenceException();
