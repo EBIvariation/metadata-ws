@@ -69,19 +69,18 @@ public class MetadataImporterMainApplicationDBTest {
         // Two of the analysis hasn't got a proper ReferenceSequence so they are not imported
         assertEquals(1, analysisRepository.count());
 
-        //TODO Analysis is not imported but dependent study being imported.Need a fix.
-        assertEquals(3, studyRepository.count());
+        assertEquals(1, studyRepository.count());
         assertEquals(13, referenceSequenceRepository.count());
-        assertEquals(3, sampleRepository.count());
+        assertEquals(1, sampleRepository.count());
 
         sraObjectsImporterThroughDatabase.getAccessionsToStudy().clear();
 
         // Import additional analyses into already imported study
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
                 new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessionsSharedStudyPreviousImport.txt"}));
-        assertEquals(3, studyRepository.count());
+        assertEquals(1, studyRepository.count());
         assertEquals(3, analysisRepository.count());
-        assertEquals(5, sampleRepository.count());
+        assertEquals(3, sampleRepository.count());
     }
 
 }

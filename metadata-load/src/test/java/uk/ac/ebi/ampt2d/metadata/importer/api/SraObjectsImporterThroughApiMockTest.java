@@ -64,12 +64,8 @@ public class SraObjectsImporterThroughApiMockTest {
         assertEquals(Analysis.Technology.EXOME_SEQUENCING, analysis.getTechnology());
         assertEquals(2, analysis.getFiles().size());
         List<ReferenceSequence> referenceSequences = analysis.getReferenceSequences();
-        assertEquals(2, referenceSequences.size());
+        assertEquals(1, referenceSequences.size());
         ReferenceSequence referenceSequence = referenceSequences.get(0);
-        assertEquals("GCA_000002305.1", referenceSequence.getAccessions().get(0));
-        assertEquals("EquCab2.0", referenceSequence.getName());
-        assertEquals(ReferenceSequence.Type.GENOME_ASSEMBLY, referenceSequence.getType());
-        referenceSequence = referenceSequences.get(1);
         assertEquals("GBRU01000000", referenceSequence.getAccessions().get(0));
         assertEquals("Petunia axillaris, TSA project GBRU01000000 data", referenceSequence.getName());
         assertEquals(ReferenceSequence.Type.TRANSCRIPTOME_SHOTGUN_ASSEMBLY, referenceSequence.getType());

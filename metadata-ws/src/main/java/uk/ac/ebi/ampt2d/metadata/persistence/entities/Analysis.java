@@ -109,7 +109,7 @@ public class Analysis extends Auditable<Long> {
     private Study study;
 
     @ApiModelProperty(position = 6, dataType = "java.lang.String", example = "[url1, url2]",
-            notes = "URL(s) to the reference sequence(s): either a single URL to an assembly/transcriptome, or a comma-separated list of gene sequences")
+            notes = "URL(s) to the reference sequence(s)")
     @JsonProperty
     @ManyToMany
     private List<ReferenceSequence> referenceSequences;

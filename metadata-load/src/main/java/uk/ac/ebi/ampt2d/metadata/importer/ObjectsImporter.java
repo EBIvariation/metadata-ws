@@ -31,6 +31,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
+import uk.ac.ebi.ampt2d.metadata.persistence.events.AnalysisEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
@@ -184,12 +185,13 @@ public abstract class ObjectsImporter {
             String xml = sraXmlRetrieverByAccession.getXml(accession);
             AnalysisType analysisType = sraAnalysisXmlParser.parseXml(xml, accession);
             analysis = analysisConverter.convert(analysisType);
-            analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
             List<ReferenceSequence> referenceSequences = new ArrayList<>();
             for (String referenceSequenceAccession : getReferenceSequenceAccessions(analysisType)) {
                 referenceSequences.add(importReferenceSequence(referenceSequenceAccession));
             }
             analysis.setReferenceSequences(referenceSequences);
+            AnalysisEventHandler.validateReferenceSequenceLink(analysis);
+            analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
             List<Sample> samples = new ArrayList<>();
             for (String sampleAccession : getSampleAccessions(analysisType)) {
                 samples.add(importSample(sampleAccession));
@@ -197,6 +199,7 @@ public abstract class ObjectsImporter {
             analysis.setSamples(samples);
             analysis = extractStudyFromAnalysis(analysisType, analysis);
         } catch (Exception exception) {
+            analysis = null;
             IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Analysis accession " + accession);
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
         }
