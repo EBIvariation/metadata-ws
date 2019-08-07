@@ -134,7 +134,6 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     protected Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis) {
         Study study = importStudyFromAnalysis(analysisType.getSTUDYREF().getAccession());
         analysis.setStudy(study);
-        AnalysisEventHandler.validateReferenceSequenceLink(analysis);
         return analysisRepository.save(analysis);
     }
 

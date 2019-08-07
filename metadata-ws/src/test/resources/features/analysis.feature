@@ -244,7 +244,7 @@ Feature: analysis object
     And the href of the referenceSequence of reference-sequences has items REFERENCE_SEQUENCE_1,REFERENCE_SEQUENCE_2
 
 
-  Scenario Outline: register an analysis with multiple non-gene reference sequences should fail
+  Scenario Outline: register an analysis with multiple reference sequences should not fail
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
