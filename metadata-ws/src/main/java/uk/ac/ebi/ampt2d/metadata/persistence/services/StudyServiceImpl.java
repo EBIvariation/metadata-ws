@@ -22,7 +22,9 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -36,6 +38,9 @@ public class StudyServiceImpl implements StudyService {
 
     @Autowired
     private StudyRepository studyRepository;
+
+    @Autowired
+    private TaxonomyRepository taxonomyRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -94,19 +99,22 @@ public class StudyServiceImpl implements StudyService {
     @Override
     public List<Study> findStudiesByTaxonomyId(long id) {
         QStudy study = QStudy.study;
-        Predicate predicate = study.taxonomy.taxonomyId.eq(id).
-                or(study.taxonomy.ancestors.any().taxonomyId.eq(id));
-
-        return findStudiesByPredicate(predicate);
+        List<Taxonomy> taxonomyList = taxonomyRepository.findAllTaxonomyTreeByParentTaxonomyId(id);
+        return getStudies(taxonomyList);
     }
 
     @Override
     public List<Study> findStudiesByTaxonomyName(String name) {
         QStudy study = QStudy.study;
-        Predicate predicate = study.taxonomy.name.equalsIgnoreCase(name).
-                or(study.taxonomy.ancestors.any().name.equalsIgnoreCase(name));
+        List<Taxonomy> taxonomyList = taxonomyRepository.findAllTaxonomyTreeByParentTaxonomyName(name);
+        return getStudies(taxonomyList);
+    }
 
-        return findStudiesByPredicate(predicate);
+    public List<Study> getStudies(List<Taxonomy> taxonomyList) {
+        QStudy qStudy = QStudy.study;
+        Predicate predicate = qStudy.taxonomy.taxonomyId.in(taxonomyList.parallelStream().map(taxonomy ->
+                taxonomy.getTaxonomyId()).toArray(Long[]::new));
+        return (List<Study>) studyRepository.findAll(predicate);
     }
 
     @Override

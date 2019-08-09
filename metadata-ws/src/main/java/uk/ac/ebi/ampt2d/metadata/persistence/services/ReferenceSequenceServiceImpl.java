@@ -21,7 +21,9 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 
 import java.util.List;
 
@@ -30,25 +32,25 @@ public class ReferenceSequenceServiceImpl implements ReferenceSequenceService {
     @Autowired
     private ReferenceSequenceRepository referenceSequenceRepository;
 
+    @Autowired
+    private TaxonomyRepository taxonomyRepository;
+
     @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyId(long id) {
-        QReferenceSequence referenceSequence = QReferenceSequence.referenceSequence;
-        Predicate predicate = referenceSequence.taxonomy.taxonomyId.eq(id).
-                or(referenceSequence.taxonomy.ancestors.any().taxonomyId.eq(id));
-
-        return findReferenceSequencesByPredicate(predicate);
+        List<Taxonomy> taxonomyList = taxonomyRepository.findAllTaxonomyTreeByParentTaxonomyId(id);
+        return getReferenceSequences(taxonomyList);
     }
 
     @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyName(String name) {
-        QReferenceSequence referenceSequence = QReferenceSequence.referenceSequence;
-        Predicate predicate = referenceSequence.taxonomy.name.equalsIgnoreCase(name).
-                or(referenceSequence.taxonomy.ancestors.any().name.equalsIgnoreCase(name));
-
-        return findReferenceSequencesByPredicate(predicate);
+        List<Taxonomy> taxonomyList = taxonomyRepository.findAllTaxonomyTreeByParentTaxonomyName(name);
+        return getReferenceSequences(taxonomyList);
     }
 
-    private List<ReferenceSequence> findReferenceSequencesByPredicate(Predicate predicate) {
+    public List<ReferenceSequence> getReferenceSequences(List<Taxonomy> taxonomyList) {
+        QReferenceSequence referenceSequence = QReferenceSequence.referenceSequence;
+        Predicate predicate = referenceSequence.taxonomy.taxonomyId.in(taxonomyList.parallelStream().map(taxonomy ->
+                taxonomy.getTaxonomyId()).toArray(Long[]::new));
         return (List<ReferenceSequence>) referenceSequenceRepository.findAll(predicate);
     }
 

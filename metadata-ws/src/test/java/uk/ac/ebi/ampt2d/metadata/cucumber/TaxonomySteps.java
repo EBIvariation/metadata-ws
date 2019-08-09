@@ -23,9 +23,6 @@ import cucumber.api.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
-
-import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -44,13 +41,13 @@ public class TaxonomySteps {
                 .andExpect(jsonPath("$..taxonomies.length()").value(0));
     }
 
-    @When("^I request POST taxonomies with (\\d*) for ID, (.*) for name and (.*) for ancestors")
-    public void performPostOnTaxonomies(long id, String name, String ancestorKeys) throws Exception {
-        List<String> newUrls = CommonStates.getUrls(ancestorKeys);
+    @When("^I request POST taxonomies with (\\d*) for ID, (.*) for name and (.*) for parent")
+    public void performPostOnTaxonomies(long id, String name, String parentKey) throws Exception {
+        String newUrl = CommonStates.getUrl(parentKey);
         String jsonContent = "{ " +
                 "\"taxonomyId\": " + id + "," +
                 "\"name\": \"" + name + "\"," +
-                "\"ancestors\": " + objectMapper.writeValueAsString(newUrls) + "" +
+                "\"parent\": " + objectMapper.writeValueAsString(newUrl) + "" +
                 "}";
 
         CommonStates.setResultActions(mockMvc.perform(post("/taxonomies")

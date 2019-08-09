@@ -3,7 +3,7 @@ Feature: study object
   Scenario: register a study successfully and check its fields
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create a taxonomy
-    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and NONE for ancestors
+    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and NONE for parent
     Then set the URL to TAXONOMY
     # Create a reference sequence
     When I request POST /reference-sequences with JSON-like payload:
@@ -33,15 +33,15 @@ Feature: study object
   Scenario Outline: search various study by taxonomy name and id
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create taxonomies
-    When I request POST taxonomies with 207598 for ID, Homininae for name and NONE for ancestors
+    When I request POST taxonomies with 207598 for ID, Homininae for name and NONE for parent
     Then set the URL to TAXONOMY_1
-    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for ancestors
+    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for parent
     Then set the URL to TAXONOMY_2
-    When I request POST taxonomies with 9596 for ID, Pan for name and TAXONOMY_1 for ancestors
+    When I request POST taxonomies with 9596 for ID, Pan for name and TAXONOMY_1 for parent
     Then set the URL to TAXONOMY_3
-    When I request POST taxonomies with 9597 for ID, Pan paniscus for name and TAXONOMY_1,TAXONOMY_3 for ancestors
+    When I request POST taxonomies with 9597 for ID, Pan paniscus for name and TAXONOMY_3 for parent
     Then set the URL to TAXONOMY_4
-    When I request POST taxonomies with 9598 for ID, Pan troglodytes for name and TAXONOMY_1,TAXONOMY_3 for ancestors
+    When I request POST taxonomies with 9598 for ID, Pan troglodytes for name and TAXONOMY_3 for parent
     Then set the URL to TAXONOMY_5
 
     # Create reference sequences

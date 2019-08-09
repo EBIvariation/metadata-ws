@@ -283,7 +283,7 @@ Feature: reference sequence
     And the response should contain error message A reference sequence must have one valid URL to taxonomy
     Then the response code should be 4xx
 
-    Scenario: register a reference sequence with invalid taxonomy and fail
+  Scenario: register a reference sequence with invalid taxonomy and fail
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /reference-sequences with JSON payload:
     """
@@ -326,18 +326,17 @@ Feature: reference sequence
     And the response should contain error message A reference sequence must have one valid URL to taxonomy
     Then the response code should be 4xx
 
-
   Scenario Outline: search various reference sequences by taxonomy name and id
     Given I set authorization with testoperator having SERVICE_OPERATOR role
-    When I request POST taxonomies with 207598 for ID, Homininae for name and NONE for ancestors
+    When I request POST taxonomies with 207598 for ID, Homininae for name and NONE for parent
     Then set the URL to TAXONOMY_1
-    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for ancestors
+    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for parent
     Then set the URL to TAXONOMY_2
-    When I request POST taxonomies with 9596 for ID, Pan for name and TAXONOMY_1 for ancestors
+    When I request POST taxonomies with 9596 for ID, Pan for name and TAXONOMY_1 for parent
     Then set the URL to TAXONOMY_3
-    When I request POST taxonomies with 9597 for ID, Pan paniscus for name and TAXONOMY_1,TAXONOMY_3 for ancestors
+    When I request POST taxonomies with 9597 for ID, Pan paniscus for name and TAXONOMY_3 for parent
     Then set the URL to TAXONOMY_4
-    When I request POST taxonomies with 9598 for ID, Pan troglodytes for name and TAXONOMY_1,TAXONOMY_3 for ancestors
+    When I request POST taxonomies with 9598 for ID, Pan troglodytes for name and TAXONOMY_3 for parent
     Then set the URL to TAXONOMY_5
 
     When I request POST /reference-sequences with JSON-like payload:

@@ -17,25 +17,28 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @SequenceGenerator(allocationSize = 1, name = "TAXONOMY_SEQ", sequenceName = "taxonomy_sequence")
-public class Taxonomy extends Auditable<Long> {
+public class Taxonomy extends Auditable<Long> implements Serializable {
 
     @ApiModelProperty(position = 1, value = "Taxonomy auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -54,11 +57,14 @@ public class Taxonomy extends Auditable<Long> {
     @NotNull
     @JsonProperty
     @Size(max = 255, min = 1)
+    @Column(unique = true)
     private String name;
 
-    @ManyToMany
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonProperty
-    private List<Taxonomy> ancestors;
+    @ApiModelProperty(position = 4, dataType = "java.lang.String", notes = "Url to a Study")
+    @JoinColumn(name = "parent_id", referencedColumnName = "taxonomyId")
+    private Taxonomy parent;
 
     public Taxonomy() {
     }
@@ -84,8 +90,16 @@ public class Taxonomy extends Auditable<Long> {
      * Release date control: taxonomies are always public.
      */
     @Override
+    @JsonIgnore
     public LocalDate getReleaseDate() {
         return null;
     }
 
+    public Taxonomy getParent() {
+        return parent;
+    }
+
+    public void setParent(Taxonomy parent) {
+        this.parent = parent;
+    }
 }
