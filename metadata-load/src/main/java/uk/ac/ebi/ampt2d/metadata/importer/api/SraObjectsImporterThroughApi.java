@@ -43,9 +43,13 @@ import uk.ac.ebi.ena.sra.xml.XRefType;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class SraObjectsImporterThroughApi extends ObjectsImporter {
+
+    private static final Logger IMPORT_LOGGER = Logger.getLogger(SraObjectsImporterThroughApi.class.getName());
 
     public SraObjectsImporterThroughApi(
             SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
@@ -107,8 +111,13 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
         studyRepository.save(study);
         for (String analysisAccession : getAnalysisAccessions(studyType)) {
             Analysis analysis = importAnalysis(analysisAccession);
-            analysis.setStudy(study);
-            analysisRepository.save(analysis);
+            try {
+                analysis.setStudy(study);
+                analysisRepository.save(analysis);
+            } catch (Exception exception) {
+                IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for accession " + analysisAccession);
+                IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+            }
         }
         return study;
     }

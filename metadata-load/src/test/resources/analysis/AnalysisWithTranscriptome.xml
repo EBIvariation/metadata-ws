@@ -15,9 +15,6 @@
         </STUDY_REF>
         <ANALYSIS_TYPE>
             <SEQUENCE_VARIATION>
-                <ASSEMBLY>
-                    <STANDARD accession="GCA_000002305.1"/>
-                </ASSEMBLY>
                 <SEQUENCE accession="GBRU01" label="11"/>
                 <EXPERIMENT_TYPE>Exome sequencing</EXPERIMENT_TYPE>
                 <PROGRAM>Vector NTI Advance 10.3</PROGRAM>

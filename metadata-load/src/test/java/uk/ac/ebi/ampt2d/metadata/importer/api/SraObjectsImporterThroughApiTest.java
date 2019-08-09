@@ -44,6 +44,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=API"})
@@ -76,12 +77,22 @@ public class SraObjectsImporterThroughApiTest {
 
     @Test
     public void importStudy() throws Exception {
-        // This study contains two analyses and one reference sequence
+        // This study contains two analyses with referenceSequences
         Study study = sraObjectImporter.importStudy("ERP006576");
         assertNotNull(study);
         assertEquals("ERP006576", study.getAccessionVersionId().getAccession());
         assertEquals(LocalDate.of(2014, 8, 4), study.getReleaseDate());
         assertEquals("Sanger Institute Mouse Genomes Project v3", study.getName());
+        assertEquals(2, study.getAnalyses().size());
+
+        study = sraObjectImporter.importStudy("ERP111092");
+        assertNotNull(study);
+        assertEquals("ERP111092", study.getAccessionVersionId().getAccession());
+        assertEquals(LocalDate.of(2018, 9, 28), study.getReleaseDate());
+        assertEquals("Genetic diversity at LPL gene in river buffalo", study.getName());
+
+        // The analysis in the study is not imported because it is not linked to a ReferenceSequence
+        assertNull(study.getAnalyses());
 
         // Below two studies doesn't have analysis associated with it
         study = sraObjectImporter.importStudy("SRP000392");
@@ -98,7 +109,7 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals("Reference genome for the Human Microbiome Project", study.getName());
         assertEquals(1, study.getResources().size());
 
-        assertEquals(3, studyRepository.count());
+        assertEquals(4, studyRepository.count());
         assertEquals(2, analysisRepository.count());
         assertEquals(21, referenceSequenceRepository.count());
         assertEquals(25, sampleRepository.count());
@@ -127,10 +138,7 @@ public class SraObjectsImporterThroughApiTest {
     @Test
     public void importAnalysisObjectWithoutReferenceSequence() throws Exception {
         Analysis analysis = sraObjectImporter.importAnalysis("ERZ000001");
-        assertEquals("ERZ000001", analysis.getAccessionVersionId().getAccession());
-        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
-        assertEquals(2, analysis.getFiles().size());
-        assertEquals(0, analysis.getReferenceSequences().size());
+        assertNull(analysis);
     }
 
     @Test
@@ -164,7 +172,7 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals("GRCh38", referenceSequence.getName());
         assertEquals("p13", referenceSequence.getPatch());
         assertEquals(ReferenceSequence.Type.GENOME_ASSEMBLY, referenceSequence.getType());
-        Taxonomy  taxonomy = referenceSequence.getTaxonomy();
+        Taxonomy taxonomy = referenceSequence.getTaxonomy();
         assertEquals(9606, taxonomy.getTaxonomyId());
         assertEquals("Homo sapiens", taxonomy.getName());
         assertEquals(1, referenceSequenceRepository.count());

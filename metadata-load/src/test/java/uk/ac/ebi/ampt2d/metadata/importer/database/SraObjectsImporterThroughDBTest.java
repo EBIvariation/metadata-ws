@@ -41,7 +41,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
 
 @RunWith(SpringRunner.class)
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=DB"})
@@ -126,14 +126,10 @@ public class SraObjectsImporterThroughDBTest {
     @Category(OracleDbCategory.class)
     public void importAnalysisObjectWithEmptyReferenceSequenceAccession() throws Exception {
         Analysis analysis = sraObjectImporter.importAnalysis("ERZ000011");
-        assertNotNull(analysis);
-        assertEquals("ERZ000011", analysis.getAccessionVersionId().getAccession());
-        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
-        assertEquals(1, analysis.getFiles().size());
-        assertEquals("ERP000860", analysis.getStudy().getAccessionVersionId().getAccession());
-        assertTrue(analysis.getReferenceSequences().isEmpty());
-        assertEquals(1, studyRepository.count());
-        assertEquals(1, analysisRepository.count());
+        assertNull(analysis);
+
+        // Analysis is not saved to database as it doesn't have a referenceSequence.
+        assertEquals(0, analysisRepository.count());
         assertEquals(0, referenceSequenceRepository.count());
     }
 
