@@ -76,7 +76,18 @@ public class MetadataImporterMainApplicationDBTest {
         assertEquals(2, studyRepository.count());
         assertEquals(2, referenceSequenceRepository.count());
         assertEquals(2, sampleRepository.count());
-        assertEquals(1, taxonomyRepository.count());
+
+        /*
+         *  Two taxonomies are imported one for referenceSequence and one for sample
+         *  4081 (Solanum pennellii) and 28526(Solanum lycopersicum) both share the same parent but does not have a
+         *   Class.
+         *
+         *  4069(Solanales) - order
+         *      4107(Solanum) - genus
+         *          4081 (Solanum pennellii) and 28526(Solanum lycopersicum)
+         */
+
+        assertEquals(4, taxonomyRepository.count());
 
         sraObjectsImporterThroughDatabase.getAccessionsToStudy().clear();
 

@@ -88,6 +88,10 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
     public Taxonomy() {
     }
 
+    public Taxonomy(long taxonomyId) {
+        this.taxonomyId = taxonomyId;
+    }
+
     public Taxonomy(long taxonomyId, String name, String rank) {
         this.taxonomyId = taxonomyId;
         this.name = name;

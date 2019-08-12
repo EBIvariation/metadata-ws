@@ -138,7 +138,7 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals(1, studyRepository.count());
         assertEquals(1, analysisRepository.count());
         assertEquals(25, referenceSequenceRepository.count());
-        assertEquals(1, taxonomyRepository.count());
+        assertEquals(4, taxonomyRepository.count());
 
     }
 

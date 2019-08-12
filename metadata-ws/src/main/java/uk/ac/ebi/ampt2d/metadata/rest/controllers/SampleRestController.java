@@ -54,7 +54,7 @@ public class SampleRestController implements ResourceProcessor<RepositoryLinksRe
     @ApiOperation(value = "Get a filtered list of samples based on taxonomy name/id")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "taxonomies.name", value = "Sample's taxonomy name", dataType = "string",
-                    paramType = "query", example = "Homo Sapiens"),
+                    paramType = "query", example = "Homo sapiens"),
             @ApiImplicitParam(name = "taxonomies.id", value = "Sample's taxonomy id", dataType = "long",
                     paramType = "query", example = "9606")
     })

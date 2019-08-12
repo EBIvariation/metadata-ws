@@ -6,7 +6,7 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens",
+      "name": "Homo sapiens",
       "rank": "SPECIES"
     }
     """
@@ -51,7 +51,7 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens",
+      "name": "Homo sapiens",
       "rank": "SPECIES"
     }
     """
@@ -91,7 +91,7 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens",
+      "name": "Homo sapiens",
       "rank": "SPECIES"
     }
     """
@@ -165,7 +165,7 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens",
+      "name": "Homo sapiens",
       "rank": "SPECIES"
     }
     """
@@ -226,7 +226,7 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens",
+      "name": "Homo sapiens",
       "rank": "SPECIES"
     }
     """
@@ -294,7 +294,7 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens",
+      "name": "Homo sapiens",
       "rank": "SPECIES"
     }
     """
@@ -349,7 +349,7 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens",
+      "name": "Homo sapiens",
       "rank": "SPECIES"
     }
     """
