@@ -150,4 +150,9 @@ public class ReferenceSequence extends Auditable<Long> {
     public void setType(Type type) {
         this.type = type;
     }
+
+    @Override
+    public String getStudyIds() {
+        return null;
+    }
 }

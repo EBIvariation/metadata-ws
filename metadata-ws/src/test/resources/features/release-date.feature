@@ -118,12 +118,13 @@ Feature: Transitive release date control for child objects of a Study
 
     # Set release dates for studies according to the scenario
     When I request PATCH STUDY1 with patch and day <S1_RELEASE>
-    Then the response code should be 200
+    Then the response code should be 2xx
     When I request PATCH STUDY2 with patch and day <S2_RELEASE>
-    Then the response code should be 200
+    Then the response code should be 2xx
 
     # Check availability of entities according to the scenario
-    When I request GET with value of ANALYSIS1
+    When I set authorization with testuser having default role
+    And I request GET with value of ANALYSIS1
     Then the response code should be <A1>
     When I request GET with value of ANALYSIS2
     Then the response code should be <A2>
@@ -156,7 +157,6 @@ Feature: Transitive release date control for child objects of a Study
       | today      | tomorrow   | 2xx | 4xx | 2xx | 4xx | 2xx | 2xx | 4xx |
       | tomorrow   | tomorrow   | 4xx | 4xx | 4xx | 4xx | 4xx | 4xx | 4xx |
 
-
   Scenario Outline: patching Study between released and unreleased states must work both ways
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create the study
@@ -167,13 +167,16 @@ Feature: Transitive release date control for child objects of a Study
     # Set original release date & check availability
     When I request PATCH STUDY with patch and day <DATE1>
     Then the response code should be 2xx
-    When I request GET with value of STUDY
+    When I set authorization with testuser having default role
+    And I request GET with value of STUDY
     Then the response code should be <CODE1>
 
     # Set new release date & check availability
+    When I set authorization with testoperator having SERVICE_OPERATOR role
     When I request PATCH STUDY with patch and day <DATE2>
     Then the response code should be 2xx
-    When I request GET with value of STUDY
+    When I set authorization with testuser having default role
+    And I request GET with value of STUDY
     Then the response code should be <CODE2>
 
     Examples:
@@ -184,3 +187,110 @@ Feature: Transitive release date control for child objects of a Study
       | tomorrow  | 4xx   | null      | 2xx   |
       | tomorrow  | 4xx   | yesterday | 2xx   |
       | tomorrow  | 4xx   | today     | 2xx   |
+
+  Scenario: Dependent objects to unreleased study should be accessible if provided access
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I request POST taxonomy with 9606 for ID
+    And set the URL to TAXONOMY
+    Then the response code should be 201
+
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+          "name": "GRCh37",
+          "patch": "p2",
+          "accession": "GCA_000001407.3",
+          "type": "GENOME_ASSEMBLY",
+          "taxonomy": "TAXONOMY"
+    """
+    And set the URL to REFERENCE_SEQUENCE
+    Then the response code should be 201
+
+    When I create a study with unreleasedStudy for accession
+    And set the URL to STUDY
+    Then the response code should be 201
+
+    When I create a study with unreleasedStudy1 for accession
+    And set the URL to STUDY1
+    Then the response code should be 201
+
+    When I create an analysis with Analysis for accession, REFERENCE_SEQUENCE for reference sequence and STUDY for study
+    And set the URL to ANALYSIS
+    Then the response code should be 201
+
+    When I request POST /files with JSON payload:
+    """
+    {
+      "accessionVersionId": {
+        "accession": "File",
+        "version": 1
+        },
+      "hash": "Hash3",
+      "name": "File3",
+      "size": 100,
+      "type": "TSV"
+    }
+    """
+    And set the URL to FILE
+    Then the response code should be 201
+
+    When I request PATCH ANALYSIS with list FILE of files
+    Then the response code should be 2xx
+
+    When I request POST /publications with JSON payload:
+    """
+    {
+      "publicationId": "publication1"
+    }
+    """
+    Then set the URL to PUBLICATION
+    And the response code should be 201
+    When I request PATCH STUDY with list PUBLICATION of publications
+    Then the response code should be 2xx
+
+    When I request POST /webResources with JSON payload:
+    """
+    {
+      "type": "CENTER_WEB",
+      "resourceUrl": "http://test-release-date.example.com"
+    }
+    """
+    And set the URL to WEBRESOURCE
+    Then the response code should be 201
+
+    When I request POST /webResources with JSON payload:
+    """
+    {
+      "type": "CENTER_WEB1",
+      "resourceUrl": "http://test-release-date1.example.com"
+    }
+    """
+    And set the URL to WEBRESOURCE1
+    Then the response code should be 201
+
+    When I request PATCH STUDY with list WEBRESOURCE of resources
+    Then the response code should be 2xx
+    When I request PATCH STUDY1 with list WEBRESOURCE of resources
+    Then the response code should be 2xx
+    When I request PATCH STUDY1 with list WEBRESOURCE1 of resources
+    Then the response code should be 2xx
+
+    When I request PATCH STUDY with patch and day tomorrow
+    Then the response code should be 2xx
+    When I request PATCH STUDY1 with patch and day tomorrow
+    Then the response code should be 2xx
+
+    When I set authorization with testuser having default role
+    And I request GET with value of STUDY
+    Then the response code should be 200
+    And I request GET with value of STUDY1
+    Then the response code should be 4xx
+    And I request GET with value of ANALYSIS
+    Then the response code should be 200
+    When I request GET with value of FILE
+    Then the response code should be 200
+    When I request GET with value of PUBLICATION
+    Then the response code should be 200
+    When I request GET with value of WEBRESOURCE
+    Then the response code should be 200
+    When I request GET with value of WEBRESOURCE1
+    Then the response code should be 4xx

@@ -69,6 +69,7 @@ public class AuthorizationServerHelper extends AuthorizationServerConfigurerAdap
     @Override
     public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {
         Map<String, Object> testuserMap = getClientInfo("testuser", "DEFAULT");
+        testuserMap.put("studies","unreleasedStudy.1");
         Map<String, Object> testoperatorMap = getClientInfo("testoperator", EnableSecurityConfig.ROLE_SERVICE_OPERATOR);
         clients.inMemory()
                 .withClient("testoperator")

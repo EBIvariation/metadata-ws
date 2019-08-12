@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -69,7 +70,30 @@ public class Sample extends Auditable<Long> {
     @Size(min = 1)
     private List<Taxonomy> taxonomies;
 
-    public Sample() {}
+    /**
+     * Release date control: get the *earliest* release date from all studies which link to this sample.
+     */
+    @Formula("(SELECT min(study.release_date) FROM sample " +
+            "INNER JOIN analysis_samples on sample.id = analysis_samples.samples_id " +
+            "INNER JOIN analysis on analysis_samples.analysis_id = analysis.id " +
+            "INNER JOIN study on analysis.study_id = study.id " +
+            "WHERE sample.id=id)")
+    @JsonIgnore
+    private LocalDate releaseDate;
+
+    /**
+     * Get the studyIds.
+     */
+    @Formula("(SELECT string_agg(concat(study.accession,'.',study.version),',') FROM sample " +
+            "INNER JOIN analysis_samples on sample.id = analysis_samples.samples_id " +
+            "INNER JOIN analysis on analysis_samples.analysis_id = analysis.id " +
+            "INNER JOIN study on analysis.study_id = study.id " +
+            "WHERE sample.id=id)")
+    @JsonIgnore
+    private String studyIds;
+
+    public Sample() {
+    }
 
     public Sample(AccessionVersionId accessionVersionId, String name) {
         this.accessionVersionId = accessionVersionId;
@@ -103,19 +127,13 @@ public class Sample extends Auditable<Long> {
         this.taxonomies = taxonomies;
     }
 
-    /**
-     * Release date control: get the *earliest* release date from all studies which link to this sample.
-     */
-    @Formula("(SELECT min(study.release_date) FROM sample " +
-            "INNER JOIN analysis_samples on sample.id = analysis_samples.samples_id " +
-            "INNER JOIN analysis on analysis_samples.analysis_id = analysis.id " +
-            "INNER JOIN study on analysis.study_id = study.id " +
-            "WHERE sample.id=id)")
-    @JsonIgnore
-    private LocalDate releaseDate;
-
     public LocalDate getReleaseDate() {
         return releaseDate;
+    }
+
+    @Override
+    public String getStudyIds() {
+        return studyIds;
     }
 
 }

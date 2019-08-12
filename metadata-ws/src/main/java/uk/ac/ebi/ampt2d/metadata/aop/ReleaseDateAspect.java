@@ -20,10 +20,19 @@ package uk.ac.ebi.ampt2d.metadata.aop;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Auditable;
+import uk.ac.ebi.ampt2d.metadata.security.CustomUsernamePasswordAuthenticationToken;
+import uk.ac.ebi.ampt2d.metadata.security.EnableSecurityConfig;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * An @Aspect for ensuring only published entities are returned through checking an entity's releaseDate field
@@ -33,7 +42,7 @@ public class ReleaseDateAspect {
 
     /**
      * An @Around advice for repositories.*.findAll(..) method execution.
-     *
+     * <p>
      * Check the release field of each entity and return only published entities.
      *
      * @param proceedingJoinPoint
@@ -56,7 +65,7 @@ public class ReleaseDateAspect {
 
     /**
      * An @Around advice for CrudRepository.findOne(..) method execution
-     *
+     * <p>
      * It takes the returned object from join point method execution and checks the returned object. If the returned
      * object is not a Auditable object, return as it is. If the returned object is an Auditable object, check its
      * release date. Return null if the release date is a date in the future.
@@ -72,13 +81,38 @@ public class ReleaseDateAspect {
     }
 
     private Object getObjectUnlessBeforeReleaseDate(Object result) {
-        if (result instanceof Auditable) {
-            LocalDate releaseDate = ((Auditable) result).getReleaseDate();
-            if (releaseDate != null && releaseDate.isAfter(LocalDate.now())) {
-                return null;
-            }
+        if (!(result instanceof Auditable)) {
+            return result;
         }
-        return result;
+
+        LocalDate releaseDate = ((Auditable) result).getReleaseDate();
+        if (releaseDate == null || !releaseDate.isAfter(LocalDate.now())) {
+            return result;
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication instanceof AnonymousAuthenticationToken) {
+            throw new SecurityException("Authentication required");
+        }
+
+        //Allow admins to access before release date
+        if (authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority()
+                        .equals("ROLE_" + EnableSecurityConfig.ROLE_SERVICE_OPERATOR))) {
+            return result;
+        }
+
+        String commaSeperatedPermittedStudiesToTheUsers = ((CustomUsernamePasswordAuthenticationToken)
+                ((OAuth2Authentication) authentication).getUserAuthentication()).getStudies();
+        List<String> permittedStudies = (commaSeperatedPermittedStudiesToTheUsers.isEmpty()) ? new ArrayList<>() : Arrays.asList
+                (commaSeperatedPermittedStudiesToTheUsers.split(","));
+        String studiesAssociatedToEntities = ((Auditable) result).getStudyIds();
+        if (permittedStudies.stream()
+                .anyMatch(permittedStudy -> studiesAssociatedToEntities.contains(permittedStudy))) {
+            return result;
+        }
+        return null;
     }
 
 }

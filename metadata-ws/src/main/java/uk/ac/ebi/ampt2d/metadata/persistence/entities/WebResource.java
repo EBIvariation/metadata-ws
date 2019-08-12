@@ -24,6 +24,7 @@ import org.hibernate.annotations.Formula;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,6 +33,7 @@ import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @SequenceGenerator(initialValue = 1, allocationSize = 1, name = "WEB_RESOURCE_SEQ", sequenceName = "web_resource_sequence")
@@ -60,6 +62,15 @@ public class WebResource extends Auditable<Long> {
     @JsonIgnore
     private LocalDate releaseDate;
 
+    /**
+     * Get the studyIds.
+     */
+    @Formula("(SELECT string_agg(concat(study.accession,'.',study.version),',') FROM study_resources " +
+            "INNER JOIN study on study_resources.study_id = study.id " +
+            "WHERE study_resources.resources_id=id)")
+    @JsonIgnore
+    private String studyIds;
+
     WebResource() {
     }
 
@@ -76,4 +87,8 @@ public class WebResource extends Auditable<Long> {
         return releaseDate;
     }
 
+    @Override
+    public String getStudyIds() {
+        return studyIds;
+    }
 }

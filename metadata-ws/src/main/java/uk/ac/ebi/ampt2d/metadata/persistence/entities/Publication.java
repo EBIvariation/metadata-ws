@@ -23,12 +23,14 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 public class Publication extends Auditable<Long>{
@@ -66,8 +68,21 @@ public class Publication extends Auditable<Long>{
     @JsonIgnore
     private LocalDate releaseDate;
 
+    /**
+     * Get the studyIds.
+     */
+    @Formula("(SELECT string_agg(concat(study.accession,'.',study.version),',') FROM study_publications " +
+            "INNER JOIN study on study_publications.study_id = study.id " +
+            "WHERE study_publications.publications_id=id)")
+    @JsonIgnore
+    private String studyIds;
+
     public LocalDate getReleaseDate() {
         return releaseDate;
     }
 
+    @Override
+    public String getStudyIds() {
+        return studyIds;
+    }
 }

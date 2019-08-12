@@ -178,4 +178,9 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
                 break;
         }
     }
+
+    @Override
+    public String getStudyIds() {
+        return null;
+    }
 }

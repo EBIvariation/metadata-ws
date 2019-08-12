@@ -40,7 +40,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
-@SequenceGenerator(initialValue=1, allocationSize=1 , name="FILE_SEQ", sequenceName="file_sequence")
+@SequenceGenerator(initialValue = 1, allocationSize = 1, name = "FILE_SEQ", sequenceName = "file_sequence")
 public class File extends Auditable<Long> {
 
     public enum Type {
@@ -53,7 +53,7 @@ public class File extends Auditable<Long> {
     @ApiModelProperty(position = 1, value = "File auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="FILE_SEQ")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FILE_SEQ")
     private Long id;
 
     @ApiModelProperty(position = 2)
@@ -86,7 +86,31 @@ public class File extends Auditable<Long> {
     @Column(nullable = false)
     private Type type;
 
-    File() {}
+    /**
+     * Release date control: get the *earliest* release date from all studies which link to this file.
+     */
+    @Formula("(SELECT min(study.release_date) FROM file " +
+            "INNER JOIN analysis_files on file.id = analysis_files.files_id " +
+            "INNER JOIN analysis on analysis_files.analysis_id = analysis.id " +
+            "INNER JOIN study on analysis.study_id = study.id " +
+            "WHERE file.id=id)")
+    @JsonIgnore
+    private LocalDate releaseDate;
+
+    /**
+     * Get the studyIds.
+     */
+
+    @Formula("(SELECT string_agg(concat(study.accession,'.',study.version),',') FROM file " +
+            "INNER JOIN analysis_files on file.id = analysis_files.files_id " +
+            "INNER JOIN analysis on analysis_files.analysis_id = analysis.id " +
+            "INNER JOIN study on analysis.study_id = study.id " +
+            "WHERE file.id=id)")
+    @JsonIgnore
+    private String studyIds;
+
+    File() {
+    }
 
     public File(String hash, String name, String type) {
         this.hash = hash;
@@ -127,19 +151,12 @@ public class File extends Auditable<Long> {
         return type;
     }
 
-    /**
-     * Release date control: get the *earliest* release date from all studies which link to this file.
-     */
-    @Formula("(SELECT min(study.release_date) FROM file " +
-             "INNER JOIN analysis_files on file.id = analysis_files.files_id " +
-             "INNER JOIN analysis on analysis_files.analysis_id = analysis.id " +
-             "INNER JOIN study on analysis.study_id = study.id " +
-             "WHERE file.id=id)")
-    @JsonIgnore
-    private LocalDate releaseDate;
-
     public LocalDate getReleaseDate() {
         return releaseDate;
     }
 
+    @Override
+    public String getStudyIds() {
+        return studyIds;
+    }
 }
