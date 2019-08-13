@@ -62,7 +62,7 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonProperty
-    @ApiModelProperty(position = 4, dataType = "java.lang.String", notes = "Url to a Study")
+    @ApiModelProperty(position = 4, dataType = "java.lang.String", notes = "URL to parent taxonomy")
     @JoinColumn(name = "parent_id", referencedColumnName = "taxonomyId")
     private Taxonomy parent;
 
