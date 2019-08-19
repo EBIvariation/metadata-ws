@@ -31,7 +31,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
-import uk.ac.ebi.ampt2d.metadata.persistence.events.AnalysisEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
@@ -43,6 +42,7 @@ import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -128,6 +128,13 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         Sample sample = super.importSample(accession);
         setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
         return sample;
+    }
+
+    public List<Sample> importSampleList(List<String> accessionList) {
+        setEnaObjectQuery(EnaObjectQuery.SAMPLE_QUERY_LIST);
+        List<Sample> sampleList = super.importSampleList(accessionList);
+        setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
+        return sampleList;
     }
 
     @Override

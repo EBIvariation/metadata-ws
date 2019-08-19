@@ -21,6 +21,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SraXmlRetrieverThroughApi implements SraXmlRetrieverByAccession {
 
     private static final String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
@@ -30,5 +33,14 @@ public class SraXmlRetrieverThroughApi implements SraXmlRetrieverByAccession {
     @Override
     public String getXml(String accession) {
         return restTemplate.exchange(ENA_API_URL, HttpMethod.GET, null, String.class, accession).getBody();
+    }
+
+    @Override
+    public List<String> getXmlList(List<String> accession) {
+        List<String> accessionList = new ArrayList<>();
+        for(String item:accession) {
+            accessionList.add(restTemplate.exchange(ENA_API_URL, HttpMethod.GET, null, String.class, item).getBody());
+        }
+        return accessionList;
     }
 }

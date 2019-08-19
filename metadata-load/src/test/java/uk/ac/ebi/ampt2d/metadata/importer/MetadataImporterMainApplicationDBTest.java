@@ -34,6 +34,9 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepos
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
+import java.time.Duration;
+import java.time.Instant;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
@@ -81,6 +84,35 @@ public class MetadataImporterMainApplicationDBTest {
         assertEquals(1, studyRepository.count());
         assertEquals(3, analysisRepository.count());
         assertEquals(3, sampleRepository.count());
+    }
+
+    //To be removed
+    @Test
+    @Category(OracleDbCategory.class)
+    public void performance() throws Exception {
+
+        for (int index = 0; index < 4; index++) {
+            referenceSequenceRepository.deleteAll();
+            analysisRepository.deleteAll();
+            referenceSequenceRepository.deleteAll();
+            sampleRepository.deleteAll();
+
+            Instant start = Instant.now();
+            metadataImporterMainApplication.run(new DefaultApplicationArguments(
+                    new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessionsPerf.txt"}));
+            Instant finish = Instant.now();
+            System.out.println("-------------Statistics Group------------- " + index);
+            System.out.println("Elapsed time in milli secs: " + Duration.between(start, finish).toMillis());
+            System.out.println("Elapsed time in nano secs: " + Duration.between(start, finish).toNanos());
+
+            if (index == 0) {
+                System.out.println("Total studies: " + studyRepository.count());
+                System.out.println("Total analysis: " + analysisRepository.count());
+                System.out.println("Total ref seq: " + referenceSequenceRepository.count());
+                System.out.println("Total sample: " + sampleRepository.count());
+            }
+        }
+        System.out.println();
     }
 
 }

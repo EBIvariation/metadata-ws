@@ -21,6 +21,7 @@ import org.apache.xmlbeans.XmlException;
 import uk.ac.ebi.ena.sra.xml.ASSEMBLYDocument;
 import uk.ac.ebi.ena.sra.xml.AssemblyType;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,6 +39,11 @@ public class SraAssemblyXmlParser extends SraXmlParser<AssemblyType> {
             LOGGER.log(Level.SEVERE, "An error occurred while parsing XML for accession " + accession);
             throw e;
         }
+    }
+
+    @Override
+    public List<AssemblyType> parseXmlList(List<String> xmlList, List<String> accessionList) throws XmlException {
+        return null;
     }
 
 }
