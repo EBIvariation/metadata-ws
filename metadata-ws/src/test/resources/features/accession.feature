@@ -7,7 +7,7 @@ Feature: accession object
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -47,7 +47,7 @@ Feature: accession object
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -97,7 +97,7 @@ Feature: accession object
     {
       "taxonomyId": 1,
       "name": "Species1",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY1
@@ -106,7 +106,7 @@ Feature: accession object
     {
       "taxonomyId": 2,
       "name": "Species2",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY2
@@ -127,7 +127,7 @@ Feature: accession object
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY

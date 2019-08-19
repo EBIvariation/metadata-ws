@@ -7,7 +7,7 @@ Feature: taxonomy object
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -20,7 +20,7 @@ Feature: taxonomy object
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     When I request GET /taxonomies
@@ -34,7 +34,7 @@ Feature: taxonomy object
     {
       "taxonomyId": 0,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     Then the response code should be 4xx

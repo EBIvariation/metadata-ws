@@ -17,7 +17,7 @@ Feature: Miscellaneous functions
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY

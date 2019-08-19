@@ -7,7 +7,7 @@ Feature: sample object
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -31,11 +31,11 @@ Feature: sample object
     {
       "taxonomyId": 10090,
       "name": "Mus Musculus",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_1
-    When I create a sample with TAXONOMY_1 for taxonomy
+    Then set the URL to TAXONOMY_MUS_MUSCULUS
+    When I create a sample with TAXONOMY_MUS_MUSCULUS for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE
     When I request GET with value of SAMPLE
@@ -45,23 +45,23 @@ Feature: sample object
     When I request GET for taxonomies of SAMPLE
     Then the response code should be 200
     And the response should contain one taxonomy
-    And the href of the taxonomy of taxonomies has items TAXONOMY_1
+    And the href of the taxonomy of taxonomies has items TAXONOMY_MUS_MUSCULUS
 
     When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_2
-    When I request PATCH SAMPLE with list TAXONOMY_2 of taxonomies
+    Then set the URL to TAXONOMY_HOMO_SAPIEN
+    When I request PATCH SAMPLE with list TAXONOMY_HOMO_SAPIEN of taxonomies
     Then the response code should be 2xx
     When I request GET for taxonomies of SAMPLE
     Then the response code should be 200
     And the response should contain one taxonomy
-    And the href of the taxonomy of taxonomies has items TAXONOMY_2
+    And the href of the taxonomy of taxonomies has items TAXONOMY_HOMO_SAPIEN
 
 
   Scenario Outline: post a sample with invalid taxonomy list should fail
@@ -83,20 +83,20 @@ Feature: sample object
     {
       "taxonomyId": 10090,
       "name": "Mus Musculus",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_1
+    Then set the URL to TAXONOMY_MUS_MUSCULUS
     When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_2
-    When I create a sample with TAXONOMY_1,TAXONOMY_2 for taxonomy
+    Then set the URL to TAXONOMY_HOMO_SAPIEN
+    When I create a sample with TAXONOMY_MUS_MUSCULUS,TAXONOMY_HOMO_SAPIEN for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE
     When I request GET with value of SAMPLE
@@ -106,12 +106,12 @@ Feature: sample object
     When I request GET for taxonomies of SAMPLE
     Then the response code should be 200
     And the response should contain 2 taxonomies
-    And the href of the taxonomy of taxonomies has items TAXONOMY_1,TAXONOMY_2
+    And the href of the taxonomy of taxonomies has items TAXONOMY_MUS_MUSCULUS,TAXONOMY_HOMO_SAPIEN
 
-    When I request DELETE for the taxonomies of TAXONOMY_1 of the SAMPLE
+    When I request DELETE for the taxonomies of TAXONOMY_MUS_MUSCULUS of the SAMPLE
     Then the response code should be 2xx
 
-    When I request DELETE for the taxonomies of TAXONOMY_2 of the SAMPLE
+    When I request DELETE for the taxonomies of TAXONOMY_HOMO_SAPIEN of the SAMPLE
     Then the response code should be 4xx
     And the response should contain field exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException
 
@@ -123,7 +123,7 @@ Feature: sample object
     {
       "taxonomyId": 10090,
       "name": "Mus Musculus",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -157,20 +157,20 @@ Feature: sample object
     {
       "taxonomyId": 9593,
       "name": "Gorilla gorilla",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_1
+    Then set the URL to TAXONOMY_GORILLA
     When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_2
-    When I create a parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TAXONOMY_1,TAXONOMY_2 for taxonomy
+    Then set the URL to TAXONOMY_HOMO_SAPIEN
+    When I create a parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TAXONOMY_GORILLA,TAXONOMY_HOMO_SAPIEN for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE1
     When I request POST /taxonomies with JSON payload:
@@ -178,23 +178,23 @@ Feature: sample object
     {
       "taxonomyId": 9597,
       "name": "Pan paniscus",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_3
+    Then set the URL to TAXONOMY_PAN_PANISCUS
     When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9598,
       "name": "Pan troglodytes",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_4
-    When I create a parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TAXONOMY_3,TAXONOMY_4 for taxonomy
+    Then set the URL to TAXONOMY_PAN_TROGLODYTES
+    When I create a parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TAXONOMY_PAN_PANISCUS,TAXONOMY_PAN_TROGLODYTES for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE2
-    When I create a parameterized sample with Species3 for accession, 1 for version, Species collection3 for name and TAXONOMY_1,TAXONOMY_3 for taxonomy
+    When I create a parameterized sample with Species3 for accession, 1 for version, Species collection3 for name and TAXONOMY_GORILLA,TAXONOMY_PAN_PANISCUS for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE3
 
@@ -218,20 +218,20 @@ Feature: sample object
     {
       "taxonomyId": 9593,
       "name": "Gorilla gorilla",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_1
+    Then set the URL to TAXONOMY_GORILLA
     When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_2
-    When I create a parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TAXONOMY_1,TAXONOMY_2 for taxonomy
+    Then set the URL to TAXONOMY_HOMO_SAPIEN
+    When I create a parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TAXONOMY_GORILLA,TAXONOMY_HOMO_SAPIEN for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE1
     When I request POST /taxonomies with JSON payload:
@@ -239,20 +239,20 @@ Feature: sample object
     {
       "taxonomyId": 9597,
       "name": "Pan paniscus",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_3
+    Then set the URL to TAXONOMY_PAN_PANISCUS
     When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9598,
       "name": "Pan troglodytes",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_4
-    When I create a parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TAXONOMY_3,TAXONOMY_4 for taxonomy
+    Then set the URL to TAXONOMY_PAN_TROGLODYTES
+    When I create a parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TAXONOMY_PAN_PANISCUS,TAXONOMY_PAN_TROGLODYTES for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE2
 
@@ -276,20 +276,20 @@ Feature: sample object
     {
       "taxonomyId": 9593,
       "name": "Gorilla gorilla",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_1
+    Then set the URL to TAXONOMY_GORILLA
     When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_2
-    When I create a parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TAXONOMY_1,TAXONOMY_2 for taxonomy
+    Then set the URL to TAXONOMY_HOMO_SAPIEN
+    When I create a parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TAXONOMY_GORILLA,TAXONOMY_HOMO_SAPIEN for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE1
     When I request POST /taxonomies with JSON payload:
@@ -297,20 +297,20 @@ Feature: sample object
     {
       "taxonomyId": 9597,
       "name": "Pan paniscus",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_3
+    Then set the URL to TAXONOMY_PAN_PANISCUS
     When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 9598,
       "name": "Pan troglodytes",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_4
-    When I create a parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TAXONOMY_3,TAXONOMY_4 for taxonomy
+    Then set the URL to TAXONOMY_PAN_TROGLODYTES
+    When I create a parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TAXONOMY_PAN_PANISCUS,TAXONOMY_PAN_TROGLODYTES for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE2
 
@@ -331,7 +331,7 @@ Feature: sample object
     {
       "taxonomyId": 9593,
       "name": "Gorilla gorilla",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     And set the URL to TAXONOMY1
@@ -340,7 +340,7 @@ Feature: sample object
     {
       "taxonomyId": 9606,
       "name": "Homo Sapiens",
-      "rank":"SPECIES"
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY2

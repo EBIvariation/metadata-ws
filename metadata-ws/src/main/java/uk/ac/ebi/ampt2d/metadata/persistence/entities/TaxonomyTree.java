@@ -65,7 +65,7 @@ public class TaxonomyTree {
     }
 
     @ApiModelProperty(position = 1, readOnly = true)
-    public Long getTaxSpeciesId() {
+    public Long getTaxonomySpeciesId() {
         return taxonomySpecies.getTaxonomyId();
     }
 
@@ -78,7 +78,7 @@ public class TaxonomyTree {
     }
 
     @ApiModelProperty(position = 3, readOnly = true)
-    public Long getTaxGenusId() {
+    public Long getTaxonomyGenusId() {
         return (taxonomyGenus == null) ? null : taxonomyGenus.getTaxonomyId();
     }
 
@@ -104,7 +104,7 @@ public class TaxonomyTree {
     }
 
     @ApiModelProperty(position = 7, readOnly = true)
-    public Long getTaxClassId() {
+    public Long getTaxonomyClassId() {
         return (taxonomyClass == null) ? null : taxonomyClass.getTaxonomyId();
     }
 }
