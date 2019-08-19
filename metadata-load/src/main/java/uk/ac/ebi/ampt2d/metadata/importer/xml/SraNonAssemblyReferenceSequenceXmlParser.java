@@ -23,6 +23,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,5 +59,10 @@ public class SraNonAssemblyReferenceSequenceXmlParser extends SraXmlParser<Refer
             LOGGER.log(Level.SEVERE, "An error occurred while parsing XML for accession " + accession);
             throw new XmlException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public List<ReferenceSequence> parseXmlList(List<String> xmlList, List<String> accessionList) throws XmlException {
+        return null;
     }
 }

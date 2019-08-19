@@ -24,6 +24,9 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QSample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @NoRepositoryBean
 public interface SampleRepositoryCustom extends PagingAndSortingRepository<Sample, Long>,
         QueryDslPredicateExecutor<Sample> {
@@ -39,4 +42,21 @@ public interface SampleRepositoryCustom extends PagingAndSortingRepository<Sampl
         }
         return save(sample);
     }
+
+    default List<Sample> findOrSaveList(List<Sample> sampleIn) {
+        List<Sample> sampleList = new ArrayList<>();
+        for(Sample s:sampleIn) {
+            Sample existingSample = findOne(
+                    qSample.accessionVersionId.accession.eq(s.getAccessionVersionId().getAccession()).and(
+                            qSample.accessionVersionId.version.eq(s.getAccessionVersionId().getVersion()))
+            );
+            if (existingSample != null) {
+                sampleList.add(existingSample);
+            } else {
+                sampleList.add(save(s));
+            }
+        }
+        return sampleList;
+    }
+
 }

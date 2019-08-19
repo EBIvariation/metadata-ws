@@ -192,11 +192,10 @@ public abstract class ObjectsImporter {
             analysis.setReferenceSequences(referenceSequences);
             AnalysisEventHandler.validateReferenceSequenceLink(analysis);
             analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
-            List<Sample> samples = new ArrayList<>();
-            for (String sampleAccession : getSampleAccessions(analysisType)) {
-                samples.add(importSample(sampleAccession));
-            }
-            analysis.setSamples(samples);
+            Set<String> sampleSet = getSampleAccessions(analysisType);
+            List<String> stringList = new ArrayList<>(sampleSet);
+            List<Sample> sampleList = importSampleList(stringList);
+            analysis.setSamples(sampleList);
             analysis = extractStudyFromAnalysis(analysisType, analysis);
         } catch (Exception exception) {
             analysis = null;
@@ -301,6 +300,25 @@ public abstract class ObjectsImporter {
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
         }
         return sample;
+    }
+
+    public List<Sample> importSampleList(List<String> accessionList) {
+        List<Sample> sampleList = new ArrayList<>();
+        try {
+            List<String> xmlList = sraXmlRetrieverByAccession.getXmlList(accessionList);
+            List<SampleType> sampleTypeList = sraSampleXmlParser.parseXmlList(xmlList, accessionList);
+            for (SampleType item:sampleTypeList) {
+                Sample sampleElement = sampleConverter.convert(item);
+                Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(item));
+                sampleElement.setTaxonomies(Arrays.asList(taxonomy));
+                sampleList.add(sampleElement);
+            }
+            sampleList = sampleRepository.findOrSaveList(sampleList);
+        } catch (Exception exception) {
+            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + accessionList);
+            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+        }
+        return sampleList;
     }
 
     private Taxonomy extractTaxonomyFromSample(SampleType sampleType) {

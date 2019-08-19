@@ -19,6 +19,8 @@ package uk.ac.ebi.ampt2d.metadata.importer.xml;
 
 import org.apache.xmlbeans.XmlException;
 
+import java.util.List;
+
 public abstract class SraXmlParser<SRA_OBJECT> {
 
     private final String XML_ROOT_TAGS = "(</ROOT>|<ROOT.*display=xml\">)";
@@ -26,6 +28,8 @@ public abstract class SraXmlParser<SRA_OBJECT> {
     private final String XML_SET_TAGS = "(<[A-Z]+_SET>|</[A-Z]+_SET>|<DATASETS>|</DATASETS>)";
 
     public abstract SRA_OBJECT parseXml(String xmlString, String accession) throws XmlException;
+
+    public abstract List<SRA_OBJECT> parseXmlList(List<String> xmlList, List<String> accessionList) throws XmlException;
 
     protected String removeRootTagsFromXmlString(String xmlString) {
         return (xmlString != null) ? xmlString.replaceAll(XML_ROOT_TAGS, "") : xmlString;

@@ -22,6 +22,8 @@ import org.apache.xmlbeans.XmlException;
 import uk.ac.ebi.ena.sra.xml.SAMPLEDocument;
 import uk.ac.ebi.ena.sra.xml.SampleType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,6 +41,22 @@ public class SraSampleXmlParser extends SraXmlParser<SampleType> {
             LOGGER.log(Level.SEVERE, "An error occurred while parsing XML for accession " + accession);
             throw e;
         }
+    }
+
+    @Override
+    public List<SampleType> parseXmlList(List<String> xmlList, List<String> accessionList) throws XmlException {
+        List<SampleType> sampleTypeList = new ArrayList<>();
+        for(String xml:xmlList) {
+            String xmlString = removeRootTagsFromXmlString(xml); // For API calls
+            xmlString = removeSetTagsFromXmlString(xmlString); // For database queries
+            try {
+                sampleTypeList.add(SAMPLEDocument.Factory.parse(xmlString).getSAMPLE());
+            } catch (XmlException e) {
+                LOGGER.log(Level.SEVERE, "An error occurred while parsing XML for accession " + accessionList);
+                throw e;
+            }
+        }
+        return sampleTypeList;
     }
 
 }

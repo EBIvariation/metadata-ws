@@ -58,6 +58,7 @@ public class MetadataImporterMainApplicationAPITest {
         analysisRepository.deleteAll();
         studyRepository.deleteAll();
         referenceSequenceRepository.deleteAll();
+        sampleRepository.deleteAll();
     }
 
     @Test

@@ -23,6 +23,10 @@ import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 
 import java.sql.SQLException;
 import java.sql.SQLXML;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class SraXmlRetrieverThroughDatabase implements SraXmlRetrieverByAccession {
 
@@ -42,6 +46,21 @@ public class SraXmlRetrieverThroughDatabase implements SraXmlRetrieverByAccessio
         SQLXML sqlxml = jdbcTemplate.queryForObject(enaObjectQuery, parameters, SQLXML.class);
         try {
             return sqlxml.getString();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<String> getXmlList(List<String> accessionList) {
+        Map<String, List> paramMap = Collections.singletonMap("accession", accessionList);
+        List<SQLXML> sqlxmlList = jdbcTemplate.queryForList(enaObjectQuery, paramMap, SQLXML.class);
+        try {
+            List<String> sqlxmlStringList = new ArrayList<>();
+            for (SQLXML xml : sqlxmlList) {
+                sqlxmlStringList.add(xml.getString());
+            }
+            return sqlxmlStringList;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

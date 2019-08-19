@@ -17,8 +17,11 @@
  */
 package uk.ac.ebi.ampt2d.metadata.importer;
 
+import java.util.List;
+
 public interface SraXmlRetrieverByAccession {
 
     String getXml(String accession);
 
+    List<String> getXmlList(List<String> accessionList);
 }
