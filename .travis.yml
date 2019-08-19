@@ -6,7 +6,7 @@ jdk:
   - openjdk8
 
 install:
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -PTravis
+  - mvn -DcreateChecksum=true install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -PTravis
 
 script:
   - mvn test -PTravis
