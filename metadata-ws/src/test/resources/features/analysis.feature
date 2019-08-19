@@ -6,7 +6,8 @@ Feature: analysis object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -36,7 +37,8 @@ Feature: analysis object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -90,7 +92,8 @@ Feature: analysis object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -135,7 +138,8 @@ Feature: analysis object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -157,7 +161,8 @@ Feature: analysis object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -207,7 +212,8 @@ Feature: analysis object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -250,7 +256,8 @@ Feature: analysis object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -286,7 +293,8 @@ Feature: analysis object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_HUMAN
@@ -295,7 +303,8 @@ Feature: analysis object
     """
     {
       "taxonomyId": 10090,
-      "name": "Mus musculus"
+      "name": "Mus musculus",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_MOUSE
@@ -331,7 +340,8 @@ Feature: analysis object
      """
      {
        "taxonomyId": 9606,
-       "name": "Homo Sapiens"
+       "name": "Homo Sapiens",
+       "rank":"SPECIES"
      }
      """
     Then set the URL to TAXONOMY
@@ -377,7 +387,8 @@ Feature: analysis object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -418,7 +429,8 @@ Feature: analysis object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY

@@ -21,9 +21,8 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.TaxonomyTree;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 
 import java.util.List;
 
@@ -33,25 +32,24 @@ public class ReferenceSequenceServiceImpl implements ReferenceSequenceService {
     private ReferenceSequenceRepository referenceSequenceRepository;
 
     @Autowired
-    private TaxonomyRepository taxonomyRepository;
+    private TaxonomyTreeService taxonomyTreeService;
 
     @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyId(long id) {
-        List<Taxonomy> taxonomyList = taxonomyRepository.findAllTaxonomyTreeByParentTaxonomyId(id);
-        return getReferenceSequences(taxonomyList);
+        List<TaxonomyTree> taxonomyTrees = taxonomyTreeService.findTaxonomyTreesById(id);
+        return getReferenceSequences(taxonomyTrees);
     }
 
     @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyName(String name) {
-        List<Taxonomy> taxonomyList = taxonomyRepository.findAllTaxonomyTreeByParentTaxonomyName(name);
-        return getReferenceSequences(taxonomyList);
+        List<TaxonomyTree> taxonomyTrees = taxonomyTreeService.findTaxonomyTreesByName(name);
+        return getReferenceSequences(taxonomyTrees);
     }
 
-    public List<ReferenceSequence> getReferenceSequences(List<Taxonomy> taxonomyList) {
+    public List<ReferenceSequence> getReferenceSequences(List<TaxonomyTree> taxonomyTreeList) {
         QReferenceSequence referenceSequence = QReferenceSequence.referenceSequence;
-        Predicate predicate = referenceSequence.taxonomy.taxonomyId.in(taxonomyList.parallelStream().map(taxonomy ->
-                taxonomy.getTaxonomyId()).toArray(Long[]::new));
+        Predicate predicate = referenceSequence.taxonomy.taxonomyId.in(taxonomyTreeList.parallelStream().map
+                (taxonomyTree -> taxonomyTree.getTaxonomySpecies().getTaxonomyId()).toArray(Long[]::new));
         return (List<ReferenceSequence>) referenceSequenceRepository.findAll(predicate);
     }
-
 }

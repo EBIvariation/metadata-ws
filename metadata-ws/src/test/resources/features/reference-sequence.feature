@@ -6,7 +6,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -43,7 +44,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -90,7 +92,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -134,7 +137,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -177,7 +181,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -231,7 +236,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 1,
-      "name": "Species1"
+      "name": "Species1",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY1
@@ -252,7 +258,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 2,
-      "name": "Species2"
+      "name": "Species2",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY2
@@ -305,7 +312,9 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 1,
-      "name": "Species1"
+      "name": "Species1",
+      "rank": "SPECIES"
+
     }
     """
     Then set the URL to TAXONOMY1
@@ -326,18 +335,29 @@ Feature: reference sequence
     And the response should contain error message A reference sequence must have one valid URL to taxonomy
     Then the response code should be 4xx
 
+
   Scenario Outline: search various reference sequences by taxonomy name and id
     Given I set authorization with testoperator having SERVICE_OPERATOR role
-    When I request POST taxonomies with 207598 for ID, Homininae for name and NONE for parent
+    When I request POST taxonomy with 40674 for ID, Mammalia for name and CLASS for rank
     Then set the URL to TAXONOMY_1
-    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for parent
+    When I request POST taxonomy with 9443 for ID, Primates for name and ORDER for rank
     Then set the URL to TAXONOMY_2
-    When I request POST taxonomies with 9596 for ID, Pan for name and TAXONOMY_1 for parent
+    When I request POST taxonomy with 9605 for ID, Homo for name and GENUS for rank
     Then set the URL to TAXONOMY_3
-    When I request POST taxonomies with 9597 for ID, Pan paniscus for name and TAXONOMY_3 for parent
+    When I request POST taxonomy with 9596 for ID, Pan for name and GENUS for rank
     Then set the URL to TAXONOMY_4
-    When I request POST taxonomies with 9598 for ID, Pan troglodytes for name and TAXONOMY_3 for parent
+    When I request POST taxonomy with 9606 for ID, Homo sapiens for name and SPECIES for rank
     Then set the URL to TAXONOMY_5
+    When I request POST taxonomy with 9598 for ID, Pan troglodytes for name and SPECIES for rank
+    Then set the URL to TAXONOMY_6
+    When I request POST taxonomy with 9597 for ID, Pan paniscus for name and SPECIES for rank
+    Then set the URL to TAXONOMY_7
+    When I request POST taxonomyTree with TAXONOMY_5 for species , TAXONOMY_3 for GENUS , TAXONOMY_2 for ORDER and TAXONOMY_1 for CLASS
+    Then set the URL to TAXONOMY_TREE_1
+    When I request POST taxonomyTree with TAXONOMY_6 for species , TAXONOMY_4 for GENUS , TAXONOMY_2 for ORDER and TAXONOMY_1 for CLASS
+    Then set the URL to TAXONOMY_TREE_2
+    When I request POST taxonomyTree with TAXONOMY_7 for species , TAXONOMY_4 for GENUS , TAXONOMY_2 for ORDER and TAXONOMY_1 for CLASS
+    Then set the URL to TAXONOMY_TREE_3
 
     When I request POST /reference-sequences with JSON-like payload:
     """
@@ -345,7 +365,7 @@ Feature: reference sequence
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
       "type": "GENOME_ASSEMBLY",
-      "taxonomy": "TAXONOMY_2"
+      "taxonomy": "TAXONOMY_5"
     """
     Then set the URL to REFERENCE_SEQUENCE1
 
@@ -355,7 +375,7 @@ Feature: reference sequence
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
       "type": "GENOME_ASSEMBLY",
-      "taxonomy": "TAXONOMY_4"
+      "taxonomy": "TAXONOMY_6"
     """
     Then set the URL to REFERENCE_SEQUENCE2
 
@@ -365,7 +385,7 @@ Feature: reference sequence
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
       "type": "GENOME_ASSEMBLY",
-      "taxonomy": "TAXONOMY_5"
+      "taxonomy": "TAXONOMY_7"
     """
     Then set the URL to REFERENCE_SEQUENCE3
 
@@ -378,9 +398,10 @@ Feature: reference sequence
       | base          | query             | N | url                                                         |
       | taxonomy-id   | id=9606           | 1 | REFERENCE_SEQUENCE1                                         |
       | taxonomy-id   | id=9596           | 2 | REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3                     |
-      | taxonomy-id   | id=207598         | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
+      | taxonomy-id   | id=40674          | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
       | taxonomy-id   | id=0              | 0 | NONE                                                        |
       | taxonomy-name | name=Homo sapiens | 1 | REFERENCE_SEQUENCE1                                         |
       | taxonomy-name | name=Pan          | 2 | REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3                     |
-      | taxonomy-name | name=Homininae    | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
+      | taxonomy-name | name=Primates     | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
+      | taxonomy-name | name=Mammalia     | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
       | taxonomy-name | name=None         | 0 | NONE                                                        |

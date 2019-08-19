@@ -22,9 +22,8 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.TaxonomyTree;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -40,10 +39,10 @@ public class StudyServiceImpl implements StudyService {
     private StudyRepository studyRepository;
 
     @Autowired
-    private TaxonomyRepository taxonomyRepository;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private TaxonomyTreeService taxonomyTreeService;
 
     @Override
     public Study findOneStudyByPredicate(Predicate predicate) {
@@ -98,22 +97,20 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     public List<Study> findStudiesByTaxonomyId(long id) {
-        QStudy study = QStudy.study;
-        List<Taxonomy> taxonomyList = taxonomyRepository.findAllTaxonomyTreeByParentTaxonomyId(id);
-        return getStudies(taxonomyList);
+        List<TaxonomyTree> taxonomyTrees = taxonomyTreeService.findTaxonomyTreesById(id);
+        return getStudiesByTaxonomyTree(taxonomyTrees);
     }
 
     @Override
     public List<Study> findStudiesByTaxonomyName(String name) {
-        QStudy study = QStudy.study;
-        List<Taxonomy> taxonomyList = taxonomyRepository.findAllTaxonomyTreeByParentTaxonomyName(name);
-        return getStudies(taxonomyList);
+        List<TaxonomyTree> taxonomyTrees = taxonomyTreeService.findTaxonomyTreesByName(name);
+        return getStudiesByTaxonomyTree(taxonomyTrees);
     }
 
-    public List<Study> getStudies(List<Taxonomy> taxonomyList) {
-        QStudy qStudy = QStudy.study;
-        Predicate predicate = qStudy.taxonomy.taxonomyId.in(taxonomyList.parallelStream().map(taxonomy ->
-                taxonomy.getTaxonomyId()).toArray(Long[]::new));
+    public List<Study> getStudiesByTaxonomyTree(List<TaxonomyTree> taxonomyTrees) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.taxonomy.taxonomyId.in(taxonomyTrees.parallelStream().map
+                (taxonomyTree -> taxonomyTree.getTaxonomySpecies().getTaxonomyId()).toArray(Long[]::new));
         return (List<Study>) studyRepository.findAll(predicate);
     }
 

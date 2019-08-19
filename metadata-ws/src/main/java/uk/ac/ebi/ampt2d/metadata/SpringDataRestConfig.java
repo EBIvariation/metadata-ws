@@ -42,10 +42,15 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
-import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceServiceImpl;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyTreeRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceService;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.TaxonomyTreeService;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.TaxonomyTreeServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.AnalysisRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.ReferenceSequenceRestController;
@@ -114,13 +119,20 @@ public class SpringDataRestConfig {
     }
 
     @Bean
-    public StudyService studyService() {
+    public StudyService studyService(ReferenceSequenceRepository referenceSequenceRepository,
+                                     TaxonomyTreeRepository taxonomyTreeRepository,
+                                     TaxonomyRepository taxonomyRepository) {
         return new StudyServiceImpl();
     }
 
     @Bean
     public ReferenceSequenceService referenceSequenceService() {
         return new ReferenceSequenceServiceImpl();
+    }
+
+    @Bean
+    public TaxonomyTreeService taxonomyTreeService() {
+        return new TaxonomyTreeServiceImpl();
     }
 
     @Bean
@@ -145,7 +157,7 @@ public class SpringDataRestConfig {
 
     /**
      * Inject StudyDeprecationAspect bean
-     *
+     * <p>
      * The StudyDeprecationAspect ensures every GET request returns only not yet deprecated studies
      *
      * @return StudyDeprecationAspect
@@ -157,7 +169,7 @@ public class SpringDataRestConfig {
 
     /**
      * Inject ReleaseDateAspect bean conditionally
-     *
+     * <p>
      * The ReleaseDateAspect ensures every GET request returns only published entities
      * Set "endpoints.studies.date.restricted" to false if you don't want this restriction
      *

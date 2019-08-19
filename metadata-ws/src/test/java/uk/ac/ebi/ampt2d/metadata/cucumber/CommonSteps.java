@@ -31,15 +31,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
-import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyTreeRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
+import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -89,6 +90,9 @@ public class CommonSteps {
     private TaxonomyRepository taxonomyRepository;
 
     @Autowired
+    private TaxonomyTreeRepository taxonomyTreeRepository;
+
+    @Autowired
     private WebResourceRepository webResourceRepository;
 
     @Autowired
@@ -104,6 +108,7 @@ public class CommonSteps {
         fileRepository.deleteAll();
         sampleRepository.deleteAll();
         studyRepository.deleteAll();
+        taxonomyTreeRepository.deleteAll();
         taxonomyRepository.deleteAll();
         webResourceRepository.deleteAll();
         publicationRepository.deleteAll();

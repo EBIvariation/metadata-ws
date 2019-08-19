@@ -16,7 +16,8 @@ Feature: Miscellaneous functions
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -62,7 +63,8 @@ Feature: Miscellaneous functions
     """
       {
         "taxonomyId": 1,
-        "name": "Species1"
+        "name": "Species1",
+        "rank": "SPECIES"
       }
       """
     Then set the URL to TAXONOMY1
@@ -70,7 +72,8 @@ Feature: Miscellaneous functions
     """
       {
         "taxonomyId": 2,
-        "name": "Species2"
+        "name": "Species2",
+        "rank": "SPECIES"
       }
       """
     Then set the URL to TAXONOMY2

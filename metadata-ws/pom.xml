@@ -16,6 +16,7 @@
 
     <properties>
         <cucumber.version>2.4.0</cucumber.version>
+        <buildDirectory>target</buildDirectory>
     </properties>
 
     <dependencies>

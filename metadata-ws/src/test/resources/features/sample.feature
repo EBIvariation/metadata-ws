@@ -6,7 +6,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -29,7 +30,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 10090,
-      "name": "Mus Musculus"
+      "name": "Mus Musculus",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_1
@@ -49,7 +51,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_2
@@ -79,7 +82,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 10090,
-      "name": "Mus Musculus"
+      "name": "Mus Musculus",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_1
@@ -87,7 +91,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_2
@@ -117,7 +122,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 10090,
-      "name": "Mus Musculus"
+      "name": "Mus Musculus",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -149,8 +155,9 @@ Feature: sample object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 207598,
-      "name": "Homininae"
+      "taxonomyId": 9593,
+      "name": "Gorilla gorilla",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_1
@@ -158,7 +165,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_2
@@ -169,7 +177,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9597,
-      "name": "Pan paniscus"
+      "name": "Pan paniscus",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_3
@@ -177,7 +186,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9598,
-      "name": "Pan troglodytes"
+      "name": "Pan troglodytes",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_4
@@ -194,11 +204,11 @@ Feature: sample object
     And the href of the sample of samples has items <url>
 
     Examples:
-      | query                        | url             |
-      | taxonomies.name=Homininae    | SAMPLE1,SAMPLE3 |
-      | taxonomies.name=Pan paniscus | SAMPLE2,SAMPLE3 |
-      | taxonomies.taxonomyId=207598 | SAMPLE1,SAMPLE3 |
-      | taxonomies.taxonomyId=9597   | SAMPLE2,SAMPLE3 |
+      | query                           | url             |
+      | taxonomies.name=Gorilla gorilla | SAMPLE1,SAMPLE3 |
+      | taxonomies.name=Pan paniscus    | SAMPLE2,SAMPLE3 |
+      | taxonomies.taxonomyId=9593      | SAMPLE1,SAMPLE3 |
+      | taxonomies.taxonomyId=9597      | SAMPLE2,SAMPLE3 |
 
 
   Scenario Outline: find one sample by taxonomy
@@ -206,8 +216,9 @@ Feature: sample object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 207598,
-      "name": "Homininae"
+      "taxonomyId": 9593,
+      "name": "Gorilla gorilla",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_1
@@ -215,7 +226,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_2
@@ -226,7 +238,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9597,
-      "name": "Pan paniscus"
+      "name": "Pan paniscus",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_3
@@ -234,7 +247,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9598,
-      "name": "Pan troglodytes"
+      "name": "Pan troglodytes",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_4
@@ -260,8 +274,9 @@ Feature: sample object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 207598,
-      "name": "Homininae"
+      "taxonomyId": 9593,
+      "name": "Gorilla gorilla",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_1
@@ -269,7 +284,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_2
@@ -280,7 +296,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9597,
-      "name": "Pan paniscus"
+      "name": "Pan paniscus",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_3
@@ -288,7 +305,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9598,
-      "name": "Pan troglodytes"
+      "name": "Pan troglodytes",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY_4
@@ -311,8 +329,9 @@ Feature: sample object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 207598,
-      "name": "Homininae"
+      "taxonomyId": 9593,
+      "name": "Gorilla gorilla",
+      "rank":"SPECIES"
     }
     """
     And set the URL to TAXONOMY1
@@ -320,7 +339,8 @@ Feature: sample object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY2

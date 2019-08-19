@@ -54,6 +54,6 @@ public class ReferenceSequenceConverter implements Converter<AssemblyType, Refer
 
     private Taxonomy extractTaxonomyFromAssembly(AssemblyType assemblyType) {
         AssemblyType.TAXON taxon = assemblyType.getTAXON();
-        return new Taxonomy(taxon.getTAXONID(), taxon.getSCIENTIFICNAME());
+        return new Taxonomy(taxon.getTAXONID(), taxon.getSCIENTIFICNAME(), Taxonomy.Rank.SPECIES);
     }
 }

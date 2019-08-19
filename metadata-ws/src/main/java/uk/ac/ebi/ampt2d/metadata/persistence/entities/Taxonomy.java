@@ -23,12 +23,11 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -60,18 +59,20 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
     @Column(unique = true)
     private String name;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ApiModelProperty(position = 4)
+    @NotNull
     @JsonProperty
-    @ApiModelProperty(position = 4, dataType = "java.lang.String", notes = "URL to parent taxonomy")
-    @JoinColumn(name = "parent_id", referencedColumnName = "taxonomyId")
-    private Taxonomy parent;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Rank rank;
 
     public Taxonomy() {
     }
 
-    public Taxonomy(long taxonomyId, String name) {
+    public Taxonomy(long taxonomyId, String name, Rank rank) {
         this.taxonomyId = taxonomyId;
         this.name = name;
+        this.rank = rank;
     }
 
     public Long getId() {
@@ -95,11 +96,5 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
         return null;
     }
 
-    public Taxonomy getParent() {
-        return parent;
-    }
-
-    public void setParent(Taxonomy parent) {
-        this.parent = parent;
-    }
+    public enum Rank {SPECIES, GENUS, ORDER, CLASS}
 }

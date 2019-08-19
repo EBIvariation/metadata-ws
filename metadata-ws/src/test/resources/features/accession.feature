@@ -6,7 +6,8 @@ Feature: accession object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -45,7 +46,8 @@ Feature: accession object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -88,14 +90,14 @@ Feature: accession object
     And the response should contain one file
     And the accessionVersionId.accession field of files 0 should be EGAF0001
 
-
   Scenario: find sample by accession and version
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
     """
     {
       "taxonomyId": 1,
-      "name": "Species1"
+      "name": "Species1",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY1
@@ -103,7 +105,8 @@ Feature: accession object
     """
     {
       "taxonomyId": 2,
-      "name": "Species2"
+      "name": "Species2",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY2
@@ -123,7 +126,8 @@ Feature: accession object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank":"SPECIES"
     }
     """
     Then set the URL to TAXONOMY
