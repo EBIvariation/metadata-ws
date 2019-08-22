@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -194,7 +195,7 @@ public abstract class ObjectsImporter {
             analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
             Set<String> sampleSet = getSampleAccessions(analysisType);
             List<String> stringList = new ArrayList<>(sampleSet);
-            List<Sample> sampleList = importSampleList(stringList);
+            List<Sample> sampleList = importSamples(stringList);
             analysis.setSamples(sampleList);
             analysis = extractStudyFromAnalysis(analysisType, analysis);
         } catch (Exception exception) {
@@ -302,14 +303,15 @@ public abstract class ObjectsImporter {
         return sample;
     }
 
-    public List<Sample> importSampleList(List<String> accessionList) {
+    public List<Sample> importSamples(List<String> accessionList) {
         List<Sample> sampleList = new ArrayList<>();
         try {
-            List<String> xmlList = sraXmlRetrieverByAccession.getXmlList(accessionList);
-            List<SampleType> sampleTypeList = sraSampleXmlParser.parseXmlList(xmlList, accessionList);
-            for (SampleType item:sampleTypeList) {
-                Sample sampleElement = sampleConverter.convert(item);
-                Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(item));
+            Map<String, String> idXmlMap = sraXmlRetrieverByAccession.getXmls(accessionList);
+            SampleType sampleType;
+            for (Map.Entry<String, String> entry : idXmlMap.entrySet()) {
+                sampleType = sraSampleXmlParser.parseXml(entry.getValue(), entry.getKey());
+                Sample sampleElement = sampleConverter.convert(sampleType);
+                Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(sampleType));
                 sampleElement.setTaxonomies(Arrays.asList(taxonomy));
                 sampleList.add(sampleElement);
             }

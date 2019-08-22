@@ -131,9 +131,9 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     }
 
     @Override
-    public List<Sample> importSampleList(List<String> accessionList) {
+    public List<Sample> importSamples(List<String> accessionList) {
         setEnaObjectQuery(EnaObjectQuery.SAMPLE_QUERY_LIST);
-        List<Sample> sampleList = super.importSampleList(accessionList);
+        List<Sample> sampleList = super.importSamples(accessionList);
         setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
         return sampleList;
     }

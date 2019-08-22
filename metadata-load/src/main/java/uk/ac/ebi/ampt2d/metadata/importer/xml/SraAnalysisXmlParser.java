@@ -41,9 +41,4 @@ public class SraAnalysisXmlParser extends SraXmlParser<AnalysisType> {
         }
     }
 
-    @Override
-    public List<AnalysisType> parseXmlList(List<String> xmlList, List<String> accessionList) throws XmlException {
-        return null;
-    }
-
 }

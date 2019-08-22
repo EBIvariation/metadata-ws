@@ -61,8 +61,4 @@ public class SraNonAssemblyReferenceSequenceXmlParser extends SraXmlParser<Refer
         }
     }
 
-    @Override
-    public List<ReferenceSequence> parseXmlList(List<String> xmlList, List<String> accessionList) throws XmlException {
-        return null;
-    }
 }

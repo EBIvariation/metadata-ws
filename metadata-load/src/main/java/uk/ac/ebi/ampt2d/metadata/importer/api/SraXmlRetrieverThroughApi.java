@@ -21,8 +21,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SraXmlRetrieverThroughApi implements SraXmlRetrieverByAccession {
 
@@ -36,11 +37,11 @@ public class SraXmlRetrieverThroughApi implements SraXmlRetrieverByAccession {
     }
 
     @Override
-    public List<String> getXmlList(List<String> accession) {
-        List<String> accessionList = new ArrayList<>();
+    public Map<String, String> getXmls(List<String> accession) {
+        Map<String, String> idXmlMap = new HashMap<>();
         for(String item:accession) {
-            accessionList.add(restTemplate.exchange(ENA_API_URL, HttpMethod.GET, null, String.class, item).getBody());
+            idXmlMap.put(item, restTemplate.exchange(ENA_API_URL, HttpMethod.GET, null, String.class, item).getBody());
         }
-        return accessionList;
+        return idXmlMap;
     }
 }

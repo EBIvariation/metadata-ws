@@ -42,9 +42,4 @@ public class SraStudyXmlParser extends SraXmlParser<StudyType> {
         }
     }
 
-    @Override
-    public List<StudyType> parseXmlList(List<String> xmlList, List<String> accessionList) throws XmlException {
-        return null;
-    }
-
 }

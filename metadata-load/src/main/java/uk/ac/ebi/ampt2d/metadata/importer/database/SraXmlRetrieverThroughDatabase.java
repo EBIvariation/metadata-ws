@@ -17,6 +17,7 @@
  */
 package uk.ac.ebi.ampt2d.metadata.importer.database;
 
+import com.google.common.collect.Lists;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
@@ -24,11 +25,13 @@ import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 import java.sql.SQLException;
 import java.sql.SQLXML;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SraXmlRetrieverThroughDatabase implements SraXmlRetrieverByAccession {
+
+    private static final int MAX_QUERY_LIST = 1000;
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -52,18 +55,33 @@ public class SraXmlRetrieverThroughDatabase implements SraXmlRetrieverByAccessio
     }
 
     @Override
-    public List<String> getXmlList(List<String> accessionList) {
-        Map<String, List> paramMap = Collections.singletonMap("accession", accessionList);
-        List<SQLXML> sqlxmlList = jdbcTemplate.queryForList(enaObjectQuery, paramMap, SQLXML.class);
-        try {
-            List<String> sqlxmlStringList = new ArrayList<>();
-            for (SQLXML xml : sqlxmlList) {
-                sqlxmlStringList.add(xml.getString());
+    public Map<String, String> getXmls(List<String> accessionList) {
+        Map<String, List> paramMap = new HashMap<>();
+        String sampleListQuery = enaObjectQuery;
+        String dynamicQuery = "SAMPLE_ID IN (:accession0) ";
+        List<List<String>> accessionSubList = Lists.partition(accessionList, MAX_QUERY_LIST);
+
+        // Oracle limitation: IN query can not have more than 1000 items in single list
+        for (int index = 0; index < (accessionList.size() / MAX_QUERY_LIST) + 1; index++) {
+            if (index > 0) {
+                dynamicQuery = "OR SAMPLE_ID IN (:accession" + index + ") ";
             }
-            return sqlxmlStringList;
+            sampleListQuery += dynamicQuery;
+            paramMap.put("accession" + index, accessionSubList.get(index));
+        }
+
+        List<Map<String, Object>> idSqlxmlList = jdbcTemplate.queryForList(sampleListQuery, paramMap);
+        Map<String, String> idXmlMap = new HashMap<>();
+        try {
+            for (Map<String, Object> xmlId : idSqlxmlList) {
+                String sampleId = (String) xmlId.get("SAMPLE_ID");
+                SQLXML sqlxml = (SQLXML) xmlId.get("SAMPLE_XML");
+                idXmlMap.put(sampleId, sqlxml.getString());
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        return idXmlMap;
     }
 
     public void setEnaObjectQuery(String enaObjectQuery) {

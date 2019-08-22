@@ -41,9 +41,4 @@ public class SraAssemblyXmlParser extends SraXmlParser<AssemblyType> {
         }
     }
 
-    @Override
-    public List<AssemblyType> parseXmlList(List<String> xmlList, List<String> accessionList) throws XmlException {
-        return null;
-    }
-
 }
