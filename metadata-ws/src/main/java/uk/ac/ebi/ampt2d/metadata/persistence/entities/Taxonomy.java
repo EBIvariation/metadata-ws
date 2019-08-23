@@ -96,5 +96,5 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
         return null;
     }
 
-    public enum Rank {SPECIES, GENUS, ORDER, CLASS}
+    public enum Rank {SUBSPECIES, SPECIES, GENUS, ORDER, CLASS}
 }

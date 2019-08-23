@@ -335,7 +335,6 @@ Feature: reference sequence
     And the response should contain error message A reference sequence must have one valid URL to taxonomy
     Then the response code should be 4xx
 
-
   Scenario Outline: search various reference sequences by taxonomy name and id
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST taxonomy with 40674 for ID, Mammalia for name and CLASS for rank
@@ -352,9 +351,13 @@ Feature: reference sequence
     Then set the URL to TAXONOMY_SPECIES_PAN_TROGLODYTES
     When I request POST taxonomy with 9597 for ID, Pan paniscus for name and SPECIES for rank
     Then set the URL to TAXONOMY_SPECIES_PAN_PANISCUS
+    When I request POST taxonomy with 756884 for ID, Pan troglodytes ellioti for name and SUBSPECIES for rank
+    Then set the URL to TAXONOMY_SUBSPECIES_PAN_ELLIOTI
+    When I request POST taxonomy with 37010 for ID, Pan troglodytes schweinfurthii for name and SUBSPECIES for rank
+    Then set the URL to TAXONOMY_SUBSPECIES_PAN_TROGLODYTES_SCWEINFURTHII
     When I request POST taxonomyTree with TAXONOMY_SPECIES_HOMO_SAPIENS for species , TAXONOMY_GENUS_HOMO for GENUS , TAXONOMY_ORDER_PRIMATES for ORDER and TAXONOMY_CLASS_MAMMALIA for CLASS
     Then set the URL to TAXONOMY_TREE_HOMO_SAPIENS
-    When I request POST taxonomyTree with TAXONOMY_SPECIES_PAN_TROGLODYTES for species , TAXONOMY_GENUS_PAN for GENUS , TAXONOMY_ORDER_PRIMATES for ORDER and TAXONOMY_CLASS_MAMMALIA for CLASS
+    When I request POST taxonomyTree with TAXONOMY_SPECIES_PAN_TROGLODYTES for species , TAXONOMY_GENUS_PAN for GENUS , TAXONOMY_ORDER_PRIMATES for ORDER , TAXONOMY_CLASS_MAMMALIA for CLASS and TAXONOMY_SUBSPECIES_PAN_ELLIOTI,TAXONOMY_SUBSPECIES_PAN_TROGLODYTES_SCWEINFURTHII for SUBSPECIES
     Then set the URL to TAXONOMY_TREE_PAN_TROGLODYTES
     When I request POST taxonomyTree with TAXONOMY_SPECIES_PAN_PANISCUS for species , TAXONOMY_GENUS_PAN for GENUS , TAXONOMY_ORDER_PRIMATES for ORDER and TAXONOMY_CLASS_MAMMALIA for CLASS
     Then set the URL to TAXONOMY_TREE_PAN_PANISCUS
@@ -389,19 +392,30 @@ Feature: reference sequence
     """
     Then set the URL to REFERENCE_SEQUENCE_PAN_PANISCUS
 
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "Pan_tro_scweinfurthii",
+      "patch": "null",
+      "accessions": ["GCA_000001516.6"],
+      "type": "GENOME_ASSEMBLY",
+      "taxonomy": "TAXONOMY_SUBSPECIES_PAN_TROGLODYTES_SCWEINFURTHII"
+    """
+    Then set the URL to REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII
+
     When I request elaborate search for the reference-sequences base <base> and with the parameters: <query>
     Then the response code should be 200
     And the response should contain <N> reference-sequences
     And the href of the referenceSequence of reference-sequences has items <url>
 
     Examples:
-      | base          | query             | N | url                                                                                                |
-      | taxonomy-id   | id=9606           | 1 | REFERENCE_SEQUENCE_HOMO_SAPIENS                                                                    |
-      | taxonomy-id   | id=9596           | 2 | REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS                                 |
-      | taxonomy-id   | id=40674          | 3 | REFERENCE_SEQUENCE_HOMO_SAPIENS,REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS |
-      | taxonomy-id   | id=0              | 0 | NONE                                                                                               |
-      | taxonomy-name | name=Homo sapiens | 1 | REFERENCE_SEQUENCE_HOMO_SAPIENS                                                                    |
-      | taxonomy-name | name=Pan          | 2 | REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS                                 |
-      | taxonomy-name | name=Primates     | 3 | REFERENCE_SEQUENCE_HOMO_SAPIENS,REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS |
-      | taxonomy-name | name=Mammalia     | 3 | REFERENCE_SEQUENCE_HOMO_SAPIENS,REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS |
-      | taxonomy-name | name=None         | 0 | NONE                                                                                               |
+      | base          | query             | N | url                                                                                                                                                 |
+      | taxonomy-id   | id=9606           | 1 | REFERENCE_SEQUENCE_HOMO_SAPIENS                                                                                                                     |
+      | taxonomy-id   | id=9596           | 3 | REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS,REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII                                 |
+      | taxonomy-id   | id=40674          | 4 | REFERENCE_SEQUENCE_HOMO_SAPIENS,REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS,REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII |
+      | taxonomy-id   | id=37010          | 1 | REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII                                                                                                    |
+      | taxonomy-id   | id=756884         | 0 | NONE                                                                                                                                                |
+      | taxonomy-name | name=Homo sapiens | 1 | REFERENCE_SEQUENCE_HOMO_SAPIENS                                                                                                                     |
+      | taxonomy-name | name=Pan          | 3 | REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS,REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII                                 |
+      | taxonomy-name | name=Primates     | 4 | REFERENCE_SEQUENCE_HOMO_SAPIENS,REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS,REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII |
+      | taxonomy-name | name=Mammalia     | 4 | REFERENCE_SEQUENCE_HOMO_SAPIENS,REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS,REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII |
+      | taxonomy-name | name=None         | 0 | NONE                                                                                                                                                |

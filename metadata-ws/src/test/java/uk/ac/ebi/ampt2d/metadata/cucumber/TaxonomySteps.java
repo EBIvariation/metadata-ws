@@ -70,4 +70,23 @@ public class TaxonomySteps {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent.getBytes())));
     }
+
+    @When("^I request POST taxonomyTree with (.*) for species , (.*) for GENUS , (.*) for ORDER , (.*) for CLASS and " +
+            "(.*) for SUBSPECIES$")
+    public void performPostOnTaxonomyTreeWithSubspecies(String speciesUrl, String genusUrl, String orderUrl, String
+            classUrl, String subspeciesUrls)
+            throws Exception {
+
+        String jsonContent = "{ " +
+                "\"taxonomySpecies\": \"" + CommonStates.getUrl(speciesUrl) + "\"," +
+                "\"taxonomyGenus\": \"" + CommonStates.getUrl(genusUrl) + "\"," +
+                "\"taxonomyOrder\": \"" + CommonStates.getUrl(orderUrl) + "\"," +
+                "\"taxonomyClass\": \"" + CommonStates.getUrl(classUrl) + "\"," +
+                "\"taxonomySubSpecieses\":" + objectMapper.writeValueAsString(CommonStates.getUrls(subspeciesUrls))
+                + "}";
+        CommonStates.setResultActions(mockMvc.perform(post("/taxonomyTrees")
+                .with(CommonStates.getRequestPostProcessor())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent.getBytes())));
+    }
 }

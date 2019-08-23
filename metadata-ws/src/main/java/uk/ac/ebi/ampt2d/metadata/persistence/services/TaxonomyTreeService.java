@@ -24,7 +24,7 @@ import java.util.List;
 
 public interface TaxonomyTreeService {
 
-    List<TaxonomyTree> findTaxonomyTreesById(long taxonomyId);
+    List<Long> findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(long taxonomyId);
 
-    List<TaxonomyTree> findTaxonomyTreesByName(String taxonomyName);
+    List<Long> findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyName(String taxonomyName);
 }

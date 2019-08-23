@@ -21,7 +21,6 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.TaxonomyTree;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 
 import java.util.List;
@@ -36,20 +35,21 @@ public class ReferenceSequenceServiceImpl implements ReferenceSequenceService {
 
     @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyId(long id) {
-        List<TaxonomyTree> taxonomyTrees = taxonomyTreeService.findTaxonomyTreesById(id);
-        return getReferenceSequences(taxonomyTrees);
+        List<Long> speciesAndSubspeciesTaxonomyIds =
+                taxonomyTreeService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(id);
+        return getReferenceSequences(speciesAndSubspeciesTaxonomyIds);
     }
 
     @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyName(String name) {
-        List<TaxonomyTree> taxonomyTrees = taxonomyTreeService.findTaxonomyTreesByName(name);
-        return getReferenceSequences(taxonomyTrees);
+        List<Long> speciesAndSubspeciesTaxonomyIds =
+                taxonomyTreeService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyName(name);
+        return getReferenceSequences(speciesAndSubspeciesTaxonomyIds);
     }
 
-    public List<ReferenceSequence> getReferenceSequences(List<TaxonomyTree> taxonomyTreeList) {
+    public List<ReferenceSequence> getReferenceSequences(List<Long> speciesAndSubspeciesTaxonomyIds) {
         QReferenceSequence referenceSequence = QReferenceSequence.referenceSequence;
-        Predicate predicate = referenceSequence.taxonomy.taxonomyId.in(taxonomyTreeList.parallelStream().map
-                (taxonomyTree -> taxonomyTree.getTaxonomySpecies().getTaxonomyId()).toArray(Long[]::new));
+        Predicate predicate = referenceSequence.taxonomy.taxonomyId.in(speciesAndSubspeciesTaxonomyIds);
         return (List<ReferenceSequence>) referenceSequenceRepository.findAll(predicate);
     }
 }

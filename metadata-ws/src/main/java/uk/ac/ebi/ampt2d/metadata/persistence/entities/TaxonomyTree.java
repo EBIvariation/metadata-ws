@@ -18,19 +18,27 @@
 
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @SequenceGenerator(allocationSize = 1, name = "TAXONOMY_TREE_SEQ", sequenceName = "taxonomy_tree_sequence")
-public class TaxonomyTree {
+public class TaxonomyTree implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TAXONOMY_TREE_SEQ")
@@ -56,6 +64,23 @@ public class TaxonomyTree {
     @OneToOne
     private Taxonomy taxonomyClass;
 
+    @ApiModelProperty(position = 11, dataType = "java.lang.String", example = "[Url1, Url2]")
+    @JsonProperty
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "taxonomyTreeSubspecies", joinColumns = @JoinColumn(referencedColumnName = "species_id"),
+            inverseJoinColumns = @JoinColumn(referencedColumnName = "taxonomyId"))
+    private List<Taxonomy> taxonomySubSpecieses = new ArrayList<>();
+
+    public TaxonomyTree() {
+    }
+
+    public TaxonomyTree(Taxonomy taxonomySpecies, Taxonomy taxonomyGenus, Taxonomy taxonomyOrder, Taxonomy taxonomyClass) {
+        this.taxonomySpecies = taxonomySpecies;
+        this.taxonomyGenus = taxonomyGenus;
+        this.taxonomyOrder = taxonomyOrder;
+        this.taxonomyClass = taxonomyClass;
+    }
+
     public Taxonomy getTaxonomySpecies() {
         return taxonomySpecies;
     }
@@ -79,7 +104,7 @@ public class TaxonomyTree {
 
     @ApiModelProperty(position = 3, readOnly = true)
     public Long getTaxonomyGenusId() {
-        return (taxonomyGenus == null) ? null : taxonomyGenus.getTaxonomyId();
+        return (taxonomyGenus == null) ? -1 : taxonomyGenus.getTaxonomyId();
     }
 
     public Taxonomy getTaxonomyOrder() {
@@ -92,7 +117,7 @@ public class TaxonomyTree {
 
     @ApiModelProperty(position = 5, readOnly = true)
     public Long getTaxOrderId() {
-        return (taxonomyOrder == null) ? null : taxonomyOrder.getTaxonomyId();
+        return (taxonomyOrder == null) ? -1 : taxonomyOrder.getTaxonomyId();
     }
 
     public Taxonomy getTaxonomyClass() {
@@ -105,6 +130,20 @@ public class TaxonomyTree {
 
     @ApiModelProperty(position = 7, readOnly = true)
     public Long getTaxonomyClassId() {
-        return (taxonomyClass == null) ? null : taxonomyClass.getTaxonomyId();
+        return (taxonomyClass == null) ? -1 : taxonomyClass.getTaxonomyId();
+    }
+
+    @ApiModelProperty(position = 8, readOnly = true)
+    public List<Long> getTaxonomySubSpeciesesIds() {
+        return this.getTaxonomySubSpecieses().parallelStream().map(taxonomy -> taxonomy.getTaxonomyId())
+                .collect(Collectors.toList());
+    }
+
+    public List<Taxonomy> getTaxonomySubSpecieses() {
+        return taxonomySubSpecieses;
+    }
+
+    public void setTaxonomySubSpecieses(List<Taxonomy> taxonomySubSpecieses) {
+        this.taxonomySubSpecieses = taxonomySubSpecieses;
     }
 }

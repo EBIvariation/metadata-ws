@@ -252,7 +252,16 @@ Feature: sample object
     }
     """
     Then set the URL to TAXONOMY_PAN_TROGLODYTES
-    When I create a parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TAXONOMY_PAN_PANISCUS,TAXONOMY_PAN_TROGLODYTES for taxonomy
+    When I request POST /taxonomies with JSON payload:
+    """
+    {
+      "taxonomyId": 37010,
+      "name": "Pan troglodytes schweinfurthii",
+      "rank": "SUBSPECIES"
+    }
+    """
+    Then set the URL to TAXONOMY_PAN_TROGLODYTES_SCWEINFURTHII
+    When I create a parameterized sample with Species2 for accession, 1 for version, Species collection2 for name and TAXONOMY_PAN_PANISCUS,TAXONOMY_PAN_TROGLODYTES,TAXONOMY_PAN_TROGLODYTES_SCWEINFURTHII for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE2
 
@@ -267,6 +276,7 @@ Feature: sample object
       | taxonomies.name=Pan troglodytes | SAMPLE2 |
       | taxonomies.taxonomyId=9606      | SAMPLE1 |
       | taxonomies.taxonomyId=9598      | SAMPLE2 |
+      | taxonomies.taxonomyId=37010     | SAMPLE2 |
 
 
   Scenario Outline: find no sample by non-existing taxonomy

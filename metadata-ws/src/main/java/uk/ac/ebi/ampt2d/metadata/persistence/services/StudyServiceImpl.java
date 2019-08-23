@@ -22,7 +22,6 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QStudy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.TaxonomyTree;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 
 import java.time.LocalDate;
@@ -97,20 +96,21 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     public List<Study> findStudiesByTaxonomyId(long id) {
-        List<TaxonomyTree> taxonomyTrees = taxonomyTreeService.findTaxonomyTreesById(id);
-        return getStudiesByTaxonomyTree(taxonomyTrees);
+        List<Long> speciesAndSubspeciesTaxonomyIds =
+                taxonomyTreeService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(id);
+        return getStudiesByTaxonomyIds(speciesAndSubspeciesTaxonomyIds);
     }
 
     @Override
     public List<Study> findStudiesByTaxonomyName(String name) {
-        List<TaxonomyTree> taxonomyTrees = taxonomyTreeService.findTaxonomyTreesByName(name);
-        return getStudiesByTaxonomyTree(taxonomyTrees);
+        List<Long> speciesAndSubspeciesTaxonomyIds =
+                taxonomyTreeService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyName(name);
+        return getStudiesByTaxonomyIds(speciesAndSubspeciesTaxonomyIds);
     }
 
-    public List<Study> getStudiesByTaxonomyTree(List<TaxonomyTree> taxonomyTrees) {
+    public List<Study> getStudiesByTaxonomyIds(List<Long> speciesAndSubspeciesTaxonomyIds) {
         QStudy study = QStudy.study;
-        Predicate predicate = study.taxonomy.taxonomyId.in(taxonomyTrees.parallelStream().map
-                (taxonomyTree -> taxonomyTree.getTaxonomySpecies().getTaxonomyId()).toArray(Long[]::new));
+        Predicate predicate = study.taxonomy.taxonomyId.in(speciesAndSubspeciesTaxonomyIds);
         return (List<Study>) studyRepository.findAll(predicate);
     }
 
