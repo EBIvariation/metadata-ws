@@ -19,8 +19,6 @@ package uk.ac.ebi.ampt2d.metadata.importer.xml;
 
 import org.apache.xmlbeans.XmlException;
 
-import java.util.List;
-
 public abstract class SraXmlParser<SRA_OBJECT> {
 
     private final String XML_ROOT_TAGS = "(</ROOT>|<ROOT.*display=xml\">)";

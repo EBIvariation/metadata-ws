@@ -22,7 +22,6 @@ import org.apache.xmlbeans.XmlException;
 import uk.ac.ebi.ena.sra.xml.STUDYDocument;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

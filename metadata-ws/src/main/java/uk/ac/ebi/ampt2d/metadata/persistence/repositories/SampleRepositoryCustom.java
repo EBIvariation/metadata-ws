@@ -18,14 +18,17 @@
 
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
+import com.querydsl.core.types.Predicate;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.QSample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @NoRepositoryBean
 public interface SampleRepositoryCustom extends PagingAndSortingRepository<Sample, Long>,
@@ -44,18 +47,26 @@ public interface SampleRepositoryCustom extends PagingAndSortingRepository<Sampl
     }
 
     default List<Sample> findOrSaveList(List<Sample> sampleIn) {
-        List<Sample> sampleList = new ArrayList<>();
-        for(Sample s:sampleIn) {
-            Sample existingSample = findOne(
-                    qSample.accessionVersionId.accession.eq(s.getAccessionVersionId().getAccession()).and(
-                            qSample.accessionVersionId.version.eq(s.getAccessionVersionId().getVersion()))
-            );
-            if (existingSample != null) {
-                sampleList.add(existingSample);
-            } else {
-                sampleList.add(save(s));
+        List<Sample> existingSampleList;
+        Predicate predicate = qSample.accessionVersionId.accession.in(sampleIn.stream()
+                .map(Sample::getAccessionVersionId).map(AccessionVersionId::getAccession).collect(Collectors.toList()))
+                .and(qSample.accessionVersionId.version.in(sampleIn.stream()
+                        .map(Sample::getAccessionVersionId).map(AccessionVersionId::getVersion).collect(Collectors.toList())));
+        existingSampleList = (List<Sample>) findAll(predicate);
+        List<String> existingSampleIdList = existingSampleList.stream().map(Sample::getAccessionVersionId)
+                .map(AccessionVersionId::getAccession).collect(Collectors.toList());
+
+        List<Sample> missingSampleList = new ArrayList<>();
+        for (Sample s : sampleIn) {
+            if (!existingSampleIdList.contains(s.getAccessionVersionId().getAccession())) {
+                missingSampleList.add(s);
             }
         }
+        missingSampleList = (List<Sample>) save(missingSampleList);
+
+        List<Sample> sampleList = new ArrayList<>();
+        sampleList.addAll(existingSampleList);
+        sampleList.addAll(missingSampleList);
         return sampleList;
     }
 

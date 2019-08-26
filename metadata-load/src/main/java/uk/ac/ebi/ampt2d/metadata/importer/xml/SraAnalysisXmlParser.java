@@ -21,7 +21,6 @@ import org.apache.xmlbeans.XmlException;
 import uk.ac.ebi.ena.sra.xml.ANALYSISDocument;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
