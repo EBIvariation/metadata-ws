@@ -40,7 +40,7 @@ public class SraXmlRetrieverThroughApi implements SraXmlRetrieverByAccession {
     public Map<String, String> getXmls(List<String> accession) {
         Map<String, String> idXmlMap = new HashMap<>();
         for(String item:accession) {
-            idXmlMap.put(item, restTemplate.exchange(ENA_API_URL, HttpMethod.GET, null, String.class, item).getBody());
+            idXmlMap.put(item, getXml(item));
         }
         return idXmlMap;
     }

@@ -23,7 +23,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,5 +59,4 @@ public class SraNonAssemblyReferenceSequenceXmlParser extends SraXmlParser<Refer
             throw new XmlException(e.getMessage(), e);
         }
     }
-
 }
