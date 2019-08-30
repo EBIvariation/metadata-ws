@@ -18,8 +18,6 @@
 
 package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.TaxonomyTree;
-
 import java.util.List;
 
 public interface TaxonomyTreeService {

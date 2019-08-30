@@ -41,7 +41,7 @@ public class TaxonomySteps {
                 .andExpect(jsonPath("$..taxonomies.length()").value(0));
     }
 
-    @When("^I request POST taxonomy with (\\d*) for ID, (.*) for name and (.*) for rank")
+    @When("^I request POST taxonomy with (\\d*) for ID, (.*) for name and (.*) for rank without parent")
     public void performPostOnTaxonomies(long id, String name, String rank) throws Exception {
         String jsonContent = "{ " +
                 "\"taxonomyId\": " + id + "," +
@@ -55,38 +55,38 @@ public class TaxonomySteps {
                 .content(jsonContent.getBytes())));
     }
 
-    @When("^I request POST taxonomyTree with (.*) for species , (.*) for GENUS , (.*) for ORDER and (.*) for CLASS$")
-    public void performPostOnTaxonomyTree(String speciesUrl, String genusUrl, String orderUrl, String classUrl)
-            throws Exception {
+    @When("^I request POST taxonomy with (\\d*) for ID, (.*) for name and (.*) for rank (.*) for SPECIES (.*) for " +
+            "GENUS (.*) for ORDER (.*) for CLASS")
+    public void performPostOnTaxonomiesWithTree(long id, String name, String rank,
+                                                String speciesUrl, String genusUrl,
+                                                String orderUrl, String classUrl) throws Exception {
 
-        String jsonContent = "{ " +
-                "\"taxonomySpecies\": \"" + CommonStates.getUrl(speciesUrl) + "\"," +
-                "\"taxonomyGenus\": \"" + CommonStates.getUrl(genusUrl) + "\"," +
-                "\"taxonomyOrder\": \"" + CommonStates.getUrl(orderUrl) + "\"," +
-                "\"taxonomyClass\": \"" + CommonStates.getUrl(classUrl) + "\"" +
-                "}";
-        CommonStates.setResultActions(mockMvc.perform(post("/taxonomyTrees")
+        StringBuilder jsonContent = new StringBuilder();
+        jsonContent.append("{ " +
+                "\"taxonomyId\": " + id + "," +
+                "\"name\": \"" + name + "\"," +
+                "\"rank\": \"" + rank + "\"") ;
+        String taxonomySpeciesUrl = CommonStates.getUrl(speciesUrl);
+        if (taxonomySpeciesUrl !=null){
+            jsonContent.append(",\"taxonomySpecies\": \"" + taxonomySpeciesUrl + "\"");
+        }
+        String taxonomyGenusUrl = CommonStates.getUrl(genusUrl);
+        if (taxonomyGenusUrl !=null){
+            jsonContent.append(",\"taxonomyGenus\": \"" + taxonomyGenusUrl + "\"");
+        }
+        String taxonomyOrderUrl = CommonStates.getUrl(orderUrl);
+        if (taxonomyOrderUrl !=null){
+            jsonContent.append(",\"taxonomyOrder\": \"" + taxonomyOrderUrl + "\"");
+        }
+        String taxonomyClassUrl = CommonStates.getUrl(classUrl);
+        if (taxonomyClassUrl !=null){
+            jsonContent.append(",\"taxonomyClass\": \"" + taxonomyClassUrl + "\"");
+        }
+        jsonContent.append("}");
+
+        CommonStates.setResultActions(mockMvc.perform(post("/taxonomies")
                 .with(CommonStates.getRequestPostProcessor())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonContent.getBytes())));
-    }
-
-    @When("^I request POST taxonomyTree with (.*) for species , (.*) for GENUS , (.*) for ORDER , (.*) for CLASS and " +
-            "(.*) for SUBSPECIES$")
-    public void performPostOnTaxonomyTreeWithSubspecies(String speciesUrl, String genusUrl, String orderUrl, String
-            classUrl, String subspeciesUrls)
-            throws Exception {
-
-        String jsonContent = "{ " +
-                "\"taxonomySpecies\": \"" + CommonStates.getUrl(speciesUrl) + "\"," +
-                "\"taxonomyGenus\": \"" + CommonStates.getUrl(genusUrl) + "\"," +
-                "\"taxonomyOrder\": \"" + CommonStates.getUrl(orderUrl) + "\"," +
-                "\"taxonomyClass\": \"" + CommonStates.getUrl(classUrl) + "\"," +
-                "\"taxonomySubSpecieses\":" + objectMapper.writeValueAsString(CommonStates.getUrls(subspeciesUrls))
-                + "}";
-        CommonStates.setResultActions(mockMvc.perform(post("/taxonomyTrees")
-                .with(CommonStates.getRequestPostProcessor())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonContent.getBytes())));
+                .content(jsonContent.toString().getBytes())));
     }
 }

@@ -28,6 +28,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -63,8 +65,28 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private Rank rank;
+
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a taxonomySpecies")
+    @JoinColumn(name = "speciesId", referencedColumnName = "taxonomyId")
+    @ManyToOne
+    private Taxonomy taxonomySpecies;
+
+    @ApiModelProperty(position = 8, dataType = "java.lang.String", notes = "Url to a taxonomyGenus")
+    @JoinColumn(name = "genusId", referencedColumnName = "taxonomyId")
+    @ManyToOne
+    private Taxonomy taxonomyGenus;
+
+    @ApiModelProperty(position = 10, dataType = "java.lang.String", notes = "Url to a taxonomyOrder")
+    @JoinColumn(name = "orderId", referencedColumnName = "taxonomyId")
+    @ManyToOne
+    private Taxonomy taxonomyOrder;
+
+    @ApiModelProperty(position = 12, dataType = "java.lang.String", notes = "Url to a taxonomyClass")
+    @JoinColumn(name = "classId", referencedColumnName = "taxonomyId")
+    @ManyToOne
+    private Taxonomy taxonomyClass;
 
     public Taxonomy() {
     }
@@ -83,8 +105,16 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
         return taxonomyId;
     }
 
+    public void setTaxonomyId(long taxonomyId) {
+        this.taxonomyId = taxonomyId;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -96,5 +126,65 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
         return null;
     }
 
-    public enum Rank {SUBSPECIES, SPECIES, GENUS, ORDER, CLASS}
+    public Rank getRank() {
+        return rank;
+    }
+
+    public void setRank(Rank rank) {
+        this.rank = rank;
+    }
+
+    @ApiModelProperty(position = 5, readOnly = true)
+    public Long getTaxonomySpeciesId() {
+        return (taxonomySpecies == null) ? -1 : taxonomySpecies.getTaxonomyId();
+    }
+
+    @ApiModelProperty(position = 7, readOnly = true)
+    public Long getTaxonomyGenusId() {
+        return (taxonomyGenus == null) ? -1 : taxonomyGenus.getTaxonomyId();
+    }
+
+    @ApiModelProperty(position = 9, readOnly = true)
+    public Long getTaxOrderId() {
+        return (taxonomyOrder == null) ? -1 : taxonomyOrder.getTaxonomyId();
+    }
+
+    @ApiModelProperty(position = 11, readOnly = true)
+    public Long getTaxonomyClassId() {
+        return (taxonomyClass == null) ? -1 : taxonomyClass.getTaxonomyId();
+    }
+
+    public Taxonomy getTaxonomySpecies() {
+        return taxonomySpecies;
+    }
+
+    public void setTaxonomySpecies(Taxonomy taxonomySpecies) {
+        this.taxonomySpecies = taxonomySpecies;
+    }
+
+    public Taxonomy getTaxonomyGenus() {
+        return taxonomyGenus;
+    }
+
+    public void setTaxonomyGenus(Taxonomy taxonomyGenus) {
+        this.taxonomyGenus = taxonomyGenus;
+    }
+
+    public Taxonomy getTaxonomyOrder() {
+        return taxonomyOrder;
+    }
+
+    public void setTaxonomyOrder(Taxonomy taxonomyOrder) {
+        this.taxonomyOrder = taxonomyOrder;
+    }
+
+    public Taxonomy getTaxonomyClass() {
+        return taxonomyClass;
+    }
+
+    public void setTaxonomyClass(Taxonomy taxonomyClass) {
+        this.taxonomyClass = taxonomyClass;
+    }
+
+    public enum Rank {SUBSPECIES, SPECIES, GENUS, ORDER, CLASS, UNKNOWN}
 }

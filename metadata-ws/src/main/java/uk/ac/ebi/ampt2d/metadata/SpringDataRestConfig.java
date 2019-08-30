@@ -42,9 +42,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyTreeRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
@@ -119,9 +116,7 @@ public class SpringDataRestConfig {
     }
 
     @Bean
-    public StudyService studyService(ReferenceSequenceRepository referenceSequenceRepository,
-                                     TaxonomyTreeRepository taxonomyTreeRepository,
-                                     TaxonomyRepository taxonomyRepository) {
+    public StudyService studyService() {
         return new StudyServiceImpl();
     }
 

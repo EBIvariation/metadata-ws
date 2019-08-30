@@ -38,7 +38,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepos
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyTreeRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
 
@@ -90,9 +89,6 @@ public class CommonSteps {
     private TaxonomyRepository taxonomyRepository;
 
     @Autowired
-    private TaxonomyTreeRepository taxonomyTreeRepository;
-
-    @Autowired
     private WebResourceRepository webResourceRepository;
 
     @Autowired
@@ -108,7 +104,6 @@ public class CommonSteps {
         fileRepository.deleteAll();
         sampleRepository.deleteAll();
         studyRepository.deleteAll();
-        taxonomyTreeRepository.deleteAll();
         taxonomyRepository.deleteAll();
         webResourceRepository.deleteAll();
         publicationRepository.deleteAll();

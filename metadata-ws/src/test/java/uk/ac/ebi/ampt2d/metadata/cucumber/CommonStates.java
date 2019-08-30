@@ -46,6 +46,9 @@ public class CommonStates {
     }
 
     public static String getUrl(String key) {
+        if (key.equals("NONE")) {
+            return null;
+        }
         return urlMap.get(key);
     }
 

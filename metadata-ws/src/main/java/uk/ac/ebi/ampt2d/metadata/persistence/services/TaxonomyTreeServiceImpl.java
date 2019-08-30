@@ -18,47 +18,45 @@
 
 package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.QTaxonomyTree;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.QTaxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.TaxonomyTree;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyTreeRepository;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TaxonomyTreeServiceImpl implements TaxonomyTreeService {
 
     @Autowired
-    private TaxonomyTreeRepository taxonomyTreeRepository;
+    private TaxonomyRepository taxonomyRepository;
 
     @Autowired
-    private TaxonomyRepository taxonomyRepository;
+    private EntityManager entityManager;
 
     @Override
     public List<Long> findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(long taxonomyId) {
-        QTaxonomyTree qTaxonomyTree = QTaxonomyTree.taxonomyTree;
+        QTaxonomy qTaxonomy = QTaxonomy.taxonomy;
+        QTaxonomy qTaxonomySpecies = new QTaxonomy("qTaxonomySpecies");
+        QTaxonomy qTaxonomyGenus = new QTaxonomy("qTaxonomyGenus");
+        QTaxonomy qTaxonomyOrder = new QTaxonomy("qTaxonomyOrder");
+        QTaxonomy qTaxonomyClass = new QTaxonomy("qTaxonomyClass");
 
-        //Search by subspecies
-        List<TaxonomyTree> taxonomySubSpecies = (List<TaxonomyTree>) taxonomyTreeRepository
-                .findAll(qTaxonomyTree.taxonomySubSpecieses.isNotEmpty()
-                        .and(qTaxonomyTree.taxonomySubSpecieses.any().taxonomyId.eq(taxonomyId)));
-        if (taxonomySubSpecies.size() > 0) {
-            return Arrays.asList(new Long(taxonomyId));
-        }
-
-        //Search by species or order or class taxonomy id
-        List<TaxonomyTree> taxonomyTrees = (List<TaxonomyTree>) taxonomyTreeRepository.findAll(qTaxonomyTree
-                .taxonomySpecies
-                .taxonomyId.eq(taxonomyId)
-                .or(qTaxonomyTree.taxonomyGenus.isNotNull().and(qTaxonomyTree.taxonomyGenus.taxonomyId.eq(taxonomyId)))
-                .or(qTaxonomyTree.taxonomyClass.isNotNull().and(qTaxonomyTree.taxonomyClass.taxonomyId.eq(taxonomyId)))
-                .or(qTaxonomyTree.taxonomyOrder.isNotNull().and(qTaxonomyTree.taxonomyOrder.taxonomyId.eq(taxonomyId)
-                )));
-        return getSpeciesAndSubspeciesTaxonomyIds(taxonomyTrees);
+        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
+        List<Taxonomy> taxonomies = (List<Taxonomy>) jpaQueryFactory.from(qTaxonomy)
+                .leftJoin(qTaxonomy.taxonomySpecies, qTaxonomySpecies)
+                .leftJoin(qTaxonomy.taxonomyGenus, qTaxonomyGenus)
+                .leftJoin(qTaxonomy.taxonomyOrder, qTaxonomyOrder)
+                .leftJoin(qTaxonomy.taxonomyClass, qTaxonomyClass)
+                .where(qTaxonomySpecies.taxonomyId.eq(taxonomyId)
+                        .or(qTaxonomyOrder.taxonomyId.eq(taxonomyId)
+                                .or(qTaxonomyGenus.taxonomyId.eq(taxonomyId))
+                                .or(qTaxonomyClass.taxonomyId.eq(taxonomyId)))
+                        .or(qTaxonomy.taxonomyId.eq(taxonomyId))).fetch();
+        return getSpeciesAndSubspeciesTaxonomyIds(taxonomies);
     }
 
     @Override
@@ -70,12 +68,14 @@ public class TaxonomyTreeServiceImpl implements TaxonomyTreeService {
         return findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(taxonomy.getTaxonomyId());
     }
 
-    public List<Long> getSpeciesAndSubspeciesTaxonomyIds(List<TaxonomyTree> taxonomyTrees) {
-        return taxonomyTrees.parallelStream()
-                .map(taxonomyTree -> {
-                    List<Long> taxIds = taxonomyTree.getTaxonomySubSpeciesesIds();
-                    taxIds.add(taxonomyTree.getTaxonomySpeciesId());
-                    return taxIds;
-                }).flatMap(tax -> tax.stream()).collect(Collectors.toList());
+    public List<Long> getSpeciesAndSubspeciesTaxonomyIds(List<Taxonomy> taxonomies) {
+        return taxonomies.parallelStream().filter(taxonomy -> {
+            Taxonomy.Rank rank = taxonomy.getRank();
+            if (rank.equals(Taxonomy.Rank.SPECIES) || rank.equals(Taxonomy.Rank.SUBSPECIES)
+                    || rank.equals(Taxonomy.Rank.UNKNOWN)) {
+                return true;
+            }
+            return false;
+        }).map(taxonomy -> taxonomy.getTaxonomyId()).collect(Collectors.toList());
     }
 }
