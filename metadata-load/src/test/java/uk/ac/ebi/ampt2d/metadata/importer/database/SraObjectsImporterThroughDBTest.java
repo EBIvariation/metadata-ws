@@ -22,12 +22,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired;;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
@@ -35,7 +37,10 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -47,6 +52,8 @@ import static org.junit.Assert.assertNull;
 @TestPropertySource(value = "classpath:application.properties", properties = {"import.source=DB"})
 @ContextConfiguration(classes = {MetadataImporterMainApplication.class})
 public class SraObjectsImporterThroughDBTest {
+
+    private static final String ANALYSIS_DOCUMENT_BIG_XML = "analysis/AnalysisDocumentBig.xml";
 
     @Autowired
     private ObjectsImporter sraObjectImporter;
@@ -135,11 +142,17 @@ public class SraObjectsImporterThroughDBTest {
 
     @Test
     @Category(OracleDbCategory.class)
-    public void importSampleObject() throws Exception {
-        Sample sample = sraObjectImporter.importSample("ERS000002");
-        assertNotNull(sample);
-        assertEquals("ERS000002", sample.getAccessionVersionId().getAccession());
-        assertEquals("Solexa sequencing of Saccharomyces cerevisiae strain SK1 random 200 bp library", sample.getName());
+    public void importSamplesObject() throws Exception {
+        SraXmlParser<AnalysisType> analysisTypeSraXmlParser = new SraAnalysisXmlParser();
+        String xmlString = new String(Files.readAllBytes(
+                Paths.get(getClass().getClassLoader().getResource(ANALYSIS_DOCUMENT_BIG_XML).toURI())));
+        AnalysisType analysisType = analysisTypeSraXmlParser.parseXml(xmlString, "ERZ015710");
+        List<Sample> sample = sraObjectImporter.importSamples(analysisType);
+        assertEquals(1092, sample.size());
+        assertEquals("SRS000621", sample.get(0).getAccessionVersionId().getAccession());
+        assertEquals("NA12286", sample.get(0).getName());
+        assertEquals("SRS003719", sample.get(1091).getAccessionVersionId().getAccession());
+        assertEquals("NA19776", sample.get(1091).getName());
     }
 
 }

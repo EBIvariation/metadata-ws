@@ -48,14 +48,11 @@ public interface SampleRepositoryCustom extends PagingAndSortingRepository<Sampl
 
     default List<Sample> findOrSaveList(List<Sample> sampleIn) {
         List<Sample> existingSampleList;
-        Predicate predicate;
-
-        predicate = qSample.accessionVersionId.accession.eq(sampleIn.get(0).getAccessionVersionId().getAccession()).and(
-                qSample.accessionVersionId.version.eq(sampleIn.get(0).getAccessionVersionId().getVersion()));
-        for (int index = 1; index < sampleIn.size(); index++) {
-            predicate = (qSample.accessionVersionId.accession.eq(sampleIn.get(index).getAccessionVersionId().getAccession()).and(
-                    qSample.accessionVersionId.version.eq(sampleIn.get(index).getAccessionVersionId().getVersion()))).or(predicate);
-        }
+        Predicate predicate = qSample.accessionVersionId.accession.concat(qSample.accessionVersionId.version.stringValue())
+                .in(sampleIn.stream()
+                        .map(sample -> sample
+                                .getAccessionVersionId().getAccession()
+                                + sample.getAccessionVersionId().getVersion()).collect(Collectors.toList()));
         existingSampleList = (List<Sample>) findAll(predicate);
         List<String> existingSampleIdList = existingSampleList.stream().map(Sample::getAccessionVersionId)
                 .map(AccessionVersionId::getAccession).collect(Collectors.toList());

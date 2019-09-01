@@ -28,6 +28,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
@@ -37,7 +39,10 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -205,13 +210,19 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals("Homo sapiens", taxonomy.getName());
         assertEquals(2, referenceSequenceRepository.count());
     }
-
+    
     @Test
-    public void importSampleObject() throws Exception {
-        Sample sample = sraObjectImporter.importSample("ERS000156");
-        assertNotNull(sample);
-        assertEquals("ERS000156", sample.getAccessionVersionId().getAccession());
-        assertEquals("E-TABM-722:mmu5", sample.getName());
+    public void importSamplesObject() throws Exception {
+        SraXmlParser<AnalysisType> analysisTypeSraXmlParser = new SraAnalysisXmlParser();
+        String xmlString = new String(Files.readAllBytes(
+                Paths.get(getClass().getClassLoader().getResource("analysis/AnalysisDocumentBig.xml").toURI())));
+        AnalysisType analysisType = analysisTypeSraXmlParser.parseXml(xmlString, "ERZ015710");
+        List<Sample> sample = sraObjectImporter.importSamples(analysisType);
+        assertEquals(1092, sample.size());
+        assertEquals("SRS000621", sample.get(0).getAccessionVersionId().getAccession());
+        assertEquals("NA12286", sample.get(0).getName());
+        assertEquals("SRS003719", sample.get(1091).getAccessionVersionId().getAccession());
+        assertEquals("NA19776", sample.get(1091).getName());
     }
 
 }

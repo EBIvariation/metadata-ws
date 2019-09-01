@@ -17,21 +17,18 @@
  */
 package uk.ac.ebi.ampt2d.metadata.importer.database;
 
-import com.google.common.collect.Lists;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 
 import java.sql.SQLException;
 import java.sql.SQLXML;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SraXmlRetrieverThroughDatabase implements SraXmlRetrieverByAccession {
-
-    private static final int MAX_QUERY_LIST = 1000;
 
     private NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -58,17 +55,7 @@ public class SraXmlRetrieverThroughDatabase implements SraXmlRetrieverByAccessio
     public Map<String, String> getXmls(List<String> accessionList) {
         Map<String, List> paramMap = new HashMap<>();
         String sampleListQuery = enaObjectQuery;
-        String dynamicQuery = "SAMPLE_ID IN (:accession0) ";
-        List<List<String>> accessionSubList = Lists.partition(accessionList, MAX_QUERY_LIST);
-
-        // Oracle limitation: IN query can not have more than 1000 items in single list
-        for (int index = 0; index < (accessionList.size() / MAX_QUERY_LIST) + 1; index++) {
-            if (index > 0) {
-                dynamicQuery = "OR SAMPLE_ID IN (:accession" + index + ") ";
-            }
-            sampleListQuery += dynamicQuery;
-            paramMap.put("accession" + index, accessionSubList.get(index));
-        }
+        paramMap.put("accession", Arrays.asList(accessionList.get(0)));
 
         List<Map<String, Object>> idSqlxmlList = jdbcTemplate.queryForList(sampleListQuery, paramMap);
         Map<String, String> idXmlMap = new HashMap<>();

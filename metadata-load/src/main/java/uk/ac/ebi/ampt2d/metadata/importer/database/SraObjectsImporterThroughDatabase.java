@@ -31,6 +31,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
@@ -41,9 +42,13 @@ import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This importer is mainly used for EGA studies where Study XML doesn't have analysis accessions
@@ -51,6 +56,8 @@ import java.util.Map;
 public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
     private Map<String, Study> accessionsToStudy = new HashMap<>();
+
+    private static final Logger IMPORT_LOGGER = Logger.getLogger(SraObjectsImporterThroughDatabase.class.getName());
 
     public SraObjectsImporterThroughDatabase(
             SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
@@ -123,17 +130,26 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     }
 
     @Override
-    public Sample importSample(String accession) {
+    public List<Sample> importSamples(AnalysisType analysisType) {
         setEnaObjectQuery(EnaObjectQuery.SAMPLE_QUERY);
-        Sample sample = super.importSample(accession);
-        setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
-        return sample;
-    }
+        String analysisAccession = analysisType.getAccession();
+        List<Sample> sampleList = new ArrayList<>();
+        try {
+            Map<String, String> idXmlMap = sraXmlRetrieverByAccession.getXmls(Arrays.asList(analysisAccession));
+            SampleType sampleType;
+            for (Map.Entry<String, String> entry : idXmlMap.entrySet()) {
+                sampleType = sraSampleXmlParser.parseXml(entry.getValue(), entry.getKey());
+                Sample sampleElement = sampleConverter.convert(sampleType);
+                Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(sampleType));
+                sampleElement.setTaxonomies(Arrays.asList(taxonomy));
+                sampleList.add(sampleElement);
+            }
+            sampleList = sampleRepository.findOrSaveList(sampleList);
+        } catch (Exception exception) {
+            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Analysis accession " + analysisAccession);
+            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+        }
 
-    @Override
-    public List<Sample> importSamples(List<String> accessionList) {
-        setEnaObjectQuery(EnaObjectQuery.SAMPLE_QUERY_LIST);
-        List<Sample> sampleList = super.importSamples(accessionList);
         setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
         return sampleList;
     }
