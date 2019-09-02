@@ -35,39 +35,26 @@ public interface SampleRepositoryCustom extends PagingAndSortingRepository<Sampl
         QueryDslPredicateExecutor<Sample> {
     QSample qSample = QSample.sample;
 
-    default Sample findOrSave(Sample sample) {
-        Sample existingSample = findOne(
-                qSample.accessionVersionId.accession.eq(sample.getAccessionVersionId().getAccession()).and(
-                qSample.accessionVersionId.version.eq(sample.getAccessionVersionId().getVersion()))
-        );
-        if (existingSample != null) {
-            return existingSample;
-        }
-        return save(sample);
-    }
-
-    default List<Sample> findOrSaveList(List<Sample> sampleIn) {
-        List<Sample> existingSampleList;
+    default List<Sample> findOrSave(List<Sample> sampleIn) {
+        List<Sample> existingSamples;
         Predicate predicate = qSample.accessionVersionId.accession.concat(qSample.accessionVersionId.version.stringValue())
-                .in(sampleIn.stream()
-                        .map(sample -> sample
-                                .getAccessionVersionId().getAccession()
-                                + sample.getAccessionVersionId().getVersion()).collect(Collectors.toList()));
-        existingSampleList = (List<Sample>) findAll(predicate);
-        List<String> existingSampleIdList = existingSampleList.stream().map(Sample::getAccessionVersionId)
+                .in(sampleIn.stream().map(s -> s.getAccessionVersionId().getAccession()
+                + s.getAccessionVersionId().getVersion()).collect(Collectors.toList()));
+        existingSamples = (List<Sample>) findAll(predicate);
+        List<String> existingSampleIdList = existingSamples.stream().map(Sample::getAccessionVersionId)
                 .map(AccessionVersionId::getAccession).collect(Collectors.toList());
 
-        List<Sample> missingSampleList = new ArrayList<>();
+        List<Sample> missingSamples = new ArrayList<>();
         for (Sample s : sampleIn) {
             if (!existingSampleIdList.contains(s.getAccessionVersionId().getAccession())) {
-                missingSampleList.add(s);
+                missingSamples.add(s);
             }
         }
-        missingSampleList = (List<Sample>) save(missingSampleList);
+        missingSamples = (List<Sample>) save(missingSamples);
 
         List<Sample> sampleList = new ArrayList<>();
-        sampleList.addAll(existingSampleList);
-        sampleList.addAll(missingSampleList);
+        sampleList.addAll(existingSamples);
+        sampleList.addAll(missingSamples);
         return sampleList;
     }
 

@@ -52,15 +52,15 @@ public class SraXmlRetrieverThroughDatabase implements SraXmlRetrieverByAccessio
     }
 
     @Override
-    public Map<String, String> getXmls(List<String> accessionList) {
+    public Map<String, String> getXmls(List<String> accessions) {
         Map<String, List> paramMap = new HashMap<>();
-        String sampleListQuery = enaObjectQuery;
-        paramMap.put("accession", Arrays.asList(accessionList.get(0)));
+        String samplesQuery = enaObjectQuery;
+        paramMap.put("accession", Arrays.asList(accessions.get(0)));
 
-        List<Map<String, Object>> idSqlxmlList = jdbcTemplate.queryForList(sampleListQuery, paramMap);
+        List<Map<String, Object>> idSqlxmls = jdbcTemplate.queryForList(samplesQuery, paramMap);
         Map<String, String> idXmlMap = new HashMap<>();
         try {
-            for (Map<String, Object> xmlId : idSqlxmlList) {
+            for (Map<String, Object> xmlId : idSqlxmls) {
                 String sampleId = (String) xmlId.get("SAMPLE_ID");
                 SQLXML sqlxml = (SQLXML) xmlId.get("SAMPLE_XML");
                 idXmlMap.put(sampleId, sqlxml.getString());

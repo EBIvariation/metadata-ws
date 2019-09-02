@@ -133,7 +133,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     public List<Sample> importSamples(AnalysisType analysisType) {
         setEnaObjectQuery(EnaObjectQuery.SAMPLE_QUERY);
         String analysisAccession = analysisType.getAccession();
-        List<Sample> sampleList = new ArrayList<>();
+        List<Sample> samples = new ArrayList<>();
         try {
             Map<String, String> idXmlMap = sraXmlRetrieverByAccession.getXmls(Arrays.asList(analysisAccession));
             SampleType sampleType;
@@ -142,16 +142,16 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                 Sample sampleElement = sampleConverter.convert(sampleType);
                 Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(sampleType));
                 sampleElement.setTaxonomies(Arrays.asList(taxonomy));
-                sampleList.add(sampleElement);
+                samples.add(sampleElement);
             }
-            sampleList = sampleRepository.findOrSaveList(sampleList);
+            samples = sampleRepository.findOrSave(samples);
         } catch (Exception exception) {
             IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Analysis accession " + analysisAccession);
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
         }
 
         setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
-        return sampleList;
+        return samples;
     }
 
     @Override

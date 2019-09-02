@@ -37,9 +37,9 @@ public class SraXmlRetrieverThroughApi implements SraXmlRetrieverByAccession {
     }
 
     @Override
-    public Map<String, String> getXmls(List<String> accession) {
+    public Map<String, String> getXmls(List<String> accessions) {
         Map<String, String> idXmlMap = new HashMap<>();
-        for(String item:accession) {
+        for(String item:accessions) {
             idXmlMap.put(item, getXml(item));
         }
         return idXmlMap;

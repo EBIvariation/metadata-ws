@@ -24,5 +24,5 @@ public interface SraXmlRetrieverByAccession {
 
     String getXml(String accession);
 
-    Map<String, String> getXmls(List<String> accessionList);
+    Map<String, String> getXmls(List<String> accessions);
 }
