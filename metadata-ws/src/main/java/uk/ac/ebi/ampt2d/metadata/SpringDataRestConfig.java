@@ -46,8 +46,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
-import uk.ac.ebi.ampt2d.metadata.persistence.services.TaxonomyTreeService;
-import uk.ac.ebi.ampt2d.metadata.persistence.services.TaxonomyTreeServiceImpl;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.TaxonomyService;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.TaxonomyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.AnalysisRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.ReferenceSequenceRestController;
@@ -126,8 +126,8 @@ public class SpringDataRestConfig {
     }
 
     @Bean
-    public TaxonomyTreeService taxonomyTreeService() {
-        return new TaxonomyTreeServiceImpl();
+    public TaxonomyService taxonomyTreeService() {
+        return new TaxonomyServiceImpl();
     }
 
     @Bean

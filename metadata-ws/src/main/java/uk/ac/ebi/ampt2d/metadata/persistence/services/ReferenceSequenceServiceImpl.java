@@ -31,19 +31,19 @@ public class ReferenceSequenceServiceImpl implements ReferenceSequenceService {
     private ReferenceSequenceRepository referenceSequenceRepository;
 
     @Autowired
-    private TaxonomyTreeService taxonomyTreeService;
+    private TaxonomyService taxonomyService;
 
     @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyId(long id) {
         List<Long> speciesAndSubspeciesTaxonomyIds =
-                taxonomyTreeService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(id);
+                taxonomyService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(id);
         return getReferenceSequences(speciesAndSubspeciesTaxonomyIds);
     }
 
     @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyName(String name) {
         List<Long> speciesAndSubspeciesTaxonomyIds =
-                taxonomyTreeService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyName(name);
+                taxonomyService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyName(name);
         return getReferenceSequences(speciesAndSubspeciesTaxonomyIds);
     }
 

@@ -51,7 +51,7 @@ public class SraNonAssemblyReferenceSequenceXmlParser extends SraXmlParser<Refer
             String taxonomyName = domQueryUsingXPath.findInDom(ENTRY_PATH + SLASH + "feature/taxon/@scientificName");
             long taxonomyId = Long.parseLong(domQueryUsingXPath.findInDom(ENTRY_PATH + SLASH +
                     "feature/taxon/@taxId"));
-            Taxonomy taxonomy = new Taxonomy(taxonomyId, taxonomyName, Taxonomy.Rank.SPECIES);
+            Taxonomy taxonomy = new Taxonomy(taxonomyId, taxonomyName);
             referenceSequence.setTaxonomy(taxonomy);
             return referenceSequence;
         } catch (Exception e) {

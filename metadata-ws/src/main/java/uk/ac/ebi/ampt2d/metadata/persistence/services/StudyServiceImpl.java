@@ -41,7 +41,7 @@ public class StudyServiceImpl implements StudyService {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private TaxonomyTreeService taxonomyTreeService;
+    private TaxonomyService taxonomyService;
 
     @Override
     public Study findOneStudyByPredicate(Predicate predicate) {
@@ -97,14 +97,14 @@ public class StudyServiceImpl implements StudyService {
     @Override
     public List<Study> findStudiesByTaxonomyId(long id) {
         List<Long> speciesAndSubspeciesTaxonomyIds =
-                taxonomyTreeService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(id);
+                taxonomyService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(id);
         return getStudiesByTaxonomyIds(speciesAndSubspeciesTaxonomyIds);
     }
 
     @Override
     public List<Study> findStudiesByTaxonomyName(String name) {
         List<Long> speciesAndSubspeciesTaxonomyIds =
-                taxonomyTreeService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyName(name);
+                taxonomyService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyName(name);
         return getStudiesByTaxonomyIds(speciesAndSubspeciesTaxonomyIds);
     }
 

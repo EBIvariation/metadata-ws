@@ -92,8 +92,7 @@ public class SwaggerConfig {
                         new Tag("Sample Entity", "Sample metadata"),
                         new Tag("Study Entity", "Study metadata"),
                         new Tag("Taxonomy Entity", "Taxonomy definitions"),
-                        new Tag("WebResource Entity", "Study resources that can be accessed through web protocols"),
-                        new Tag("TaxonomyTree Entity", "Taxonomy tree")
+                        new Tag("WebResource Entity", "Study resources that can be accessed through web protocols")
                 )
                 .globalResponseMessage(RequestMethod.POST, getResponseMessagesForPostAndPatch())
                 .globalResponseMessage(RequestMethod.PATCH, getResponseMessagesForPostAndPatch())

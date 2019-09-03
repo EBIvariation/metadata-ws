@@ -17,7 +17,6 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.repositories;
 
-import org.hibernate.SQLQuery;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
@@ -31,7 +30,7 @@ public interface TaxonomyRepository extends TaxonomyRepositoryCustom, PagingAndS
 
     Taxonomy findByTaxonomyId(@Param("taxonomyId") long taxonomyId);
 
-    Taxonomy findByRank(@Param("rank") Taxonomy.Rank rank);
+    Taxonomy findByRank(@Param("rank") String rank);
 
     Taxonomy findByName(@Param("name") String name);
 

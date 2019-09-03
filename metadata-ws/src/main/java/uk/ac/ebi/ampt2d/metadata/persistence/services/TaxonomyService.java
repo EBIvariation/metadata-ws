@@ -20,7 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.services;
 
 import java.util.List;
 
-public interface TaxonomyTreeService {
+public interface TaxonomyService {
 
     List<Long> findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(long taxonomyId);
 

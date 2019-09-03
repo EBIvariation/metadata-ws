@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TaxonomyTreeServiceImpl implements TaxonomyTreeService {
+public class TaxonomyServiceImpl implements TaxonomyService {
 
     @Autowired
     private TaxonomyRepository taxonomyRepository;
@@ -70,12 +70,11 @@ public class TaxonomyTreeServiceImpl implements TaxonomyTreeService {
 
     public List<Long> getSpeciesAndSubspeciesTaxonomyIds(List<Taxonomy> taxonomies) {
         return taxonomies.parallelStream().filter(taxonomy -> {
-            Taxonomy.Rank rank = taxonomy.getRank();
-            if (rank.equals(Taxonomy.Rank.SPECIES) || rank.equals(Taxonomy.Rank.SUBSPECIES)
-                    || rank.equals(Taxonomy.Rank.UNKNOWN)) {
-                return true;
+            String rank = taxonomy.getRank();
+            if (rank.equals("class") || rank.equals("order") || rank.equals("genus")) {
+                return false;
             }
-            return false;
+            return true;
         }).map(taxonomy -> taxonomy.getTaxonomyId()).collect(Collectors.toList());
     }
 }

@@ -23,8 +23,6 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -64,26 +62,25 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
     @ApiModelProperty(position = 4)
     @NotNull
     @JsonProperty
-    @Enumerated(EnumType.STRING)
     @Column
-    private Rank rank;
+    private String rank;
 
-    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a taxonomySpecies")
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a taxonomySpecies")
     @JoinColumn(name = "speciesId", referencedColumnName = "taxonomyId")
     @ManyToOne
     private Taxonomy taxonomySpecies;
 
-    @ApiModelProperty(position = 8, dataType = "java.lang.String", notes = "Url to a taxonomyGenus")
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a taxonomyGenus")
     @JoinColumn(name = "genusId", referencedColumnName = "taxonomyId")
     @ManyToOne
     private Taxonomy taxonomyGenus;
 
-    @ApiModelProperty(position = 10, dataType = "java.lang.String", notes = "Url to a taxonomyOrder")
+    @ApiModelProperty(position = 7, dataType = "java.lang.String", notes = "Url to a taxonomyOrder")
     @JoinColumn(name = "orderId", referencedColumnName = "taxonomyId")
     @ManyToOne
     private Taxonomy taxonomyOrder;
 
-    @ApiModelProperty(position = 12, dataType = "java.lang.String", notes = "Url to a taxonomyClass")
+    @ApiModelProperty(position = 8, dataType = "java.lang.String", notes = "Url to a taxonomyClass")
     @JoinColumn(name = "classId", referencedColumnName = "taxonomyId")
     @ManyToOne
     private Taxonomy taxonomyClass;
@@ -91,10 +88,9 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
     public Taxonomy() {
     }
 
-    public Taxonomy(long taxonomyId, String name, Rank rank) {
+    public Taxonomy(long taxonomyId, String name) {
         this.taxonomyId = taxonomyId;
         this.name = name;
-        this.rank = rank;
     }
 
     public Long getId() {
@@ -126,32 +122,12 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
         return null;
     }
 
-    public Rank getRank() {
+    public String getRank() {
         return rank;
     }
 
-    public void setRank(Rank rank) {
+    public void setRank(String rank) {
         this.rank = rank;
-    }
-
-    @ApiModelProperty(position = 5, readOnly = true)
-    public Long getTaxonomySpeciesId() {
-        return (taxonomySpecies == null) ? -1 : taxonomySpecies.getTaxonomyId();
-    }
-
-    @ApiModelProperty(position = 7, readOnly = true)
-    public Long getTaxonomyGenusId() {
-        return (taxonomyGenus == null) ? -1 : taxonomyGenus.getTaxonomyId();
-    }
-
-    @ApiModelProperty(position = 9, readOnly = true)
-    public Long getTaxOrderId() {
-        return (taxonomyOrder == null) ? -1 : taxonomyOrder.getTaxonomyId();
-    }
-
-    @ApiModelProperty(position = 11, readOnly = true)
-    public Long getTaxonomyClassId() {
-        return (taxonomyClass == null) ? -1 : taxonomyClass.getTaxonomyId();
     }
 
     public Taxonomy getTaxonomySpecies() {
@@ -185,6 +161,4 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
     public void setTaxonomyClass(Taxonomy taxonomyClass) {
         this.taxonomyClass = taxonomyClass;
     }
-
-    public enum Rank {SUBSPECIES, SPECIES, GENUS, ORDER, CLASS, UNKNOWN}
 }

@@ -3,7 +3,7 @@ Feature: study object
   Scenario: register a study successfully and check its fields
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create a taxonomy
-    When I request POST taxonomy with 9606 for ID, Homo Sapiens for name and SPECIES for rank without parent
+    When I request POST taxonomy with 9606 for ID, Homo Sapiens for name and species for rank without parent
     Then set the URL to TAXONOMY
     # Create a reference sequence
     When I request POST /reference-sequences with JSON-like payload:
@@ -32,21 +32,21 @@ Feature: study object
 
   Scenario Outline: search various study by taxonomy name and id
     Given I set authorization with testoperator having SERVICE_OPERATOR role
-    When I request POST taxonomy with 40674 for ID, Mammalia for name and CLASS for rank NONE for SPECIES NONE for GENUS NONE for ORDER NONE for CLASS
+    When I request POST taxonomy with 40674 for ID, Mammalia for name and class for rank NONE for SPECIES NONE for GENUS NONE for ORDER NONE for CLASS
     Then set the URL to TAXONOMY_CLASS_MAMMALIA
-    When I request POST taxonomy with 9443 for ID, Primates for name and ORDER for rank NONE for SPECIES NONE for GENUS NONE for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    When I request POST taxonomy with 9443 for ID, Primates for name and order for rank NONE for SPECIES NONE for GENUS NONE for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
     Then set the URL to TAXONOMY_ORDER_PRIMATES
-    When I request POST taxonomy with 9605 for ID, Homo for name and GENUS for rank NONE for SPECIES NONE for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    When I request POST taxonomy with 9605 for ID, Homo for name and genus for rank NONE for SPECIES NONE for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
     Then set the URL to TAXONOMY_GENUS_HOMO
-    When I request POST taxonomy with 9596 for ID, Pan for name and GENUS for rank NONE for SPECIES NONE for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    When I request POST taxonomy with 9596 for ID, Pan for name and genus for rank NONE for SPECIES NONE for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
     Then set the URL to TAXONOMY_GENUS_PAN
-    When I request POST taxonomy with 9606 for ID, Homo sapiens for name and SPECIES for rank NONE for SPECIES TAXONOMY_GENUS_HOMO for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    When I request POST taxonomy with 9606 for ID, Homo sapiens for name and species for rank NONE for SPECIES TAXONOMY_GENUS_HOMO for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
     Then set the URL to TAXONOMY_SPECIES_HOMO_SAPIENS
-    When I request POST taxonomy with 9598 for ID, Pan troglodytes for name and SPECIES for rank NONE for SPECIES TAXONOMY_GENUS_PAN for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    When I request POST taxonomy with 9598 for ID, Pan troglodytes for name and species for rank NONE for SPECIES TAXONOMY_GENUS_PAN for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
     Then set the URL to TAXONOMY_SPECIES_PAN_TROGLODYTES
-    When I request POST taxonomy with 9597 for ID, Pan paniscus for name and SPECIES for rank NONE for SPECIES TAXONOMY_GENUS_PAN for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    When I request POST taxonomy with 9597 for ID, Pan paniscus for name and species for rank NONE for SPECIES TAXONOMY_GENUS_PAN for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
     Then set the URL to TAXONOMY_SPECIES_PAN_PANISCUS
-    When I request POST taxonomy with 37010 for ID, Pan troglodytes schweinfurthii for name and SUBSPECIES for rank TAXONOMY_SPECIES_PAN_TROGLODYTES for SPECIES TAXONOMY_GENUS_PAN for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    When I request POST taxonomy with 37010 for ID, Pan troglodytes schweinfurthii for name and subspecies for rank TAXONOMY_SPECIES_PAN_TROGLODYTES for SPECIES TAXONOMY_GENUS_PAN for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
     Then set the URL to TAXONOMY_SUBSPECIES_PAN_TROGLODYTES_SCWEINFURTHII
 
     When I request POST /reference-sequences with JSON-like payload:
@@ -509,13 +509,13 @@ Feature: study object
   Scenario Outline: search various public studies
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create a common taxonomy
-    When I request POST taxonomy with 40674 for ID, Mammalia for name and CLASS for rank NONE for SPECIES NONE for GENUS NONE for ORDER NONE for CLASS
+    When I request POST taxonomy with 40674 for ID, Mammalia for name and class for rank NONE for SPECIES NONE for GENUS NONE for ORDER NONE for CLASS
     Then set the URL to TAXONOMY_CLASS_MAMMALIA
-    When I request POST taxonomy with 9443 for ID, Primates for name and ORDER for rank NONE for SPECIES NONE for GENUS NONE for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    When I request POST taxonomy with 9443 for ID, Primates for name and order for rank NONE for SPECIES NONE for GENUS NONE for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
     Then set the URL to TAXONOMY_ORDER_PRIMATES
-    When I request POST taxonomy with 9605 for ID, Homo for name and GENUS for rank NONE for SPECIES NONE for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    When I request POST taxonomy with 9605 for ID, Homo for name and genus for rank NONE for SPECIES NONE for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
     Then set the URL to TAXONOMY_GENUS_HOMO
-    When I request POST taxonomy with 9606 for ID, Homo sapiens for name and SPECIES for rank NONE for SPECIES TAXONOMY_GENUS_HOMO for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    When I request POST taxonomy with 9606 for ID, Homo sapiens for name and species for rank NONE for SPECIES TAXONOMY_GENUS_HOMO for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
     Then set the URL to TAXONOMY_SPECIES_HOMO_SAPIENS
 
     # Create a common reference sequence
@@ -616,7 +616,7 @@ Feature: study object
   Scenario Outline: search various undeprecated studies
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create a common taxonomy
-    When I request POST taxonomy with 9606 for ID, Homo Sapiens for name and SPECIES for rank without parent
+    When I request POST taxonomy with 9606 for ID, Homo Sapiens for name and species for rank without parent
     Then set the URL to TAXONOMY_SPECIES_HOMO_SAPIENS
 
     # Create common reference sequence
