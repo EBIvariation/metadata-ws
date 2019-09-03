@@ -153,6 +153,13 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals("NA12286", sample.get(0).getName());
         assertEquals("SRS003719", sample.get(1091).getAccessionVersionId().getAccession());
         assertEquals("NA19776", sample.get(1091).getName());
+        sample.clear();
+        sample = sraObjectImporter.importSamples(analysisType);
+        assertEquals(1092, sample.size());
+        assertEquals("SRS000621", sample.get(0).getAccessionVersionId().getAccession());
+        assertEquals("NA12286", sample.get(0).getName());
+        assertEquals("SRS003719", sample.get(1091).getAccessionVersionId().getAccession());
+        assertEquals("NA19776", sample.get(1091).getName());
     }
 
 }

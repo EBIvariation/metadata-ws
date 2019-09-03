@@ -58,9 +58,9 @@ public class SraXmlRetrieverThroughDatabase implements SraXmlRetrieverByAccessio
     A list of Sample XMLs with associated Sample accession will be returned.
     */
     public Map<String, String> getSampleXmls(String analysisAccession) {
-        Map<String, List> paramMap = new HashMap<>();
+        Map<String, String> paramMap = new HashMap<>();
         String samplesQuery = enaObjectQuery;
-        paramMap.put("accession", Arrays.asList(analysisAccession));
+        paramMap.put("accession", analysisAccession);
 
         List<Map<String, Object>> idSqlxmls = jdbcTemplate.queryForList(samplesQuery, paramMap);
         Map<String, String> idXmlMap = new HashMap<>();

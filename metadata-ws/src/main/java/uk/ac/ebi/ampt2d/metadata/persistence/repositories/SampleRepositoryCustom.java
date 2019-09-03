@@ -41,15 +41,11 @@ public interface SampleRepositoryCustom extends PagingAndSortingRepository<Sampl
                 .in(sampleIn.stream().map(s -> s.getAccessionVersionId().getAccession()
                 + s.getAccessionVersionId().getVersion()).collect(Collectors.toList()));
         existingSamples = (List<Sample>) findAll(predicate);
-        List<String> existingSampleIdList = existingSamples.stream().map(Sample::getAccessionVersionId)
-                .map(AccessionVersionId::getAccession).collect(Collectors.toList());
+        List<AccessionVersionId> existingSampleIdList = existingSamples.stream().map(Sample::getAccessionVersionId)
+                .collect(Collectors.toList());
 
-        List<Sample> missingSamples = new ArrayList<>();
-        for (Sample s : sampleIn) {
-            if (!existingSampleIdList.contains(s.getAccessionVersionId().getAccession())) {
-                missingSamples.add(s);
-            }
-        }
+        List<Sample> missingSamples = sampleIn.stream()
+                .filter(s -> !existingSampleIdList.contains(s.getAccessionVersionId())).collect(Collectors.toList());
         missingSamples = (List<Sample>) save(missingSamples);
 
         List<Sample> samples = new ArrayList<>();
