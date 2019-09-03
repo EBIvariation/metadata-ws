@@ -135,7 +135,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         String analysisAccession = analysisType.getAccession();
         List<Sample> samples = new ArrayList<>();
         try {
-            Map<String, String> idXmlMap = getXmls(Arrays.asList(analysisAccession));
+            Map<String, String> idXmlMap = getSampleXmls(analysisAccession);
             SampleType sampleType;
             for (Map.Entry<String, String> entry : idXmlMap.entrySet()) {
                 sampleType = sraSampleXmlParser.parseXml(entry.getValue(), entry.getKey());
@@ -189,8 +189,8 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         return accessionsToStudy;
     }
 
-    private Map<String, String> getXmls(List<String> accessions) {
-        return ((SraXmlRetrieverThroughDatabase) sraXmlRetrieverByAccession).getXmls(accessions);
+    private Map<String, String> getSampleXmls(String analysisAccession) {
+        return ((SraXmlRetrieverThroughDatabase) sraXmlRetrieverByAccession).getSampleXmls(analysisAccession);
     }
 
 }

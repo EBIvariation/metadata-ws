@@ -52,15 +52,15 @@ public class SraXmlRetrieverThroughDatabase implements SraXmlRetrieverByAccessio
     }
 
     /*
-    In DB requests ObjectImporter.java->importAnalysis()->importSamples()->importSample will invoke this method
+    In DB requests ObjectImporter.java->importAnalysis()->importSamples()->importSample() will invoke this method
     to retrieve Sample XMLs by providing an "Analysis accession".
     Prepared statement will be made with SQL query EnaObjectQuery.SAMPLE_QUERY.
     A list of Sample XMLs with associated Sample accession will be returned.
     */
-    public Map<String, String> getXmls(List<String> accessions) {
+    public Map<String, String> getSampleXmls(String analysisAccession) {
         Map<String, List> paramMap = new HashMap<>();
         String samplesQuery = enaObjectQuery;
-        paramMap.put("accession", Arrays.asList(accessions.get(0)));
+        paramMap.put("accession", Arrays.asList(analysisAccession));
 
         List<Map<String, Object>> idSqlxmls = jdbcTemplate.queryForList(samplesQuery, paramMap);
         Map<String, String> idXmlMap = new HashMap<>();
