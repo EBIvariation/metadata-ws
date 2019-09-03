@@ -210,7 +210,7 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals("Homo sapiens", taxonomy.getName());
         assertEquals(2, referenceSequenceRepository.count());
     }
-    
+
     @Test
     public void importSamplesObject() throws Exception {
         SraXmlParser<AnalysisType> analysisTypeSraXmlParser = new SraAnalysisXmlParser();
@@ -223,6 +223,23 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals("NA12286", sample.get(0).getName());
         assertEquals("SRS003719", sample.get(1091).getAccessionVersionId().getAccession());
         assertEquals("NA19776", sample.get(1091).getName());
+        assertEquals(1092, sampleRepository.count());
+        sample.clear();
+        sample = sraObjectImporter.importSamples(analysisType);
+        assertEquals(1092, sample.size());
+        assertEquals("SRS000621", sample.get(0).getAccessionVersionId().getAccession());
+        assertEquals("NA12286", sample.get(0).getName());
+        assertEquals("SRS003719", sample.get(1091).getAccessionVersionId().getAccession());
+        assertEquals("NA19776", sample.get(1091).getName());
+        assertEquals(1092, sampleRepository.count());
+    }
+
+    @Test
+    public void importSampleObject() throws Exception {
+        Sample sample = sraObjectImporter.importSample("ERS000156");
+        assertNotNull(sample);
+        assertEquals("ERS000156", sample.getAccessionVersionId().getAccession());
+        assertEquals("E-TABM-722:mmu5", sample.getName());
     }
 
 }

@@ -36,6 +36,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
@@ -67,11 +68,16 @@ public class SraObjectsImporterThroughDBTest {
     @Autowired
     private ReferenceSequenceRepository referenceSequenceRepository;
 
+    @Autowired
+    private SampleRepository sampleRepository;
+
+
     @Before
     public void setUp() {
         analysisRepository.deleteAll();
         studyRepository.deleteAll();
         referenceSequenceRepository.deleteAll();
+        sampleRepository.deleteAll();
     }
 
     @Test
@@ -153,6 +159,7 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals("NA12286", sample.get(0).getName());
         assertEquals("SRS003719", sample.get(1091).getAccessionVersionId().getAccession());
         assertEquals("NA19776", sample.get(1091).getName());
+        assertEquals(1092, sampleRepository.count());
         sample.clear();
         sample = sraObjectImporter.importSamples(analysisType);
         assertEquals(1092, sample.size());
@@ -160,6 +167,7 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals("NA12286", sample.get(0).getName());
         assertEquals("SRS003719", sample.get(1091).getAccessionVersionId().getAccession());
         assertEquals("NA19776", sample.get(1091).getName());
+        assertEquals(1092, sampleRepository.count());
     }
 
 }
