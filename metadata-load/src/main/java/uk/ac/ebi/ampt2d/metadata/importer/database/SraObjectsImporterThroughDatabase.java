@@ -135,7 +135,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         String analysisAccession = analysisType.getAccession();
         List<Sample> samples = new ArrayList<>();
         try {
-            Map<String, String> idXmlMap = sraXmlRetrieverByAccession.getXmls(Arrays.asList(analysisAccession));
+            Map<String, String> idXmlMap = getXmls(Arrays.asList(analysisAccession));
             SampleType sampleType;
             for (Map.Entry<String, String> entry : idXmlMap.entrySet()) {
                 sampleType = sraSampleXmlParser.parseXml(entry.getValue(), entry.getKey());
@@ -149,7 +149,6 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Analysis accession " + analysisAccession);
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
         }
-
         setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
         return samples;
     }
@@ -188,6 +187,10 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
     public Map<String, Study> getAccessionsToStudy() {
         return accessionsToStudy;
+    }
+
+    private Map<String, String> getXmls(List<String> accessions) {
+        return ((SraXmlRetrieverThroughDatabase) sraXmlRetrieverByAccession).getXmls(accessions);
     }
 
 }

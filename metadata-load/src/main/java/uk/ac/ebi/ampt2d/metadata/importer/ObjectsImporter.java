@@ -48,7 +48,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -286,25 +285,27 @@ public abstract class ObjectsImporter {
     }
 
     public List<Sample> importSamples(AnalysisType analysisType) {
-        Set<String> sampleSet = getSampleAccessions(analysisType);
-        List<String> accessions = new ArrayList<>(sampleSet);
         List<Sample> samples = new ArrayList<>();
+        for (String sampleAccession : getSampleAccessions(analysisType)) {
+            samples.add(importSample(sampleAccession));
+        }
+        samples = sampleRepository.findOrSave(samples);
+        return samples;
+    }
+
+    public Sample importSample(String accession) {
+        Sample sample = null;
         try {
-            Map<String, String> idXmlMap = sraXmlRetrieverByAccession.getXmls(accessions);
-            SampleType sampleType;
-            for (Map.Entry<String, String> entry : idXmlMap.entrySet()) {
-                sampleType = sraSampleXmlParser.parseXml(entry.getValue(), entry.getKey());
-                Sample sampleElement = sampleConverter.convert(sampleType);
-                Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(sampleType));
-                sampleElement.setTaxonomies(Arrays.asList(taxonomy));
-                samples.add(sampleElement);
-            }
-            samples = sampleRepository.findOrSave(samples);
+            String xml = sraXmlRetrieverByAccession.getXml(accession);
+            SampleType sampleType = sraSampleXmlParser.parseXml(xml, accession);
+            sample = sampleConverter.convert(sampleType);
+            Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(sampleType));
+            sample.setTaxonomies(Arrays.asList(taxonomy));
         } catch (Exception exception) {
-            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + accessions);
+            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + accession);
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
         }
-        return samples;
+        return sample;
     }
 
     protected Taxonomy extractTaxonomyFromSample(SampleType sampleType) {

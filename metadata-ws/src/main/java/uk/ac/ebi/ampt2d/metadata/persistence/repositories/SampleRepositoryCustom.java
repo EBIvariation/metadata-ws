@@ -52,10 +52,10 @@ public interface SampleRepositoryCustom extends PagingAndSortingRepository<Sampl
         }
         missingSamples = (List<Sample>) save(missingSamples);
 
-        List<Sample> sampleList = new ArrayList<>();
-        sampleList.addAll(existingSamples);
-        sampleList.addAll(missingSamples);
-        return sampleList;
+        List<Sample> samples = new ArrayList<>();
+        samples.addAll(existingSamples);
+        samples.addAll(missingSamples);
+        return samples;
     }
 
 }
