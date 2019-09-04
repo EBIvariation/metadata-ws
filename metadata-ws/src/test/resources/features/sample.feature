@@ -55,13 +55,13 @@ Feature: sample object
       "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_HOMO_SAPIEN
-    When I request PATCH SAMPLE with list TAXONOMY_HOMO_SAPIEN of taxonomies
+    Then set the URL to TAXONOMY_HOMO_SAPIENS
+    When I request PATCH SAMPLE with list TAXONOMY_HOMO_SAPIENS of taxonomies
     Then the response code should be 2xx
     When I request GET for taxonomies of SAMPLE
     Then the response code should be 200
     And the response should contain one taxonomy
-    And the href of the taxonomy of taxonomies has items TAXONOMY_HOMO_SAPIEN
+    And the href of the taxonomy of taxonomies has items TAXONOMY_HOMO_SAPIENS
 
 
   Scenario Outline: post a sample with invalid taxonomy list should fail
@@ -95,8 +95,8 @@ Feature: sample object
       "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_HOMO_SAPIEN
-    When I create a sample with TAXONOMY_MUS_MUSCULUS,TAXONOMY_HOMO_SAPIEN for taxonomy
+    Then set the URL to TAXONOMY_HOMO_SAPIENS
+    When I create a sample with TAXONOMY_MUS_MUSCULUS,TAXONOMY_HOMO_SAPIENS for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE
     When I request GET with value of SAMPLE
@@ -106,12 +106,12 @@ Feature: sample object
     When I request GET for taxonomies of SAMPLE
     Then the response code should be 200
     And the response should contain 2 taxonomies
-    And the href of the taxonomy of taxonomies has items TAXONOMY_MUS_MUSCULUS,TAXONOMY_HOMO_SAPIEN
+    And the href of the taxonomy of taxonomies has items TAXONOMY_MUS_MUSCULUS,TAXONOMY_HOMO_SAPIENS
 
     When I request DELETE for the taxonomies of TAXONOMY_MUS_MUSCULUS of the SAMPLE
     Then the response code should be 2xx
 
-    When I request DELETE for the taxonomies of TAXONOMY_HOMO_SAPIEN of the SAMPLE
+    When I request DELETE for the taxonomies of TAXONOMY_HOMO_SAPIENS of the SAMPLE
     Then the response code should be 4xx
     And the response should contain field exception with value uk.ac.ebi.ampt2d.metadata.exceptionhandling.SampleWithoutTaxonomyException
 
@@ -169,8 +169,8 @@ Feature: sample object
       "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_HOMO_SAPIEN
-    When I create a parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TAXONOMY_GORILLA,TAXONOMY_HOMO_SAPIEN for taxonomy
+    Then set the URL to TAXONOMY_HOMO_SAPIENS
+    When I create a parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TAXONOMY_GORILLA,TAXONOMY_HOMO_SAPIENS for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE1
     When I request POST /taxonomies with JSON payload:
@@ -230,8 +230,8 @@ Feature: sample object
       "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_HOMO_SAPIEN
-    When I create a parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TAXONOMY_GORILLA,TAXONOMY_HOMO_SAPIEN for taxonomy
+    Then set the URL to TAXONOMY_HOMO_SAPIENS
+    When I create a parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TAXONOMY_GORILLA,TAXONOMY_HOMO_SAPIENS for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE1
     When I request POST /taxonomies with JSON payload:
@@ -298,8 +298,8 @@ Feature: sample object
       "rank": "SPECIES"
     }
     """
-    Then set the URL to TAXONOMY_HOMO_SAPIEN
-    When I create a parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TAXONOMY_GORILLA,TAXONOMY_HOMO_SAPIEN for taxonomy
+    Then set the URL to TAXONOMY_HOMO_SAPIENS
+    When I create a parameterized sample with Species1 for accession, 1 for version, Species collection1 for name and TAXONOMY_GORILLA,TAXONOMY_HOMO_SAPIENS for taxonomy
     Then the response code should be 201
     And set the URL to SAMPLE1
     When I request POST /taxonomies with JSON payload:

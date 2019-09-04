@@ -305,7 +305,7 @@ public abstract class ObjectsImporter {
 
     private Taxonomy extractTaxonomyFromSample(SampleType sampleType) {
         SampleType.SAMPLENAME sampleName = sampleType.getSAMPLENAME();
-        return new Taxonomy(sampleName.getTAXONID(), sampleName.getSCIENTIFICNAME());
+        return new Taxonomy(sampleName.getTAXONID(), sampleName.getSCIENTIFICNAME(), "no rank");
     }
 
     private Set<String> getSampleAccessions(AnalysisType analysisType) {

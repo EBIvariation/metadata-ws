@@ -43,7 +43,7 @@ public class EntrezAssemblyXmlParser {
             long taxonomyId = Long.parseLong(domQueryUsingXPath
                     .findInDom(documentSummary + "Taxid"));
             String taxonomyName = domQueryUsingXPath.findInDom(documentSummary + "SpeciesName");
-            Taxonomy taxonomy = new Taxonomy(taxonomyId, taxonomyName);
+            Taxonomy taxonomy = new Taxonomy(taxonomyId, taxonomyName, "no rank");
             referenceSequence.setTaxonomy(taxonomy);
             return referenceSequence;
         } catch (Exception e) {

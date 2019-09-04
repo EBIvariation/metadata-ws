@@ -22,7 +22,7 @@ import java.util.List;
 
 public interface TaxonomyService {
 
-    List<Long> findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(long taxonomyId);
+    List<Long> findAllTaxonomiesInATreeByTaxonomyIds(long taxonomyId);
 
-    List<Long> findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyName(String taxonomyName);
+    List<Long> findAllTaxonomiesInATreeByTaxonomyName(String taxonomyName);
 }

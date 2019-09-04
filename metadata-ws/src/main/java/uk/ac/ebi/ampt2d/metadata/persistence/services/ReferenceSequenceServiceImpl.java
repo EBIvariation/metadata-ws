@@ -35,21 +35,19 @@ public class ReferenceSequenceServiceImpl implements ReferenceSequenceService {
 
     @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyId(long id) {
-        List<Long> speciesAndSubspeciesTaxonomyIds =
-                taxonomyService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(id);
-        return getReferenceSequences(speciesAndSubspeciesTaxonomyIds);
+        List<Long> taxonomyIds = taxonomyService.findAllTaxonomiesInATreeByTaxonomyIds(id);
+        return getReferenceSequences(taxonomyIds);
     }
 
     @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyName(String name) {
-        List<Long> speciesAndSubspeciesTaxonomyIds =
-                taxonomyService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyName(name);
-        return getReferenceSequences(speciesAndSubspeciesTaxonomyIds);
+        List<Long> taxonomyIds = taxonomyService.findAllTaxonomiesInATreeByTaxonomyName(name);
+        return getReferenceSequences(taxonomyIds);
     }
 
-    public List<ReferenceSequence> getReferenceSequences(List<Long> speciesAndSubspeciesTaxonomyIds) {
+    public List<ReferenceSequence> getReferenceSequences(List<Long> taxonomyIds) {
         QReferenceSequence referenceSequence = QReferenceSequence.referenceSequence;
-        Predicate predicate = referenceSequence.taxonomy.taxonomyId.in(speciesAndSubspeciesTaxonomyIds);
+        Predicate predicate = referenceSequence.taxonomy.taxonomyId.in(taxonomyIds);
         return (List<ReferenceSequence>) referenceSequenceRepository.findAll(predicate);
     }
 }

@@ -96,21 +96,19 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     public List<Study> findStudiesByTaxonomyId(long id) {
-        List<Long> speciesAndSubspeciesTaxonomyIds =
-                taxonomyService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyId(id);
-        return getStudiesByTaxonomyIds(speciesAndSubspeciesTaxonomyIds);
+        List<Long> taxonomyIds = taxonomyService.findAllTaxonomiesInATreeByTaxonomyIds(id);
+        return getStudiesByTaxonomyIds(taxonomyIds);
     }
 
     @Override
     public List<Study> findStudiesByTaxonomyName(String name) {
-        List<Long> speciesAndSubspeciesTaxonomyIds =
-                taxonomyService.findAllSpeciesAndSubspeciesTaxonomyIdsInATaxonomyTreeByTaxonomyName(name);
-        return getStudiesByTaxonomyIds(speciesAndSubspeciesTaxonomyIds);
+        List<Long> taxonomyIds = taxonomyService.findAllTaxonomiesInATreeByTaxonomyName(name);
+        return getStudiesByTaxonomyIds(taxonomyIds);
     }
 
-    public List<Study> getStudiesByTaxonomyIds(List<Long> speciesAndSubspeciesTaxonomyIds) {
+    public List<Study> getStudiesByTaxonomyIds(List<Long> taxonomyIds) {
         QStudy study = QStudy.study;
-        Predicate predicate = study.taxonomy.taxonomyId.in(speciesAndSubspeciesTaxonomyIds);
+        Predicate predicate = study.taxonomy.taxonomyId.in(taxonomyIds);
         return (List<Study>) studyRepository.findAll(predicate);
     }
 

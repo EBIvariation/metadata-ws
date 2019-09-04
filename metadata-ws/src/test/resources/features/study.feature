@@ -616,7 +616,7 @@ Feature: study object
   Scenario Outline: search various undeprecated studies
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create a common taxonomy
-    When I request POST taxonomy with 9606 for ID, Homo Sapiens for name and species for rank without parent
+    When I request POST taxonomy with 9606 for ID, Homo sapiens for name and species for rank without parent
     Then set the URL to TAXONOMY_SPECIES_HOMO_SAPIENS
 
     # Create common reference sequence
@@ -691,7 +691,7 @@ Feature: study object
     Examples:
       | base          | query             | url    |
       | taxonomy-id   | id=9606           | STUDY2 |
-      | taxonomy-name | name=Homo Sapiens | STUDY2 |
+      | taxonomy-name | name=Homo sapiens | STUDY2 |
       | text          | searchTerm=1kg    | STUDY2 |
 
 
