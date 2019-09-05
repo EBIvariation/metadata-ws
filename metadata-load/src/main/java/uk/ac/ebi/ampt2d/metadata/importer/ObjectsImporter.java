@@ -19,6 +19,7 @@
 package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.ampt2d.metadata.importer.api.AssemblyXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
@@ -87,9 +88,9 @@ public abstract class ObjectsImporter {
 
     private SraXmlParser<ReferenceSequence> sraEntryXmlParser;
 
-    private EntrezAssemblyXmlParser entrezAssemblyXmlParser;
-
     protected SraXmlParser<SampleType> sraSampleXmlParser;
+
+    private EntrezAssemblyXmlParser entrezAssemblyXmlParser;
 
     // Entity converters
     private Converter<StudyType, Study> studyConverter;
@@ -160,53 +161,43 @@ public abstract class ObjectsImporter {
         this.sampleRepository = sampleRepository;
     }
 
-    public Study importStudy(String accession) {
-        Study study = null;
-        try {
-            String xml = sraXmlRetrieverByAccession.getXml(accession);
-            StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
-            study = studyConverter.convert(studyType);
-            StudyType.STUDYLINKS studylinks = studyType.getSTUDYLINKS();
-            study.setPublications(publicationExtractorFromStudy.getPublications(studylinks));
-            study.setResources(webResourceExtractorFromStudy.getWebResources(studylinks));
-            study = extractAnalysisFromStudy(studyType, study);
-        } catch (Exception exception) {
-            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for accession " + accession);
-            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
-        }
+    @Transactional(rollbackFor = Exception.class)
+    public Study importStudy(String accession) throws Exception {
+        String xml = sraXmlRetrieverByAccession.getXml(accession);
+        StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
+        Study study = studyConverter.convert(studyType);
+        StudyType.STUDYLINKS studylinks = studyType.getSTUDYLINKS();
+        study.setPublications(publicationExtractorFromStudy.getPublications(studylinks));
+        study.setResources(webResourceExtractorFromStudy.getWebResources(studylinks));
+        study = extractAnalysisFromStudy(studyType, study);
         return study;
     }
 
-    protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study);
+    protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study) throws Exception;
 
-    public Analysis importAnalysis(String accession) {
-        Analysis analysis = null;
-        try {
-            String xml = sraXmlRetrieverByAccession.getXml(accession);
-            AnalysisType analysisType = sraAnalysisXmlParser.parseXml(xml, accession);
-            analysis = analysisConverter.convert(analysisType);
-            List<ReferenceSequence> referenceSequences = new ArrayList<>();
-            for (String referenceSequenceAccession : getReferenceSequenceAccessions(analysisType)) {
-                referenceSequences.add(importReferenceSequence(referenceSequenceAccession));
-            }
-            analysis.setReferenceSequences(referenceSequences);
-            AnalysisEventHandler.validateReferenceSequenceLink(analysis);
-            analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
-            List<Sample> samples = importSamples(analysisType);
-            analysis.setSamples(samples);
-            analysis = extractStudyFromAnalysis(analysisType, analysis);
-        } catch (Exception exception) {
-            analysis = null;
-            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Analysis accession " + accession);
-            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+    @Transactional(rollbackFor = Exception.class)
+    public Analysis importAnalysis(String accession) throws Exception {
+        String xml = sraXmlRetrieverByAccession.getXml(accession);
+        AnalysisType analysisType = sraAnalysisXmlParser.parseXml(xml, accession);
+        Analysis analysis = analysisConverter.convert(analysisType);
+        List<ReferenceSequence> referenceSequences = new ArrayList<>();
+        for (String referenceSequenceAccession : getReferenceSequenceAccessions(analysisType)) {
+            referenceSequences.add(importReferenceSequence(referenceSequenceAccession));
         }
-
+        analysis.setReferenceSequences(referenceSequences);
+        AnalysisEventHandler.validateReferenceSequenceLink(analysis);
+        analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
+        List<Sample> samples = importSamples(analysisType);
+        analysis.setSamples(samples);
+        analysis = extractStudyFromAnalysis(analysisType, analysis);
         return analysis;
+
     }
 
-    protected abstract Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis);
+    protected abstract Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis)
+            throws Exception;
 
-    public ReferenceSequence importReferenceSequence(String accession) {
+    public ReferenceSequence importReferenceSequence(String accession) throws Exception {
         ReferenceSequence referenceSequence = null;
         Taxonomy taxonomy;
         try {
@@ -232,11 +223,12 @@ public abstract class ObjectsImporter {
         } catch (Exception exception) {
             IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for ReferenceSequence accession " + accession);
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+            throw exception;
         }
         return referenceSequence;
     }
 
-    private Set<String> getReferenceSequenceAccessions(AnalysisType analysis) {
+    private Set<String> getReferenceSequenceAccessions(AnalysisType analysis) throws Exception {
         Set<String> referenceSequenceAccessions = new HashSet<>();
         AnalysisType.ANALYSISTYPE analysisType = analysis.getANALYSISTYPE();
         // Analysis records can contain a reference sequence in either of the three analysis categories:
@@ -284,7 +276,7 @@ public abstract class ObjectsImporter {
         return null;
     }
 
-    public List<Sample> importSamples(AnalysisType analysisType) {
+    public List<Sample> importSamples(AnalysisType analysisType) throws Exception {
         List<Sample> samples = new ArrayList<>();
         for (String sampleAccession : getSampleAccessions(analysisType)) {
             samples.add(importSample(sampleAccession));
@@ -293,7 +285,7 @@ public abstract class ObjectsImporter {
         return samples;
     }
 
-    public Sample importSample(String accession) {
+    public Sample importSample(String accession) throws Exception {
         Sample sample = null;
         try {
             String xml = sraXmlRetrieverByAccession.getXml(accession);
@@ -304,6 +296,7 @@ public abstract class ObjectsImporter {
         } catch (Exception exception) {
             IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + accession);
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+            throw exception;
         }
         return sample;
     }

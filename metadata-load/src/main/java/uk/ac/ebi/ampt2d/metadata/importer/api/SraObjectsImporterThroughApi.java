@@ -107,7 +107,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
     }
 
     @Override
-    protected Study extractAnalysisFromStudy(StudyType studyType, Study study) {
+    protected Study extractAnalysisFromStudy(StudyType studyType, Study study) throws Exception {
         studyRepository.save(study);
         for (String analysisAccession : getAnalysisAccessions(studyType)) {
             Analysis analysis = importAnalysis(analysisAccession);
@@ -117,13 +117,14 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
             } catch (Exception exception) {
                 IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for accession " + analysisAccession);
                 IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+                throw exception;
             }
         }
         return study;
     }
 
     @Override
-    protected Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis) {
+    protected Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis) throws Exception {
         return analysis;
     }
 

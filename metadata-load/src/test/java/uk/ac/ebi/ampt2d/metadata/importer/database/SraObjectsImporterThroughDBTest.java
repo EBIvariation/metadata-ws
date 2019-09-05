@@ -22,10 +22,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
@@ -38,6 +39,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 import java.nio.file.Files;
@@ -69,8 +71,10 @@ public class SraObjectsImporterThroughDBTest {
     private ReferenceSequenceRepository referenceSequenceRepository;
 
     @Autowired
-    private SampleRepository sampleRepository;
+    private TaxonomyRepository taxonomyRepository;
 
+    @Autowired
+    private SampleRepository sampleRepository;
 
     @Before
     public void setUp() {
@@ -78,6 +82,7 @@ public class SraObjectsImporterThroughDBTest {
         studyRepository.deleteAll();
         referenceSequenceRepository.deleteAll();
         sampleRepository.deleteAll();
+        taxonomyRepository.deleteAll();
     }
 
     @Test
@@ -133,9 +138,11 @@ public class SraObjectsImporterThroughDBTest {
         assertEquals(1, studyRepository.count());
         assertEquals(1, analysisRepository.count());
         assertEquals(25, referenceSequenceRepository.count());
+        assertEquals(1, taxonomyRepository.count());
+
     }
 
-    @Test
+    @Test(expected = AnalysisWithoutReferenceSequenceException.class)
     @Category(OracleDbCategory.class)
     public void importAnalysisObjectWithEmptyReferenceSequenceAccession() throws Exception {
         Analysis analysis = sraObjectImporter.importAnalysis("ERZ000011");
