@@ -31,4 +31,5 @@ public class SraXmlRetrieverThroughApi implements SraXmlRetrieverByAccession {
     public String getXml(String accession) {
         return restTemplate.exchange(ENA_API_URL, HttpMethod.GET, null, String.class, accession).getBody();
     }
+
 }

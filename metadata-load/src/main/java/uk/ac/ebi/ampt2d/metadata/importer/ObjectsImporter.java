@@ -89,7 +89,7 @@ public abstract class ObjectsImporter {
 
     private EntrezAssemblyXmlParser entrezAssemblyXmlParser;
 
-    private SraXmlParser<SampleType> sraSampleXmlParser;
+    protected SraXmlParser<SampleType> sraSampleXmlParser;
 
     // Entity converters
     private Converter<StudyType, Study> studyConverter;
@@ -98,7 +98,7 @@ public abstract class ObjectsImporter {
 
     private Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter;
 
-    private Converter<SampleType, Sample> sampleConverter;
+    protected Converter<SampleType, Sample> sampleConverter;
 
     // Extractors
     private PublicationExtractorFromStudy publicationExtractorFromStudy;
@@ -192,10 +192,7 @@ public abstract class ObjectsImporter {
             analysis.setReferenceSequences(referenceSequences);
             AnalysisEventHandler.validateReferenceSequenceLink(analysis);
             analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
-            List<Sample> samples = new ArrayList<>();
-            for (String sampleAccession : getSampleAccessions(analysisType)) {
-                samples.add(importSample(sampleAccession));
-            }
+            List<Sample> samples = importSamples(analysisType);
             analysis.setSamples(samples);
             analysis = extractStudyFromAnalysis(analysisType, analysis);
         } catch (Exception exception) {
@@ -287,6 +284,15 @@ public abstract class ObjectsImporter {
         return null;
     }
 
+    public List<Sample> importSamples(AnalysisType analysisType) {
+        List<Sample> samples = new ArrayList<>();
+        for (String sampleAccession : getSampleAccessions(analysisType)) {
+            samples.add(importSample(sampleAccession));
+        }
+        samples = sampleRepository.findOrSave(samples);
+        return samples;
+    }
+
     public Sample importSample(String accession) {
         Sample sample = null;
         try {
@@ -295,7 +301,6 @@ public abstract class ObjectsImporter {
             sample = sampleConverter.convert(sampleType);
             Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(sampleType));
             sample.setTaxonomies(Arrays.asList(taxonomy));
-            sample = sampleRepository.findOrSave(sample);
         } catch (Exception exception) {
             IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + accession);
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
@@ -303,7 +308,7 @@ public abstract class ObjectsImporter {
         return sample;
     }
 
-    private Taxonomy extractTaxonomyFromSample(SampleType sampleType) {
+    protected Taxonomy extractTaxonomyFromSample(SampleType sampleType) {
         SampleType.SAMPLENAME sampleName = sampleType.getSAMPLENAME();
         return new Taxonomy(sampleName.getTAXONID(), sampleName.getSCIENTIFICNAME(), "no rank");
     }
