@@ -40,6 +40,9 @@ public class StudyServiceImpl implements StudyService {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private TaxonomyService taxonomyService;
+
     @Override
     public Study findOneStudyByPredicate(Predicate predicate) {
         return studyRepository.findOne(predicate);
@@ -93,20 +96,20 @@ public class StudyServiceImpl implements StudyService {
 
     @Override
     public List<Study> findStudiesByTaxonomyId(long id) {
-        QStudy study = QStudy.study;
-        Predicate predicate = study.taxonomy.taxonomyId.eq(id).
-                or(study.taxonomy.ancestors.any().taxonomyId.eq(id));
-
-        return findStudiesByPredicate(predicate);
+        List<Long> taxonomyIds = taxonomyService.findAllTaxonomiesInATreeByTaxonomyIds(id);
+        return getStudiesByTaxonomyIds(taxonomyIds);
     }
 
     @Override
     public List<Study> findStudiesByTaxonomyName(String name) {
-        QStudy study = QStudy.study;
-        Predicate predicate = study.taxonomy.name.equalsIgnoreCase(name).
-                or(study.taxonomy.ancestors.any().name.equalsIgnoreCase(name));
+        List<Long> taxonomyIds = taxonomyService.findAllTaxonomiesInATreeByTaxonomyName(name);
+        return getStudiesByTaxonomyIds(taxonomyIds);
+    }
 
-        return findStudiesByPredicate(predicate);
+    public List<Study> getStudiesByTaxonomyIds(List<Long> taxonomyIds) {
+        QStudy study = QStudy.study;
+        Predicate predicate = study.taxonomy.taxonomyId.in(taxonomyIds);
+        return (List<Study>) studyRepository.findAll(predicate);
     }
 
     @Override

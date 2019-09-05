@@ -23,9 +23,6 @@ import cucumber.api.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
-
-import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -44,13 +41,12 @@ public class TaxonomySteps {
                 .andExpect(jsonPath("$..taxonomies.length()").value(0));
     }
 
-    @When("^I request POST taxonomies with (\\d*) for ID, (.*) for name and (.*) for ancestors")
-    public void performPostOnTaxonomies(long id, String name, String ancestorKeys) throws Exception {
-        List<String> newUrls = CommonStates.getUrls(ancestorKeys);
+    @When("^I request POST taxonomy with (\\d*) for ID, (.*) for name and (.*) for rank without parent")
+    public void performPostOnTaxonomies(long id, String name, String rank) throws Exception {
         String jsonContent = "{ " +
                 "\"taxonomyId\": " + id + "," +
                 "\"name\": \"" + name + "\"," +
-                "\"ancestors\": " + objectMapper.writeValueAsString(newUrls) + "" +
+                "\"rank\": \"" + rank + "\"" +
                 "}";
 
         CommonStates.setResultActions(mockMvc.perform(post("/taxonomies")
@@ -59,4 +55,38 @@ public class TaxonomySteps {
                 .content(jsonContent.getBytes())));
     }
 
+    @When("^I request POST taxonomy with (\\d*) for ID, (.*) for name and (.*) for rank (.*) for SPECIES (.*) for " +
+            "GENUS (.*) for ORDER (.*) for CLASS")
+    public void performPostOnTaxonomiesWithTree(long id, String name, String rank,
+                                                String speciesUrl, String genusUrl,
+                                                String orderUrl, String classUrl) throws Exception {
+
+        StringBuilder jsonContent = new StringBuilder();
+        jsonContent.append("{ " +
+                "\"taxonomyId\": " + id + "," +
+                "\"name\": \"" + name + "\"," +
+                "\"rank\": \"" + rank + "\"") ;
+        String taxonomySpeciesUrl = CommonStates.getUrl(speciesUrl);
+        if (taxonomySpeciesUrl !=null){
+            jsonContent.append(",\"taxonomySpecies\": \"" + taxonomySpeciesUrl + "\"");
+        }
+        String taxonomyGenusUrl = CommonStates.getUrl(genusUrl);
+        if (taxonomyGenusUrl !=null){
+            jsonContent.append(",\"taxonomyGenus\": \"" + taxonomyGenusUrl + "\"");
+        }
+        String taxonomyOrderUrl = CommonStates.getUrl(orderUrl);
+        if (taxonomyOrderUrl !=null){
+            jsonContent.append(",\"taxonomyOrder\": \"" + taxonomyOrderUrl + "\"");
+        }
+        String taxonomyClassUrl = CommonStates.getUrl(classUrl);
+        if (taxonomyClassUrl !=null){
+            jsonContent.append(",\"taxonomyClass\": \"" + taxonomyClassUrl + "\"");
+        }
+        jsonContent.append("}");
+
+        CommonStates.setResultActions(mockMvc.perform(post("/taxonomies")
+                .with(CommonStates.getRequestPostProcessor())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonContent.toString().getBytes())));
+    }
 }

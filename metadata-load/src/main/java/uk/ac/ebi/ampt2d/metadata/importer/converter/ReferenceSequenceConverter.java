@@ -26,6 +26,18 @@ import java.util.Arrays;
 
 public class ReferenceSequenceConverter implements Converter<AssemblyType, ReferenceSequence> {
 
+    public static String getPatch(StringBuilder refName) {
+        String refNameStr = refName.toString();
+        String patch = null;
+        // Attempt to extract patch from refName (only for GRC human or mouse assembly names)
+        if (refNameStr != null && refNameStr.matches("^GRC[hm]\\d+\\.p\\d+$")) {
+            String[] refNameSplit = refNameStr.split("\\.", 2);
+            refName.replace(refName.indexOf("."), refName.length(), "");
+            patch = refNameSplit[1];
+        }
+        return patch;
+    }
+
     @Override
     public ReferenceSequence convert(AssemblyType assemblyType) {
         StringBuilder refName = new StringBuilder(assemblyType.getNAME());
@@ -40,20 +52,8 @@ public class ReferenceSequenceConverter implements Converter<AssemblyType, Refer
         return referenceSequence;
     }
 
-    public static String getPatch(StringBuilder refName) {
-        String refNameStr = refName.toString();
-        String patch = null;
-        // Attempt to extract patch from refName (only for GRC human or mouse assembly names)
-        if (refNameStr != null && refNameStr.matches("^GRC[hm]\\d+\\.p\\d+$")) {
-            String[] refNameSplit = refNameStr.split("\\.", 2);
-            refName.replace(refName.indexOf("."), refName.length(), "");
-            patch = refNameSplit[1];
-        }
-        return patch;
-    }
-
     private Taxonomy extractTaxonomyFromAssembly(AssemblyType assemblyType) {
         AssemblyType.TAXON taxon = assemblyType.getTAXON();
-        return new Taxonomy(taxon.getTAXONID(), taxon.getSCIENTIFICNAME());
+        return new Taxonomy(taxon.getTAXONID(), taxon.getSCIENTIFICNAME(), "no rank");
     }
 }

@@ -6,7 +6,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -43,7 +44,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -90,7 +92,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -134,7 +137,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -177,7 +181,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -231,7 +236,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 1,
-      "name": "Species1"
+      "name": "Species1",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY1
@@ -252,7 +258,8 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 2,
-      "name": "Species2"
+      "name": "Species2",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY2
@@ -283,7 +290,7 @@ Feature: reference sequence
     And the response should contain error message A reference sequence must have one valid URL to taxonomy
     Then the response code should be 4xx
 
-    Scenario: register a reference sequence with invalid taxonomy and fail
+  Scenario: register a reference sequence with invalid taxonomy and fail
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /reference-sequences with JSON payload:
     """
@@ -305,7 +312,9 @@ Feature: reference sequence
     """
     {
       "taxonomyId": 1,
-      "name": "Species1"
+      "name": "Species1",
+      "rank": "SPECIES"
+
     }
     """
     Then set the URL to TAXONOMY1
@@ -326,19 +335,24 @@ Feature: reference sequence
     And the response should contain error message A reference sequence must have one valid URL to taxonomy
     Then the response code should be 4xx
 
-
   Scenario Outline: search various reference sequences by taxonomy name and id
     Given I set authorization with testoperator having SERVICE_OPERATOR role
-    When I request POST taxonomies with 207598 for ID, Homininae for name and NONE for ancestors
-    Then set the URL to TAXONOMY_1
-    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for ancestors
-    Then set the URL to TAXONOMY_2
-    When I request POST taxonomies with 9596 for ID, Pan for name and TAXONOMY_1 for ancestors
-    Then set the URL to TAXONOMY_3
-    When I request POST taxonomies with 9597 for ID, Pan paniscus for name and TAXONOMY_1,TAXONOMY_3 for ancestors
-    Then set the URL to TAXONOMY_4
-    When I request POST taxonomies with 9598 for ID, Pan troglodytes for name and TAXONOMY_1,TAXONOMY_3 for ancestors
-    Then set the URL to TAXONOMY_5
+    When I request POST taxonomy with 40674 for ID, Mammalia for name and class for rank NONE for SPECIES NONE for GENUS NONE for ORDER NONE for CLASS
+    Then set the URL to TAXONOMY_CLASS_MAMMALIA
+    When I request POST taxonomy with 9443 for ID, Primates for name and order for rank NONE for SPECIES NONE for GENUS NONE for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_ORDER_PRIMATES
+    When I request POST taxonomy with 9605 for ID, Homo for name and genus for rank NONE for SPECIES NONE for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_GENUS_HOMO
+    When I request POST taxonomy with 9596 for ID, Pan for name and genus for rank NONE for SPECIES NONE for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_GENUS_PAN
+    When I request POST taxonomy with 9606 for ID, Homo sapiens for name and species for rank NONE for SPECIES TAXONOMY_GENUS_HOMO for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_SPECIES_HOMO_SAPIENS
+    When I request POST taxonomy with 9598 for ID, Pan troglodytes for name and species for rank NONE for SPECIES TAXONOMY_GENUS_PAN for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_SPECIES_PAN_TROGLODYTES
+    When I request POST taxonomy with 9597 for ID, Pan paniscus for name and species for rank NONE for SPECIES TAXONOMY_GENUS_PAN for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_SPECIES_PAN_PANISCUS
+    When I request POST taxonomy with 37010 for ID, Pan troglodytes schweinfurthii for name and subspecies for rank TAXONOMY_SPECIES_PAN_TROGLODYTES for SPECIES TAXONOMY_GENUS_PAN for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_SUBSPECIES_PAN_TROGLODYTES_SCWEINFURTHII
 
     When I request POST /reference-sequences with JSON-like payload:
     """
@@ -346,29 +360,39 @@ Feature: reference sequence
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
       "type": "GENOME_ASSEMBLY",
-      "taxonomy": "TAXONOMY_2"
+      "taxonomy": "TAXONOMY_SPECIES_HOMO_SAPIENS"
     """
-    Then set the URL to REFERENCE_SEQUENCE1
+    Then set the URL to REFERENCE_SEQUENCE_HOMO_SAPIENS
 
     When I request POST /reference-sequences with JSON-like payload:
     """
-      "name": "GRCh38",
-      "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "name": "Pan_tro 3.0",
+      "patch": "null",
+      "accessions": ["GCA_000001515.5"],
       "type": "GENOME_ASSEMBLY",
-      "taxonomy": "TAXONOMY_4"
+      "taxonomy": "TAXONOMY_SPECIES_PAN_TROGLODYTES"
     """
-    Then set the URL to REFERENCE_SEQUENCE2
+    Then set the URL to REFERENCE_SEQUENCE_PAN_TROGLODYTES
 
     When I request POST /reference-sequences with JSON-like payload:
     """
-      "name": "GRCh39",
-      "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "name": "panpan1.1",
+      "patch": "null",
+      "accessions": ["GCA_000258655.2"],
       "type": "GENOME_ASSEMBLY",
-      "taxonomy": "TAXONOMY_5"
+      "taxonomy": "TAXONOMY_SPECIES_PAN_PANISCUS"
     """
-    Then set the URL to REFERENCE_SEQUENCE3
+    Then set the URL to REFERENCE_SEQUENCE_PAN_PANISCUS
+
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "Pan_tro_scweinfurthii",
+      "patch": "null",
+      "accessions": ["GCA_000001516.6"],
+      "type": "GENOME_ASSEMBLY",
+      "taxonomy": "TAXONOMY_SUBSPECIES_PAN_TROGLODYTES_SCWEINFURTHII"
+    """
+    Then set the URL to REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII
 
     When I request elaborate search for the reference-sequences base <base> and with the parameters: <query>
     Then the response code should be 200
@@ -376,12 +400,14 @@ Feature: reference sequence
     And the href of the referenceSequence of reference-sequences has items <url>
 
     Examples:
-      | base          | query             | N | url                                                         |
-      | taxonomy-id   | id=9606           | 1 | REFERENCE_SEQUENCE1                                         |
-      | taxonomy-id   | id=9596           | 2 | REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3                     |
-      | taxonomy-id   | id=207598         | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
-      | taxonomy-id   | id=0              | 0 | NONE                                                        |
-      | taxonomy-name | name=Homo sapiens | 1 | REFERENCE_SEQUENCE1                                         |
-      | taxonomy-name | name=Pan          | 2 | REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3                     |
-      | taxonomy-name | name=Homininae    | 3 | REFERENCE_SEQUENCE1,REFERENCE_SEQUENCE2,REFERENCE_SEQUENCE3 |
-      | taxonomy-name | name=None         | 0 | NONE                                                        |
+      | base          | query             | N | url                                                                                                                                                 |
+      | taxonomy-id   | id=9606           | 1 | REFERENCE_SEQUENCE_HOMO_SAPIENS                                                                                                                     |
+      | taxonomy-id   | id=9596           | 3 | REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS,REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII                                 |
+      | taxonomy-id   | id=40674          | 4 | REFERENCE_SEQUENCE_HOMO_SAPIENS,REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS,REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII |
+      | taxonomy-id   | id=37010          | 1 | REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII                                                                                                    |
+      | taxonomy-id   | id=756884         | 0 | NONE                                                                                                                                                |
+      | taxonomy-name | name=Homo sapiens | 1 | REFERENCE_SEQUENCE_HOMO_SAPIENS                                                                                                                     |
+      | taxonomy-name | name=Pan          | 3 | REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS,REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII                                 |
+      | taxonomy-name | name=Primates     | 4 | REFERENCE_SEQUENCE_HOMO_SAPIENS,REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS,REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII |
+      | taxonomy-name | name=Mammalia     | 4 | REFERENCE_SEQUENCE_HOMO_SAPIENS,REFERENCE_SEQUENCE_PAN_TROGLODYTES,REFERENCE_SEQUENCE_PAN_PANISCUS,REFERENCE_SEQUENCE_PAN_TROGLODYTES_SCWEINFURTHII |
+      | taxonomy-name | name=None         | 0 | NONE                                                                                                                                                |

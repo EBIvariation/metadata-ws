@@ -3,7 +3,7 @@ Feature: study object
   Scenario: register a study successfully and check its fields
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create a taxonomy
-    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and NONE for ancestors
+    When I request POST taxonomy with 9606 for ID, Homo Sapiens for name and species for rank without parent
     Then set the URL to TAXONOMY
     # Create a reference sequence
     When I request POST /reference-sequences with JSON-like payload:
@@ -32,46 +32,52 @@ Feature: study object
 
   Scenario Outline: search various study by taxonomy name and id
     Given I set authorization with testoperator having SERVICE_OPERATOR role
-    # Create taxonomies
-    When I request POST taxonomies with 207598 for ID, Homininae for name and NONE for ancestors
-    Then set the URL to TAXONOMY_1
-    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and TAXONOMY_1 for ancestors
-    Then set the URL to TAXONOMY_2
-    When I request POST taxonomies with 9596 for ID, Pan for name and TAXONOMY_1 for ancestors
-    Then set the URL to TAXONOMY_3
-    When I request POST taxonomies with 9597 for ID, Pan paniscus for name and TAXONOMY_1,TAXONOMY_3 for ancestors
-    Then set the URL to TAXONOMY_4
-    When I request POST taxonomies with 9598 for ID, Pan troglodytes for name and TAXONOMY_1,TAXONOMY_3 for ancestors
-    Then set the URL to TAXONOMY_5
+    When I request POST taxonomy with 40674 for ID, Mammalia for name and class for rank NONE for SPECIES NONE for GENUS NONE for ORDER NONE for CLASS
+    Then set the URL to TAXONOMY_CLASS_MAMMALIA
+    When I request POST taxonomy with 9443 for ID, Primates for name and order for rank NONE for SPECIES NONE for GENUS NONE for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_ORDER_PRIMATES
+    When I request POST taxonomy with 9605 for ID, Homo for name and genus for rank NONE for SPECIES NONE for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_GENUS_HOMO
+    When I request POST taxonomy with 9596 for ID, Pan for name and genus for rank NONE for SPECIES NONE for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_GENUS_PAN
+    When I request POST taxonomy with 9606 for ID, Homo sapiens for name and species for rank NONE for SPECIES TAXONOMY_GENUS_HOMO for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_SPECIES_HOMO_SAPIENS
+    When I request POST taxonomy with 9598 for ID, Pan troglodytes for name and species for rank NONE for SPECIES TAXONOMY_GENUS_PAN for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_SPECIES_PAN_TROGLODYTES
+    When I request POST taxonomy with 9597 for ID, Pan paniscus for name and species for rank NONE for SPECIES TAXONOMY_GENUS_PAN for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_SPECIES_PAN_PANISCUS
+    When I request POST taxonomy with 37010 for ID, Pan troglodytes schweinfurthii for name and subspecies for rank TAXONOMY_SPECIES_PAN_TROGLODYTES for SPECIES TAXONOMY_GENUS_PAN for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_SUBSPECIES_PAN_TROGLODYTES_SCWEINFURTHII
 
-    # Create reference sequences
     When I request POST /reference-sequences with JSON-like payload:
     """
       "name": "GRCh37",
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
       "type": "GENOME_ASSEMBLY",
-      "taxonomy": "TAXONOMY_2"
+      "taxonomy": "TAXONOMY_SPECIES_HOMO_SAPIENS"
     """
-    Then set the URL to REFERENCE_SEQUENCE1
+    Then set the URL to REFERENCE_SEQUENCE_HOMO_SAPIENS
+
     When I request POST /reference-sequences with JSON-like payload:
     """
-      "name": "GRCh38",
-      "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "name": "Pan_tro 3.0",
+      "patch": "null",
+      "accessions": ["GCA_000001515.5"],
       "type": "GENOME_ASSEMBLY",
-      "taxonomy": "TAXONOMY_4"
+      "taxonomy": "TAXONOMY_SPECIES_PAN_TROGLODYTES"
     """
-    Then set the URL to REFERENCE_SEQUENCE2
+    Then set the URL to REFERENCE_SEQUENCE_PAN_TROGLODYTES
+
     When I request POST /reference-sequences with JSON-like payload:
     """
-      "name": "GRCh39",
-      "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "name": "panpan1.1",
+      "patch": "null",
+      "accessions": ["GCA_000258655.2"],
       "type": "GENOME_ASSEMBLY",
-      "taxonomy": "TAXONOMY_5"
+      "taxonomy": "TAXONOMY_SPECIES_PAN_PANISCUS"
     """
-    Then set the URL to REFERENCE_SEQUENCE3
+    Then set the URL to REFERENCE_SEQUENCE_PAN_PANISCUS
 
     # Create studies
     When I request POST /studies with JSON-like payload:
@@ -84,7 +90,7 @@ Feature: study object
     "deprecated": false,
     "releaseDate": today
     """
-    Then set the URL to STUDY1
+    Then set the URL to STUDY_HOMO_SAPIENS
     When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
@@ -96,7 +102,7 @@ Feature: study object
     "releaseDate": today
     """
     And the response code should be 2xx
-    Then set the URL to STUDY2
+    Then set the URL to STUDY_PAN_TROGLODYTES
     When I request POST /studies with JSON-like payload:
     """
     "accessionVersionId": {
@@ -107,12 +113,12 @@ Feature: study object
     "deprecated": false,
     "releaseDate": today
     """
-    Then set the URL to STUDY3
+    Then set the URL to STUDY_PAN_PANISCUS
 
     # Create analyses to link studies to taxonomies
-    When I create an analysis with Analysis1 for accession, REFERENCE_SEQUENCE1 for reference sequence and STUDY1 for study
-    When I create an analysis with Analysis2 for accession, REFERENCE_SEQUENCE2 for reference sequence and STUDY2 for study
-    When I create an analysis with Analysis3 for accession, REFERENCE_SEQUENCE3 for reference sequence and STUDY3 for study
+    When I create an analysis with Analysis1 for accession, REFERENCE_SEQUENCE_HOMO_SAPIENS for reference sequence and STUDY_HOMO_SAPIENS for study
+    When I create an analysis with Analysis2 for accession, REFERENCE_SEQUENCE_PAN_TROGLODYTES for reference sequence and STUDY_PAN_TROGLODYTES for study
+    When I create an analysis with Analysis3 for accession, REFERENCE_SEQUENCE_PAN_PANISCUS for reference sequence and STUDY_PAN_PANISCUS for study
 
     When I request elaborate search for the studies base <base> and with the parameters: <query>
     Then the response code should be 200
@@ -120,15 +126,15 @@ Feature: study object
     And the href of the study of studies has items <url>
 
     Examples:
-      | base          | query             | N | url                  |
-      | taxonomy-id   | id=9606           | 1 | STUDY1               |
-      | taxonomy-id   | id=9596           | 2 | STUDY2,STUDY3        |
-      | taxonomy-id   | id=207598         | 3 | STUDY1,STUDY2,STUDY3 |
-      | taxonomy-id   | id=0              | 0 | NONE                 |
-      | taxonomy-name | name=Homo sapiens | 1 | STUDY1               |
-      | taxonomy-name | name=Pan          | 2 | STUDY2,STUDY3        |
-      | taxonomy-name | name=Homininae    | 3 | STUDY1,STUDY2,STUDY3 |
-      | taxonomy-name | name=None         | 0 | NONE                 |
+      | base          | query             | N | url                                                         |
+      | taxonomy-id   | id=9606           | 1 | STUDY_HOMO_SAPIENS                                          |
+      | taxonomy-id   | id=9596           | 2 | STUDY_PAN_TROGLODYTES,STUDY_PAN_PANISCUS                    |
+      | taxonomy-id   | id=40674          | 3 | STUDY_HOMO_SAPIENS,STUDY_PAN_TROGLODYTES,STUDY_PAN_PANISCUS |
+      | taxonomy-id   | id=0              | 0 | NONE                                                        |
+      | taxonomy-name | name=Homo sapiens | 1 | STUDY_HOMO_SAPIENS                                          |
+      | taxonomy-name | name=Pan          | 2 | STUDY_PAN_TROGLODYTES,STUDY_PAN_PANISCUS                    |
+      | taxonomy-name | name=Primates     | 3 | STUDY_HOMO_SAPIENS,STUDY_PAN_TROGLODYTES,STUDY_PAN_PANISCUS |
+      | taxonomy-name | name=None         | 0 | NONE                                                        |
 
 
   Scenario Outline: search various studies by release date
@@ -137,7 +143,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -192,7 +199,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -242,7 +250,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -320,7 +329,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -380,7 +390,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -446,7 +457,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -494,18 +506,17 @@ Feature: study object
       | size=1           | STUDY2 |
       | size=1&sort=name | STUDY1 |
 
-
   Scenario Outline: search various public studies
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create a common taxonomy
-    When I request POST /taxonomies with JSON payload:
-    """
-    {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens"
-    }
-    """
-    Then set the URL to TAXONOMY
+    When I request POST taxonomy with 40674 for ID, Mammalia for name and class for rank NONE for SPECIES NONE for GENUS NONE for ORDER NONE for CLASS
+    Then set the URL to TAXONOMY_CLASS_MAMMALIA
+    When I request POST taxonomy with 9443 for ID, Primates for name and order for rank NONE for SPECIES NONE for GENUS NONE for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_ORDER_PRIMATES
+    When I request POST taxonomy with 9605 for ID, Homo for name and genus for rank NONE for SPECIES NONE for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_GENUS_HOMO
+    When I request POST taxonomy with 9606 for ID, Homo sapiens for name and species for rank NONE for SPECIES TAXONOMY_GENUS_HOMO for GENUS TAXONOMY_ORDER_PRIMATES for ORDER TAXONOMY_CLASS_MAMMALIA for CLASS
+    Then set the URL to TAXONOMY_SPECIES_HOMO_SAPIENS
 
     # Create a common reference sequence
     When I request POST /reference-sequences with JSON-like payload:
@@ -514,7 +525,7 @@ Feature: study object
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
       "type": "GENOME_ASSEMBLY",
-      "taxonomy": "TAXONOMY"
+      "taxonomy": "TAXONOMY_SPECIES_HOMO_SAPIENS"
     """
     Then the response code should be 201
     And set the URL to REFERENCE_SEQUENCE_1
@@ -549,8 +560,8 @@ Feature: study object
       "version": 3
     },
     "name": "1kg phase 3",
-    "deprecated": tomorrow,
-    "releaseDate": today
+    "deprecated": false,
+    "releaseDate": tomorrow
     """
     Then set the URL to STUDY3
 
@@ -559,7 +570,6 @@ Feature: study object
     Then set the URL to ANALYSIS1
     When I create an analysis with Analysis2 for accession, REFERENCE_SEQUENCE_1 for reference sequence and STUDY2 for study
     Then set the URL to ANALYSIS2
-    When I create an analysis with Analysis3 for accession, REFERENCE_SEQUENCE_1 for reference sequence and STUDY3 for study
 
     When I request GET /studies
     Then the response should contain 2 studies
@@ -603,18 +613,11 @@ Feature: study object
       | taxonomy-name | name=Homo sapiens | STUDY1,STUDY2 |
       | text          | searchTerm=1kg    | STUDY1,STUDY2 |
 
-
   Scenario Outline: search various undeprecated studies
     Given I set authorization with testoperator having SERVICE_OPERATOR role
-    # Create common taxonomy
-    When I request POST /taxonomies with JSON payload:
-    """
-    {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens"
-    }
-    """
-    Then set the URL to TAXONOMY
+    # Create a common taxonomy
+    When I request POST taxonomy with 9606 for ID, Homo sapiens for name and species for rank without parent
+    Then set the URL to TAXONOMY_SPECIES_HOMO_SAPIENS
 
     # Create common reference sequence
     When I request POST /reference-sequences with JSON-like payload:
@@ -623,7 +626,7 @@ Feature: study object
       "patch": "p2",
       "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
       "type": "GENOME_ASSEMBLY",
-      "taxonomy": "TAXONOMY"
+      "taxonomy": "TAXONOMY_SPECIES_HOMO_SAPIENS"
     """
     Then set the URL to REFERENCE_SEQUENCE
 
@@ -698,7 +701,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -739,7 +743,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -768,7 +773,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -804,7 +810,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -885,7 +892,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -926,7 +934,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -965,7 +974,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY
@@ -1017,7 +1027,8 @@ Feature: study object
     """
     {
       "taxonomyId": 9606,
-      "name": "Homo Sapiens"
+      "name": "Homo Sapiens",
+      "rank": "SPECIES"
     }
     """
     Then set the URL to TAXONOMY

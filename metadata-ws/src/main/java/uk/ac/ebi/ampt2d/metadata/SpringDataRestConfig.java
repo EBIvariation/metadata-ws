@@ -42,10 +42,12 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
-import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceService;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyServiceImpl;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.TaxonomyService;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.TaxonomyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.AnalysisRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.ReferenceSequenceRestController;
@@ -124,6 +126,11 @@ public class SpringDataRestConfig {
     }
 
     @Bean
+    public TaxonomyService taxonomyTreeService() {
+        return new TaxonomyServiceImpl();
+    }
+
+    @Bean
     public GenericResourceAssembler<Analysis, AnalysisResource> analysisResourceAssembler() {
         return new GenericResourceAssembler<Analysis, AnalysisResource>(AnalysisRestController.class, AnalysisResource.class);
     }
@@ -145,7 +152,7 @@ public class SpringDataRestConfig {
 
     /**
      * Inject StudyDeprecationAspect bean
-     *
+     * <p>
      * The StudyDeprecationAspect ensures every GET request returns only not yet deprecated studies
      *
      * @return StudyDeprecationAspect
@@ -157,7 +164,7 @@ public class SpringDataRestConfig {
 
     /**
      * Inject ReleaseDateAspect bean conditionally
-     *
+     * <p>
      * The ReleaseDateAspect ensures every GET request returns only published entities
      * Set "endpoints.studies.date.restricted" to false if you don't want this restriction
      *

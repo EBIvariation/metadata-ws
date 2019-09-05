@@ -3,7 +3,7 @@ Feature: Transitive release date control for child objects of a Study
   Scenario Outline: Objects to which at least released study links should be accessible, and vice versa
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create the common taxonomy
-    When I request POST taxonomies with 9606 for ID, Homo Sapiens for name and NONE for ancestors
+    When I request POST taxonomy with 9606 for ID, Homo Sapiens for name and species for rank without parent
     And set the URL to TAXONOMY
     Then the response code should be 201
 

@@ -17,6 +17,7 @@
  */
 package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -25,17 +26,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @SequenceGenerator(allocationSize = 1, name = "TAXONOMY_SEQ", sequenceName = "taxonomy_sequence")
-public class Taxonomy extends Auditable<Long> {
+public class Taxonomy extends Auditable<Long> implements Serializable {
 
     @ApiModelProperty(position = 1, value = "Taxonomy auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -54,18 +56,42 @@ public class Taxonomy extends Auditable<Long> {
     @NotNull
     @JsonProperty
     @Size(max = 255, min = 1)
+    @Column(unique = true)
     private String name;
 
-    @ManyToMany
+    @ApiModelProperty(position = 4)
     @JsonProperty
-    private List<Taxonomy> ancestors;
+    @NotNull
+    @Column
+    private String rank;
+
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a taxonomySpecies")
+    @JoinColumn(name = "speciesId", referencedColumnName = "taxonomyId")
+    @ManyToOne
+    private Taxonomy taxonomySpecies;
+
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a taxonomyGenus")
+    @JoinColumn(name = "genusId", referencedColumnName = "taxonomyId")
+    @ManyToOne
+    private Taxonomy taxonomyGenus;
+
+    @ApiModelProperty(position = 7, dataType = "java.lang.String", notes = "Url to a taxonomyOrder")
+    @JoinColumn(name = "orderId", referencedColumnName = "taxonomyId")
+    @ManyToOne
+    private Taxonomy taxonomyOrder;
+
+    @ApiModelProperty(position = 8, dataType = "java.lang.String", notes = "Url to a taxonomyClass")
+    @JoinColumn(name = "classId", referencedColumnName = "taxonomyId")
+    @ManyToOne
+    private Taxonomy taxonomyClass;
 
     public Taxonomy() {
     }
 
-    public Taxonomy(long taxonomyId, String name) {
+    public Taxonomy(long taxonomyId, String name, String rank) {
         this.taxonomyId = taxonomyId;
         this.name = name;
+        this.rank = rank;
     }
 
     public Long getId() {
@@ -76,16 +102,64 @@ public class Taxonomy extends Auditable<Long> {
         return taxonomyId;
     }
 
+    public void setTaxonomyId(long taxonomyId) {
+        this.taxonomyId = taxonomyId;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
      * Release date control: taxonomies are always public.
      */
     @Override
+    @JsonIgnore
     public LocalDate getReleaseDate() {
         return null;
     }
 
+    public String getRank() {
+        return rank;
+    }
+
+    public void setRank(String rank) {
+        this.rank = rank;
+    }
+
+    public Taxonomy getTaxonomySpecies() {
+        return taxonomySpecies;
+    }
+
+    public void setTaxonomySpecies(Taxonomy taxonomySpecies) {
+        this.taxonomySpecies = taxonomySpecies;
+    }
+
+    public Taxonomy getTaxonomyGenus() {
+        return taxonomyGenus;
+    }
+
+    public void setTaxonomyGenus(Taxonomy taxonomyGenus) {
+        this.taxonomyGenus = taxonomyGenus;
+    }
+
+    public Taxonomy getTaxonomyOrder() {
+        return taxonomyOrder;
+    }
+
+    public void setTaxonomyOrder(Taxonomy taxonomyOrder) {
+        this.taxonomyOrder = taxonomyOrder;
+    }
+
+    public Taxonomy getTaxonomyClass() {
+        return taxonomyClass;
+    }
+
+    public void setTaxonomyClass(Taxonomy taxonomyClass) {
+        this.taxonomyClass = taxonomyClass;
+    }
 }

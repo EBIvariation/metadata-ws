@@ -30,26 +30,24 @@ public class ReferenceSequenceServiceImpl implements ReferenceSequenceService {
     @Autowired
     private ReferenceSequenceRepository referenceSequenceRepository;
 
+    @Autowired
+    private TaxonomyService taxonomyService;
+
     @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyId(long id) {
-        QReferenceSequence referenceSequence = QReferenceSequence.referenceSequence;
-        Predicate predicate = referenceSequence.taxonomy.taxonomyId.eq(id).
-                or(referenceSequence.taxonomy.ancestors.any().taxonomyId.eq(id));
-
-        return findReferenceSequencesByPredicate(predicate);
+        List<Long> taxonomyIds = taxonomyService.findAllTaxonomiesInATreeByTaxonomyIds(id);
+        return getReferenceSequences(taxonomyIds);
     }
 
     @Override
     public List<ReferenceSequence> findReferenceSequencesByTaxonomyName(String name) {
-        QReferenceSequence referenceSequence = QReferenceSequence.referenceSequence;
-        Predicate predicate = referenceSequence.taxonomy.name.equalsIgnoreCase(name).
-                or(referenceSequence.taxonomy.ancestors.any().name.equalsIgnoreCase(name));
-
-        return findReferenceSequencesByPredicate(predicate);
+        List<Long> taxonomyIds = taxonomyService.findAllTaxonomiesInATreeByTaxonomyName(name);
+        return getReferenceSequences(taxonomyIds);
     }
 
-    private List<ReferenceSequence> findReferenceSequencesByPredicate(Predicate predicate) {
+    public List<ReferenceSequence> getReferenceSequences(List<Long> taxonomyIds) {
+        QReferenceSequence referenceSequence = QReferenceSequence.referenceSequence;
+        Predicate predicate = referenceSequence.taxonomy.taxonomyId.in(taxonomyIds);
         return (List<ReferenceSequence>) referenceSequenceRepository.findAll(predicate);
     }
-
 }
