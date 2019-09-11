@@ -26,7 +26,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisFileType;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -48,22 +47,16 @@ public class FileExtractorFromAnalysis {
         this.fileConverter = new FileConverter();
     }
 
-    public List<File> getFiles(AnalysisType analysisType) {
-        List<File> files = new ArrayList<>();
+    public List<File> getFiles(AnalysisType analysisType) throws Exception {
+        List<File> files;
+
         try {
-            files = getFilesOfAnalysis(analysisType);
-            return files.parallelStream().map(file -> {
-                File fileInDb = fileRepository.findOne(qFile.name.eq(file.getName())
-                        .and(qFile.hash.eq(file.getHash())));
-                if (fileInDb != null) {
-                    return fileInDb;
-                }
-                return fileRepository.save(file);
-            }).collect(Collectors.toList());
+            files = fileRepository.findOrSave(getFilesOfAnalysis(analysisType));
         } catch (Exception exception) {
             String message = "Encountered exception when extracting files from analysis ";
             FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, message + analysisType.getAccession());
             FILE_EXTRACT_SERVICE_LOGGER.log(Level.SEVERE, exception.getMessage());
+            throw exception;
         }
         return files;
     }
