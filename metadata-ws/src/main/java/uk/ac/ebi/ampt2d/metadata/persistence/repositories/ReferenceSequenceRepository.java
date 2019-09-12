@@ -29,8 +29,8 @@ public interface ReferenceSequenceRepository extends ReferenceSequenceRepository
     default void customize(QuerydslBindings bindings, QReferenceSequence referenceSequence) {
         bindings.bind(referenceSequence.name, referenceSequence.patch)
                 .first((path, value) -> path.equalsIgnoreCase(value));
-        bindings.bind(referenceSequence.accessions)
-                .first((path, value) -> path.any().equalsIgnoreCase(value.iterator().next()));
+        bindings.bind(referenceSequence.accession)
+                .first((path, value) -> path.equalsIgnoreCase(value));
     }
 
 }

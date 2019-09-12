@@ -21,11 +21,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,8 +34,6 @@ import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name","patch"}))
@@ -74,10 +70,11 @@ public class ReferenceSequence extends Auditable<Long> {
     private String patch;
 
     @ApiModelProperty(position = 4, required = true)
+    @Size(min = 1, max = 255)
     @NotNull
     @JsonProperty
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> accessions = new ArrayList<String>();
+    @Column(nullable = false)
+    private String accession;
 
     @ApiModelProperty(position = 5, required = true)
     @NotNull
@@ -94,10 +91,10 @@ public class ReferenceSequence extends Auditable<Long> {
 
     public ReferenceSequence() {}
 
-    public ReferenceSequence(String name, String patch, List<String> accessions, Type type) {
+    public ReferenceSequence(String name, String patch, String accession, Type type) {
         this.name = name;
         this.patch = patch;
-        this.accessions = accessions;
+        this.accession = accession;
         this.type = type;
     }
 
@@ -114,8 +111,8 @@ public class ReferenceSequence extends Auditable<Long> {
         return patch;
     }
 
-    public List<String> getAccessions() {
-        return accessions;
+    public String getAccession() {
+        return accession;
     }
 
     public Type getType() {
@@ -146,8 +143,8 @@ public class ReferenceSequence extends Auditable<Long> {
         this.patch = patch;
     }
 
-    public void setAccessions(List<String> accessions) {
-        this.accessions = accessions;
+    public void setAccession(String accession) {
+        this.accession = accession;
     }
 
     public void setType(Type type) {

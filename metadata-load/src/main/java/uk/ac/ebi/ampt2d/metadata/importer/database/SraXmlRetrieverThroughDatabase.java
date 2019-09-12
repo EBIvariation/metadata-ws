@@ -23,7 +23,6 @@ import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 
 import java.sql.SQLException;
 import java.sql.SQLXML;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

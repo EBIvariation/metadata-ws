@@ -23,10 +23,10 @@ import org.junit.runner.RunWith;
 import org.mockito.AdditionalAnswers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 import java.nio.file.Files;

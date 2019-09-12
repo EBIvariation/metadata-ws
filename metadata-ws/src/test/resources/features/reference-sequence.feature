@@ -16,7 +16,7 @@ Feature: reference sequence
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -30,7 +30,7 @@ Feature: reference sequence
     {
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY"
     }
     """
@@ -54,7 +54,7 @@ Feature: reference sequence
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -64,7 +64,7 @@ Feature: reference sequence
     """
       "name": "GRCh38",
       "patch": "p2",
-      "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
+      "accession": "GCA_000001405.17",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -83,7 +83,7 @@ Feature: reference sequence
       | name=GRCh38                                     | REFERENCE_SEQUENCE_2 | name   | GRCh38 | patch  | p2     |
       | name=GRCh37&patch=p2                            | REFERENCE_SEQUENCE_1 | name   | GRCh37 | patch  | p2     |
       | name=GRCh38&patch=p2                            | REFERENCE_SEQUENCE_2 | name   | GRCh38 | patch  | p2     |
-      | name=GRCh37&patch=p2&accessions=GCA_000001405.3 | REFERENCE_SEQUENCE_1 | name   | GRCh37 | patch  | p2     |
+      | name=GRCh37&patch=p2&accession=GCA_000001405.3  | REFERENCE_SEQUENCE_1 | name   | GRCh37 | patch  | p2     |
 
 
   Scenario Outline: find one reference sequence by accession
@@ -102,7 +102,7 @@ Feature: reference sequence
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -112,7 +112,7 @@ Feature: reference sequence
     """
       "name": "GRCh38",
       "patch": "p2",
-      "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
+      "accession": "GCA_000001405.17",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -122,13 +122,13 @@ Feature: reference sequence
     Then the response code should be 200
     And the response should contain one reference sequence
     And the href of the referenceSequence of reference-sequences has items <url>
-    And the accessions field of reference-sequences 0 should have item <contained_accession>
+    And the accession field of reference-sequences 0 should be <contained_accession>
 
     Examples:
       | query                               | url                  | contained_accession |
-      | accessions=GCA_000001405.3          | REFERENCE_SEQUENCE_1 | GCA_000001405.3     |
-      | accessions=GCF_000001405.28         | REFERENCE_SEQUENCE_2 | GCF_000001405.28    |
-      | patch=p2&accessions=GCA_000001405.3 | REFERENCE_SEQUENCE_1 | GCA_000001405.3     |
+      | accession=GCA_000001405.3           | REFERENCE_SEQUENCE_1 | GCA_000001405.3     |
+      | accession=GCA_000001405.17          | REFERENCE_SEQUENCE_2 | GCA_000001405.17    |
+      | patch=p2&accession=GCA_000001405.3  | REFERENCE_SEQUENCE_1 | GCA_000001405.3     |
 
 
   Scenario Outline: find one reference sequence by type
@@ -147,7 +147,7 @@ Feature: reference sequence
     """
       "name": "BRCA1",
       "patch": "3",
-      "accessions": ["NM_007294.3"],
+      "accession": "NM_007294.3",
       "type": "SEQUENCE",
       "taxonomy": "TAXONOMY"
     """
@@ -157,7 +157,7 @@ Feature: reference sequence
     """
       "name": "GRCh38",
       "patch": "p2",
-      "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
+      "accession": "GCA_000001405.17",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -191,7 +191,7 @@ Feature: reference sequence
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -201,7 +201,7 @@ Feature: reference sequence
     """
       "name": "GRCh38",
       "patch": "p2",
-      "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
+      "accession": "GCA_000001405.17",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -218,8 +218,8 @@ Feature: reference sequence
       | name=NCBI36&patch=p2                            |
       | name=GRCh37&patch=p3                            |
       | name=GRCh38&patch=p3                            |
-      | accessions=GCA_000001405.2                      |
-      | name=GRCh37&patch=p3&accessions=GCA_000001405.3 |
+      | accession=GCA_000001405.2                       |
+      | name=GRCh37&patch=p3&accessio=GCA_000001405.3   |
       | type=SEQUENCE                                   |
       | type=TRANSCRIPTOME_SHOTGUN_ASSEMBLY             |
 
@@ -247,7 +247,7 @@ Feature: reference sequence
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY1"
     """
@@ -283,7 +283,7 @@ Feature: reference sequence
     {
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY"
     }
     """
@@ -297,7 +297,7 @@ Feature: reference sequence
     {
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "http://nohost/taxonomy/999"
     }
@@ -324,7 +324,7 @@ Feature: reference sequence
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY1"
     """
@@ -358,7 +358,7 @@ Feature: reference sequence
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_SPECIES_HOMO_SAPIENS"
     """
@@ -368,7 +368,7 @@ Feature: reference sequence
     """
       "name": "Pan_tro 3.0",
       "patch": "null",
-      "accessions": ["GCA_000001515.5"],
+      "accession": "GCA_000001515.5",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_SPECIES_PAN_TROGLODYTES"
     """
@@ -378,7 +378,7 @@ Feature: reference sequence
     """
       "name": "panpan1.1",
       "patch": "null",
-      "accessions": ["GCA_000258655.2"],
+      "accession": "GCA_000258655.2",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_SPECIES_PAN_PANISCUS"
     """
@@ -388,7 +388,7 @@ Feature: reference sequence
     """
       "name": "Pan_tro_scweinfurthii",
       "patch": "null",
-      "accessions": ["GCA_000001516.6"],
+      "accession": "GCA_000001516.6",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_SUBSPECIES_PAN_TROGLODYTES_SCWEINFURTHII"
     """

@@ -26,7 +26,7 @@ Feature: Miscellaneous functions
     """
         "name": "GRCh37",
         "patch": "p2",
-        "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+        "accession": "GCA_000001405.3",
         "type": "GENOME_ASSEMBLY",
         "taxonomy": "TAXONOMY"
       """

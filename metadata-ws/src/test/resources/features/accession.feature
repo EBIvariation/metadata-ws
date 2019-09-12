@@ -136,7 +136,7 @@ Feature: accession object
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "accession": "GCA_000001407.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """

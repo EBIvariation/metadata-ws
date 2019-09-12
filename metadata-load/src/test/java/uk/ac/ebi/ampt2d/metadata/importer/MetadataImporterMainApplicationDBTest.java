@@ -23,6 +23,7 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.DefaultApplicationArguments;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -41,6 +42,7 @@ import static org.junit.Assert.assertEquals;
 @TestPropertySource(value = "classpath:application.properties", properties = "import.source=DB")
 @ContextConfiguration(classes = {MetadataImporterMainApplication.class})
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
+@EnableRetry
 public class MetadataImporterMainApplicationDBTest {
 
     @Autowired
@@ -85,4 +87,5 @@ public class MetadataImporterMainApplicationDBTest {
         assertEquals(4, analysisRepository.count());
         assertEquals(4, sampleRepository.count());
     }
+
 }
