@@ -19,14 +19,18 @@
 package uk.ac.ebi.ampt2d.metadata.importer.api;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import uk.ac.ebi.ampt2d.metadata.exceptionhandling.AnalysisWithoutReferenceSequenceException;
+import uk.ac.ebi.ampt2d.metadata.exceptionhandling.InvalidReferenceSequenceException;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
@@ -39,6 +43,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 
 import java.nio.file.Files;
@@ -57,6 +62,9 @@ import static org.junit.Assert.assertNull;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class SraObjectsImporterThroughApiTest {
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Autowired
     private SraObjectsImporterThroughApi sraObjectImporter;
 
@@ -72,12 +80,16 @@ public class SraObjectsImporterThroughApiTest {
     @Autowired
     private SampleRepository sampleRepository;
 
+    @Autowired
+    private TaxonomyRepository taxonomyRepository;
+
     @Before
     public void setUp() {
         analysisRepository.deleteAll();
         studyRepository.deleteAll();
         referenceSequenceRepository.deleteAll();
         sampleRepository.deleteAll();
+        taxonomyRepository.deleteAll();
     }
 
     @Test
@@ -89,15 +101,6 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals(LocalDate.of(2014, 8, 4), study.getReleaseDate());
         assertEquals("Sanger Institute Mouse Genomes Project v3", study.getName());
         assertEquals(2, study.getAnalyses().size());
-
-        study = sraObjectImporter.importStudy("ERP111092");
-        assertNotNull(study);
-        assertEquals("ERP111092", study.getAccessionVersionId().getAccession());
-        assertEquals(LocalDate.of(2018, 9, 28), study.getReleaseDate());
-        assertEquals("Genetic diversity at LPL gene in river buffalo", study.getName());
-
-        // The analysis in the study is not imported because it is not linked to a ReferenceSequence
-        assertNull(study.getAnalyses());
 
         // Below two studies doesn't have analysis associated with it
         study = sraObjectImporter.importStudy("SRP000392");
@@ -114,10 +117,13 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals("Reference genome for the Human Microbiome Project", study.getName());
         assertEquals(1, study.getResources().size());
 
-        assertEquals(4, studyRepository.count());
+        assertEquals(3, studyRepository.count());
         assertEquals(2, analysisRepository.count());
         assertEquals(21, referenceSequenceRepository.count());
         assertEquals(25, sampleRepository.count());
+
+        expectedException.expect(InvalidReferenceSequenceException.class);
+        sraObjectImporter.importStudy("ERP111092");
     }
 
     @Test
@@ -140,7 +146,7 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals(0, analysisRepository.count());
     }
 
-    @Test
+    @Test(expected = AnalysisWithoutReferenceSequenceException.class)
     public void importAnalysisObjectWithoutReferenceSequence() throws Exception {
         Analysis analysis = sraObjectImporter.importAnalysis("ERZ000001");
         assertNull(analysis);
@@ -186,6 +192,7 @@ public class SraObjectsImporterThroughApiTest {
     /**
      * Please provide the apiKey in the application.properties as entrez.api.key=xxx to run this test method else
      * the test will fail due to Entrez-API rate limit.
+     *
      * @throws Exception
      */
     @Test

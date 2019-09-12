@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.AdditionalAnswers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
@@ -57,7 +58,7 @@ public class FileExtractorFromAnalysisTest {
     @Before
     public void setUp() {
         xmlParser = new SraAnalysisXmlParser();
-        when(fileRepository.save(anyList())).thenReturn(null);
+        when(fileRepository.findOrSave(anyList())).then(AdditionalAnswers.returnsFirstArg());
         fileExtractorFromAnalysis = new FileExtractorFromAnalysis(fileRepository);
     }
 

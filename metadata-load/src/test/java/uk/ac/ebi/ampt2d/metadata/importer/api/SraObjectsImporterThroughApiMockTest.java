@@ -27,6 +27,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
@@ -59,6 +60,7 @@ public class SraObjectsImporterThroughApiMockTest {
         String analysisAccession = "ERZ496533";
         when(sraXmlRetrieverByAccession.getXml(analysisAccession)).thenReturn(new String(Files.readAllBytes(
                 Paths.get(getClass().getClassLoader().getResource(ANALYSIS_DOCUMENT_API_XML).toURI()))));
+        ReflectionTestUtils.setField(sraObjectImporter, "sraXmlRetrieverByAccession", sraXmlRetrieverByAccession);
         Analysis analysis = sraObjectImporter.importAnalysis(analysisAccession);
         assertEquals("ERZ496533", analysis.getAccessionVersionId().getAccession());
         assertEquals(Analysis.Technology.EXOME_SEQUENCING, analysis.getTechnology());

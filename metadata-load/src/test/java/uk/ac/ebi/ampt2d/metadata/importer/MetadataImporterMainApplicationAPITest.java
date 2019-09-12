@@ -27,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
@@ -53,10 +54,15 @@ public class MetadataImporterMainApplicationAPITest {
     @Autowired
     private ReferenceSequenceRepository referenceSequenceRepository;
 
+    @Autowired
+    private FileRepository fileRepository;
+
     @Before
     public void setUp() {
         analysisRepository.deleteAll();
+        fileRepository.deleteAll();
         studyRepository.deleteAll();
+        sampleRepository.deleteAll();
         referenceSequenceRepository.deleteAll();
         sampleRepository.deleteAll();
     }
@@ -66,10 +72,9 @@ public class MetadataImporterMainApplicationAPITest {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
                 new String[]{"--accessions.file.path=study/StudyAccessions.txt"}));
         assertEquals(2, studyRepository.count());
-        // Actual count should be 3 but ERZ000001 Analysis has a CUSTOM assembly so not imported
         assertEquals(2, analysisRepository.count());
-        assertEquals(24, referenceSequenceRepository.count());
-        assertEquals(2, sampleRepository.count());
+        assertEquals(21, referenceSequenceRepository.count());
+        assertEquals(25, sampleRepository.count());
     }
 
     @Test(expected = RuntimeException.class)
@@ -85,4 +90,27 @@ public class MetadataImporterMainApplicationAPITest {
         assertEquals(1, studyRepository.count());
     }
 
+    @Test
+    public void testInvalidAnalysisOfAStudyStopsWholeTreeFromImporting() throws Exception {
+        metadataImporterMainApplication.run(new DefaultApplicationArguments(
+                new String[]{"--accessions.file.path=study/StudyAccessionsWithInvalidAnalysis.txt"}));
+        assertEquals(0, studyRepository.count());
+        assertEquals(0, analysisRepository.count());
+        assertEquals(0, referenceSequenceRepository.count());
+        assertEquals(0, sampleRepository.count());
+        assertEquals(0, fileRepository.count());
+    }
+
+    @Test
+    public void testValidAndInvalidStudy() throws Exception {
+        /* The below file contains two studies ERP000054,ERP009613 but only one study(ERP009613) and its dependent tree
+        is imported as the other study contains a invalid Analysis */
+        metadataImporterMainApplication.run(new DefaultApplicationArguments(
+                new String[]{"--accessions.file.path=study/ValidAndInvalidStudyAccessions.txt"}));
+        assertEquals(1, studyRepository.count());
+        assertEquals(2, analysisRepository.count());
+        assertEquals(24, referenceSequenceRepository.count());
+        assertEquals(2, sampleRepository.count());
+        assertEquals(10, fileRepository.count());
+    }
 }

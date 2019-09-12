@@ -90,7 +90,6 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                 sraXmlRetrieverThroughApi,
                 assemblyXmlRetrieverThroughEntrezApi,
 
-
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,
                 sraAssemblyXmlParser,
@@ -116,7 +115,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     }
 
     @Override
-    public Study importStudy(String accession) {
+    public Study importStudy(String accession) throws Exception {
         setEnaObjectQuery(EnaObjectQuery.STUDY_QUERY);
         Study study = super.importStudy(accession);
         setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
@@ -124,37 +123,38 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     }
 
     @Override
-    public Analysis importAnalysis(String accession) {
+    public Analysis importAnalysis(String accession) throws Exception {
         setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
         return super.importAnalysis(accession);
     }
 
     @Override
-    public List<Sample> importSamples(AnalysisType analysisType) {
+    public List<Sample> importSamples(AnalysisType analysisType) throws Exception {
         setEnaObjectQuery(EnaObjectQuery.SAMPLE_QUERY);
         String analysisAccession = analysisType.getAccession();
         List<Sample> samples = new ArrayList<>();
-        try {
-            Map<String, String> idXmlMap = getSampleXmls(analysisAccession);
-            SampleType sampleType;
-            for (Map.Entry<String, String> entry : idXmlMap.entrySet()) {
+        Map<String, String> idXmlMap = getSampleXmls(analysisAccession);
+        SampleType sampleType;
+        for (Map.Entry<String, String> entry : idXmlMap.entrySet()) {
+            try {
                 sampleType = sraSampleXmlParser.parseXml(entry.getValue(), entry.getKey());
                 Sample sampleElement = sampleConverter.convert(sampleType);
                 Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(sampleType));
                 sampleElement.setTaxonomies(Arrays.asList(taxonomy));
                 samples.add(sampleElement);
+            } catch (Exception exception) {
+                IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + entry.getKey());
+                IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+                throw exception;
             }
-            samples = sampleRepository.findOrSave(samples);
-        } catch (Exception exception) {
-            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Analysis accession " + analysisAccession);
-            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
         }
+        samples = sampleRepository.findOrSave(samples);
         setEnaObjectQuery(EnaObjectQuery.ANALYSIS_QUERY);
         return samples;
     }
 
     @Override
-    protected Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis) {
+    protected Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis) throws Exception {
         Study study = importStudyFromAnalysis(analysisType.getSTUDYREF().getAccession());
         analysis.setStudy(study);
         return analysisRepository.save(analysis);
@@ -165,7 +165,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         return study;
     }
 
-    private synchronized Study importStudyFromAnalysis(String studyAccession) {
+    private synchronized Study importStudyFromAnalysis(String studyAccession) throws Exception {
         /* The below get will make sure to return shared study when analyses sharing same study are imported
           in current run */
         Study sharedStudy = accessionsToStudy.get(studyAccession);

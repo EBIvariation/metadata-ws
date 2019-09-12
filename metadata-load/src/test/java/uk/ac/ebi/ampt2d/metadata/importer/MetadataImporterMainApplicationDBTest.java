@@ -33,6 +33,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 
 import static org.junit.Assert.assertEquals;
 
@@ -58,6 +59,9 @@ public class MetadataImporterMainApplicationDBTest {
     private SampleRepository sampleRepository;
 
     @Autowired
+    private TaxonomyRepository taxonomyRepository;
+
+    @Autowired
     private ReferenceSequenceRepository referenceSequenceRepository;
 
     @Test
@@ -65,22 +69,20 @@ public class MetadataImporterMainApplicationDBTest {
     public void run() throws Exception {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
                 new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessions.txt"}));
+        assertEquals(2, analysisRepository.count());
 
-        // Two of the analysis hasn't got a proper ReferenceSequence so they are not imported
-        assertEquals(1, analysisRepository.count());
-
-        assertEquals(1, studyRepository.count());
-        assertEquals(13, referenceSequenceRepository.count());
-        assertEquals(1, sampleRepository.count());
+        assertEquals(2, studyRepository.count());
+        assertEquals(2, referenceSequenceRepository.count());
+        assertEquals(2, sampleRepository.count());
+        assertEquals(1, taxonomyRepository.count());
 
         sraObjectsImporterThroughDatabase.getAccessionsToStudy().clear();
 
         // Import additional analyses into already imported study
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
                 new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessionsSharedStudyPreviousImport.txt"}));
-        assertEquals(1, studyRepository.count());
-        assertEquals(3, analysisRepository.count());
-        assertEquals(3, sampleRepository.count());
+        assertEquals(2, studyRepository.count());
+        assertEquals(4, analysisRepository.count());
+        assertEquals(4, sampleRepository.count());
     }
-
 }

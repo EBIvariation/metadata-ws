@@ -64,9 +64,25 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
     public void run(ApplicationArguments applicationArguments) throws Exception {
         Set<String> accessions = readAccessionsFromFile(applicationArguments);
         if (objectsImporter instanceof SraObjectsImporterThroughDatabase) {
-            accessions.forEach(accession -> objectsImporter.importAnalysis(accession));
+            accessions.forEach(accession -> {
+                try {
+                    objectsImporter.importAnalysis(accession);
+                } catch (Exception exception) {
+                    METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, "Encountered Exception for " +
+                            "analysis accession " + accession);
+                    METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, exception.getMessage());
+                }
+            });
         } else if (objectsImporter instanceof SraObjectsImporterThroughApi) {
-            accessions.forEach(accession -> objectsImporter.importStudy(accession));
+            accessions.forEach(accession -> {
+                try {
+                    objectsImporter.importStudy(accession);
+                } catch (Exception exception) {
+                    METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, "Encountered Exception for " +
+                            "study accession " + accession);
+                    METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, exception.getMessage());
+                }
+            });
         } else {
             throw new RuntimeException("ObjectsImporter instance not known/supported");
         }
