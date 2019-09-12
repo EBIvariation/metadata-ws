@@ -23,7 +23,6 @@ Feature: taxonomy object
     When I request GET /taxonomies
     Then the response should contain 4 taxonomies
 
-
   Scenario: register a taxonomy with taxonomyId less than 1 should fail
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
@@ -36,7 +35,6 @@ Feature: taxonomy object
     When I request GET /taxonomies
     Then the response should contain no taxonomy
 
-    @hello
   Scenario Outline: search taxonomy tree
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST taxonomy with 9606 for ID

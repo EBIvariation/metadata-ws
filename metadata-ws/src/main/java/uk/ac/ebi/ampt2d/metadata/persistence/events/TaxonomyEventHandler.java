@@ -73,6 +73,10 @@ public class TaxonomyEventHandler {
         }
 
         String taxonXml = getXml(taxonomyId);
+        if (taxonXml.contains("type is either not supported or entry is not found")) {
+            throw new IllegalArgumentException("taxonomyId provided is invalid");
+        }
+
         DomQueryUsingXPath domQueryUsingXPath = new DomQueryUsingXPath(taxonXml);
         String taxonomyName = domQueryUsingXPath.findInDom("/ROOT/taxon/@scientificName");
         String rank = domQueryUsingXPath.findInDom("/ROOT/taxon/@rank");
