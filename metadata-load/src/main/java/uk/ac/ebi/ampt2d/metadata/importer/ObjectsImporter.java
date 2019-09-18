@@ -191,9 +191,12 @@ public abstract class ObjectsImporter {
      * @return Ready ReferenceSequence entity
      */
     public ReferenceSequence importReferenceSequence(String accession, String referenceSequenceKind) throws Exception {
-        ReferenceSequence referenceSequence = null;
-        Taxonomy taxonomy;
+        ReferenceSequence referenceSequence = referenceSequenceRepository.findByAccession(accession);
+        if (referenceSequence != null) {
+            return referenceSequence;
+        }
         try {
+            Taxonomy taxonomy;
             // Import XML through Entrez API
             String assemblyXml = assemblyXmlRetrieverThroughEntrezApi.getXml(accession, referenceSequenceKind);
             referenceSequence = entrezAssemblyXmlParser.parseXml(assemblyXml, accession, referenceSequenceKind);
