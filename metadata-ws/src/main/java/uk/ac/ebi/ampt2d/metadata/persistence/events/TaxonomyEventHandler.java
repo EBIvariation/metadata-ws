@@ -19,7 +19,6 @@
 package uk.ac.ebi.ampt2d.metadata.persistence.events;
 
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
-import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
@@ -57,13 +56,7 @@ public class TaxonomyEventHandler {
         return domQueryUsingXPath.findInDom(expression);
     }
 
-    private static String findTaxName(DomQueryUsingXPath domQueryUsingXPath, String rank) throws Exception {
-        String expression = "//lineage/taxon[@rank='" + rank + "']/@scientificName";
-        return domQueryUsingXPath.findInDom(expression);
-    }
-
     @HandleBeforeCreate
-    @HandleBeforeSave
     public Taxonomy importTaxonomyTree(Taxonomy taxonomy) throws Exception {
         long taxonomyId = taxonomy.getTaxonomyId();
         Taxonomy existingTaxonomy = taxonomyRepository.findByTaxonomyId(taxonomyId);
@@ -87,59 +80,30 @@ public class TaxonomyEventHandler {
         taxonomy.setRank(rank);
 
         String classTaxId = findTaxId(domQueryUsingXPath, CLASS);
-        String classTaxName = findTaxName(domQueryUsingXPath, CLASS);
-        Taxonomy classTaxonomy = null;
         if (classTaxId != null && !classTaxId.equals("")) {
             long classTaxIdLong = Long.parseLong(classTaxId);
-            classTaxonomy = taxonomyRepository.findByTaxonomyId(classTaxIdLong);
-            if (classTaxonomy == null) {
-                classTaxonomy = taxonomyRepository.save(new Taxonomy(classTaxIdLong, classTaxName, CLASS));
-            }
+            Taxonomy classTaxonomy = importTaxonomyTree(new Taxonomy(classTaxIdLong));
             taxonomy.setTaxonomyClass(classTaxonomy);
         }
 
         String orderTaxId = findTaxId(domQueryUsingXPath, ORDER);
-        String orderTaxName = findTaxName(domQueryUsingXPath, ORDER);
-        Taxonomy orderTaxonomy = null;
         if (orderTaxId != null && !orderTaxId.equals("")) {
             long orderTaxIdLong = Long.parseLong(orderTaxId);
-            orderTaxonomy = taxonomyRepository.findByTaxonomyId(orderTaxIdLong);
-            if (orderTaxonomy == null) {
-                orderTaxonomy = new Taxonomy(orderTaxIdLong, orderTaxName, ORDER);
-                orderTaxonomy.setTaxonomyClass(classTaxonomy);
-                orderTaxonomy = taxonomyRepository.save(orderTaxonomy);
-            }
+            Taxonomy orderTaxonomy = importTaxonomyTree(new Taxonomy(orderTaxIdLong));
             taxonomy.setTaxonomyOrder(orderTaxonomy);
         }
 
         String genusTaxId = findTaxId(domQueryUsingXPath, GENUS);
-        String genusTaxName = findTaxName(domQueryUsingXPath, GENUS);
-        Taxonomy genusTaxonomy = null;
         if (genusTaxId != null && !genusTaxId.equals("")) {
             long genusTaxIdLong = Long.parseLong(genusTaxId);
-            genusTaxonomy = taxonomyRepository.findByTaxonomyId(genusTaxIdLong);
-            if (genusTaxonomy == null) {
-                genusTaxonomy = new Taxonomy(genusTaxIdLong, genusTaxName, GENUS);
-                genusTaxonomy.setTaxonomyClass(classTaxonomy);
-                genusTaxonomy.setTaxonomyOrder(orderTaxonomy);
-                genusTaxonomy = taxonomyRepository.save(genusTaxonomy);
-            }
+            Taxonomy genusTaxonomy = importTaxonomyTree(new Taxonomy(genusTaxIdLong));
             taxonomy.setTaxonomyGenus(genusTaxonomy);
         }
 
         String speciesTaxId = findTaxId(domQueryUsingXPath, SPECIES);
-        String speciesTaxName = findTaxName(domQueryUsingXPath, SPECIES);
-        Taxonomy speciesTaxonomy = null;
         if (speciesTaxId != null && !speciesTaxId.equals("")) {
             long speciesTaxIdLong = Long.parseLong(speciesTaxId);
-            speciesTaxonomy = taxonomyRepository.findByTaxonomyId(speciesTaxIdLong);
-            if (speciesTaxonomy == null) {
-                speciesTaxonomy = new Taxonomy(speciesTaxIdLong, speciesTaxName, SPECIES);
-                speciesTaxonomy.setTaxonomyClass(classTaxonomy);
-                speciesTaxonomy.setTaxonomyOrder(orderTaxonomy);
-                speciesTaxonomy.setTaxonomyGenus(genusTaxonomy);
-                speciesTaxonomy = taxonomyRepository.save(speciesTaxonomy);
-            }
+            Taxonomy speciesTaxonomy = importTaxonomyTree(new Taxonomy(speciesTaxIdLong));
             taxonomy.setTaxonomySpecies(speciesTaxonomy);
         }
 

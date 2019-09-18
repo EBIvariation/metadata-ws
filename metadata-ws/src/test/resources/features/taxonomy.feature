@@ -15,9 +15,7 @@ Feature: taxonomy object
     And the response JSON should be:
     """
     {
-      "taxonomyId" : 9606,
-      "name" : "Homo sapiens",
-      "rank" : "species"
+      "taxonomyId" : 9606
     }
     """
     When I request GET /taxonomies
