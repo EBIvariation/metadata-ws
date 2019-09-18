@@ -55,7 +55,8 @@ public abstract class ObjectsImporter {
 
     private static final Logger IMPORT_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
 
-    // XML retrievers: first is used for all but reference sequence, and the second one only for reference sequences
+    // XML retrievers: first is used for all entities except reference sequence, and the second one specifically for
+    // reference sequences.
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
 
     protected ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi;
