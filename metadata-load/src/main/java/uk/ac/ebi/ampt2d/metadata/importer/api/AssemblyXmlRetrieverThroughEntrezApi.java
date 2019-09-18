@@ -69,7 +69,8 @@ public class AssemblyXmlRetrieverThroughEntrezApi {
                 entrezDatabase, id, entrezApiKey).getBody();
     }
 
-    @Retryable(maxAttempts=10, backoff=@Backoff(value=500))
+    @Retryable(maxAttemptsExpression="#{${entrez.api.attempts}}",
+            backoff=@Backoff(delayExpression="#{${entrez.api.delay}}"))
     public String getXml(String accession, String entrezDatabase) {
         String idXml = fetchEntrezId(accession, entrezDatabase);
         String id = idXml.substring(idXml.indexOf(ID_START_TAG) + ID_START_TAG_LENGTH, idXml.indexOf(ID_END_TAG));
