@@ -20,7 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.importer.database;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
-import uk.ac.ebi.ampt2d.metadata.importer.api.AssemblyXmlRetrieverThroughEntrezApi;
+import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
@@ -58,7 +58,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
     public SraObjectsImporterThroughDatabase(
             SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
-            AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi,
+            ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
@@ -80,7 +80,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             TaxonomyRepository taxonomyRepository) {
         super(
                 sraXmlRetrieverThroughDatabase,
-                assemblyXmlRetrieverThroughEntrezApi,
+                referenceSequenceXmlRetrieverThroughEntrezApi,
 
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,

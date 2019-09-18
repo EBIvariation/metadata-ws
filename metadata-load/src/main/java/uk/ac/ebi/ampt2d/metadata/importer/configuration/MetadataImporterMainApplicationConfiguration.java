@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
-import uk.ac.ebi.ampt2d.metadata.importer.api.AssemblyXmlRetrieverThroughEntrezApi;
+import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
@@ -58,15 +58,15 @@ public class MetadataImporterMainApplicationConfiguration {
     }
 
     @Bean
-    public AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi(
+    public ReferenceSequenceXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi(
             @Value("${entrez.api.key:}") String entrezApiKey) {
-        return new AssemblyXmlRetrieverThroughEntrezApi(entrezApiKey);
+        return new ReferenceSequenceXmlRetrieverThroughEntrezApi(entrezApiKey);
     }
 
     @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "API")
     public ObjectsImporter objectImporterThroughEnaApi(SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
-                                                       AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi,
+                                                       ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
                                                        PublicationRepository publicationRepository,
                                                        WebResourceRepository webResourceRepository,
                                                        FileRepository fileRepository,
@@ -77,7 +77,7 @@ public class MetadataImporterMainApplicationConfiguration {
                                                        SampleRepository sampleRepository) {
         return new SraObjectsImporterThroughApi(
                 sraXmlRetrieverThroughApi,
-                assemblyXmlRetrieverThroughEntrezApi,
+                referenceSequenceXmlRetrieverThroughEntrezApi,
 
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
@@ -104,7 +104,7 @@ public class MetadataImporterMainApplicationConfiguration {
     @ConditionalOnProperty(name = "import.source", havingValue = "DB")
     public ObjectsImporter objectImporterThroughEnaDatabase(
             SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
-            AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi,
+            ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
             PublicationRepository publicationRepository,
             WebResourceRepository webResourceRepository,
             FileRepository fileRepository,
@@ -115,7 +115,7 @@ public class MetadataImporterMainApplicationConfiguration {
             SampleRepository sampleRepository) {
         return new SraObjectsImporterThroughDatabase(
                 sraXmlRetrieverThroughDatabase,
-                assemblyXmlRetrieverThroughEntrezApi,
+                referenceSequenceXmlRetrieverThroughEntrezApi,
 
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),

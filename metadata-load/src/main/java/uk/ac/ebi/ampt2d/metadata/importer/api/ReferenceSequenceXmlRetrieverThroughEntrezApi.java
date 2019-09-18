@@ -23,7 +23,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.client.RestTemplate;
 
-public class AssemblyXmlRetrieverThroughEntrezApi {
+public class ReferenceSequenceXmlRetrieverThroughEntrezApi {
 
     private static final String ID_START_TAG = "<Id>";
 
@@ -49,7 +49,7 @@ public class AssemblyXmlRetrieverThroughEntrezApi {
 
     private String entrezApiKey;
 
-    public AssemblyXmlRetrieverThroughEntrezApi(String entrezApiKey) {
+    public ReferenceSequenceXmlRetrieverThroughEntrezApi(String entrezApiKey) {
         if (entrezApiKey != null && !entrezApiKey.isEmpty()) {
             this.entrezApiKey = entrezApiKey;
             entrezApiIdRetrievalUrl = entrezApiIdRetrievalUrl + ENTREZ_API_KEY_QUERY;

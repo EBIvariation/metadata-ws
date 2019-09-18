@@ -20,7 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.ampt2d.metadata.importer.api.AssemblyXmlRetrieverThroughEntrezApi;
+import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
@@ -58,7 +58,7 @@ public abstract class ObjectsImporter {
     // XML retrievers: first is used for all but reference sequence, and the second one only for reference sequences
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
 
-    protected AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi;
+    protected ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi;
 
     // Entity repositories
     protected StudyRepository studyRepository;
@@ -96,7 +96,7 @@ public abstract class ObjectsImporter {
 
     public ObjectsImporter(
             SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
-            AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi,
+            ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
@@ -117,7 +117,7 @@ public abstract class ObjectsImporter {
             SampleRepository sampleRepository,
             TaxonomyRepository taxonomyRepository) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
-        this.assemblyXmlRetrieverThroughEntrezApi = assemblyXmlRetrieverThroughEntrezApi;
+        this.referenceSequenceXmlRetrieverThroughEntrezApi = referenceSequenceXmlRetrieverThroughEntrezApi;
 
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
@@ -198,7 +198,7 @@ public abstract class ObjectsImporter {
         try {
             Taxonomy taxonomy;
             // Import XML through Entrez API
-            String assemblyXml = assemblyXmlRetrieverThroughEntrezApi.getXml(accession, referenceSequenceKind);
+            String assemblyXml = referenceSequenceXmlRetrieverThroughEntrezApi.getXml(accession, referenceSequenceKind);
             referenceSequence = entrezAssemblyXmlParser.parseXml(assemblyXml, accession, referenceSequenceKind);
             // Taxonomy of a reference sequence might already be saved in the database
             taxonomy = taxonomyRepository.findOrSave(referenceSequence.getTaxonomy());

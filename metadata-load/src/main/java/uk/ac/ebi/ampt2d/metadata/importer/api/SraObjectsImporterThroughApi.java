@@ -51,7 +51,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
 
     public SraObjectsImporterThroughApi(
             SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
-            AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi,
+            ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
@@ -73,7 +73,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
             TaxonomyRepository taxonomyRepository) {
         super(
                 sraXmlRetrieverThroughApi,
-                assemblyXmlRetrieverThroughEntrezApi,
+                referenceSequenceXmlRetrieverThroughEntrezApi,
 
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,
