@@ -46,7 +46,6 @@ import javax.sql.DataSource;
         basePackages = "uk.ac.ebi.ampt2d.metadata.persistence.repositories",
         transactionManagerRef = "metadataTransactionManager")
 @EnableJpaAuditing
-@EnableRetry
 public class MetadataDatabaseConfiguration {
 
     @Autowired
