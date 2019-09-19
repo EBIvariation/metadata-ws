@@ -16,7 +16,7 @@ Feature: analysis object
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "accession": "GCA_000001407.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -47,7 +47,7 @@ Feature: analysis object
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "accession": "GCA_000001407.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -70,7 +70,7 @@ Feature: analysis object
     """
       "name": "GRCh37",
       "patch": "p3",
-      "accessions": ["GCA_000001407.4", "GCF_000001407.15"],
+      "accession": "GCA_000001407.4",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -102,7 +102,7 @@ Feature: analysis object
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "accession": "GCA_000001407.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -171,7 +171,7 @@ Feature: analysis object
     """
       "name": "BRCA1",
       "patch": "3",
-      "accessions": ["NM_007294.3"],
+      "accession": "NM_007294.3",
       "type": "SEQUENCE",
       "taxonomy": "TAXONOMY"
     """
@@ -180,7 +180,7 @@ Feature: analysis object
     """
       "name": "BRCA2",
       "patch": "3",
-      "accessions": ["NM_000059.3"],
+      "accession": "NM_000059.3",
       "type": "SEQUENCE",
       "taxonomy": "TAXONOMY"
     """
@@ -222,7 +222,7 @@ Feature: analysis object
     """
       "name": "BRCA1",
       "patch": "3",
-      "accessions": ["NM_007294.3"],
+      "accession": "NM_007294.3",
       "type": "SEQUENCE",
       "taxonomy": "TAXONOMY"
     """
@@ -231,7 +231,7 @@ Feature: analysis object
     """
       "name": "BRCA2",
       "patch": "3",
-      "accessions": ["NM_000059.3"],
+      "accession": "NM_000059.3",
       "type": "SEQUENCE",
       "taxonomy": "TAXONOMY"
     """
@@ -282,9 +282,9 @@ Feature: analysis object
 
     Examples:
       | test_reference_sequence_1_json                                                                                                             | test_reference_sequence_2_json                                                                                                             |
-      | "name": "GRCh37","patch": "p2","accessions": ["GCA_000001407.3", "GCF_000001407.14"],"type": "GENOME_ASSEMBLY","taxonomy": "TAXONOMY"      | "name": "GRCh37","patch": "p3","accessions": ["GCA_000001407.4", "GCF_000001407.15"],"type": "GENOME_ASSEMBLY","taxonomy": "TAXONOMY"      |
-      | "name": "FOXP2","patch": "nothing important","accessions": ["NM_014491.3"],"type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY" | "name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY" |
-      | "name": "BRCA1","patch": "3","accessions": ["NM_007294.3"],"type": "SEQUENCE","taxonomy": "TAXONOMY"                                       | "name": "BRCA2","patch": "nothing important","accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY" |
+      | "name": "GRCh37","patch": "p2","accession": "GCA_000001407.3","type": "GENOME_ASSEMBLY","taxonomy": "TAXONOMY"      | "name": "GRCh37","patch": "p3","accession": "GCA_000001407.4","type": "GENOME_ASSEMBLY","taxonomy": "TAXONOMY"      |
+      | "name": "FOXP2","patch": "nothing important","accession": "NM_014491.3","type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY" | "name": "BRCA2","patch": "nothing important","accession": "NM_000059.3","type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY" |
+      | "name": "BRCA1","patch": "3","accession": "NM_007294.3","type": "SEQUENCE","taxonomy": "TAXONOMY"                                       | "name": "BRCA2","patch": "nothing important","accession": "NM_000059.3","type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY" |
 
 
   Scenario Outline: register an analysis with multiple reference sequences having different taxonomy should fail
@@ -331,8 +331,8 @@ Feature: analysis object
 
     Examples:
       | test_reference_sequence_1_json                                                                                                                   | test_reference_sequence_2_json                                                                                                                     |
-      | "name": "GRCh37","patch": "p2","accessions": ["GCA_000001407.3", "GCF_000001407.14"], "type":"GENOME_ASSEMBLY","taxonomy": "TAXONOMY_HUMAN"      | "name": "GRCh37","patch": "p3","accessions":   ["GCA_000001407.4","GCF_000001407.15"],"type": "GENOME_ASSEMBLY","taxonomy": "TAXONOMY_MOUSE"       |
-      | "name": "FOXP2","patch": "nothing important","accessions": ["NM_014491.3"],"type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY_MOUSE" | "name": "BRCA2","patch": "nothing important",  "accessions": ["NM_000059.3"],"type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY_HUMAN" |
+      | "name": "GRCh37","patch": "p2","accession": "GCA_000001407.3", "type":"GENOME_ASSEMBLY","taxonomy": "TAXONOMY_HUMAN"      | "name": "GRCh37","patch": "p3","accession": "GCA_000001407.4","type": "GENOME_ASSEMBLY","taxonomy": "TAXONOMY_MOUSE"       |
+      | "name": "FOXP2","patch": "nothing important","accession": "NM_014491.3","type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY_MOUSE" | "name": "BRCA2","patch": "nothing important",  "accession": "NM_000059.3","type": "TRANSCRIPTOME_SHOTGUN_ASSEMBLY","taxonomy": "TAXONOMY_HUMAN" |
 
   Scenario Outline: find one analysis by type, technology or platform
     Given I set authorization with testoperator having SERVICE_OPERATOR role
@@ -351,7 +351,7 @@ Feature: analysis object
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "accession": "GCA_000001407.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -398,7 +398,7 @@ Feature: analysis object
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "accession": "GCA_000001407.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -440,7 +440,7 @@ Feature: analysis object
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001407.3", "GCF_000001407.14"],
+      "accession": "GCA_000001407.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """

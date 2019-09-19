@@ -20,15 +20,13 @@ package uk.ac.ebi.ampt2d.metadata.importer.database;
 
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
-import uk.ac.ebi.ampt2d.metadata.importer.api.AssemblyXmlRetrieverThroughEntrezApi;
-import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
+import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
@@ -38,7 +36,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
-import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 
@@ -61,19 +58,15 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
     public SraObjectsImporterThroughDatabase(
             SraXmlRetrieverThroughDatabase sraXmlRetrieverThroughDatabase,
-            SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
-            AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi,
+            ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
-            SraXmlParser<AssemblyType> sraAssemblyXmlParser,
-            SraXmlParser<ReferenceSequence> sraEntryXmlParser,
             EntrezAssemblyXmlParser entrezAssemblyXmlParser,
             SraXmlParser<SampleType> sraSampleXmlParser,
 
             Converter<StudyType, Study> studyConverter,
             Converter<AnalysisType, Analysis> analysisConverter,
-            Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
             Converter<SampleType, Sample> sampleConverter,
 
             PublicationExtractorFromStudy publicationExtractorFromStudy,
@@ -87,19 +80,15 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             TaxonomyRepository taxonomyRepository) {
         super(
                 sraXmlRetrieverThroughDatabase,
-                sraXmlRetrieverThroughApi,
-                assemblyXmlRetrieverThroughEntrezApi,
+                referenceSequenceXmlRetrieverThroughEntrezApi,
 
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,
-                sraAssemblyXmlParser,
-                sraEntryXmlParser,
                 entrezAssemblyXmlParser,
                 sraSampleXmlParser,
 
                 studyConverter,
                 analysisConverter,
-                referenceSequenceConverter,
                 sampleConverter,
 
                 publicationExtractorFromStudy,

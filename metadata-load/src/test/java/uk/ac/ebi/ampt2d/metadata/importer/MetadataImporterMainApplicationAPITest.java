@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.DefaultApplicationArguments;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -37,6 +38,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(SpringRunner.class)
 @TestPropertySource(value = "classpath:application.properties", properties = "import.source=API")
 @ContextConfiguration(classes = {MetadataImporterMainApplication.class})
+@EnableRetry
 public class MetadataImporterMainApplicationAPITest {
 
     @Autowired

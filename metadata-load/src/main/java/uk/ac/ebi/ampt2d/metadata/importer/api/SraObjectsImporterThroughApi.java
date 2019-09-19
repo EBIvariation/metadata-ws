@@ -26,7 +26,6 @@ import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStud
 import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
-import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
@@ -35,7 +34,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
-import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.LinkType;
 import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
@@ -53,18 +51,15 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
 
     public SraObjectsImporterThroughApi(
             SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
-            AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi,
+            ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
-            SraXmlParser<AssemblyType> sraAssemblyXmlParser,
-            SraXmlParser<ReferenceSequence> sraEntryXmlParser,
             EntrezAssemblyXmlParser entrezAssemblyXmlParser,
             SraXmlParser<SampleType> sraSampleXmlParser,
 
             Converter<StudyType, Study> studyConverter,
             Converter<AnalysisType, Analysis> analysisConverter,
-            Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
             Converter<SampleType, Sample> sampleConverter,
 
             PublicationExtractorFromStudy publicationExtractorFromStudy,
@@ -77,21 +72,16 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
             SampleRepository sampleRepository,
             TaxonomyRepository taxonomyRepository) {
         super(
-                // For API import, default and "force API" retrievers are the same
                 sraXmlRetrieverThroughApi,
-                sraXmlRetrieverThroughApi,
-                assemblyXmlRetrieverThroughEntrezApi,
+                referenceSequenceXmlRetrieverThroughEntrezApi,
 
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,
-                sraAssemblyXmlParser,
-                sraEntryXmlParser,
                 entrezAssemblyXmlParser,
                 sraSampleXmlParser,
 
                 studyConverter,
                 analysisConverter,
-                referenceSequenceConverter,
                 sampleConverter,
 
                 publicationExtractorFromStudy,

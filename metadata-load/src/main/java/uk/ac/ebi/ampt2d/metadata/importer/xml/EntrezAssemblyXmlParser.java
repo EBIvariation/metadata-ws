@@ -18,11 +18,9 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.xml;
 
-import uk.ac.ebi.ampt2d.metadata.importer.converter.ReferenceSequenceConverter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,19 +28,37 @@ public class EntrezAssemblyXmlParser {
 
     private static final Logger LOGGER = Logger.getLogger(EntrezAssemblyXmlParser.class.getName());
 
-    public ReferenceSequence parseXml(String xmlString, String accession) throws Exception {
+    public ReferenceSequence parseXml(String xmlString, String accession, String entrezDatabase) throws Exception {
+        boolean isAssembly = entrezDatabase.equals("assembly");
+        String xmlPath = isAssembly ? "/eSummaryResult/DocumentSummarySet/DocumentSummary/" : "/eSummaryResult/DocSum/";
+        String nameXmlPath = isAssembly ? "AssemblyName" : "Item[@Name=\"Title\"]";
+        String taxIdXmlPath = isAssembly ? "SpeciesTaxid" : "Item[@Name=\"TaxId\"]";
+
         try {
             DomQueryUsingXPath domQueryUsingXPath = new DomQueryUsingXPath(xmlString);
-            String documentSummary = "/eSummaryResult/DocumentSummarySet/DocumentSummary/";
-            String referenceSequenceAccession = domQueryUsingXPath.findInDom(documentSummary + "AssemblyAccession");
-            StringBuilder referenceSequenceName = new StringBuilder(domQueryUsingXPath
-                    .findInDom(documentSummary + "AssemblyName"));
-            String patch = ReferenceSequenceConverter.getPatch(referenceSequenceName);
-            ReferenceSequence referenceSequence = new ReferenceSequence(referenceSequenceName.toString(), patch,
-                    Arrays.asList(referenceSequenceAccession), ReferenceSequence.Type.GENOME_ASSEMBLY);
-            long taxonomyId = Long.parseLong(domQueryUsingXPath
-                    .findInDom(documentSummary + "Taxid"));
-            String taxonomyName = domQueryUsingXPath.findInDom(documentSummary + "SpeciesName");
+            StringBuilder referenceSequenceName = new StringBuilder(
+                    domQueryUsingXPath.findInDom(xmlPath + nameXmlPath));
+            String patch = getPatch(referenceSequenceName);
+
+            // Detect reference sequence type
+            ReferenceSequence.Type referenceSequenceType;
+            if (entrezDatabase.equals("assembly")) {
+                referenceSequenceType = ReferenceSequence.Type.GENOME_ASSEMBLY;
+            } else if (referenceSequenceName.toString().startsWith("TSA: ")) {
+                referenceSequenceType = ReferenceSequence.Type.TRANSCRIPTOME_SHOTGUN_ASSEMBLY;
+            } else {
+                referenceSequenceType = ReferenceSequence.Type.SEQUENCE;
+            }
+
+            // Create new reference sequence
+            ReferenceSequence referenceSequence = new ReferenceSequence(
+                    referenceSequenceName.toString(), patch, accession, referenceSequenceType);
+
+            // Create new taxonomy
+            long taxonomyId = Long.parseLong(domQueryUsingXPath.findInDom(xmlPath + taxIdXmlPath));
+            // TODO: NCBI provides species names for assemblies, but not for sequences from the `nuccore` database.
+            // TODO: Species name must be fetched automatically from the taxonomy ID. Same goes for the rank.
+            String taxonomyName = isAssembly ? domQueryUsingXPath.findInDom(xmlPath + "SpeciesName") : "no name";
             Taxonomy taxonomy = new Taxonomy(taxonomyId, taxonomyName, "no rank");
             referenceSequence.setTaxonomy(taxonomy);
             return referenceSequence;
@@ -50,6 +66,18 @@ public class EntrezAssemblyXmlParser {
             LOGGER.log(Level.SEVERE, "An error occurred while parsing XML for accession " + accession);
             throw e;
         }
+    }
+
+    private static String getPatch(StringBuilder refName) {
+        String refNameStr = refName.toString();
+        String patch = null;
+        // Attempt to extract patch from refName (only for GRC human or mouse assembly names)
+        if (refNameStr.matches("^GRC[hm]\\d+\\.p\\d+$")) {
+            String[] refNameSplit = refNameStr.split("\\.", 2);
+            refName.replace(refName.indexOf("."), refName.length(), "");
+            patch = refNameSplit[1];
+        }
+        return patch;
     }
 
 }

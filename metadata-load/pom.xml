@@ -42,6 +42,10 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -77,8 +81,8 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
                             <reuseForks>false</reuseForks>
-                            <excludedGroups>uk.ac.ebi.ampt2d.metadata.importer.database.OracleDbCategory,
-                                uk.ac.ebi.ampt2d.metadata.importer.api.EntrezApiKeyAccessCategory
+                            <excludedGroups>
+                                uk.ac.ebi.ampt2d.metadata.importer.database.OracleDbCategory
                             </excludedGroups>
                         </configuration>
                     </plugin>

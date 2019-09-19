@@ -56,7 +56,7 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
     @NotNull
     @JsonProperty
     @Size(max = 255, min = 1)
-    @Column(unique = true)
+    @Column
     private String name;
 
     @ApiModelProperty(position = 4)

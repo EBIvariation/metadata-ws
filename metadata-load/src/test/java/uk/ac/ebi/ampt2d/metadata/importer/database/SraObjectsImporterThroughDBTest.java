@@ -108,16 +108,16 @@ public class SraObjectsImporterThroughDBTest {
     @Test
     @Category(OracleDbCategory.class)
     public void importAnalysisObject() throws Exception {
-        Analysis analysis = sraObjectImporter.importAnalysis("ERZ019262");
+        Analysis analysis = sraObjectImporter.importAnalysis("ERZ092698");
         assertNotNull(analysis);
-        assertEquals("ERZ019262", analysis.getAccessionVersionId().getAccession());
+        assertEquals("ERZ092698", analysis.getAccessionVersionId().getAccession());
         assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
         assertEquals(1, analysis.getFiles().size());
-        assertEquals("ERP005147", analysis.getStudy().getAccessionVersionId().getAccession());
+        assertEquals("ERP009248", analysis.getStudy().getAccessionVersionId().getAccession());
         ReferenceSequence referenceSequence = analysis.getReferenceSequences().get(0);
-        assertEquals("GCA_000001405.14", referenceSequence.getAccessions().get(0));
+        assertEquals("GCA_000001405.1", referenceSequence.getAccession());
         assertEquals("GRCh37", referenceSequence.getName());
-        assertEquals("p13", referenceSequence.getPatch());
+        assertNull(referenceSequence.getPatch());
         assertEquals(1, studyRepository.count());
         assertEquals(1, analysisRepository.count());
         assertEquals(1, referenceSequenceRepository.count());

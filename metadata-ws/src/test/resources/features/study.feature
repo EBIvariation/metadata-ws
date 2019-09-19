@@ -10,7 +10,7 @@ Feature: study object
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -53,7 +53,7 @@ Feature: study object
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_SPECIES_HOMO_SAPIENS"
     """
@@ -63,7 +63,7 @@ Feature: study object
     """
       "name": "Pan_tro 3.0",
       "patch": "null",
-      "accessions": ["GCA_000001515.5"],
+      "accession": "GCA_000001515.5",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_SPECIES_PAN_TROGLODYTES"
     """
@@ -73,7 +73,7 @@ Feature: study object
     """
       "name": "panpan1.1",
       "patch": "null",
-      "accessions": ["GCA_000258655.2"],
+      "accession": "GCA_000258655.2",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_SPECIES_PAN_PANISCUS"
     """
@@ -259,7 +259,7 @@ Feature: study object
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -268,7 +268,7 @@ Feature: study object
     """
       "name": "GRCh38",
       "patch": "p2",
-      "accessions": ["GCA_000001405.17", "GCF_000001405.28"],
+      "accession": "GCA_000001405.17",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY"
     """
@@ -523,7 +523,7 @@ Feature: study object
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_SPECIES_HOMO_SAPIENS"
     """
@@ -624,7 +624,7 @@ Feature: study object
     """
       "name": "GRCh37",
       "patch": "p2",
-      "accessions": ["GCA_000001405.3", "GCF_000001405.14"],
+      "accession": "GCA_000001405.3",
       "type": "GENOME_ASSEMBLY",
       "taxonomy": "TAXONOMY_SPECIES_HOMO_SAPIENS"
     """

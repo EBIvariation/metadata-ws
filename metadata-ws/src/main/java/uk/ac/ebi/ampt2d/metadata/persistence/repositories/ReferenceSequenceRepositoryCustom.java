@@ -24,16 +24,14 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 
-import java.util.List;
-
 @NoRepositoryBean
 public interface ReferenceSequenceRepositoryCustom extends PagingAndSortingRepository<ReferenceSequence, Long>,
         QueryDslPredicateExecutor<ReferenceSequence> {
 
-    ReferenceSequence findByAccessions(@Param("accessions") List<String> accessions);
+    ReferenceSequence findByAccession(@Param("accession") String accession);
 
     default ReferenceSequence findOrSave(ReferenceSequence referenceSequence) {
-        ReferenceSequence existingReferenceSequence = findByAccessions(referenceSequence.getAccessions());
+        ReferenceSequence existingReferenceSequence = findByAccession(referenceSequence.getAccession());
         if (existingReferenceSequence != null) {
             return existingReferenceSequence;
         }

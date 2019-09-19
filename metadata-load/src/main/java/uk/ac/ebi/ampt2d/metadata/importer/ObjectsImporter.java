@@ -20,8 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.transaction.annotation.Transactional;
-import uk.ac.ebi.ampt2d.metadata.importer.api.AssemblyXmlRetrieverThroughEntrezApi;
-import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
+import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
@@ -39,7 +38,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
-import uk.ac.ebi.ena.sra.xml.AssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceSequenceType;
 import uk.ac.ebi.ena.sra.xml.SampleType;
@@ -55,18 +53,13 @@ import java.util.logging.Logger;
 
 public abstract class ObjectsImporter {
 
-    public static final String ASSEMBLY_END_TAG = "</ASSEMBLY>";
-
-    public static final String ENTRY_END_TAG = "</entry>";
-
     private static final Logger IMPORT_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
 
-    // XML retrievers. First is used as default, second for cases where API retrieval mode must be forced
+    // XML retrievers: first is used for all entities except reference sequence, and the second one specifically for
+    // reference sequences.
     protected SraXmlRetrieverByAccession sraXmlRetrieverByAccession;
 
-    protected SraXmlRetrieverThroughApi sraxmlRetrieverByAccessionForceApi;
-
-    protected AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi;
+    protected ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi;
 
     // Entity repositories
     protected StudyRepository studyRepository;
@@ -84,10 +77,6 @@ public abstract class ObjectsImporter {
 
     private SraXmlParser<AnalysisType> sraAnalysisXmlParser;
 
-    private SraXmlParser<AssemblyType> sraAssemblyXmlParser;
-
-    private SraXmlParser<ReferenceSequence> sraEntryXmlParser;
-
     protected SraXmlParser<SampleType> sraSampleXmlParser;
 
     private EntrezAssemblyXmlParser entrezAssemblyXmlParser;
@@ -96,8 +85,6 @@ public abstract class ObjectsImporter {
     private Converter<StudyType, Study> studyConverter;
 
     private Converter<AnalysisType, Analysis> analysisConverter;
-
-    private Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter;
 
     protected Converter<SampleType, Sample> sampleConverter;
 
@@ -110,19 +97,15 @@ public abstract class ObjectsImporter {
 
     public ObjectsImporter(
             SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
-            SraXmlRetrieverThroughApi sraxmlRetrieverByAccessionForceApi,
-            AssemblyXmlRetrieverThroughEntrezApi assemblyXmlRetrieverThroughEntrezApi,
+            ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
-            SraXmlParser<AssemblyType> sraAssemblyXmlParser,
-            SraXmlParser<ReferenceSequence> sraEntryXmlParser,
             EntrezAssemblyXmlParser entrezAssemblyXmlParser,
             SraXmlParser<SampleType> sraSampleXmlParser,
 
             Converter<StudyType, Study> studyConverter,
             Converter<AnalysisType, Analysis> analysisConverter,
-            Converter<AssemblyType, ReferenceSequence> referenceSequenceConverter,
             Converter<SampleType, Sample> sampleConverter,
 
             PublicationExtractorFromStudy publicationExtractorFromStudy,
@@ -135,19 +118,15 @@ public abstract class ObjectsImporter {
             SampleRepository sampleRepository,
             TaxonomyRepository taxonomyRepository) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
-        this.sraxmlRetrieverByAccessionForceApi = sraxmlRetrieverByAccessionForceApi;
-        this.assemblyXmlRetrieverThroughEntrezApi = assemblyXmlRetrieverThroughEntrezApi;
+        this.referenceSequenceXmlRetrieverThroughEntrezApi = referenceSequenceXmlRetrieverThroughEntrezApi;
 
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
-        this.sraAssemblyXmlParser = sraAssemblyXmlParser;
-        this.sraEntryXmlParser = sraEntryXmlParser;
         this.entrezAssemblyXmlParser = entrezAssemblyXmlParser;
         this.sraSampleXmlParser = sraSampleXmlParser;
 
         this.studyConverter = studyConverter;
         this.analysisConverter = analysisConverter;
-        this.referenceSequenceConverter = referenceSequenceConverter;
         this.sampleConverter = sampleConverter;
 
         this.publicationExtractorFromStudy = publicationExtractorFromStudy;
@@ -180,43 +159,49 @@ public abstract class ObjectsImporter {
         String xml = sraXmlRetrieverByAccession.getXml(accession);
         AnalysisType analysisType = sraAnalysisXmlParser.parseXml(xml, accession);
         Analysis analysis = analysisConverter.convert(analysisType);
+
+        // Import everything related to reference sequences
         List<ReferenceSequence> referenceSequences = new ArrayList<>();
-        for (String referenceSequenceAccession : getReferenceSequenceAccessions(analysisType)) {
-            referenceSequences.add(importReferenceSequence(referenceSequenceAccession));
+        ReferenceSequenceType referenceSequenceType = getReferenceSequenceType(analysisType);
+        // Import an assembly, if present
+        String assemblyAccession = getAssemblyAccession(referenceSequenceType);
+        if (assemblyAccession != null) {
+            referenceSequences.add(importReferenceSequence(assemblyAccession, "assembly"));
+        }
+        // Import all sequence and TSA accessions, if present
+        for (String sequenceOrTsaAccession : getSequenceAndTsaAccessions(referenceSequenceType)) {
+            referenceSequences.add(importReferenceSequence(sequenceOrTsaAccession, "nuccore"));
         }
         analysis.setReferenceSequences(referenceSequences);
         AnalysisEventHandler.validateReferenceSequenceLink(analysis);
+
         analysis.setFiles(fileExtractorFromAnalysis.getFiles(analysisType));
         List<Sample> samples = importSamples(analysisType);
         analysis.setSamples(samples);
         analysis = extractStudyFromAnalysis(analysisType, analysis);
         return analysis;
-
     }
 
     protected abstract Analysis extractStudyFromAnalysis(AnalysisType analysisType, Analysis analysis)
             throws Exception;
 
-    public ReferenceSequence importReferenceSequence(String accession) throws Exception {
-        ReferenceSequence referenceSequence = null;
-        Taxonomy taxonomy;
+    /**
+     * Based on an accession and type, imports a reference sequence.
+     * @param accession: INSDC accession of a reference sequence.
+     * @param referenceSequenceKind: Reference sequence kind; can be either "assembly" or "nuccore".
+     * @return Ready ReferenceSequence entity
+     */
+    public ReferenceSequence importReferenceSequence(String accession, String referenceSequenceKind) throws Exception {
+        ReferenceSequence referenceSequence = referenceSequenceRepository.findByAccession(accession);
+        if (referenceSequence != null) {
+            return referenceSequence;
+        }
         try {
-            // Reference sequences must always be imported through API, even with import mode = DB
-            final String gcfAccessionPattern = "GCF_[\\d]*\\.?[\\d]*";
-            if (accession.matches(gcfAccessionPattern)) {
-                String assemblyXml = assemblyXmlRetrieverThroughEntrezApi.getXml(accession);
-                referenceSequence = entrezAssemblyXmlParser.parseXml(assemblyXml, accession);
-            } else {
-                String referenceSequenceXml = sraxmlRetrieverByAccessionForceApi.getXml(accession);
-                if (referenceSequenceXml.contains(ASSEMBLY_END_TAG)) {
-                    AssemblyType assembly = sraAssemblyXmlParser.parseXml(referenceSequenceXml, accession);
-                    referenceSequence = referenceSequenceConverter.convert(assembly);
-                } else if (referenceSequenceXml.contains(ENTRY_END_TAG)) {
-                    referenceSequence = sraEntryXmlParser.parseXml(referenceSequenceXml, accession);
-                } else {
-                    return referenceSequence;
-                }
-            }
+            Taxonomy taxonomy;
+            // Import XML through Entrez API
+            String assemblyXml = referenceSequenceXmlRetrieverThroughEntrezApi.getXml(accession, referenceSequenceKind);
+            referenceSequence = entrezAssemblyXmlParser.parseXml(assemblyXml, accession, referenceSequenceKind);
+            // Taxonomy of a reference sequence might already be saved in the database
             taxonomy = taxonomyRepository.findOrSave(referenceSequence.getTaxonomy());
             referenceSequence.setTaxonomy(taxonomy);
             referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
@@ -228,8 +213,7 @@ public abstract class ObjectsImporter {
         return referenceSequence;
     }
 
-    private Set<String> getReferenceSequenceAccessions(AnalysisType analysis) throws Exception {
-        Set<String> referenceSequenceAccessions = new HashSet<>();
+    private ReferenceSequenceType getReferenceSequenceType(AnalysisType analysis) {
         AnalysisType.ANALYSISTYPE analysisType = analysis.getANALYSISTYPE();
         // Analysis records can contain a reference sequence in either of the three analysis categories:
         // REFERENCE_ALIGNMENT, SEQUENCE_VARIATION, and PROCESSED_READS. It is guaranteed that each analysis contains
@@ -242,25 +226,9 @@ public abstract class ObjectsImporter {
         } else if (analysisType.isSetPROCESSEDREADS()) {
             referenceSequenceType = analysisType.getPROCESSEDREADS();
         } else {
-            return referenceSequenceAccessions;
+            return null;
         }
-        referenceSequenceAccessions.addAll(getSequenceOrTsaAccessions(referenceSequenceType.getSEQUENCEArray()));
-        String accession = getAssemblyAccession(referenceSequenceType);
-        if (accession != null) {
-            referenceSequenceAccessions.add(accession);
-        }
-        return referenceSequenceAccessions;
-    }
-
-    private Set<String> getSequenceOrTsaAccessions(ReferenceSequenceType.SEQUENCE[] sequences) {
-        Set<String> sequenceOrTsaAccessions = new HashSet<>();
-        if (sequences == null || sequences.length == 0) {
-            return sequenceOrTsaAccessions;
-        }
-        for (ReferenceSequenceType.SEQUENCE sequence : sequences) {
-            sequenceOrTsaAccessions.add(sequence.getAccession());
-        }
-        return sequenceOrTsaAccessions;
+        return referenceSequenceType;
     }
 
     private String getAssemblyAccession(ReferenceSequenceType referenceSequenceType) {
@@ -274,6 +242,19 @@ public abstract class ObjectsImporter {
             }
         }
         return null;
+    }
+
+    private Set<String> getSequenceAndTsaAccessions(ReferenceSequenceType referenceSequenceType) {
+        Set<String> sequenceAndTsaAccessions = new HashSet<>();
+        if (referenceSequenceType != null) {
+            ReferenceSequenceType.SEQUENCE[] sequences = referenceSequenceType.getSEQUENCEArray();
+            if (sequences != null && sequences.length > 0) {
+                for (ReferenceSequenceType.SEQUENCE sequence : sequences) {
+                    sequenceAndTsaAccessions.add(sequence.getAccession());
+                }
+            }
+        }
+        return sequenceAndTsaAccessions;
     }
 
     public List<Sample> importSamples(AnalysisType analysisType) throws Exception {

@@ -19,9 +19,11 @@
 package uk.ac.ebi.ampt2d.metadata.importer.api;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.client.RestTemplate;
 
-public class AssemblyXmlRetrieverThroughEntrezApi {
+public class ReferenceSequenceXmlRetrieverThroughEntrezApi {
 
     private static final String ID_START_TAG = "<Id>";
 
@@ -29,25 +31,25 @@ public class AssemblyXmlRetrieverThroughEntrezApi {
 
     private static final String ENTREZ_API_KEY_QUERY = "&api_key={entrezApiKey}";
 
-    public static final int ID_START_TAG_LENGTH = 4;
+    private static final int ID_START_TAG_LENGTH = 4;
 
     /*
-     *  URL to obtain an internal Entrez ID from, given a GCF assembly accession.
+     *  URL to obtain an internal Entrez ID from, given an NCBI database and a sequence accession
     */
     private String entrezApiIdRetrievalUrl =
-            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=assembly&term={accession}";
+            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db={entrezDatabase}&term={accession}";
 
     /*
      *  URL to obtain assembly metadata from, given its internal Entrez ID.
     */
     private String entrezApiAssemblyRetrievalUrl =
-            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=assembly&id={id}";
+            "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db={entrezDatabase}&id={id}";
 
     private RestTemplate restTemplate = new RestTemplate();
 
     private String entrezApiKey;
 
-    public AssemblyXmlRetrieverThroughEntrezApi(String entrezApiKey) {
+    public ReferenceSequenceXmlRetrieverThroughEntrezApi(String entrezApiKey) {
         if (entrezApiKey != null && !entrezApiKey.isEmpty()) {
             this.entrezApiKey = entrezApiKey;
             entrezApiIdRetrievalUrl = entrezApiIdRetrievalUrl + ENTREZ_API_KEY_QUERY;
@@ -55,11 +57,24 @@ public class AssemblyXmlRetrieverThroughEntrezApi {
         }
     }
 
-    public String getXml(String accession) {
-        String idXml = restTemplate.exchange(entrezApiIdRetrievalUrl, HttpMethod.GET, null, String.class,
-                accession, entrezApiKey).getBody();
-        String id = idXml.substring(idXml.indexOf(ID_START_TAG) + ID_START_TAG_LENGTH, idXml.indexOf(ID_END_TAG));
-        return restTemplate.exchange(entrezApiAssemblyRetrievalUrl, HttpMethod.GET, null, String.class,
-                id, entrezApiKey).getBody();
+    private String fetchEntrezId(String accession, String entrezDatabase) {
+        return restTemplate.exchange(
+                entrezApiIdRetrievalUrl, HttpMethod.GET, null, String.class,
+                entrezDatabase, accession, entrezApiKey).getBody();
     }
+
+    private String fetchEntrezData(String id, String entrezDatabase) {
+        return restTemplate.exchange(
+                entrezApiAssemblyRetrievalUrl, HttpMethod.GET, null, String.class,
+                entrezDatabase, id, entrezApiKey).getBody();
+    }
+
+    @Retryable(maxAttemptsExpression="#{${entrez.api.attempts}}",
+            backoff=@Backoff(delayExpression="#{${entrez.api.delay}}"))
+    public String getXml(String accession, String entrezDatabase) {
+        String idXml = fetchEntrezId(accession, entrezDatabase);
+        String id = idXml.substring(idXml.indexOf(ID_START_TAG) + ID_START_TAG_LENGTH, idXml.indexOf(ID_END_TAG));
+        return fetchEntrezData(id, entrezDatabase);
+    }
+
 }

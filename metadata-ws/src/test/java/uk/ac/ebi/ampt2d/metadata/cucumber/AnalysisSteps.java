@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import uk.ac.ebi.ampt2d.metadata.security.AuthorizationServerHelper;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 
 import java.util.List;
