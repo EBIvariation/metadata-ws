@@ -29,14 +29,6 @@ import uk.ac.ebi.ampt2d.metadata.util.DomQueryUsingXPath;
 @RepositoryEventHandler(Taxonomy.class)
 public class TaxonomyEventHandler {
 
-    public static final String SPECIES = "species";
-
-    public static final String GENUS = "genus";
-
-    public static final String ORDER = "order";
-
-    public static final String CLASS = "class";
-
     private static final String ENA_TAXON_URL = "https://www.ebi.ac.uk/ena/data/view/Taxon:{taxonomyId}&display=xml";
 
     private static RestTemplate restTemplate = new RestTemplate();
@@ -79,35 +71,34 @@ public class TaxonomyEventHandler {
         taxonomy.setName(taxonomyName);
         taxonomy.setRank(rank);
 
-        String classTaxId = findTaxId(domQueryUsingXPath, CLASS);
-        if (classTaxId != null && !classTaxId.equals("")) {
-            long classTaxIdLong = Long.parseLong(classTaxId);
-            Taxonomy classTaxonomy = importTaxonomyTree(new Taxonomy(classTaxIdLong));
-            taxonomy.setTaxonomyClass(classTaxonomy);
-        }
-
-        String orderTaxId = findTaxId(domQueryUsingXPath, ORDER);
-        if (orderTaxId != null && !orderTaxId.equals("")) {
-            long orderTaxIdLong = Long.parseLong(orderTaxId);
-            Taxonomy orderTaxonomy = importTaxonomyTree(new Taxonomy(orderTaxIdLong));
-            taxonomy.setTaxonomyOrder(orderTaxonomy);
-        }
-
-        String genusTaxId = findTaxId(domQueryUsingXPath, GENUS);
-        if (genusTaxId != null && !genusTaxId.equals("")) {
-            long genusTaxIdLong = Long.parseLong(genusTaxId);
-            Taxonomy genusTaxonomy = importTaxonomyTree(new Taxonomy(genusTaxIdLong));
-            taxonomy.setTaxonomyGenus(genusTaxonomy);
-        }
-
-        String speciesTaxId = findTaxId(domQueryUsingXPath, SPECIES);
-        if (speciesTaxId != null && !speciesTaxId.equals("")) {
-            long speciesTaxIdLong = Long.parseLong(speciesTaxId);
-            Taxonomy speciesTaxonomy = importTaxonomyTree(new Taxonomy(speciesTaxIdLong));
-            taxonomy.setTaxonomySpecies(speciesTaxonomy);
+        for (RANK rankEnum : RANK.values()) {
+            String taxId = findTaxId(domQueryUsingXPath, rankEnum.toString());
+            if (taxId != null && !taxId.equals("")) {
+                long taxIdLong = Long.parseLong(taxId);
+                Taxonomy taxonomy1 = importTaxonomyTree(new Taxonomy(taxIdLong));
+                taxonomy.setTaxonomyForRank(taxonomy1, rankEnum.toString());
+            }
         }
 
         return taxonomyRepository.save(taxonomy);
+    }
+
+    public enum RANK {
+        SPECIES("species"),
+        GENUS("genus"),
+        ORDER("order"),
+        CLASS("class");
+
+        private String name;
+
+        RANK(String rank) {
+            name = rank;
+        }
+
+        @Override
+        public String toString() {
+            return this.name;
+        }
     }
 
 }
