@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.importer.xml;
 
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
+import uk.ac.ebi.ampt2d.metadata.util.DomQueryUsingXPath;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -57,9 +58,8 @@ public class EntrezAssemblyXmlParser {
             // Create new taxonomy
             long taxonomyId = Long.parseLong(domQueryUsingXPath.findInDom(xmlPath + taxIdXmlPath));
             // TODO: NCBI provides species names for assemblies, but not for sequences from the `nuccore` database.
-            // TODO: Species name must be fetched automatically from the taxonomy ID. Same goes for the rank.
             String taxonomyName = isAssembly ? domQueryUsingXPath.findInDom(xmlPath + "SpeciesName") : "no name";
-            Taxonomy taxonomy = new Taxonomy(taxonomyId, taxonomyName, "no rank");
+            Taxonomy taxonomy = new Taxonomy(taxonomyId);
             referenceSequence.setTaxonomy(taxonomy);
             return referenceSequence;
         } catch (Exception e) {

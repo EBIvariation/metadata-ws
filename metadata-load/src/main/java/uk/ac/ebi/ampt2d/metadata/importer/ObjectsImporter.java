@@ -32,6 +32,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.AnalysisEventHandler;
+import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
@@ -70,8 +71,6 @@ public abstract class ObjectsImporter {
 
     protected SampleRepository sampleRepository;
 
-    protected TaxonomyRepository taxonomyRepository;
-
     // Entity XML parsers
     private SraXmlParser<StudyType> sraStudyXmlParser;
 
@@ -95,6 +94,9 @@ public abstract class ObjectsImporter {
 
     private FileExtractorFromAnalysis fileExtractorFromAnalysis;
 
+    //Taxonomy-Event-Handler
+    protected TaxonomyEventHandler taxonomyEventHandler;
+
     public ObjectsImporter(
             SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
             ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
@@ -116,7 +118,7 @@ public abstract class ObjectsImporter {
             AnalysisRepository analysisRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
             SampleRepository sampleRepository,
-            TaxonomyRepository taxonomyRepository) {
+            TaxonomyEventHandler taxonomyEventHandler) {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
         this.referenceSequenceXmlRetrieverThroughEntrezApi = referenceSequenceXmlRetrieverThroughEntrezApi;
 
@@ -136,8 +138,9 @@ public abstract class ObjectsImporter {
         this.studyRepository = studyRepository;
         this.analysisRepository = analysisRepository;
         this.referenceSequenceRepository = referenceSequenceRepository;
-        this.taxonomyRepository = taxonomyRepository;
         this.sampleRepository = sampleRepository;
+
+        this.taxonomyEventHandler = taxonomyEventHandler;
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -202,7 +205,7 @@ public abstract class ObjectsImporter {
             String assemblyXml = referenceSequenceXmlRetrieverThroughEntrezApi.getXml(accession, referenceSequenceKind);
             referenceSequence = entrezAssemblyXmlParser.parseXml(assemblyXml, accession, referenceSequenceKind);
             // Taxonomy of a reference sequence might already be saved in the database
-            taxonomy = taxonomyRepository.findOrSave(referenceSequence.getTaxonomy());
+            taxonomy = taxonomyEventHandler.importTaxonomyTree(referenceSequence.getTaxonomy());
             referenceSequence.setTaxonomy(taxonomy);
             referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
         } catch (Exception exception) {
@@ -272,7 +275,7 @@ public abstract class ObjectsImporter {
             String xml = sraXmlRetrieverByAccession.getXml(accession);
             SampleType sampleType = sraSampleXmlParser.parseXml(xml, accession);
             sample = sampleConverter.convert(sampleType);
-            Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(sampleType));
+            Taxonomy taxonomy = taxonomyEventHandler.importTaxonomyTree(extractTaxonomyFromSample(sampleType));
             sample.setTaxonomies(Arrays.asList(taxonomy));
         } catch (Exception exception) {
             IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + accession);
@@ -284,7 +287,7 @@ public abstract class ObjectsImporter {
 
     protected Taxonomy extractTaxonomyFromSample(SampleType sampleType) {
         SampleType.SAMPLENAME sampleName = sampleType.getSAMPLENAME();
-        return new Taxonomy(sampleName.getTAXONID(), sampleName.getSCIENTIFICNAME(), "no rank");
+        return new Taxonomy(sampleName.getTAXONID());
     }
 
     private Set<String> getSampleAccessions(AnalysisType analysisType) {
