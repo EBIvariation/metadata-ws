@@ -176,26 +176,6 @@ public class SraObjectsImporterThroughApiTest {
     }
 
     @Test
-    public void importReferenceSequenceGcfAssemblyAccessionWithoutApiKey() throws Exception {
-        ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GCF_000001405.39", "assembly");
-        assertEquals("GCF_000001405.39", referenceSequence.getAccession());
-        assertEquals("GRCh38", referenceSequence.getName());
-        assertEquals("p13", referenceSequence.getPatch());
-        assertEquals(ReferenceSequence.Type.GENOME_ASSEMBLY, referenceSequence.getType());
-        Taxonomy taxonomy = referenceSequence.getTaxonomy();
-        assertEquals(9606, taxonomy.getTaxonomyId());
-        assertEquals("Homo sapiens", taxonomy.getName());
-        assertEquals(1, referenceSequenceRepository.count());
-    }
-
-    /**
-     * Please provide the apiKey in the application.properties as entrez.api.key=xxx to run this test method else
-     * the test will fail due to Entrez-API rate limit.
-     *
-     * @throws Exception
-     */
-    @Test
-    @Category(EntrezApiKeyAccessCategory.class)
     public void importReferenceSequenceGcfAssemblyAccessionWithApiKey() throws Exception {
         ReferenceSequence referenceSequence = sraObjectImporter.importReferenceSequence("GCF_000001405.12", "assembly");
         assertEquals("GCF_000001405.12", referenceSequence.getAccession());
