@@ -219,7 +219,7 @@ Feature: reference sequence
       | name=GRCh37&patch=p3                            |
       | name=GRCh38&patch=p3                            |
       | accession=GCA_000001405.2                       |
-      | name=GRCh37&patch=p3&accessio=GCA_000001405.3   |
+      | name=GRCh37&patch=p3&accession=GCA_000001405.3  |
       | type=SEQUENCE                                   |
       | type=TRANSCRIPTOME_SHOTGUN_ASSEMBLY             |
 
