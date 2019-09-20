@@ -170,7 +170,6 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals(ReferenceSequence.Type.TRANSCRIPTOME_SHOTGUN_ASSEMBLY, referenceSequence.getType());
         Taxonomy taxonomy = referenceSequence.getTaxonomy();
         assertEquals(7897, taxonomy.getTaxonomyId());
-        // TODO: name is not available via Entrez API for nuccore database, should be fixed in T2D-299
         assertEquals("Latimeria chalumnae", taxonomy.getName());
         assertEquals(1, referenceSequenceRepository.count());
     }
