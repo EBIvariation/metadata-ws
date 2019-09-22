@@ -6,11 +6,13 @@
 
 	<changeSet id="1503460396396-3" author="SimpleAuthor">
 		<insert tableName="publication">
+			<column name="id" value="100"></column>
 			<column name="publication_id" value="100"></column>
 			<column name="last_modified_date" value='2016-08-25 01:23:46.0'></column>
 		</insert>
 		<insert tableName="publication">
-			<column name="publication_id" value="200"></column>
+			<column name="id" value="101"></column>
+			<column name="publication_id" value="101"></column>
 			<column name="last_modified_date" value='2016-08-25 01:23:46.0'></column>
 		</insert>
 	</changeSet>
