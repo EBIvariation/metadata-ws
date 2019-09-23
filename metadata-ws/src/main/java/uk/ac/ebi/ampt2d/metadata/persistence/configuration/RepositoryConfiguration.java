@@ -21,6 +21,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.AnalysisEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.SampleEventHandler;
+import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 
 @Configuration
 public class RepositoryConfiguration {
@@ -33,6 +35,11 @@ public class RepositoryConfiguration {
     @Bean
     AnalysisEventHandler analysisEventHandler() {
         return new AnalysisEventHandler();
+    }
+
+    @Bean
+    TaxonomyEventHandler taxonomyEventHandler(TaxonomyRepository taxonomyRepository) {
+        return new TaxonomyEventHandler(taxonomyRepository);
     }
 
 }

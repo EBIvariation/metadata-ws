@@ -5,9 +5,7 @@ Feature: accession object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY
@@ -45,9 +43,7 @@ Feature: accession object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY
@@ -95,18 +91,14 @@ Feature: accession object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 1,
-      "name": "Species1",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY1
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 2,
-      "name": "Species2",
-      "rank": "SPECIES"
+      "taxonomyId": 9597
     }
     """
     Then set the URL to TAXONOMY2
@@ -125,9 +117,7 @@ Feature: accession object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY

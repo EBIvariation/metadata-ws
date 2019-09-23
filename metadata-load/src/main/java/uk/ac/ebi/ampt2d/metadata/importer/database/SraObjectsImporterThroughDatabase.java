@@ -30,6 +30,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
+import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
@@ -77,7 +78,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             AnalysisRepository analysisRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
             SampleRepository sampleRepository,
-            TaxonomyRepository taxonomyRepository) {
+            TaxonomyEventHandler taxonomyEventHandler) {
         super(
                 sraXmlRetrieverThroughDatabase,
                 referenceSequenceXmlRetrieverThroughEntrezApi,
@@ -99,7 +100,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                 analysisRepository,
                 referenceSequenceRepository,
                 sampleRepository,
-                taxonomyRepository
+                taxonomyEventHandler
         );
     }
 
@@ -128,7 +129,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             try {
                 sampleType = sraSampleXmlParser.parseXml(entry.getValue(), entry.getKey());
                 Sample sampleElement = sampleConverter.convert(sampleType);
-                Taxonomy taxonomy = taxonomyRepository.findOrSave(extractTaxonomyFromSample(sampleType));
+                Taxonomy taxonomy = taxonomyEventHandler.importTaxonomyTree(extractTaxonomyFromSample(sampleType));
                 sampleElement.setTaxonomies(Arrays.asList(taxonomy));
                 samples.add(sampleElement);
             } catch (Exception exception) {

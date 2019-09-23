@@ -16,7 +16,7 @@
  *
  */
 
-package uk.ac.ebi.ampt2d.metadata.importer.xml;
+package uk.ac.ebi.ampt2d.metadata.util;
 
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;

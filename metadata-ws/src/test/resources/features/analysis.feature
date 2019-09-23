@@ -5,9 +5,7 @@ Feature: analysis object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY
@@ -36,9 +34,7 @@ Feature: analysis object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY
@@ -91,9 +87,7 @@ Feature: analysis object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY
@@ -137,9 +131,7 @@ Feature: analysis object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY
@@ -160,9 +152,7 @@ Feature: analysis object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY
@@ -211,9 +201,7 @@ Feature: analysis object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY
@@ -255,9 +243,7 @@ Feature: analysis object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY
@@ -292,9 +278,7 @@ Feature: analysis object
     And I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY_HUMAN
@@ -302,9 +286,7 @@ Feature: analysis object
     And I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 10090,
-      "name": "Mus musculus",
-      "rank": "SPECIES"
+      "taxonomyId": 10090
     }
     """
     Then set the URL to TAXONOMY_MOUSE
@@ -339,9 +321,7 @@ Feature: analysis object
     And I request POST /taxonomies with JSON payload:
      """
      {
-       "taxonomyId": 9606,
-       "name": "Homo Sapiens",
-       "rank": "SPECIES"
+       "taxonomyId": 9606
      }
      """
     Then set the URL to TAXONOMY
@@ -386,9 +366,7 @@ Feature: analysis object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY
@@ -428,9 +406,7 @@ Feature: analysis object
     When I request POST /taxonomies with JSON payload:
     """
     {
-      "taxonomyId": 9606,
-      "name": "Homo Sapiens",
-      "rank": "SPECIES"
+      "taxonomyId": 9606
     }
     """
     Then set the URL to TAXONOMY

@@ -39,6 +39,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraSampleXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
+import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
@@ -96,7 +97,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 analysisRepository,
                 referenceSequenceRepository,
                 sampleRepository,
-                taxonomyRepository
+                taxonomyEventHandler(taxonomyRepository)
         );
     }
 
@@ -134,7 +135,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 analysisRepository,
                 referenceSequenceRepository,
                 sampleRepository,
-                taxonomyRepository
+                taxonomyEventHandler(taxonomyRepository)
         );
     }
 
@@ -182,6 +183,10 @@ public class MetadataImporterMainApplicationConfiguration {
 
     private FileExtractorFromAnalysis fileExtractorFromAnalysis(FileRepository fileRepository) {
         return new FileExtractorFromAnalysis(fileRepository);
+    }
+
+    private TaxonomyEventHandler taxonomyEventHandler(TaxonomyRepository taxonomyRepository) {
+        return new TaxonomyEventHandler(taxonomyRepository);
     }
 
 }

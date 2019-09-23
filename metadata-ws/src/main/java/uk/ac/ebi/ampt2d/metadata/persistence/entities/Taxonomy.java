@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.persistence.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
+import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -88,10 +89,8 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
     public Taxonomy() {
     }
 
-    public Taxonomy(long taxonomyId, String name, String rank) {
+    public Taxonomy(long taxonomyId) {
         this.taxonomyId = taxonomyId;
-        this.name = name;
-        this.rank = rank;
     }
 
     public Long getId() {
@@ -161,5 +160,22 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
 
     public void setTaxonomyClass(Taxonomy taxonomyClass) {
         this.taxonomyClass = taxonomyClass;
+    }
+
+    public void setTaxonomyForRank(Taxonomy taxonomy, String rank) {
+        switch (TaxonomyEventHandler.RANK.valueOf(rank.toUpperCase())) {
+            case CLASS:
+                this.setTaxonomyClass(taxonomy);
+                break;
+            case ORDER:
+                this.setTaxonomyOrder(taxonomy);
+                break;
+            case GENUS:
+                this.setTaxonomyGenus(taxonomy);
+                break;
+            case SPECIES:
+                this.setTaxonomySpecies(taxonomy);
+                break;
+        }
     }
 }
