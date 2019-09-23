@@ -5,22 +5,22 @@
 
 	<changeSet id="1503460396396-2" author="SimpleAuthor">
 		<createTable tableName="publication">
-			<column autoIncrement="true" name="id" type="INT">
+			<column autoIncrement="true" name="id" type="BIGINT">
 				<constraints primaryKey="true" />
 			</column>
+			<column name="last_modified_date" type="DATE"/>
 			<column name="publication_id" type="VARCHAR(255)"/>
-			<column name="last_modified_date" type="TIMESTAMP"/>
 		</createTable>
 	</changeSet>
 
 	<changeSet id="1503460396396-3" author="SimpleAuthor">
 		<insert tableName="publication">
 			<column name="publication_id" value="100"></column>
-			<column name="last_modified_date" value='2016-08-25 01:23:46.0'></column>
+			<column name="last_modified_date" value='2016-08-25'></column>
 		</insert>
 		<insert tableName="publication">
 			<column name="publication_id" value="101"></column>
-			<column name="last_modified_date" value='2016-08-25 01:23:46.0'></column>
+			<column name="last_modified_date" value='2016-08-25'></column>
 		</insert>
 	</changeSet>
 </databaseChangeLog>
