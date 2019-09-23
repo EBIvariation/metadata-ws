@@ -175,6 +175,7 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
                 break;
             case SPECIES:
                 this.setTaxonomySpecies(taxonomy);
+                break;
         }
     }
 }

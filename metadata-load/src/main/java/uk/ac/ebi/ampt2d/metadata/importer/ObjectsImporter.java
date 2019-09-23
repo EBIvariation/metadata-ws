@@ -37,7 +37,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceSequenceType;

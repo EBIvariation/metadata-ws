@@ -65,7 +65,7 @@ public class TaxonomyEventHandler {
         DomQueryUsingXPath domQueryUsingXPath = new DomQueryUsingXPath(taxonXml);
         String taxonomyName = domQueryUsingXPath.findInDom("/ROOT/taxon/@scientificName");
         String rank = domQueryUsingXPath.findInDom("/ROOT/taxon/@rank");
-        if (rank.equals("")) {
+        if (rank.isEmpty()) {
             rank = "no rank";
         }
         taxonomy.setName(taxonomyName);
@@ -73,10 +73,10 @@ public class TaxonomyEventHandler {
 
         for (RANK rankEnum : RANK.values()) {
             String taxId = findTaxId(domQueryUsingXPath, rankEnum.toString());
-            if (taxId != null && !taxId.equals("")) {
+            if (taxId != null && !taxId.isEmpty()) {
                 long taxIdLong = Long.parseLong(taxId);
-                Taxonomy taxonomy1 = importTaxonomyTree(new Taxonomy(taxIdLong));
-                taxonomy.setTaxonomyForRank(taxonomy1, rankEnum.toString());
+                Taxonomy taxonomyParent = importTaxonomyTree(new Taxonomy(taxIdLong));
+                taxonomy.setTaxonomyForRank(taxonomyParent, rankEnum.toString());
             }
         }
 
