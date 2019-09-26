@@ -16,7 +16,6 @@
 
     <properties>
         <cucumber.version>2.4.0</cucumber.version>
-        <buildDirectory>target</buildDirectory>
     </properties>
 
     <dependencies>
@@ -122,7 +121,6 @@
     </dependencies>
 
     <build>
-        <directory>${buildDirectory}</directory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -155,7 +153,7 @@
                             <goal>process</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${buildDirectory}/generated-sources/java</outputDirectory>
+                            <outputDirectory>${project.build.directory}/generated-sources/java</outputDirectory>
                             <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
                         </configuration>
                     </execution>
