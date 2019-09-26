@@ -283,7 +283,7 @@ Feature: Transitive release date control for child objects of a Study
     And I request GET with value of STUDY
     Then the response code should be 200
     And I request GET with value of STUDY1
-    Then the response code should be 4xx
+    Then the response code should be 404
     And I request GET with value of ANALYSIS
     Then the response code should be 200
     When I request GET with value of FILE
@@ -293,4 +293,4 @@ Feature: Transitive release date control for child objects of a Study
     When I request GET with value of WEBRESOURCE
     Then the response code should be 200
     When I request GET with value of WEBRESOURCE1
-    Then the response code should be 4xx
+    Then the response code should be 404
