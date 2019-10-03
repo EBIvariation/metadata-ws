@@ -40,7 +40,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -229,6 +228,6 @@ public class Study extends Auditable<Long> {
 
     @Override
     public String getStudyIds() {
-        return this.accessionVersionId.getAccession() + "." + this.accessionVersionId.getVersion();
+        return this.accessionVersionId.getAccession();
     }
 }

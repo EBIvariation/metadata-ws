@@ -43,6 +43,12 @@ import java.time.LocalDate;
 @SequenceGenerator(initialValue = 1, allocationSize = 1, name = "FILE_SEQ", sequenceName = "file_sequence")
 public class File extends Auditable<Long> {
 
+    private static final String FILE_QUERY_EXPRESSION = "FROM file " +
+            "INNER JOIN analysis_files on file.id = analysis_files.files_id " +
+            "INNER JOIN analysis on analysis_files.analysis_id = analysis.id " +
+            "INNER JOIN study on analysis.study_id = study.id " +
+            "WHERE file.id=id";
+
     public enum Type {
 
         AGP, BAI, BAM, BCF, BED, BIONANO_NATIVE, CHROMOSOME_LIST, CRAI, CRAM, FASTA, FASTQ, FLATFILE, GFF,
@@ -89,23 +95,14 @@ public class File extends Auditable<Long> {
     /**
      * Release date control: get the *earliest* release date from all studies which link to this file.
      */
-    @Formula("(SELECT min(study.release_date) FROM file " +
-            "INNER JOIN analysis_files on file.id = analysis_files.files_id " +
-            "INNER JOIN analysis on analysis_files.analysis_id = analysis.id " +
-            "INNER JOIN study on analysis.study_id = study.id " +
-            "WHERE file.id=id)")
+    @Formula("(SELECT min(study.release_date) " + FILE_QUERY_EXPRESSION + ")")
     @JsonIgnore
     private LocalDate releaseDate;
 
     /**
-     * Get the studyIds.
+     * Get the ids of the studies which link to this object (used for access control).
      */
-
-    @Formula("(SELECT string_agg(concat(study.accession,'.',study.version),',') FROM file " +
-            "INNER JOIN analysis_files on file.id = analysis_files.files_id " +
-            "INNER JOIN analysis on analysis_files.analysis_id = analysis.id " +
-            "INNER JOIN study on analysis.study_id = study.id " +
-            "WHERE file.id=id)")
+    @Formula("(SELECT string_agg(study.accession,',') " + FILE_QUERY_EXPRESSION + ")")
     @JsonIgnore
     private String studyIds;
 

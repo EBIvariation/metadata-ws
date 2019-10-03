@@ -29,7 +29,6 @@ import uk.ac.ebi.ampt2d.metadata.security.CustomUsernamePasswordAuthenticationTo
 import uk.ac.ebi.ampt2d.metadata.security.EnableSecurityConfig;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -103,13 +102,21 @@ public class ReleaseDateAspect {
             return result;
         }
 
-        String commaSeperatedPermittedStudiesToTheUsers = ((CustomUsernamePasswordAuthenticationToken)
+        String commaSeparatedPermittedStudies = ((CustomUsernamePasswordAuthenticationToken)
                 ((OAuth2Authentication) authentication).getUserAuthentication()).getStudies();
-        List<String> permittedStudies = (commaSeperatedPermittedStudiesToTheUsers.isEmpty()) ? new ArrayList<>() : Arrays.asList
-                (commaSeperatedPermittedStudiesToTheUsers.split(","));
+        List<String> permittedStudies;
+        if (commaSeparatedPermittedStudies.isEmpty()) {
+            return null;
+        }
+        permittedStudies = Arrays.asList(commaSeparatedPermittedStudies.split(","));
         String studiesAssociatedToEntities = ((Auditable) result).getStudyIds();
-        if (permittedStudies.stream()
-                .anyMatch(permittedStudy -> studiesAssociatedToEntities.contains(permittedStudy))) {
+        if (permittedStudies.stream().anyMatch(permittedStudy ->
+                /*
+                * Below regex checks whether the permitted study is contained in the beginning
+                * or in between or at the end of the comma-selist of studiesAssociatedToEntities
+                */
+                studiesAssociatedToEntities.matches("(^" + permittedStudy + "$)|(^" + permittedStudy +
+                        ",)|(," + permittedStudy + ",)|(," + permittedStudy + "$)"))) {
             return result;
         }
         return null;

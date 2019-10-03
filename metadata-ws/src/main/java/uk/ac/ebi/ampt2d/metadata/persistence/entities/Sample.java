@@ -23,7 +23,6 @@ import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.annotations.Formula;
 
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -43,6 +42,12 @@ import java.util.List;
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
 @SequenceGenerator(initialValue = 1, allocationSize = 1, name = "SAMPLE_SEQ", sequenceName = "sample_sequence")
 public class Sample extends Auditable<Long> {
+
+    private static final String SAMPLE_QUERY_EXPRESSION = "FROM sample " +
+            "INNER JOIN analysis_samples on sample.id = analysis_samples.samples_id " +
+            "INNER JOIN analysis on analysis_samples.analysis_id = analysis.id " +
+            "INNER JOIN study on analysis.study_id = study.id " +
+            "WHERE sample.id=id";
 
     @ApiModelProperty(position = 1, value = "Sample auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -73,22 +78,14 @@ public class Sample extends Auditable<Long> {
     /**
      * Release date control: get the *earliest* release date from all studies which link to this sample.
      */
-    @Formula("(SELECT min(study.release_date) FROM sample " +
-            "INNER JOIN analysis_samples on sample.id = analysis_samples.samples_id " +
-            "INNER JOIN analysis on analysis_samples.analysis_id = analysis.id " +
-            "INNER JOIN study on analysis.study_id = study.id " +
-            "WHERE sample.id=id)")
+    @Formula("(SELECT min(study.release_date) " + SAMPLE_QUERY_EXPRESSION + ")")
     @JsonIgnore
     private LocalDate releaseDate;
 
     /**
-     * Get the studyIds.
+     * Get the ids of the studies which link to this object (used for access control).
      */
-    @Formula("(SELECT string_agg(concat(study.accession,'.',study.version),',') FROM sample " +
-            "INNER JOIN analysis_samples on sample.id = analysis_samples.samples_id " +
-            "INNER JOIN analysis on analysis_samples.analysis_id = analysis.id " +
-            "INNER JOIN study on analysis.study_id = study.id " +
-            "WHERE sample.id=id)")
+    @Formula("(SELECT string_agg(study.accession,',') " + SAMPLE_QUERY_EXPRESSION + ")")
     @JsonIgnore
     private String studyIds;
 

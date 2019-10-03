@@ -179,6 +179,9 @@ public class Taxonomy extends Auditable<Long> implements Serializable {
         }
     }
 
+    /*
+    *  Taxonomy entities are public they are not restricted by access control. So returning null for studyIds.
+    */
     @Override
     public String getStudyIds() {
         return null;
