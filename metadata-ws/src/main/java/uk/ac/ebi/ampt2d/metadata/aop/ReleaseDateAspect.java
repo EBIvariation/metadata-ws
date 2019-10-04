@@ -24,6 +24,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.util.CollectionUtils;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Auditable;
 import uk.ac.ebi.ampt2d.metadata.security.CustomUsernamePasswordAuthenticationToken;
 import uk.ac.ebi.ampt2d.metadata.security.EnableSecurityConfig;
@@ -109,16 +110,13 @@ public class ReleaseDateAspect {
             return null;
         }
         permittedStudies = Arrays.asList(commaSeparatedPermittedStudies.split(","));
-        String studiesAssociatedToEntities = ((Auditable) result).getStudyIds();
-        if (permittedStudies.stream().anyMatch(permittedStudy ->
-                /*
-                * Below regex checks whether the permitted study is contained in the beginning
-                * or in between or at the end of the comma-selist of studiesAssociatedToEntities
-                */
-                studiesAssociatedToEntities.matches("(^" + permittedStudy + "$)|(^" + permittedStudy +
-                        ",)|(," + permittedStudy + ",)|(," + permittedStudy + "$)"))) {
+        List<String> studiesAssociatedToEntity =
+                Arrays.asList(((Auditable) result).getStudyIds().split(","));
+
+        if(CollectionUtils.containsAny(permittedStudies,studiesAssociatedToEntity)){
             return result;
         }
+
         return null;
     }
 
