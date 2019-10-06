@@ -3,7 +3,7 @@
     <changeSet author="metauser (generated)" id="1569329013185-14">
         <createTable tableName="newpublication">
             <column name="id" type="BIGINT">
-                <constraints primaryKey="true" primaryKeyName="publication_pkey"/>
+                <constraints primaryKey="true" primaryKeyName="newpublication_pkey"/>
             </column>
             <column name="last_modified_date" type="date"/>
             <column name="publication_id" type="VARCHAR(255)">
