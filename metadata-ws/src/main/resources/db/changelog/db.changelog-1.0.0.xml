@@ -333,7 +333,7 @@
         <addForeignKeyConstraint baseColumnNames="study_id" baseTableName="study_child_studies" constraintName="fktfwfp9t1op8ku2pcjrw8c80nw" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="study" validate="true"/>
     </changeSet>
 
-    <changeSet id="tag-1.0" author="metauser">
-        <tagDatabase tag="1.0" />
+    <changeSet id="tag-1.0.0" author="metauser">
+        <tagDatabase tag="1.0.0" />
     </changeSet>
 </databaseChangeLog>
