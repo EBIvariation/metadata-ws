@@ -25,19 +25,22 @@ import uk.ac.ebi.ena.sra.xml.SampleType;
 
 public class SampleConverter implements Converter<SampleType, Sample> {
 
+    /**
+     * Convert an SRA SampleType to internal Sample entity, extracting accession, name and BioSample accession.
+     */
     @Override
     public Sample convert(SampleType sampleType) {
         return new Sample(
                 new AccessionVersionId(sampleType.getAccession(), 1),
                 sampleType.getAlias(),
-                extractBioSampleId(sampleType)
+                extractBioSampleAccession(sampleType)
         );
     }
 
     /**
      * Given SampleType, extract and return BioSample ID. If no BioSample cross-reference is present, return null.
      */
-    private String extractBioSampleId(SampleType sampleType) {
+    private String extractBioSampleAccession(SampleType sampleType) {
         for (QualifiedNameType externalId : sampleType.getIDENTIFIERS().getEXTERNALIDArray()) {
             if (externalId.getNamespace().equals("BioSample")) {
                 return externalId.getStringValue();

@@ -202,6 +202,10 @@ public class SraObjectsImporterThroughApiTest {
                 Paths.get(getClass().getClassLoader().getResource("analysis/AnalysisDocumentBig.xml").toURI())));
         AnalysisType analysisType = analysisTypeSraXmlParser.parseXml(xmlString, "ERZ015710");
         List<Sample> sample = sraObjectImporter.importSamples(analysisType);
+        // The assertions here are different from the ones in `SraObjectsImporterThroughDB`, despite the same analysis
+        // with the same samples is being imported. This is because in the API case, the samples are being imported in
+        // the order in which they appear in the XML; whereas in the DB case the information is obtained via a bulk SQL
+        // query, where the samples are ordered by their accession.
         assertEquals(1092, sample.size());
         assertEquals("SRS000621", sample.get(0).getAccessionVersionId().getAccession());
         assertEquals("NA12286", sample.get(0).getName());

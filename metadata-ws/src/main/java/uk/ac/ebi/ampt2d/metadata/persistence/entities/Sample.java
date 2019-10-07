@@ -141,4 +141,8 @@ public class Sample extends Auditable<Long> {
         return bioSampleAccession;
     }
 
+    public void setBioSampleAccession(String bioSampleAccession) {
+        this.bioSampleAccession = bioSampleAccession;
+    }
+
 }

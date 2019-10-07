@@ -23,6 +23,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 
 import java.sql.SQLException;
 import java.sql.SQLXML;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -56,26 +57,28 @@ public class SraXmlRetrieverThroughDatabase implements SraXmlRetrieverByAccessio
     Prepared statement will be made with SQL query EnaObjectQuery.SAMPLE_QUERY.
     A list of Sample XMLs with associated Sample accession will be returned.
     */
-    public Map<String, String> getSampleXmls(String analysisAccession) {
+    List<String[]> getSampleXmls(String analysisAccession) {
         Map<String, String> paramMap = new HashMap<>();
         String samplesQuery = enaObjectQuery;
         paramMap.put("accession", analysisAccession);
-
-        List<Map<String, Object>> idSqlxmls = jdbcTemplate.queryForList(samplesQuery, paramMap);
-        Map<String, String> idXmlMap = new HashMap<>();
+        List<String[]> sampleData = new ArrayList<>();
         try {
+            List<Map<String, Object>> idSqlxmls = jdbcTemplate.queryForList(samplesQuery, paramMap);
             for (Map<String, Object> xmlId : idSqlxmls) {
                 String sampleId = (String) xmlId.get("SAMPLE_ID");
-                SQLXML sqlxml = (SQLXML) xmlId.get("SAMPLE_XML");
-                idXmlMap.put(sampleId, sqlxml.getString());
+                String bioSampleAccession = (String) xmlId.get("BIOSAMPLE_ID");
+                String sqlXmlString = ((SQLXML) xmlId.get("SAMPLE_XML")).getString();
+                String[] currentSampleData = new String[] {sampleId, bioSampleAccession, sqlXmlString};
+                sampleData.add(currentSampleData);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return idXmlMap;
+        return sampleData;
     }
 
-    public void setEnaObjectQuery(String enaObjectQuery) {
+    void setEnaObjectQuery(String enaObjectQuery) {
         this.enaObjectQuery = enaObjectQuery;
     }
+
 }

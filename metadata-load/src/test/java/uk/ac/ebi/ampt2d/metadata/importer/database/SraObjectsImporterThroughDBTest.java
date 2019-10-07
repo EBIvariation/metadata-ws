@@ -162,22 +162,22 @@ public class SraObjectsImporterThroughDBTest {
         AnalysisType analysisType = analysisTypeSraXmlParser.parseXml(xmlString, "ERZ015710");
         List<Sample> sample = sraObjectImporter.importSamples(analysisType);
         assertEquals(1092, sample.size());
-        assertEquals("SRS000621", sample.get(0).getAccessionVersionId().getAccession());
-        assertEquals("NA12286", sample.get(0).getName());
-        assertEquals("SAMN00801378", sample.get(0).getBioSampleAccession());
-        assertEquals("SRS003719", sample.get(1091).getAccessionVersionId().getAccession());
-        assertEquals("NA19776", sample.get(1091).getName());
-        assertEquals("SAMN00007785", sample.get(1091).getBioSampleAccession());
+        assertEquals("SRS000031", sample.get(0).getAccessionVersionId().getAccession());
+        assertEquals("NA06986", sample.get(0).getName());
+        assertEquals("SAMN00797025", sample.get(0).getBioSampleAccession());
+        assertEquals("SRS074380", sample.get(1091).getAccessionVersionId().getAccession());
+        assertEquals("HG01626", sample.get(1091).getName());
+        assertEquals("SAMN00014429", sample.get(1091).getBioSampleAccession());
         assertEquals(1092, sampleRepository.count());
         sample.clear();
         sample = sraObjectImporter.importSamples(analysisType);
         assertEquals(1092, sample.size());
-        assertEquals("SRS000621", sample.get(0).getAccessionVersionId().getAccession());
-        assertEquals("NA12286", sample.get(0).getName());
-        assertEquals("SAMN00801378", sample.get(0).getBioSampleAccession());
-        assertEquals("SRS003719", sample.get(1091).getAccessionVersionId().getAccession());
-        assertEquals("NA19776", sample.get(1091).getName());
-        assertEquals("SAMN00007785", sample.get(1091).getBioSampleAccession());
+        assertEquals("SRS000031", sample.get(0).getAccessionVersionId().getAccession());
+        assertEquals("NA06986", sample.get(0).getName());
+        assertEquals("SAMN00797025", sample.get(0).getBioSampleAccession());
+        assertEquals("SRS074380", sample.get(1091).getAccessionVersionId().getAccession());
+        assertEquals("HG01626", sample.get(1091).getName());
+        assertEquals("SAMN00014429", sample.get(1091).getBioSampleAccession());
         assertEquals(1092, sampleRepository.count());
     }
 

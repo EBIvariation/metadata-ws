@@ -65,13 +65,14 @@ public class SampleConverterTest {
     }
 
     private void testSample(String sampleAccession, String sampleDocumentXmlPath,
-                            String expectedSampleName, String expectedBioSampleId) throws Exception {
+                            String expectedSampleName, String expectedBioSampleAccession) throws Exception {
         SampleType sampleType = getSampleType(sampleDocumentXmlPath, sampleAccession);
         Sample sample = sampleConverter.convert(sampleType);
         assertNotNull(sample);
         assertEquals(sampleAccession, sample.getAccessionVersionId().getAccession());
         assertEquals(expectedSampleName, sample.getName());
-        assertEquals(expectedBioSampleId, sample.getBioSampleAccession());
+        // BioSample accession is not tested here, because it is not populated by SampleConverter in the DB case.
+        // Instead, it is populated inside `importSample` after the conversion is completed.
     }
 
     @Test
