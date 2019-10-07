@@ -20,6 +20,7 @@ package uk.ac.ebi.ampt2d.metadata.importer.converter;
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.AccessionVersionId;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
+import uk.ac.ebi.ena.sra.xml.QualifiedNameType;
 import uk.ac.ebi.ena.sra.xml.SampleType;
 
 public class SampleConverter implements Converter<SampleType, Sample> {
@@ -28,8 +29,21 @@ public class SampleConverter implements Converter<SampleType, Sample> {
     public Sample convert(SampleType sampleType) {
         return new Sample(
                 new AccessionVersionId(sampleType.getAccession(), 1),
-                sampleType.getAlias()
+                sampleType.getAlias(),
+                extractBioSampleId(sampleType)
         );
+    }
+
+    /**
+     * Given SampleType, extract and return BioSample ID. If no BioSample cross-reference is present, return null.
+     */
+    private String extractBioSampleId(SampleType sampleType) {
+        for (QualifiedNameType externalId : sampleType.getIDENTIFIERS().getEXTERNALIDArray()) {
+            if (externalId.getNamespace().equals("BioSample")) {
+                return externalId.getStringValue();
+            }
+        }
+        return null;
     }
 
 }

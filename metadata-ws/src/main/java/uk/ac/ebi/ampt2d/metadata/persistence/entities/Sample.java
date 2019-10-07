@@ -76,6 +76,15 @@ public class Sample extends Auditable<Long> {
     private List<Taxonomy> taxonomies;
 
     /**
+     * BioSample accession. It can be 11 or 12 symbols long ("SAMEA" + 6 or 7 digits)
+     */
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", example = "SAMEA0000000", notes = "BioSample ID")
+    @Size(min = 11, max = 12)
+    @JsonProperty
+    @Column
+    private String bioSampleAccession;
+
+    /**
      * Release date control: get the *earliest* release date from all studies which link to this sample.
      */
     @Formula("(SELECT min(study.release_date) " + SAMPLE_QUERY_EXPRESSION + ")")
@@ -92,15 +101,10 @@ public class Sample extends Auditable<Long> {
     public Sample() {
     }
 
-    public Sample(AccessionVersionId accessionVersionId, String name) {
+    public Sample(AccessionVersionId accessionVersionId, String name, String bioSampleAccession) {
         this.accessionVersionId = accessionVersionId;
         this.name = name;
-    }
-
-    public Sample(AccessionVersionId accessionVersionId, String name, List<Taxonomy> taxonomies) {
-        this.accessionVersionId = accessionVersionId;
-        this.name = name;
-        this.taxonomies = taxonomies;
+        this.bioSampleAccession = bioSampleAccession;
     }
 
     @Override
@@ -131,6 +135,10 @@ public class Sample extends Auditable<Long> {
     @Override
     public String getStudyIds() {
         return studyIds;
+    }
+
+    public String getBioSampleAccession() {
+        return bioSampleAccession;
     }
 
 }
