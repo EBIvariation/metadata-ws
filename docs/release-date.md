@@ -17,11 +17,11 @@ To enforce that, transitive release date control is implemented. It works in the
     linking to File), this entity is considered to be released and becomes retrievable through the API.
   + Otherwise, the entity is not released and not retrievable through the API.
   
-## Access to Entities before release date
+## Access to entities before release date
 
 In certain cases the studies and its related entities should be accessible before release date for owners and 
 journals. And by default admins will be able to access the entities regardless of the release date.
 
-* To make a study accessible before release date for any user (owner or journals) , corresponding study accessions 
-should be added in keycloak Users -> Attributes section of a particular user . Its a key value pair ,key being study 
+* To make a study accessible before release date for any user (owner or journals), corresponding study accessions
+should be added in Keycloak (Users → Attributes section of a particular user). It's a key-value pair, key being study
 and value being comma separated list of unreleased study accessions the user has access to.
