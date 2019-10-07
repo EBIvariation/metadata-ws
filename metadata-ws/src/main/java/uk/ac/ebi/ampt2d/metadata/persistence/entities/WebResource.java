@@ -37,6 +37,10 @@ import java.time.LocalDate;
 @SequenceGenerator(initialValue = 1, allocationSize = 1, name = "WEB_RESOURCE_SEQ", sequenceName = "web_resource_sequence")
 public class WebResource extends Auditable<Long> {
 
+    private static final String WEBRESOURCE_QUERY_EXPRESSION = "FROM study_resources " +
+            "INNER JOIN study on study_resources.study_id = study.id " +
+            "WHERE study_resources.resources_id=id";
+
     @ApiModelProperty(position = 1, value = "Web resource auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Id
@@ -54,11 +58,16 @@ public class WebResource extends Auditable<Long> {
     /**
      * Release date control: get the *earliest* release date from all studies which link to this web resource.
      */
-    @Formula("(SELECT min(study.release_date) FROM study_resources " +
-            "INNER JOIN study on study_resources.study_id = study.id " +
-            "WHERE study_resources.resources_id=id)")
+    @Formula("(SELECT min(study.release_date) " + WEBRESOURCE_QUERY_EXPRESSION + ")")
     @JsonIgnore
     private LocalDate releaseDate;
+
+    /**
+     * Get the ids of the studies which link to this object (used for access control).
+     */
+    @Formula("(SELECT string_agg(study.accession,',') " + WEBRESOURCE_QUERY_EXPRESSION + ")")
+    @JsonIgnore
+    private String studyIds;
 
     WebResource() {
     }
@@ -76,4 +85,8 @@ public class WebResource extends Auditable<Long> {
         return releaseDate;
     }
 
+    @Override
+    public String getStudyIds() {
+        return studyIds;
+    }
 }

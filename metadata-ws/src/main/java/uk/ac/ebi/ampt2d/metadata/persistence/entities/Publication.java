@@ -31,7 +31,11 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Entity
-public class Publication extends Auditable<Long>{
+public class Publication extends Auditable<Long> {
+
+    private static final String PUBLICATION_QUERY_EXPRESSION = "FROM study_publications " +
+            "INNER JOIN study on study_publications.study_id = study.id " +
+            "WHERE study_publications.publications_id=id";
 
     @ApiModelProperty(position = 1, value = "Publication auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -45,6 +49,20 @@ public class Publication extends Auditable<Long>{
     @Column(unique = true)
     private String publicationId;
 
+    /**
+     * Release date control: get the *earliest* release date from all studies which link to this publication.
+     */
+    @Formula("(SELECT min(study.release_date) " + PUBLICATION_QUERY_EXPRESSION + ")")
+    @JsonIgnore
+    private LocalDate releaseDate;
+
+    /**
+     * Get the ids of the studies which link to this object (used for access control).
+     */
+    @Formula("(SELECT string_agg(study.accession,',') " + PUBLICATION_QUERY_EXPRESSION + ")")
+    @JsonIgnore
+    private String studyIds;
+
     public Publication() {
     }
 
@@ -57,17 +75,12 @@ public class Publication extends Auditable<Long>{
         return id;
     }
 
-    /**
-     * Release date control: get the *earliest* release date from all studies which link to this publication.
-     */
-    @Formula("(SELECT min(study.release_date) FROM study_publications " +
-             "INNER JOIN study on study_publications.study_id = study.id " +
-             "WHERE study_publications.publications_id=id)")
-    @JsonIgnore
-    private LocalDate releaseDate;
-
     public LocalDate getReleaseDate() {
         return releaseDate;
     }
 
+    @Override
+    public String getStudyIds() {
+        return studyIds;
+    }
 }

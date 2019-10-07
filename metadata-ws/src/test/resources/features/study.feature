@@ -128,7 +128,6 @@ Feature: study object
       | taxonomy-name | name=Primates     | 3 | STUDY_HOMO_SAPIENS,STUDY_PAN_TROGLODYTES,STUDY_PAN_PANISCUS |
       | taxonomy-name | name=None         | 0 | NONE                                                        |
 
-
   Scenario Outline: search various studies by release date
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
@@ -172,7 +171,8 @@ Feature: study object
     """
     Then set the URL to STUDY3
 
-    When I request search studies having release <query> today
+    When I set authorization with testuser having default role
+    And I request search studies having release <query> today
     Then the response code should be 200
     And the response should contain <N> studies
     And the href of the study of studies has items <url>
@@ -226,7 +226,8 @@ Feature: study object
     """
     Then set the URL to STUDY3
 
-    When I request search studies having release from today
+    When I set authorization with testuser having default role
+    And I request search studies having release from today
     Then the response code should be 200
     And the response should contain one study
     And the href of the study of studies has items STUDY2
@@ -545,7 +546,8 @@ Feature: study object
     When I create an analysis with Analysis2 for accession, REFERENCE_SEQUENCE_1 for reference sequence and STUDY2 for study
     Then set the URL to ANALYSIS2
 
-    When I request GET /studies
+    When I set authorization with testuser having default role
+    And I request GET /studies
     Then the response should contain 2 studies
     And the href of the study of studies has items STUDY1,STUDY2
 
@@ -690,7 +692,8 @@ Feature: study object
     """
     Then set the URL to STUDY1
 
-    When I request GET with value of STUDY1
+    When I set authorization with testuser having default role
+    And I request GET with value of STUDY1
     Then the response code should be 404
 
     When I request GET for analyses of STUDY1
@@ -929,7 +932,6 @@ Feature: study object
     And the response should contain one study
     And the href of the study of studies has items STUDY
 
-
   Scenario: verify study release date could be changed
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     When I request POST /taxonomies with JSON payload:
@@ -952,23 +954,25 @@ Feature: study object
     Then set the URL to STUDY
 
     When I request GET with value of STUDY
-    Then the response code should be 200
+    Then the response code should be 2xx
     And the response should contain field releaseDate
 
     When I request PATCH STUDY with patch and day tomorrow
-    Then the response code should be 200
+    Then the response code should be 2xx
+    When I request GET with value of STUDY
     And the response should contain field releaseDate
     And the difference between releaseDate and today should be 1 day
 
-    When I request GET with value of STUDY
+    When I set authorization with testuser having default role
+    And I request GET with value of STUDY
     Then the response code should be 404
 
-    When I request PATCH STUDY with patch and day today
-    Then the response code should be 200
-    And the response should contain field releaseDate
-    And the difference between releaseDate and today should be 0 day
+    When I set authorization with testoperator having SERVICE_OPERATOR role
+    And I request PATCH STUDY with patch and day today
+    Then the response code should be 2xx
 
-    When I request GET with value of STUDY
+    When I set authorization with testuser having default role
+    And I request GET with value of STUDY
     Then the response code should be 200
     And the response should contain field releaseDate
     And the difference between releaseDate and today should be 0 day

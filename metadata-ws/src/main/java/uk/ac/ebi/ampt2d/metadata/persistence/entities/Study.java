@@ -111,18 +111,16 @@ public class Study extends Auditable<Long> {
     @OneToMany
     private List<Study> childStudies;
 
-    @ApiModelProperty(position = 11, dataType = "java.lang.String" , example = "[Url1, Url2]")
+    @ApiModelProperty(position = 11, dataType = "java.lang.String", example = "[Url1, Url2]")
     @ManyToMany
     @JsonProperty
     private List<Publication> publications;
 
-    @OneToMany(mappedBy = "study",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "study", fetch = FetchType.EAGER)
     private List<Analysis> analyses;
 
     @ManyToMany
     private List<WebResource> resources;
-
-
 
     public Study() {
     }
@@ -147,10 +145,6 @@ public class Study extends Auditable<Long> {
 
     public boolean isDeprecated() {
         return deprecated;
-    }
-
-    public void setReleaseDate(LocalDate releaseDate) {
-        this.releaseDate = releaseDate;
     }
 
     public List<Study> getChildStudies() {
@@ -220,6 +214,7 @@ public class Study extends Auditable<Long> {
 
     /**
      * Release date control for Study.
+     *
      * @return the date at which Study should become available.
      */
     @Override
@@ -227,4 +222,12 @@ public class Study extends Auditable<Long> {
         return releaseDate;
     }
 
+    public void setReleaseDate(LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    @Override
+    public String getStudyIds() {
+        return this.accessionVersionId.getAccession();
+    }
 }

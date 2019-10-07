@@ -20,7 +20,6 @@ package uk.ac.ebi.ampt2d.metadata.security;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.JwtAccessTokenConverterConfigurer;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -39,6 +38,8 @@ public class JwtAccessTokenCustomizer extends DefaultAccessTokenConverter implem
     private static final String CLIENT_NAME_ELEMENT_IN_JWT = "resource_access";
 
     private static final String ROLE_ELEMENT_IN_JWT = "roles";
+
+    private static final String STUDIES = "studies";
 
     private ObjectMapper mapper;
 
@@ -68,9 +69,13 @@ public class JwtAccessTokenCustomizer extends DefaultAccessTokenConverter implem
                 new OAuth2Request(oAuth2Request.getRequestParameters(), oAuth2Request.getClientId(), authorities,
                         true, oAuth2Request.getScope(), audienceList, null, null, null);
 
-        Authentication usernamePasswordAuthentication = new UsernamePasswordAuthenticationToken(
-                authentication.getPrincipal(), "N/A", authorities);
+        Authentication usernamePasswordAuthentication = new CustomUsernamePasswordAuthenticationToken(
+                authentication.getPrincipal(), "N/A", authorities, extractStudies(token));
         return new OAuth2Authentication(request, usernamePasswordAuthentication);
+    }
+
+    private String extractStudies(JsonNode jwt) {
+        return jwt.path(STUDIES).textValue();
     }
 
     private List<GrantedAuthority> extractRoles(JsonNode jwt) {
@@ -81,7 +86,6 @@ public class JwtAccessTokenCustomizer extends DefaultAccessTokenConverter implem
                 .forEachRemaining(e -> e.path(ROLE_ELEMENT_IN_JWT)
                         .elements()
                         .forEachRemaining(r -> rolesWithPrefix.add("ROLE_" + r.asText())));
-
         List<GrantedAuthority> authorityList = AuthorityUtils.createAuthorityList(rolesWithPrefix.toArray(new String[0]));
         return authorityList;
     }

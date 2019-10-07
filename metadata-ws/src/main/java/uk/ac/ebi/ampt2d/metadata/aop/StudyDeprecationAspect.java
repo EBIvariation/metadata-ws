@@ -64,6 +64,7 @@ public class StudyDeprecationAspect {
      * @return null or object
      * @throws Throwable
      */
+    //TODO deprecated study should be accessible by admin as well
     @Around("execution(* org.springframework.data.repository.CrudRepository.findOne(java.io.Serializable))")
     public Object filterOnDeprecationAdviceFindOne(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object result = proceedingJoinPoint.proceed();

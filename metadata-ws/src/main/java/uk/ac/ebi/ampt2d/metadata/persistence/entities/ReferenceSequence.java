@@ -150,4 +150,12 @@ public class ReferenceSequence extends Auditable<Long> {
     public void setType(Type type) {
         this.type = type;
     }
+
+    /*
+    *  ReferenceSequence entities are public they are not restricted by access control. So returning null for studyIds.
+    */
+    @Override
+    public String getStudyIds() {
+        return null;
+    }
 }

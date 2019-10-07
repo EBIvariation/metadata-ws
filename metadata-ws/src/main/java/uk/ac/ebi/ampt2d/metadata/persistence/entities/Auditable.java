@@ -45,4 +45,6 @@ public abstract class Auditable<ID> {
 
     public abstract LocalDate getReleaseDate();
 
+    public abstract String getStudyIds();
+
 }

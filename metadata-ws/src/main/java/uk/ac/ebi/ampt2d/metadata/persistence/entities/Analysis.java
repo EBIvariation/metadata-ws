@@ -209,4 +209,8 @@ public class Analysis extends Auditable<Long> {
         return getStudy().getReleaseDate();
     }
 
+    @Override
+    public String getStudyIds() {
+        return this.study.getAccessionVersionId().getAccession();
+    }
 }

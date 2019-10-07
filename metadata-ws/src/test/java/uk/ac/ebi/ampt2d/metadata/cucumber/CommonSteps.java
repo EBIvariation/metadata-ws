@@ -205,7 +205,7 @@ public class CommonSteps {
         content += LocalDate.now().plusDays(intDay);
         content += "\" }";
 
-        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey) + "/patch")
+        CommonStates.setResultActions(mockMvc.perform(patch(CommonStates.getUrl(urlKey))
                 .with(CommonStates.getRequestPostProcessor())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content)));
