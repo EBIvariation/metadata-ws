@@ -61,22 +61,25 @@ public class SampleConverterTest {
 
     @Test
     public void convertFromApiXml() throws Exception {
-        testSample("ERS000156", SAMPLE_DOCUMENT_API_XML, "E-TABM-722:mmu5");
+        testSample("ERS000156", SAMPLE_DOCUMENT_API_XML, "E-TABM-722:mmu5", "SAMEA907007");
     }
 
     private void testSample(String sampleAccession, String sampleDocumentXmlPath,
-                            String expectedSampleName) throws Exception {
+                            String expectedSampleName, String expectedBioSampleId) throws Exception {
         SampleType sampleType = getSampleType(sampleDocumentXmlPath, sampleAccession);
         Sample sample = sampleConverter.convert(sampleType);
         assertNotNull(sample);
         assertEquals(sampleAccession, sample.getAccessionVersionId().getAccession());
         assertEquals(expectedSampleName, sample.getName());
+        assertEquals(expectedBioSampleId, sample.getBioSampleAccession());
     }
 
     @Test
     public void convertFromDbXml() throws Exception {
         testSample("ERS000002", SAMPLE_DOCUMENT_DATABASE_XML,
-                   "Solexa sequencing of Saccharomyces cerevisiae strain SK1 random 200 bp library");
+                   "Solexa sequencing of Saccharomyces cerevisiae strain SK1 random 200 bp library",
+                   "SAMEA749881"
+                );
     }
 
     private SampleType getSampleType(String xml, String accession) throws Exception {
