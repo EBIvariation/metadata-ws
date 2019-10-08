@@ -115,4 +115,19 @@ public class MetadataImporterMainApplicationAPITest {
         assertEquals(2, sampleRepository.count());
         assertEquals(10, fileRepository.count());
     }
+
+    /**
+     * If a study has no samples, it should be handled correctly; no exceptions must be raised.
+     */
+    @Test
+    public void testStudyWithNoSamples() throws Exception {
+        metadataImporterMainApplication.run(new DefaultApplicationArguments(
+                new String[]{"--accessions.file.path=study/StudyWithoutSamples.txt"}));
+        assertEquals(1, studyRepository.count());
+        assertEquals(1, analysisRepository.count());
+        assertEquals(1, referenceSequenceRepository.count());
+        assertEquals(0, sampleRepository.count());
+        assertEquals(3, fileRepository.count());
+    }
+
 }
