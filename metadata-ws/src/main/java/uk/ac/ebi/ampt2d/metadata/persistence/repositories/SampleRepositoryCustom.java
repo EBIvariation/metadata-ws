@@ -36,6 +36,9 @@ public interface SampleRepositoryCustom extends PagingAndSortingRepository<Sampl
     QSample qSample = QSample.sample;
 
     default List<Sample> findOrSave(List<Sample> sampleIn) {
+        if (sampleIn.isEmpty()) {
+            return sampleIn;
+        }
         List<Sample> existingSamples;
         Predicate predicate = qSample.accessionVersionId.accession.concat(qSample.accessionVersionId.version.stringValue())
                 .in(sampleIn.stream().map(s -> s.getAccessionVersionId().getAccession()
