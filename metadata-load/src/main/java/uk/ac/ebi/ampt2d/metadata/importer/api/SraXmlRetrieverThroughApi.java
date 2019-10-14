@@ -23,7 +23,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 
 public class SraXmlRetrieverThroughApi implements SraXmlRetrieverByAccession {
 
-    private static final String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
+    public static final String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
 
     private RestTemplate restTemplate = new RestTemplate();
 

@@ -19,6 +19,11 @@
 package uk.ac.ebi.ampt2d.metadata.importer.api;
 
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpMethod;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
@@ -157,5 +162,25 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
                 });
 
         return analysisAccessions;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Study importStudy(String accession) throws Exception {
+        String xml = getXml(accession);
+        StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
+        Study study = studyConverter.convert(studyType);
+        StudyType.STUDYLINKS studylinks = studyType.getSTUDYLINKS();
+        study.setPublications(publicationExtractorFromStudy.getPublications(studylinks));
+        study.setResources(webResourceExtractorFromStudy.getWebResources(studylinks));
+        study = extractAnalysisFromStudy(studyType, study);
+        return study;
+    }
+
+    @Retryable(maxAttemptsExpression="#{${api.attempts}}",
+            backoff=@Backoff(delayExpression="#{${api.delay}}"))
+    private String getXml(String accession) throws Exception {
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.exchange(SraXmlRetrieverThroughApi.ENA_API_URL, HttpMethod.GET, null, String.class, accession).getBody();
     }
 }

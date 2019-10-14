@@ -71,7 +71,7 @@ public abstract class ObjectsImporter {
     protected SampleRepository sampleRepository;
 
     // Entity XML parsers
-    private SraXmlParser<StudyType> sraStudyXmlParser;
+    protected SraXmlParser<StudyType> sraStudyXmlParser;
 
     private SraXmlParser<AnalysisType> sraAnalysisXmlParser;
 
@@ -80,16 +80,16 @@ public abstract class ObjectsImporter {
     private EntrezAssemblyXmlParser entrezAssemblyXmlParser;
 
     // Entity converters
-    private Converter<StudyType, Study> studyConverter;
+    protected Converter<StudyType, Study> studyConverter;
 
     private Converter<AnalysisType, Analysis> analysisConverter;
 
     protected Converter<SampleType, Sample> sampleConverter;
 
     // Extractors
-    private PublicationExtractorFromStudy publicationExtractorFromStudy;
+    protected PublicationExtractorFromStudy publicationExtractorFromStudy;
 
-    private WebResourceExtractorFromStudy webResourceExtractorFromStudy;
+    protected WebResourceExtractorFromStudy webResourceExtractorFromStudy;
 
     private FileExtractorFromAnalysis fileExtractorFromAnalysis;
 

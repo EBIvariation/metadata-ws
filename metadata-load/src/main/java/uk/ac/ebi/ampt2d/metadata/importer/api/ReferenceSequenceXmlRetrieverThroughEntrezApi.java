@@ -69,8 +69,8 @@ public class ReferenceSequenceXmlRetrieverThroughEntrezApi {
                 entrezDatabase, id, entrezApiKey).getBody();
     }
 
-    @Retryable(maxAttemptsExpression="#{${entrez.api.attempts}}",
-            backoff=@Backoff(delayExpression="#{${entrez.api.delay}}"))
+    @Retryable(maxAttemptsExpression="#{${api.attempts}}",
+            backoff=@Backoff(delayExpression="#{${api.delay}}"))
     public String getXml(String accession, String entrezDatabase) {
         String idXml = fetchEntrezId(accession, entrezDatabase);
         String id = idXml.substring(idXml.indexOf(ID_START_TAG) + ID_START_TAG_LENGTH, idXml.indexOf(ID_END_TAG));
