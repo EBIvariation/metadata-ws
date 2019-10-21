@@ -59,8 +59,8 @@ public class AnalysisEventHandler {
         } else {
             Taxonomy taxonomy = analysis.getReferenceSequences().get(0).getTaxonomy();
             boolean invalidRefSeq = analysis.getReferenceSequences().stream()
-                    .anyMatch(referenceSequence -> referenceSequence.getTaxonomy().getTaxonomyId()
-                            != taxonomy.getTaxonomyId());
+                    .anyMatch(referenceSequence -> referenceSequence.getTaxonomy().getTaxonomySpecies().getTaxonomyId()
+                            != taxonomy.getTaxonomySpecies().getTaxonomyId());
             if (invalidRefSeq) {
                 throw new InvalidReferenceSequenceException("Invalid type of reference sequences. " +
                         "When multiple reference sequences are associated with an analysis all of them should point " +

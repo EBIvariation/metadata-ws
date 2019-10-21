@@ -77,6 +77,9 @@ public class TaxonomyEventHandler {
                 long taxIdLong = Long.parseLong(taxId);
                 Taxonomy taxonomyParent = importTaxonomyTree(new Taxonomy(taxIdLong));
                 taxonomy.setTaxonomyForRank(taxonomyParent, rankEnum.toString());
+            } else if (taxonomy.getRank().equals(RANK.SPECIES.name) && taxonomy.getTaxonomySpecies() == null) {
+                // self-reference at species level
+                taxonomy.setTaxonomySpecies(taxonomy);
             }
         }
 
