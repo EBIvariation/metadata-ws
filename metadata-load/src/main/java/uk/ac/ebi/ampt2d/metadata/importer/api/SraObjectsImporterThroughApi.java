@@ -177,8 +177,8 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
         return study;
     }
 
-    @Retryable(maxAttemptsExpression="#{${api.attempts}}",
-            backoff=@Backoff(delayExpression="#{${api.delay}}"))
+    @Retryable(maxAttemptsExpression="#{${ena.api.attempts}}",
+            backoff=@Backoff(delayExpression="#{${ena.api.delay}}"))
     private String getXml(String accession) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         return restTemplate.exchange(SraXmlRetrieverThroughApi.ENA_API_URL, HttpMethod.GET, null, String.class, accession).getBody();
