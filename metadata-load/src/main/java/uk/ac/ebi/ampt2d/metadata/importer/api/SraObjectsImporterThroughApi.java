@@ -25,6 +25,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
@@ -55,7 +56,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
     private static final Logger IMPORT_LOGGER = Logger.getLogger(SraObjectsImporterThroughApi.class.getName());
 
     public SraObjectsImporterThroughApi(
-            SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
+            SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
             ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
 
             SraXmlParser<StudyType> sraStudyXmlParser,
@@ -77,7 +78,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
             SampleRepository sampleRepository,
             TaxonomyEventHandler taxonomyEventHandler) {
         super(
-                sraXmlRetrieverThroughApi,
+                sraXmlRetrieverByAccession,
                 referenceSequenceXmlRetrieverThroughEntrezApi,
 
                 sraStudyXmlParser,
@@ -164,23 +165,4 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
         return analysisAccessions;
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Study importStudy(String accession) throws Exception {
-        String xml = getXml(accession);
-        StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
-        Study study = studyConverter.convert(studyType);
-        StudyType.STUDYLINKS studylinks = studyType.getSTUDYLINKS();
-        study.setPublications(publicationExtractorFromStudy.getPublications(studylinks));
-        study.setResources(webResourceExtractorFromStudy.getWebResources(studylinks));
-        study = extractAnalysisFromStudy(studyType, study);
-        return study;
-    }
-
-    @Retryable(maxAttemptsExpression="#{${ena.api.attempts}}",
-            backoff=@Backoff(delayExpression="#{${ena.api.delay}}"))
-    private String getXml(String accession) throws Exception {
-        RestTemplate restTemplate = new RestTemplate();
-        return restTemplate.exchange(SraXmlRetrieverThroughApi.ENA_API_URL, HttpMethod.GET, null, String.class, accession).getBody();
-    }
 }

@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
+import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
@@ -66,7 +67,7 @@ public class MetadataImporterMainApplicationConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "API")
-    public ObjectsImporter objectImporterThroughEnaApi(SraXmlRetrieverThroughApi sraXmlRetrieverThroughApi,
+    public ObjectsImporter objectImporterThroughEnaApi(SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
                                                        ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
                                                        PublicationRepository publicationRepository,
                                                        WebResourceRepository webResourceRepository,
@@ -77,7 +78,7 @@ public class MetadataImporterMainApplicationConfiguration {
                                                        StudyRepository studyRepository,
                                                        SampleRepository sampleRepository) {
         return new SraObjectsImporterThroughApi(
-                sraXmlRetrieverThroughApi,
+                sraXmlRetrieverByAccession,
                 referenceSequenceXmlRetrieverThroughEntrezApi,
 
                 sraStudyXmlParser(),
