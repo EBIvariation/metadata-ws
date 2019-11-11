@@ -21,7 +21,6 @@ package uk.ac.ebi.ampt2d.metadata.importer.api;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -203,19 +202,27 @@ public class SraObjectsImporterThroughApiTest {
                 Paths.get(getClass().getClassLoader().getResource("analysis/AnalysisDocumentBig.xml").toURI())));
         AnalysisType analysisType = analysisTypeSraXmlParser.parseXml(xmlString, "ERZ015710");
         List<Sample> sample = sraObjectImporter.importSamples(analysisType);
+        // The assertions here are different from the ones in `SraObjectsImporterThroughDB`, despite the same analysis
+        // with the same samples is being imported. This is because in the API case, the samples are being imported in
+        // the order in which they appear in the XML; whereas in the DB case the information is obtained via a bulk SQL
+        // query, where the samples are ordered by their accession.
         assertEquals(1092, sample.size());
         assertEquals("SRS000621", sample.get(0).getAccessionVersionId().getAccession());
         assertEquals("NA12286", sample.get(0).getName());
+        assertEquals("SAMN00801378", sample.get(0).getBioSampleAccession());
         assertEquals("SRS003719", sample.get(1091).getAccessionVersionId().getAccession());
         assertEquals("NA19776", sample.get(1091).getName());
+        assertEquals("SAMN00007785", sample.get(1091).getBioSampleAccession());
         assertEquals(1092, sampleRepository.count());
         sample.clear();
         sample = sraObjectImporter.importSamples(analysisType);
         assertEquals(1092, sample.size());
         assertEquals("SRS000621", sample.get(0).getAccessionVersionId().getAccession());
         assertEquals("NA12286", sample.get(0).getName());
+        assertEquals("SAMN00801378", sample.get(0).getBioSampleAccession());
         assertEquals("SRS003719", sample.get(1091).getAccessionVersionId().getAccession());
         assertEquals("NA19776", sample.get(1091).getName());
+        assertEquals("SAMN00007785", sample.get(1091).getBioSampleAccession());
         assertEquals(1092, sampleRepository.count());
     }
 
@@ -225,6 +232,7 @@ public class SraObjectsImporterThroughApiTest {
         assertNotNull(sample);
         assertEquals("ERS000156", sample.getAccessionVersionId().getAccession());
         assertEquals("E-TABM-722:mmu5", sample.getName());
+        assertEquals("SAMEA907007", sample.getBioSampleAccession());
     }
 
 }

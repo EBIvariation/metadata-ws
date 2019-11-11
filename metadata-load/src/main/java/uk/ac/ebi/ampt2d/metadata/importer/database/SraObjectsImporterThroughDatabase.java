@@ -35,7 +35,6 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
-import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
@@ -123,17 +122,25 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         setEnaObjectQuery(EnaObjectQuery.SAMPLE_QUERY);
         String analysisAccession = analysisType.getAccession();
         List<Sample> samples = new ArrayList<>();
-        Map<String, String> idXmlMap = getSampleXmls(analysisAccession);
+        List<String[]> sampleData = ((SraXmlRetrieverThroughDatabase) sraXmlRetrieverByAccession)
+                .getSampleXmls(analysisAccession);
         SampleType sampleType;
-        for (Map.Entry<String, String> entry : idXmlMap.entrySet()) {
+        for (String[] currentSampleData : sampleData) {
             try {
-                sampleType = sraSampleXmlParser.parseXml(entry.getValue(), entry.getKey());
+                String sampleId = currentSampleData[0];
+                String bioSampleAccession = currentSampleData[1];
+                String sqlXmlString = currentSampleData[2];
+                sampleType = sraSampleXmlParser.parseXml(sqlXmlString, sampleId);
                 Sample sampleElement = sampleConverter.convert(sampleType);
+                // In the database case, BioSample cross-reference is not stored in the XML, but is instead retrieved
+                // using a separate SQL field. Hence, we need to update the newly converted Sample element with this
+                // value.
+                sampleElement.setBioSampleAccession(bioSampleAccession);
                 Taxonomy taxonomy = taxonomyEventHandler.importTaxonomyTree(extractTaxonomyFromSample(sampleType));
                 sampleElement.setTaxonomies(Arrays.asList(taxonomy));
                 samples.add(sampleElement);
             } catch (Exception exception) {
-                IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + entry.getKey());
+                IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + currentSampleData[0]);
                 IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
                 throw exception;
             }
@@ -177,10 +184,6 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
 
     public Map<String, Study> getAccessionsToStudy() {
         return accessionsToStudy;
-    }
-
-    private Map<String, String> getSampleXmls(String analysisAccession) {
-        return ((SraXmlRetrieverThroughDatabase) sraXmlRetrieverByAccession).getSampleXmls(analysisAccession);
     }
 
 }
