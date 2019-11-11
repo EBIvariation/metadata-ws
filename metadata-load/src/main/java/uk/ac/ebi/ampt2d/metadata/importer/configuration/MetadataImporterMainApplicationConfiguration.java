@@ -67,7 +67,7 @@ public class MetadataImporterMainApplicationConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "import.source", havingValue = "API")
-    public ObjectsImporter objectImporterThroughEnaApi(SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
+    public ObjectsImporter objectImporterThroughEnaApi(SraXmlRetrieverByAccession sraXmlRetrieverThroughApi,
                                                        ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
                                                        PublicationRepository publicationRepository,
                                                        WebResourceRepository webResourceRepository,
@@ -78,7 +78,7 @@ public class MetadataImporterMainApplicationConfiguration {
                                                        StudyRepository studyRepository,
                                                        SampleRepository sampleRepository) {
         return new SraObjectsImporterThroughApi(
-                sraXmlRetrieverByAccession,
+                sraXmlRetrieverThroughApi,
                 referenceSequenceXmlRetrieverThroughEntrezApi,
 
                 sraStudyXmlParser(),
