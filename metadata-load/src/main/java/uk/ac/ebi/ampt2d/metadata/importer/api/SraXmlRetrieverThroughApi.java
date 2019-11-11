@@ -18,15 +18,19 @@
 package uk.ac.ebi.ampt2d.metadata.importer.api;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
 
 public class SraXmlRetrieverThroughApi implements SraXmlRetrieverByAccession {
 
-    private static final String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
+    public static final String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
 
     private RestTemplate restTemplate = new RestTemplate();
 
+    @Retryable(maxAttemptsExpression="#{${ena.api.attempts}}",
+            backoff=@Backoff(delayExpression="#{${ena.api.delay}}"))
     @Override
     public String getXml(String accession) {
         return restTemplate.exchange(ENA_API_URL, HttpMethod.GET, null, String.class, accession).getBody();
