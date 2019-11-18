@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
         },
         strict = true,
         plugin = {
-                "pretty",
+                "progress",
                 "html:target/cucumber"
         },
         tags = { "not @ignore" }
