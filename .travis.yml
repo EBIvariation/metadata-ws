@@ -9,7 +9,7 @@ jdk:
   - openjdk8
 
 install:
-  - >
+  - |
     for i in 1 2 3 4 5; do
       echo "Trying to set up Maven, attempt number $i"
       rm -rf ~/.m2
