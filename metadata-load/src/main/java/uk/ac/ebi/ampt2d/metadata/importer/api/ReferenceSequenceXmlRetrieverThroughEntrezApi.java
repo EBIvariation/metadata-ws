@@ -19,6 +19,7 @@
 package uk.ac.ebi.ampt2d.metadata.importer.api;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.client.RestTemplate;
@@ -58,23 +59,37 @@ public class ReferenceSequenceXmlRetrieverThroughEntrezApi {
     }
 
     private String fetchEntrezId(String accession, String entrezDatabase) {
-        return restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 entrezApiIdRetrievalUrl, HttpMethod.GET, null, String.class,
-                entrezDatabase, accession, entrezApiKey).getBody();
+                entrezDatabase, accession, entrezApiKey);
+        return response.getBody();
     }
 
     private String fetchEntrezData(String id, String entrezDatabase) {
-        return restTemplate.exchange(
+        ResponseEntity<String> response = restTemplate.exchange(
                 entrezApiAssemblyRetrievalUrl, HttpMethod.GET, null, String.class,
-                entrezDatabase, id, entrezApiKey).getBody();
+                entrezDatabase, id, entrezApiKey);
+        return response.getBody();
     }
 
     @Retryable(maxAttemptsExpression="#{${entrez.api.attempts}}",
             backoff=@Backoff(delayExpression="#{${entrez.api.delay}}"))
     public String getXml(String accession, String entrezDatabase) {
+        // First we query the appropriate Entrez database with an accession to find out the corresponding internal ID.
+        // For example, if we have AJPT01332946.1 and query the nuccore database, it'll return an ID of 428325741.
         String idXml = fetchEntrezId(accession, entrezDatabase);
         String id = idXml.substring(idXml.indexOf(ID_START_TAG) + ID_START_TAG_LENGTH, idXml.indexOf(ID_END_TAG));
-        return fetchEntrezData(id, entrezDatabase);
+        // Now, having an internal ID, we query the corresponding Entrez database to get the necessary data.
+        String dataXml = fetchEntrezData(id, entrezDatabase);
+        String idFromData = dataXml.substring(idXml.indexOf(ID_START_TAG) + ID_START_TAG_LENGTH, idXml.indexOf(ID_END_TAG));
+        if (! id.equals(idFromData)) {
+            // This check is here to ensure that the result which Entrez returns is actually meaningful and does contain
+            // the same ID which it was queried with. Sometimes, rarely and sporadically, Entrez does return either an
+            // empty XML, or an XML complaining about about backend error, without any actual information. The exception
+            // below is thrown so that the @Retryable annotation can kick in and resolve the issue.
+            throw new AssertionError("Entrez error: identifiers from ID XML and data XML do not match");
+        }
+        return dataXml;
     }
 
 }
