@@ -73,10 +73,10 @@ public class MetadataImporterMainApplicationAPITest {
     public void run() throws Exception {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
                 new String[]{"--accessions.file.path=study/StudyAccessions.txt"}));
-        assertEquals(2, studyRepository.count());
-        assertEquals(2, analysisRepository.count());
-        assertEquals(21, referenceSequenceRepository.count());
-        assertEquals(25, sampleRepository.count());
+        assertEquals(3, studyRepository.count());
+        assertEquals(7, analysisRepository.count());
+        assertEquals(34, referenceSequenceRepository.count());
+        assertEquals(30, sampleRepository.count());
     }
 
     @Test(expected = RuntimeException.class)

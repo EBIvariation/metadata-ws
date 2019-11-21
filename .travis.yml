@@ -2,11 +2,19 @@ sudo: false
 
 language: java
 
+git:
+  quiet: true
+
 jdk:
   - openjdk8
 
 install:
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -PTravis
+  - |
+    for i in 1 2 3 4 5; do
+      echo "Trying to set up Maven, attempt number $i"
+      rm -rf ~/.m2
+      mvn clean install -PTravis -DskipTests=true -Dmaven.javadoc.skip=true -B -V -q && break || sleep 5;
+    done
 
 script:
-  - mvn test -PTravis
+  - travis_wait mvn test -PTravis -q

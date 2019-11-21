@@ -88,12 +88,12 @@ public class Study extends Auditable<Long> {
     @ApiModelProperty(position = 7, dataType = "java.lang.String", notes = "URL to taxonomy")
     @JsonProperty
     @ManyToOne
-    @JoinFormula(value = "(SELECT DISTINCT taxonomy.id FROM taxonomy " +
+    @JoinFormula(value = "(SELECT DISTINCT taxonomy.species_id FROM taxonomy " +
             "INNER JOIN reference_sequence ON reference_sequence.taxonomy_id = taxonomy.id " +
             "INNER JOIN analysis_reference_sequences ON analysis_reference_sequences.reference_sequences_id = reference_sequence.id " +
             "INNER JOIN analysis ON analysis.id = analysis_reference_sequences.analysis_id " +
             "INNER JOIN study ON study.id = analysis.study_id " +
-            "WHERE study.id = id)", referencedColumnName = "id")
+            "WHERE study.id = id)", referencedColumnName = "taxonomyId")
     private Taxonomy taxonomy;
 
     @ApiModelProperty(position = 8, example = "false")
