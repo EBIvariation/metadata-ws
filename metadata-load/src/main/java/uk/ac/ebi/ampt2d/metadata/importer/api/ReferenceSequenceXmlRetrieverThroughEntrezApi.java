@@ -61,17 +61,15 @@ public class ReferenceSequenceXmlRetrieverThroughEntrezApi {
     }
 
     private String fetchEntrezId(String accession, String entrezDatabase) {
-        ResponseEntity<String> response = restTemplate.exchange(
+        return restTemplate.exchange(
                 entrezApiIdRetrievalUrl, HttpMethod.GET, null, String.class,
-                entrezDatabase, accession, entrezApiKey);
-        return response.getBody();
+                entrezDatabase, accession, entrezApiKey).getBody();
     }
 
     private String fetchEntrezData(String id, String entrezDatabase) {
-        ResponseEntity<String> response = restTemplate.exchange(
+        return restTemplate.exchange(
                 entrezApiAssemblyRetrievalUrl, HttpMethod.GET, null, String.class,
-                entrezDatabase, id, entrezApiKey);
-        return response.getBody();
+                entrezDatabase, id, entrezApiKey).getBody();
     }
 
     @Retryable(maxAttemptsExpression="#{${entrez.api.attempts}}",
@@ -91,7 +89,7 @@ public class ReferenceSequenceXmlRetrieverThroughEntrezApi {
                 dataXml.indexOf(DATA_ID_END_TAG));
         if (idFromData.isEmpty()) {
             // This check is here to ensure that the result which Entrez returns is actually meaningful. Sometimes,
-            // rarely and sporadically, Entrez does return either an empty XML, or an XML complaining about about
+            // rarely and sporadically, Entrez does return either an empty XML, or an XML complaining about
             // backend error, without any actual information. The exception below is thrown so that the @Retryable
             // annotation can kick in and resolve the issue.
             throw new AssertionError("Entrez error: received a malformed XML for accession " + accession);
