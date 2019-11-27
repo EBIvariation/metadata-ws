@@ -19,6 +19,7 @@
 package uk.ac.ebi.ampt2d.metadata.importer.api;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.client.RestTemplate;
@@ -29,9 +30,11 @@ public class ReferenceSequenceXmlRetrieverThroughEntrezApi {
 
     private static final String ID_END_TAG = "</Id>";
 
-    private static final String ENTREZ_API_KEY_QUERY = "&api_key={entrezApiKey}";
+    private static final String ASSEMBLY_ID_START_TAG = "<RsUid>";
 
-    private static final int ID_START_TAG_LENGTH = 4;
+    private static final String ASSEMBLY_ID_END_TAG = "</RsUid>";
+
+    private static final String ENTREZ_API_KEY_QUERY = "&api_key={entrezApiKey}";
 
     /*
      *  URL to obtain an internal Entrez ID from, given an NCBI database and a sequence accession
@@ -72,9 +75,27 @@ public class ReferenceSequenceXmlRetrieverThroughEntrezApi {
     @Retryable(maxAttemptsExpression="#{${entrez.api.attempts}}",
             backoff=@Backoff(delayExpression="#{${entrez.api.delay}}"))
     public String getXml(String accession, String entrezDatabase) {
+        // First we query the appropriate Entrez database with an accession to find out the corresponding internal ID.
+        // For example, if we have AJPT01332946.1 and query the nuccore database, it'll return an ID of 428325741.
         String idXml = fetchEntrezId(accession, entrezDatabase);
-        String id = idXml.substring(idXml.indexOf(ID_START_TAG) + ID_START_TAG_LENGTH, idXml.indexOf(ID_END_TAG));
-        return fetchEntrezData(id, entrezDatabase);
+        String id = idXml.substring(idXml.indexOf(ID_START_TAG) + ID_START_TAG.length(), idXml.indexOf(ID_END_TAG));
+
+        // Now, having an internal ID, we query the corresponding Entrez database to get the necessary data.
+        String dataXml = fetchEntrezData(id, entrezDatabase);
+        boolean isAssembly = entrezDatabase.equals("assembly");
+        String DATA_ID_START_TAG = isAssembly ? ASSEMBLY_ID_START_TAG : ID_START_TAG;
+        String DATA_ID_END_TAG = isAssembly ? ASSEMBLY_ID_END_TAG : ID_END_TAG;
+        String idFromData = dataXml.substring(dataXml.indexOf(DATA_ID_START_TAG) + DATA_ID_START_TAG.length(),
+                dataXml.indexOf(DATA_ID_END_TAG));
+        if (idFromData.isEmpty()) {
+            // This check is here to ensure that the result which Entrez returns is actually meaningful. Sometimes,
+            // rarely and sporadically, Entrez does return either an empty XML, or an XML complaining about
+            // backend error, without any actual information. The exception below is thrown so that the @Retryable
+            // annotation can kick in and resolve the issue.
+            throw new AssertionError("Entrez error: received a malformed XML for accession " + accession);
+        }
+
+        return dataXml;
     }
 
 }

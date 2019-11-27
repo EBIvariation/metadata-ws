@@ -57,13 +57,12 @@ public class EntrezAssemblyXmlParser {
 
             // Create new taxonomy
             long taxonomyId = Long.parseLong(domQueryUsingXPath.findInDom(xmlPath + taxIdXmlPath));
-            // TODO: NCBI provides species names for assemblies, but not for sequences from the `nuccore` database.
-            String taxonomyName = isAssembly ? domQueryUsingXPath.findInDom(xmlPath + "SpeciesName") : "no name";
             Taxonomy taxonomy = new Taxonomy(taxonomyId);
             referenceSequence.setTaxonomy(taxonomy);
             return referenceSequence;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "An error occurred while parsing XML for accession " + accession);
+            LOGGER.log(Level.SEVERE, xmlString);
             throw e;
         }
     }
