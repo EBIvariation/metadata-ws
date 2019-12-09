@@ -84,8 +84,10 @@ public class Analysis extends Auditable<Long> {
 
         UNSPECIFIED,
 
-        // Not present in the SRA schema
-        GWAS
+        // The following technology types are not listed in the SRA schema
+        GWAS,
+
+        ARRAY
 
     }
 
