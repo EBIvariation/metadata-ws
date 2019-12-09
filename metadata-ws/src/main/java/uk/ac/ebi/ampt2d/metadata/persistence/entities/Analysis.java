@@ -82,7 +82,10 @@ public class Analysis extends Auditable<Long> {
 
         TARGET_SEQUENCING,
 
-        UNSPECIFIED
+        UNSPECIFIED,
+
+        // Not present in the SRA schema
+        GWAS
 
     }
 
