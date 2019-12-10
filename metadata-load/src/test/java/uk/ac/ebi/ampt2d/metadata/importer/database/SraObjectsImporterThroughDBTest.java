@@ -111,7 +111,7 @@ public class SraObjectsImporterThroughDBTest {
         Analysis analysis = sraObjectImporter.importAnalysis("ERZ092698");
         assertNotNull(analysis);
         assertEquals("ERZ092698", analysis.getAccessionVersionId().getAccession());
-        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
+        assertEquals(Analysis.Technology.GENOME_SEQUENCING, analysis.getTechnology());
         assertEquals(1, analysis.getFiles().size());
         assertEquals("ERP009248", analysis.getStudy().getAccessionVersionId().getAccession());
         ReferenceSequence referenceSequence = analysis.getReferenceSequences().get(0);

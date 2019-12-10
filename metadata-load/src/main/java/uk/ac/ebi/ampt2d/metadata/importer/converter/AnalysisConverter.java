@@ -42,7 +42,6 @@ public class AnalysisConverter implements Converter<AnalysisType, Analysis> {
         return platform;
     }
 
-
     /**
      * Converts "technology type" from SRA schema to the internal representation from technology type.
      * All values permitted by SRA schema (as of version 1.5.58) are supported. See here for further details:
@@ -68,7 +67,6 @@ public class AnalysisConverter implements Converter<AnalysisType, Analysis> {
                     return Analysis.Technology.GENOTYPING;
                 case "Target sequencing":
                     return Analysis.Technology.TARGET_SEQUENCING;
-
             }
         }
         return Analysis.Technology.UNSPECIFIED;
