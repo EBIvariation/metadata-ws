@@ -68,7 +68,10 @@ public class AnalysisConverter implements Converter<AnalysisType, Analysis> {
                 case "Target sequencing":
                     return Analysis.Technology.TARGET_SEQUENCING;
             }
+            throw new AssertionError("The technology type mentioned in the imported document does not come from " +
+                    "the list of acceptable valus in the SRA schema");
+        } else {
+            return Analysis.Technology.UNSPECIFIED;
         }
-        return Analysis.Technology.UNSPECIFIED;
     }
 }
