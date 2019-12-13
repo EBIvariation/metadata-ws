@@ -52,6 +52,16 @@ public class StudySteps {
         ));
     }
 
+    /**
+     * In contrast with the previous method, this one does *not* check that the creation was successful.
+     */
+    @When("I attempt to create a study with (.*) for accession$")
+    public void createTestStudyWithAccessionNoExpect(String accession) throws Exception {
+        CommonStates.setResultActions(postTestStudyNoExpect(
+                accession, 1, "test_human_study", false, LocalDate.now()
+        ));
+    }
+
     @When("^I request POST /studies with JSON-like payload:$")
     public void postTestStudy(String jsonLikeData) throws Exception {
         String[] values = jsonLikeData.split(",");
@@ -139,7 +149,7 @@ public class StudySteps {
         CommonStates.getResultActions().andExpect(jsonPath("$."+field).doesNotExist());
     }
 
-    private ResultActions postTestStudy(String accession, int version, String name, boolean deprecated, LocalDate releaseDate) throws Exception {
+    private ResultActions postTestStudyNoExpect(String accession, int version, String name, boolean deprecated, LocalDate releaseDate) throws Exception {
         String jsonContent = "{" +
                 "      \"accessionVersionId\": {" +
                 "       \"accession\": \"" + accession +  "\"," +
@@ -151,11 +161,13 @@ public class StudySteps {
                 "      \"deprecated\": \"" + deprecated + "\"," +
                 "      \"releaseDate\": \"" + releaseDate + "\"" +
                 "    }";
-
         return mockMvc.perform(post("/studies")
                 .with(CommonStates.getRequestPostProcessor())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonContent))
-                .andExpect(status().isCreated());
+                .content(jsonContent));
+    }
+
+    private ResultActions postTestStudy(String accession, int version, String name, boolean deprecated, LocalDate releaseDate) throws Exception {
+        return postTestStudyNoExpect(accession, version, name, deprecated, releaseDate).andExpect(status().isCreated());
     }
 }

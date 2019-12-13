@@ -1015,19 +1015,5 @@ Feature: study object
 
   Scenario: Trying to create a study with an invalid accession name (containing a comma symbol) must fail
     Given I set authorization with testoperator having SERVICE_OPERATOR role
-    # Create a taxonomy
-    When I request POST taxonomy with 9606 for ID
-    Then set the URL to TAXONOMY
-    # Create a reference sequence
-    When I request POST /reference-sequences with JSON-like payload:
-    """
-      "name": "GRCh37",
-      "patch": "p2",
-      "accession": "GCA_000001405.3",
-      "type": "GENOME_ASSEMBLY",
-      "taxonomy": "TAXONOMY"
-    """
-    Then set the URL to REFERENCE_SEQUENCE
-    # Create a study
-    When I create a study with INVALID,ACCESSION for accession
-    Then the response code should be 400
+    When I attempt to create a study with INVALID,ACCESSION for accession
+    Then the response code should be 4xx
