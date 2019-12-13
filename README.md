@@ -3,8 +3,10 @@
 Metadata API for projects that follow the SRA model, such as those submitted to the EGA, EVA and AMP T2D.
 
 Available documentation:
-* [Release date control](docs/release-date.md)
-* [Security](docs/security.md)
+* Using the metadata service
+  + [Querying](docs/querying.md)
+  + [Release date control](docs/release-date.md)
+  + [Security](docs/security.md)
 * Notes on import
   + [Reference sequence import](docs/reference-sequence-import.md)
   + [Technology type import](docs/technology-type-import.md)
