@@ -70,15 +70,17 @@ public class Analysis extends Auditable<Long> {
 
         GENOME_SEQUENCING,
 
-        EXOME_SEQUENCING,
-
         TRANSCRIPTOME_SEQUENCING,
 
-        GENOTYPING,
+        EXOME_SEQUENCING,
+
+        GENOTYPING_BY_ARRAY,
 
         TRANSCRIPTOMICS,
 
         CURATION,
+
+        GENOTYPING_BY_SEQUENCING,
 
         TARGET_SEQUENCING,
 

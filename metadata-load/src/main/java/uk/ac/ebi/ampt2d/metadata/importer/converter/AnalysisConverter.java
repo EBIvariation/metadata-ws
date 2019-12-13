@@ -58,13 +58,13 @@ public class AnalysisConverter implements Converter<AnalysisType, Analysis> {
                 case "Exome sequencing":
                     return Analysis.Technology.EXOME_SEQUENCING;
                 case "Genotyping by array":
-                    return Analysis.Technology.GENOTYPING;
+                    return Analysis.Technology.GENOTYPING_BY_ARRAY;
                 case "transcriptomics":
                     return Analysis.Technology.TRANSCRIPTOMICS;
                 case "Curation":
                     return Analysis.Technology.CURATION;
                 case "Genotyping by sequencing":
-                    return Analysis.Technology.GENOTYPING;
+                    return Analysis.Technology.GENOTYPING_BY_SEQUENCING;
                 case "Target sequencing":
                     return Analysis.Technology.TARGET_SEQUENCING;
             }
