@@ -1013,6 +1013,7 @@ Feature: study object
     Then the response code should be 400
 
 
+  Scenario: Trying to create a study with an invalid accession name (containing a comma symbol) must fail
     Given I set authorization with testoperator having SERVICE_OPERATOR role
     # Create a taxonomy
     When I request POST taxonomy with 9606 for ID
