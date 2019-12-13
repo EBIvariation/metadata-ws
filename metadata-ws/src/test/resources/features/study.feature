@@ -1011,3 +1011,22 @@ Feature: study object
 
     When I request PATCH STUDY with content {""}
     Then the response code should be 400
+
+
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    # Create a taxonomy
+    When I request POST taxonomy with 9606 for ID
+    Then set the URL to TAXONOMY
+    # Create a reference sequence
+    When I request POST /reference-sequences with JSON-like payload:
+    """
+      "name": "GRCh37",
+      "patch": "p2",
+      "accession": "GCA_000001405.3",
+      "type": "GENOME_ASSEMBLY",
+      "taxonomy": "TAXONOMY"
+    """
+    Then set the URL to REFERENCE_SEQUENCE
+    # Create a study
+    When I create a study with INVALID,ACCESSION for accession
+    Then the response code should be 400
