@@ -334,5 +334,5 @@ Feature: sample object
 
     Examples:
       | accession | version | property                     | message                            |
-      |           | 1       | accessionVersionId.accession | size must be between 1 and 255     |
+      |           | 1       | accessionVersionId.accession | must match "^[^.,]+$"              |
       | EGAN0001  | 0       | accessionVersionId.version   | must be greater than or equal to 1 |
