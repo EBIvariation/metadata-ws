@@ -37,7 +37,7 @@ public class AccessionVersionId implements Serializable {
     @ApiModelProperty(position = 1)
     @NotNull
     @Size(min = 1, max = 255)
-    @Pattern(regexp = "^[^.,]+$")
+    @Pattern(regexp = "^[^.,]*$")
     private String accession;
 
     @ApiModelProperty(example = "1")
