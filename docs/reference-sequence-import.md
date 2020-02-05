@@ -1,4 +1,4 @@
-# Importing Reference Sequence
+# Importing reference sequences
 
 This document shows the flow of how different types of ReferenceSequences are extracted and imported.
 

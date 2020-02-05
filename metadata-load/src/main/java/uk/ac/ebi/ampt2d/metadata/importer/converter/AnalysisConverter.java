@@ -42,20 +42,36 @@ public class AnalysisConverter implements Converter<AnalysisType, Analysis> {
         return platform;
     }
 
+    /**
+     * Converts "technology type" from SRA schema to the internal representation from technology type.
+     * All values permitted by SRA schema (as of version 1.5.58) are supported. See here for further details:
+     * https://github.com/enasequence/schema/blob/1.5.58/src/main/resources/uk/ac/ebi/ena/sra/schema/SRA.analysis.xsd
+     */
     private Analysis.Technology getTechnology(AnalysisType analysisType) {
         SEQUENCEVARIATION sequencevariation = analysisType.getANALYSISTYPE().getSEQUENCEVARIATION();
         if (sequencevariation != null && sequencevariation.getEXPERIMENTTYPEArray().length != 0) {
             switch (sequencevariation.getEXPERIMENTTYPEArray()[0].toString()) {
+                case "Whole genome sequencing":
+                    return Analysis.Technology.GENOME_SEQUENCING;
+                case "Whole transcriptome sequencing":
+                    return Analysis.Technology.TRANSCRIPTOME_SEQUENCING;
                 case "Exome sequencing":
                     return Analysis.Technology.EXOME_SEQUENCING;
                 case "Genotyping by array":
-                    return Analysis.Technology.GENOTYPING;
+                    return Analysis.Technology.GENOTYPING_BY_ARRAY;
+                case "transcriptomics":
+                    return Analysis.Technology.TRANSCRIPTOMICS;
                 case "Curation":
                     return Analysis.Technology.CURATION;
                 case "Genotyping by sequencing":
-                    return Analysis.Technology.GENOTYPING;
+                    return Analysis.Technology.GENOTYPING_BY_SEQUENCING;
+                case "Target sequencing":
+                    return Analysis.Technology.TARGET_SEQUENCING;
             }
+            throw new AssertionError("The technology type mentioned in the imported document does not come from " +
+                    "the list of acceptable values in the SRA schema");
+        } else {
+            return Analysis.Technology.UNSPECIFIED;
         }
-        return Analysis.Technology.UNSPECIFIED;
     }
 }

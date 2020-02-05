@@ -51,16 +51,15 @@ public class AnalysisRestController implements ResourceProcessor<RepositoryLinks
     @Autowired
     private GenericResourceAssembler<Analysis, AnalysisResource> resourceAssembler;
 
-    @ApiOperation(value = "Get a filtered list of analyses based on filtering criteria")
+    @ApiOperation(value = "Get a filtered list of analyses based on filtering criteria. See Analysis entity " +
+            "description to get the list of acceptable values for each of the attributes.")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "type", value = "Analysis's type", dataType = "string",
-                    paramType = "query", example = "CASE_CONTROL",
-                    allowableValues = "CASE_CONTROL,CONTROL_SET,CASE_SET,COLLECTION,TUMOR,MATCHED_NORMAL"),
-            @ApiImplicitParam(name = "platform", value = "Analysis's Platform", dataType = "string",
+            @ApiImplicitParam(name = "type", value = "Type of analysis", dataType = "string",
+                    paramType = "query", example = "CASE_CONTROL"),
+            @ApiImplicitParam(name = "platform", value = "Sequencing platform of analysis", dataType = "string",
                     paramType = "query", example = "Illumina"),
-            @ApiImplicitParam(name = "technology", value = "Analysis's Technoloy", dataType = "string",
-                    paramType = "query", example = "GWAS",
-                    allowableValues = "GWAS,EXOME_SEQUENCING,GENOTYPING,ARRAY,CURATION")
+            @ApiImplicitParam(name = "technology", value = "Technology type of analysis", dataType = "string",
+                    paramType = "query", example = "GWAS")
     })
     @RequestMapping(method = RequestMethod.GET, path = "search", produces = "application/json")
     @ResponseBody

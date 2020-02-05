@@ -62,19 +62,34 @@ public class Analysis extends Auditable<Long> {
         UNSPECIFIED
     }
 
+    /**
+     * Contains technology types which are largely influenced by the list of technology types accepted by SRA.
+     * See details in the AnalysisConverter.getTechnology() function.
+     */
     public enum Technology {
 
-        GWAS,
+        GENOME_SEQUENCING,
+
+        TRANSCRIPTOME_SEQUENCING,
 
         EXOME_SEQUENCING,
 
-        GENOTYPING,
+        GENOTYPING_BY_ARRAY,
 
-        ARRAY,
+        TRANSCRIPTOMICS,
 
         CURATION,
 
-        UNSPECIFIED
+        GENOTYPING_BY_SEQUENCING,
+
+        TARGET_SEQUENCING,
+
+        UNSPECIFIED,
+
+        // The following technology types are not listed in the SRA schema
+        GWAS,
+
+        ARRAY
 
     }
 

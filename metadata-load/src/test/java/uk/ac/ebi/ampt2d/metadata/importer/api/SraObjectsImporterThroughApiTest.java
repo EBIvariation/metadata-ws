@@ -132,7 +132,7 @@ public class SraObjectsImporterThroughApiTest {
 
         analysis = sraObjectImporter.importAnalysis("ERZ094050");
         assertEquals("ERZ094050", analysis.getAccessionVersionId().getAccession());
-        assertEquals(Analysis.Technology.UNSPECIFIED, analysis.getTechnology());
+        assertEquals(Analysis.Technology.GENOME_SEQUENCING, analysis.getTechnology());
         assertEquals(5, analysis.getFiles().size());
         List<ReferenceSequence> referenceSequences = analysis.getReferenceSequences();
         assertEquals(24, referenceSequences.size());
