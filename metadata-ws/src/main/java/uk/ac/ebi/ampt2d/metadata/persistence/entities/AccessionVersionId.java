@@ -22,15 +22,22 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 @Embeddable
 public class AccessionVersionId implements Serializable {
 
+    /**
+     * @Pattern annotation ensures that the accession does not contain dot and comma symbols. Dots are commonly used
+     * to separate accession from version; commas are used in the security configuration to separate multiple
+     * accessions.
+     */
     @ApiModelProperty(position = 1)
     @NotNull
     @Size(min = 1, max = 255)
+    @Pattern(regexp = "^[^.,]*$")
     private String accession;
 
     @ApiModelProperty(example = "1")

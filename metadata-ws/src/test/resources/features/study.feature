@@ -1011,3 +1011,13 @@ Feature: study object
 
     When I request PATCH STUDY with content {""}
     Then the response code should be 400
+
+
+  Scenario Outline: Trying to create a study with an invalid accession name (containing a comma symbol) must fail
+    Given I set authorization with testoperator having SERVICE_OPERATOR role
+    When I attempt to create a study with <invalid_accession> for accession
+    Then the response code should be 4xx
+    Examples:
+      | invalid_accession |
+      | CONTAINING,COMMA  |
+      | CONTAINING.DOT    |

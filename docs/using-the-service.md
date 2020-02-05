@@ -1,4 +1,8 @@
-# Querying the metadata service
+# Using the metadata service
+
+## Study queries
+
+Please note that a comma symbol (`,`) is not permitted to be used in a study accession, because this symbol is used to separate study accessions when configuring access control.
 
 ## Analysis queries
 

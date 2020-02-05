@@ -4,7 +4,7 @@ Metadata API for projects that follow the SRA model, such as those submitted to 
 
 Available documentation:
 * Using the metadata service
-  + [Querying](docs/querying.md)
+  + [Using the service](docs/using-the-service.md)
   + [Release date control](docs/release-date.md)
   + [Security](docs/security.md)
 * Notes on import
