@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <ASSEMBLY_SET>
     <ASSEMBLY accession="GCA_000002305.1" alias="EquCab2.0" center_name="The Genome Assembly Team">
         <IDENTIFIERS>
@@ -5,9 +6,7 @@
             <SUBMITTER_ID namespace="The Genome Assembly Team">EquCab2.0</SUBMITTER_ID>
         </IDENTIFIERS>
         <TITLE>EquCab2.0 assembly for Equus caballus</TITLE>
-        <DESCRIPTION>
-            <p>A 6.8X whole genome shotgun (WGS) assembly of the <i>Equus caballus</i>, or domestic horse, genome was produced by the <a href="http://www.broad.mit.edu/mammals/">Broad Institute</a> using DNA derived from a female thoroughbred. The WGS sequences have been deposited at GenBank/EMBL/DDBJ under the project accession <a "href=http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&val=124106287">AAWR00000000</A>.<br/><p><b>Comment</b><br/>This version of the project represents approximately 6.8x coverage of the genome.~This assembly of the horse genome is EquCab2.0. It is an assembly of contigs AAWR02000001-AAWR02055316 into chromosomes CM000377-CM000408 and unlinked multi-component scaffolds DS497970-DS499507.
-        </DESCRIPTION>
+        <DESCRIPTION>&lt;p&gt;A 6.8X whole genome shotgun (WGS) assembly of the &lt;i&gt;Equus caballus&lt;/i&gt;, or domestic horse, genome was produced by the &lt;a href="http://www.broad.mit.edu/mammals/"&gt;Broad Institute&lt;/a&gt; using DNA derived from a female thoroughbred. The WGS sequences have been deposited at GenBank/EMBL/DDBJ under the project accession &lt;a "href=http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&amp;val=124106287"&gt;AAWR00000000&lt;/A&gt;.&lt;br/&gt;&lt;p&gt;&lt;b&gt;Comment&lt;/b&gt;&lt;br/&gt;This version of the project represents approximately 6.8x coverage of the genome.~This assembly of the horse genome is EquCab2.0. It is an assembly of contigs AAWR02000001-AAWR02055316 into chromosomes CM000377-CM000408 and unlinked multi-component scaffolds DS497970-DS499507.</DESCRIPTION>
         <NAME>EquCab2.0</NAME>
         <ASSEMBLY_LEVEL>chromosome</ASSEMBLY_LEVEL>
         <GENOME_REPRESENTATION>full</GENOME_REPRESENTATION>
@@ -165,25 +164,19 @@
             <ASSEMBLY_LINK>
                 <URL_LINK>
                     <LABEL>WGS_SET_FLATFILE</LABEL>
-                    <URL>
-                        ftp://ftp.ebi.ac.uk/pub/databases/ena/wgs/public/aa/AAWR02.dat.gz
-                    </URL>
+                    <URL>ftp://ftp.ebi.ac.uk/pub/databases/ena/wgs/public/aa/AAWR02.dat.gz</URL>
                 </URL_LINK>
             </ASSEMBLY_LINK>
             <ASSEMBLY_LINK>
                 <URL_LINK>
                     <LABEL>WGS_SET_FASTA</LABEL>
-                    <URL>
-                        ftp://ftp.ebi.ac.uk/pub/databases/ena/wgs/public/aa/AAWR02.fasta.gz
-                    </URL>
+                    <URL>ftp://ftp.ebi.ac.uk/pub/databases/ena/wgs/public/aa/AAWR02.fasta.gz</URL>
                 </URL_LINK>
             </ASSEMBLY_LINK>
             <ASSEMBLY_LINK>
                 <URL_LINK>
                     <LABEL>Sequence Report</LABEL>
-                    <URL>
-                        ftp://ftp.ebi.ac.uk/pub/databases/ena/assembly/GCA_000/GCA_000002/GCA_000002305.1_sequence_report.txt
-                    </URL>
+                    <URL>ftp://ftp.ebi.ac.uk/pub/databases/ena/assembly/GCA_000/GCA_000002/GCA_000002305.1_sequence_report.txt</URL>
                 </URL_LINK>
             </ASSEMBLY_LINK>
         </ASSEMBLY_LINKS>
