@@ -8,8 +8,8 @@ Available documentation:
   + [Release date control](docs/release-date.md)
   + [Security](docs/security.md)
 * Notes on import
-  + [Reference sequence import](docs/reference-sequence-import.md)
-  + [Technology type import](docs/technology-type-import.md)
+  + [Reference sequence import](docs/import/reference-sequence-import.md)
+  + [Technology type import](docs/import/technology-type-import.md)
 
 
 ## Tests
