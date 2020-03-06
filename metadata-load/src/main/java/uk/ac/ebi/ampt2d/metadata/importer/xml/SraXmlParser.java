@@ -27,10 +27,6 @@ public abstract class SraXmlParser<SRA_OBJECT> {
 
     public abstract SRA_OBJECT parseXml(String xmlString, String accession) throws XmlException;
 
-    protected String removeRootTagsFromXmlString(String xmlString) {
-        return (xmlString != null) ? xmlString.replaceAll(XML_ROOT_TAGS, "") : xmlString;
-    }
-
     protected String removeSetTagsFromXmlString(String xmlString) {
         return (xmlString != null) ? xmlString.replaceAll(XML_SET_TAGS, "") : xmlString;
     }
