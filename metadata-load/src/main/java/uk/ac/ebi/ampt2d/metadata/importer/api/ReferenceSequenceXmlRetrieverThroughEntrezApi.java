@@ -28,9 +28,9 @@ public class ReferenceSequenceXmlRetrieverThroughEntrezApi {
 
     private static final String ID_END_TAG = "</Id>";
 
-    private static final String ASSEMBLY_ID_START_TAG = "<RsUid>";
+    private static final String ASSEMBLY_ID_START_TAG = "<DocumentSummary uid=\"";
 
-    private static final String ASSEMBLY_ID_END_TAG = "</RsUid>";
+    private static final String ASSEMBLY_ID_END_TAG = "\">\n\t<RsUid>";
 
     private static final String ENTREZ_API_KEY_QUERY = "&api_key={entrezApiKey}";
 
