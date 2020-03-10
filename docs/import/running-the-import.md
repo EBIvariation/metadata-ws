@@ -70,5 +70,7 @@ time bsub -M 20G -I java -Xmx18g \
     --metadata.datasource.url=$METADATA_DATASOURCE_URL \
     --metadata.datasource.username=$METADATA_DATASOURCE_USERNAME \
     --metadata.datasource.password=$METADATA_DATASOURCE_PASSWORD \
+    --spring.jpa.generate-ddl=true \
+    --spring.jpa.hibernate.ddl-auto=create \
 2>&1 | tee run.log
 ```
