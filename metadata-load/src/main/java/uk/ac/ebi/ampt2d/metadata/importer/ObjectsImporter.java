@@ -276,7 +276,9 @@ public abstract class ObjectsImporter {
 
     public Sample importSample(String accession) throws Exception {
         IMPORT_LOGGER.log(Level.INFO, "Importing sample " + accession);
-        Sample sample = null;
+        Sample sample = sampleRepository.findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc(
+                accession);
+        if (sample != null) { return sample; }
         try {
             String xml = sraXmlRetrieverByAccession.getXml(accession);
             if (xml == null) { return null; }
