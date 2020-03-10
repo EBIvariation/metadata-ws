@@ -17,7 +17,6 @@
  */
 package uk.ac.ebi.ampt2d.metadata.importer.api;
 
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -41,8 +40,7 @@ public class SraXmlRetrieverThroughApi implements SraXmlRetrieverByAccession {
     @Override
     public String getXml(String accession) {
         try {
-            return restTemplate.exchange(ENA_API_URL, HttpMethod.GET, null,
-                    String.class, accession).getBody();
+            return restTemplate.getForEntity(ENA_API_URL, String.class, accession).getBody();
         } catch (HttpClientErrorException e) {
             // When ENA XML API returns a 404 Not Found response, it represents a special non-critical class of errors.
             // In this case, import of the object should not be aborted and the transaction should not be rolled back.

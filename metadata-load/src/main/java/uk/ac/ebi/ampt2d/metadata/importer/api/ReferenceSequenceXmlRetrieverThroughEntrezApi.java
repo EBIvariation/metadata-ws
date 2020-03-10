@@ -18,8 +18,6 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer.api;
 
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.client.RestTemplate;
@@ -61,15 +59,13 @@ public class ReferenceSequenceXmlRetrieverThroughEntrezApi {
     }
 
     private String fetchEntrezId(String accession, String entrezDatabase) {
-        return restTemplate.exchange(
-                entrezApiIdRetrievalUrl, HttpMethod.GET, null, String.class,
-                entrezDatabase, accession, entrezApiKey).getBody();
+        return restTemplate.getForEntity(entrezApiIdRetrievalUrl, String.class, entrezDatabase, accession,
+                entrezApiKey).getBody();
     }
 
     private String fetchEntrezData(String id, String entrezDatabase) {
-        return restTemplate.exchange(
-                entrezApiAssemblyRetrievalUrl, HttpMethod.GET, null, String.class,
-                entrezDatabase, id, entrezApiKey).getBody();
+        return restTemplate.getForEntity(entrezApiAssemblyRetrievalUrl, String.class, entrezDatabase, id,
+                entrezApiKey).getBody();
     }
 
     @Retryable(maxAttemptsExpression="#{${entrez.api.attempts}}",
