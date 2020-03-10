@@ -70,7 +70,7 @@ public class MetadataImporterMainApplicationDBTest {
     @Category(OracleDbCategory.class)
     public void run() throws Exception {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
-                new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessions.txt"}));
+                new String[]{"--accessions.file.path=src/test/resources/analysis/EgaAnalysisAccessions.txt"}));
         assertEquals(2, analysisRepository.count());
 
         assertEquals(2, studyRepository.count());
@@ -93,7 +93,7 @@ public class MetadataImporterMainApplicationDBTest {
 
         // Import additional analyses into already imported study
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
-                new String[]{"--accessions.file.path=analysis/EgaAnalysisAccessionsSharedStudyPreviousImport.txt"}));
+                new String[]{"--accessions.file.path=src/test/resources/analysis/EgaAnalysisAccessionsSharedStudyPreviousImport.txt"}));
         assertEquals(2, studyRepository.count());
         assertEquals(4, analysisRepository.count());
         assertEquals(4, sampleRepository.count());
