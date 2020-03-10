@@ -1,12 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ROOT request="ERZ496533&amp;display=xml">
+<ANALYSIS_SET>
     <ANALYSIS accession="ERZ496533" alias="DNA sequencing ACAN" broker_name="European Bioinformatics Institute" center_name="University of Kentucky">
         <IDENTIFIERS>
             <PRIMARY_ID>ERZ496533</PRIMARY_ID>
             <SUBMITTER_ID namespace="University of Kentucky">DNA sequencing ACAN</SUBMITTER_ID>
         </IDENTIFIERS>
         <TITLE>DNA sequencing ACAN</TITLE>
-        <DESCRIPTION>Exon 7 was PCR amplified from dwarf and non-dwarf ponies then sequenced and compared</DESCRIPTION>
+        <DESCRIPTION>
+            Exon 7 was PCR amplified from dwarf and non-dwarf ponies then sequenced and compared
+        </DESCRIPTION>
         <STUDY_REF accession="ERP107353">
             <IDENTIFIERS>
                 <PRIMARY_ID>ERP107353</PRIMARY_ID>
@@ -44,4 +45,4 @@
             </ANALYSIS_ATTRIBUTE>
         </ANALYSIS_ATTRIBUTES>
     </ANALYSIS>
-</ROOT>
+</ANALYSIS_SET>

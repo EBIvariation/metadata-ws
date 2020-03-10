@@ -144,7 +144,9 @@ public abstract class ObjectsImporter {
 
     @Transactional(rollbackFor = Exception.class)
     public Study importStudy(String accession) throws Exception {
+        IMPORT_LOGGER.log(Level.INFO, "Importing study " + accession);
         String xml = sraXmlRetrieverByAccession.getXml(accession);
+        if (xml == null) { return null; }
         StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
         Study study = studyConverter.convert(studyType);
         StudyType.STUDYLINKS studylinks = studyType.getSTUDYLINKS();
@@ -158,7 +160,9 @@ public abstract class ObjectsImporter {
 
     @Transactional(rollbackFor = Exception.class)
     public Analysis importAnalysis(String accession) throws Exception {
+        IMPORT_LOGGER.log(Level.INFO, "Importing analysis " + accession);
         String xml = sraXmlRetrieverByAccession.getXml(accession);
+        if (xml == null) { return null; }
         AnalysisType analysisType = sraAnalysisXmlParser.parseXml(xml, accession);
         Analysis analysis = analysisConverter.convert(analysisType);
 
@@ -194,6 +198,7 @@ public abstract class ObjectsImporter {
      * @return Ready ReferenceSequence entity
      */
     public ReferenceSequence importReferenceSequence(String accession, String referenceSequenceKind) throws Exception {
+        IMPORT_LOGGER.log(Level.INFO, "Importing reference sequence " + accession + " of kind " + referenceSequenceKind);
         ReferenceSequence referenceSequence = referenceSequenceRepository.findByAccession(accession);
         if (referenceSequence != null) {
             return referenceSequence;
@@ -262,22 +267,25 @@ public abstract class ObjectsImporter {
     public List<Sample> importSamples(AnalysisType analysisType) throws Exception {
         List<Sample> samples = new ArrayList<>();
         for (String sampleAccession : getSampleAccessions(analysisType)) {
-            samples.add(importSample(sampleAccession));
+            Sample sample = importSample(sampleAccession);
+            if (sample != null) { samples.add(sample); }
         }
         samples = sampleRepository.findOrSave(samples);
         return samples;
     }
 
     public Sample importSample(String accession) throws Exception {
+        IMPORT_LOGGER.log(Level.INFO, "Importing sample " + accession);
         Sample sample = null;
         try {
             String xml = sraXmlRetrieverByAccession.getXml(accession);
+            if (xml == null) { return null; }
             SampleType sampleType = sraSampleXmlParser.parseXml(xml, accession);
             sample = sampleConverter.convert(sampleType);
             Taxonomy taxonomy = taxonomyEventHandler.importTaxonomyTree(extractTaxonomyFromSample(sampleType));
             sample.setTaxonomies(Arrays.asList(taxonomy));
         } catch (Exception exception) {
-            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for Sample accession " + accession);
+            IMPORT_LOGGER.log(Level.SEVERE, "Encountered exception for sample accession " + accession);
             IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
             throw exception;
         }

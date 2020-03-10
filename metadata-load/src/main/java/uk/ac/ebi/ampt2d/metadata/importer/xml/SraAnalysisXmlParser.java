@@ -30,7 +30,6 @@ public class SraAnalysisXmlParser extends SraXmlParser<AnalysisType> {
 
     @Override
     public AnalysisType parseXml(String xmlString, String accession) throws XmlException {
-        xmlString = removeRootTagsFromXmlString(xmlString); // For API calls
         xmlString = removeSetTagsFromXmlString(xmlString); // For database queries
         try {
             return ANALYSISDocument.Factory.parse(xmlString).getANALYSIS();

@@ -46,6 +46,8 @@ import static org.mockito.Mockito.when;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class SraObjectsImporterThroughApiMockTest {
 
+    // Note that the XML used in this test is synthetic. The actual analysis this is based upon does not include a
+    // transcriptome as the reference.
     private static final String ANALYSIS_DOCUMENT_API_XML = "analysis/AnalysisWithTranscriptome.xml";
 
     @InjectMocks

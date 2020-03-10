@@ -17,23 +17,40 @@
  */
 package uk.ac.ebi.ampt2d.metadata.importer.api;
 
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.SraXmlRetrieverByAccession;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SraXmlRetrieverThroughApi implements SraXmlRetrieverByAccession {
 
-    public static final String ENA_API_URL = "https://www.ebi.ac.uk/ena/data/view/{accessionId}&display=xml";
+    public static final String ENA_API_URL = "https://www.ebi.ac.uk/ena/browser/api/xml/{accessionId}";
+
+    private static final Logger XML_RETRIEVE_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
 
     private RestTemplate restTemplate = new RestTemplate();
 
-    @Retryable(maxAttemptsExpression="#{${ena.api.attempts}}",
-            backoff=@Backoff(delayExpression="#{${ena.api.delay}}"))
+    @Retryable(maxAttemptsExpression="#{${ena.api.attempts}}", backoff=@Backoff(delayExpression="#{${ena.api.delay}}"))
     @Override
     public String getXml(String accession) {
-        return restTemplate.exchange(ENA_API_URL, HttpMethod.GET, null, String.class, accession).getBody();
+        try {
+            return restTemplate.getForEntity(ENA_API_URL, String.class, accession).getBody();
+        } catch (HttpClientErrorException e) {
+            // When ENA XML API returns a 404 Not Found response, it represents a special non-critical class of errors.
+            // In this case, import of the object should not be aborted and the transaction should not be rolled back.
+            // Hence, in this case the method will return `null` in place of an XML and will not raise an excepion.
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                XML_RETRIEVE_LOGGER.log(Level.WARNING, "Accession not found in ENA " + accession);
+                return null;
+            }
+            throw e;
+        }
     }
 
 }

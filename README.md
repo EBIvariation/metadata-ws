@@ -8,13 +8,13 @@ Available documentation:
   + [Release date control](docs/release-date.md)
   + [Security](docs/security.md)
 * Notes on import
-  + [Reference sequence import](docs/reference-sequence-import.md)
-  + [Technology type import](docs/technology-type-import.md)
+  + [Reference sequence import](docs/import/reference-sequence-import.md)
+  + [Technology type import](docs/import/technology-type-import.md)
+  + [Handling missing and suppressed entities during import](docs/import/missing-and-suppressed-entities.md)
 
 
 ## Tests
 
 The profile for testing in a non-Travis environment requires an ENA database connection to be configured.
 
-Unfortunately the corresponding properties can't be populated using a Maven profile because they are defined inside
-the src/test/resources folder, so they must be explicitly set before running said tests.
+Unfortunately the corresponding properties can't be populated using a Maven profile because they are defined inside the src/test/resources folder, so they must be explicitly set before running said tests.

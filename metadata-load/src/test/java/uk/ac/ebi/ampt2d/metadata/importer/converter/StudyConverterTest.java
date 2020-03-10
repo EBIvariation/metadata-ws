@@ -68,8 +68,7 @@ public class StudyConverterTest {
 
         assertNotNull(study);
         assertEquals(studyAccession, study.getAccessionVersionId().getAccession());
-        assertEquals("Whole genome resequencing of the human parasite Schistosoma mansoni reveals population history\n" +
-                "                and effects of selection", study.getName());
+        assertEquals("Whole genome resequencing of the human parasite Schistosoma mansoni reveals population history and effects of selection", study.getName());
         assertEquals(LocalDate.parse("2016-04-20"), study.getReleaseDate());
         assertEquals("Wellcome Trust Sanger Institute", study.getCenter());
     }

@@ -20,7 +20,6 @@ package uk.ac.ebi.ampt2d.metadata.persistence.events;
 
 import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.TaxonomyRepository;
@@ -40,7 +39,7 @@ public class TaxonomyEventHandler {
     }
 
     private static String getXml(Long taxonomyId) {
-        return restTemplate.exchange(ENA_TAXON_URL, HttpMethod.GET, null, String.class, taxonomyId).getBody();
+        return restTemplate.getForEntity(ENA_TAXON_URL, String.class, taxonomyId).getBody();
     }
 
     private static String findTaxId(DomQueryUsingXPath domQueryUsingXPath, String rank) throws Exception {

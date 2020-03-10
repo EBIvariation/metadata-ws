@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ROOT request="GCA_000002305.1&amp;display=xml">
-<ASSEMBLY accession="GCA_000002305.1" alias="EquCab2.0" center_name="The Genome Assembly Team">
+<ASSEMBLY_SET>
+    <ASSEMBLY accession="GCA_000002305.1" alias="EquCab2.0" center_name="The Genome Assembly Team">
         <IDENTIFIERS>
             <PRIMARY_ID>GCA_000002305.1</PRIMARY_ID>
             <SUBMITTER_ID namespace="The Genome Assembly Team">EquCab2.0</SUBMITTER_ID>
         </IDENTIFIERS>
         <TITLE>EquCab2.0 assembly for Equus caballus</TITLE>
-        <DESCRIPTION>&lt;p&gt;A 6.8X whole genome shotgun (WGS) assembly of the &lt;i&gt;Equus caballus&lt;/i&gt;, or domestic horse, genome was produced by the &lt;a href="http://www.broad.mit.edu/mammals/"&gt;Broad Institute&lt;/a&gt; using DNA derived from a female thoroughbred. The WGS sequences have been deposited at GenBank/EMBL/DDBJ under the project accession &lt;a "href=http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&amp;val=124106287"&gt;AAWR00000000&lt;/A&gt;.</DESCRIPTION>
+        <DESCRIPTION>&lt;p&gt;A 6.8X whole genome shotgun (WGS) assembly of the &lt;i&gt;Equus caballus&lt;/i&gt;, or domestic horse, genome was produced by the &lt;a href="http://www.broad.mit.edu/mammals/"&gt;Broad Institute&lt;/a&gt; using DNA derived from a female thoroughbred. The WGS sequences have been deposited at GenBank/EMBL/DDBJ under the project accession &lt;a "href=http://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi?db=nucleotide&amp;val=124106287"&gt;AAWR00000000&lt;/A&gt;.&lt;br/&gt;&lt;p&gt;&lt;b&gt;Comment&lt;/b&gt;&lt;br/&gt;This version of the project represents approximately 6.8x coverage of the genome.~This assembly of the horse genome is EquCab2.0. It is an assembly of contigs AAWR02000001-AAWR02055316 into chromosomes CM000377-CM000408 and unlinked multi-component scaffolds DS497970-DS499507.</DESCRIPTION>
         <NAME>EquCab2.0</NAME>
         <ASSEMBLY_LEVEL>chromosome</ASSEMBLY_LEVEL>
         <GENOME_REPRESENTATION>full</GENOME_REPRESENTATION>
@@ -263,4 +263,4 @@
             </ASSEMBLY_ATTRIBUTE>
         </ASSEMBLY_ATTRIBUTES>
     </ASSEMBLY>
-</ROOT>
+</ASSEMBLY_SET>
