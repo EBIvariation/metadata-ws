@@ -19,6 +19,7 @@
 package uk.ac.ebi.ampt2d.metadata.importer;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,7 +93,12 @@ public class MetadataImporterMainApplicationAPITest {
         assertEquals(1, studyRepository.count());
     }
 
+    /**
+     * The two tests below reflect the expected behaviour when studies are being imported with a @Transactional
+     * annotation. However, this annotation is not used during import due to having a severe effect on performance.
+     */
     @Test
+    @Ignore
     public void testInvalidAnalysisOfAStudyStopsWholeTreeFromImporting() throws Exception {
         metadataImporterMainApplication.run(new DefaultApplicationArguments(
                 new String[]{"--accessions.file.path=src/test/resources/study/StudyAccessionsWithInvalidAnalysis.txt"}));
@@ -104,6 +110,7 @@ public class MetadataImporterMainApplicationAPITest {
     }
 
     @Test
+    @Ignore
     public void testValidAndInvalidStudy() throws Exception {
         /* The below file contains two studies ERP000054,ERP009613 but only one study(ERP009613) and its dependent tree
         is imported as the other study contains a invalid Analysis */
