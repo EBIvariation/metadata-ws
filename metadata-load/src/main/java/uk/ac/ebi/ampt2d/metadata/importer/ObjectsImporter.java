@@ -142,7 +142,6 @@ public abstract class ObjectsImporter {
         this.taxonomyEventHandler = taxonomyEventHandler;
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public Study importStudy(String accession) throws Exception {
         IMPORT_LOGGER.log(Level.INFO, "Importing study " + accession);
         String xml = sraXmlRetrieverByAccession.getXml(accession);
@@ -158,7 +157,6 @@ public abstract class ObjectsImporter {
 
     protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study) throws Exception;
 
-    @Transactional(rollbackFor = Exception.class)
     public Analysis importAnalysis(String accession) throws Exception {
         IMPORT_LOGGER.log(Level.INFO, "Importing analysis " + accession);
         String xml = sraXmlRetrieverByAccession.getXml(accession);
