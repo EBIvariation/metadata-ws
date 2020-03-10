@@ -97,9 +97,8 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
         String accessionFilePath = accessionsFilePath.get(0);
         Set<String> accessions;
         try {
-            accessions = new HashSet<>(Files.readAllLines(Paths.get(MetadataImporterMainApplication.class
-                    .getClassLoader().getResource(accessionFilePath).toURI())));
-        } catch (NullPointerException | URISyntaxException exception) {
+            accessions = new HashSet<>(Files.readAllLines(Paths.get(accessionFilePath)));
+        } catch (NullPointerException exception) {
             String message = "Provided file path is invalid/file does not exists";
             METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, message);
             throw new RuntimeException(message);
