@@ -8,6 +8,7 @@ Available documentation:
   + [Release date control](docs/release-date.md)
   + [Security](docs/security.md)
 * Notes on import
+  + [Running the import](docs/import/running-the-import.md)
   + [Reference sequence import](docs/import/reference-sequence-import.md)
   + [Technology type import](docs/import/technology-type-import.md)
   + [Handling missing and suppressed entities during import](docs/import/missing-and-suppressed-entities.md)
