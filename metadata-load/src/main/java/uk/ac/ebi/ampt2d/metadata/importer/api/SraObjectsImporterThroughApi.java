@@ -108,6 +108,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
             } catch (Exception exception) {
                 IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for accession " + analysisAccession);
                 IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+                exception.getCause().printStackTrace();
                 throw exception;
             }
         }
