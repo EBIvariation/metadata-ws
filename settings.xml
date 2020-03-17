@@ -6,8 +6,8 @@
     <password></password>
     <configuration>
       <basicAuthScope>
-        <host>ANY </host>
-        <port>ANY </port>
+        <host>ANY</host>
+        <port>ANY</port>
         <realm>OAM 11g </realm>
       </basicAuthScope>
       <httpConfiguration>

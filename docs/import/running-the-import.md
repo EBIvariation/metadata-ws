@@ -13,8 +13,8 @@ export PATH=$MAVEN_INSTALL_PATH/bin:$PATH
 
 # Oracle credentials to download the database drivers
 # See Confluence → Variation home → IT infrastructure → External services credentials → Oracle
-export ORACLE_USERNAME=
-export ORACLE_PASSWORD=
+export ORACLE_SSO_USERNAME=
+export ORACLE_SSO_PASSWORD=
 
 # Entrez API key to do batch queries
 # See Confluence → Variation home → IT infrastructure → External services credentials → NCBI Entrez API key 
@@ -49,8 +49,8 @@ Clone the repository and build the package:
 git clone $REPOSITORY
 cd metadata-ws
 git checkout $BRANCH
-sed -ie "s|<username></username>|<username>${ORACLE_USERNAME}</username>|" settings.xml
-sed -ie "s|<password></password>|<password>${ORACLE_PASSWORD}</password>|" settings.xml
+sed -ie "s|<username></username>|<username>${ORACLE_SSO_USERNAME}</username>|" settings.xml
+sed -ie "s|<password></password>|<password>${ORACLE_SSO_PASSWORD}</password>|" settings.xml
 mvn -s settings.xml clean install -DskipTests=true
 ```
 
@@ -58,7 +58,7 @@ Write the list of studies to import to `studies-to-import.txt`.
 
 Run the import:
 ```bash
-time bsub -M 20G -I java -Xmx18g \
+time bsub -M 20G -I java -Xmx18g -Rusage \
   -jar metadata-load/target/metadata-load-1.0-SNAPSHOT.jar \
   uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication \
     --accessions.file.path=studies-to-import.txt \
