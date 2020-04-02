@@ -21,17 +21,19 @@ In IDEA, open File → Project Structure. Change the “Project SDK” to Java 8
 * Right click on the project → Maven → Generate sources and update folders.
 
 ## 3. Create and configure local Postgres database
-If necessary, install and enable Postgres installation:
+
+### Method 1: system installation
 ```bash
 sudo apt install postgresql postgresql-contrib
 sudo systemctl start postgresql
 sudo systemctl enable postgresql
-```
-
-Set password:
-```bash
 sudo -u postgres psql postgres
 \password postgres
+```
+
+### Method 2: run with Docker
+```bash
+docker run --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=00000000 -d postgres
 ```
 
 Type `exit`.
