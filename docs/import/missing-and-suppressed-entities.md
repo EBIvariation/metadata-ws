@@ -34,3 +34,5 @@ The skipped entities are being logged with a `WARN` type and a specitic error me
 During the earlier stages of development, import of Study and Analysis entities was defined to be `@Transactional`, meaning that if any error occurs during import, all changes to the database would be rolled back. This would guarantee a clean but possibly incomplete state after import, where studies and analyses would either be imported completely, or not imported at all.
 
 However, test runs demonstrated that doing a transactional import decreases performance by at least a factor of 10, which is critical. For EVA use case, since the goal is to import all data for all studies, even a single unhandled exception during import means that the import as a whole was a failure and hence the results are unusable in production. Hence, there is no reason to do a transactional import anyway.
+
+This approach means that in case the import is not successful, it will not be possible to roll it back. A possible solution to that is to use two databases and to run the import on one while another one serves as production, and to alternate between them.

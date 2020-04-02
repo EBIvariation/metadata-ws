@@ -58,7 +58,7 @@ Write the list of studies to import to `studies-to-import.txt`.
 
 Run the import:
 ```bash
-time bsub -M 20G -I java -Xmx18g -Rusage \
+time bsub -M 20G -R 'rusage[mem=20G]' -I java -Xmx18g \
   -jar metadata-load/target/metadata-load-1.0-SNAPSHOT.jar \
   uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication \
     --accessions.file.path=studies-to-import.txt \
