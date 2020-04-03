@@ -38,7 +38,7 @@ public interface SampleRepository extends SampleRepositoryCustom, QuerydslBinder
 
     @ApiOperation(value = "Get the latest version of Sample based on accession")
     @RestResource(path = "/accession")
-    List<Sample> findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc
+    Sample findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc
             (@Param("accession") String accession);
 
 }

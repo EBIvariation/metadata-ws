@@ -76,10 +76,9 @@ public class Sample extends Auditable<Long> {
     private List<Taxonomy> taxonomies;
 
     /**
-     * BioSample accession. It can be 11 or 12 symbols long ("SAMEA" + 6 or 7 digits). Optional.
+     * BioSample accession. Optional.
      */
     @ApiModelProperty(position = 5, dataType = "java.lang.String", example = "SAMEA0000000", notes = "BioSample ID")
-    @Size(min = 11, max = 12)
     @JsonProperty
     @Column
     private String bioSampleAccession;

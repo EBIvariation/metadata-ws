@@ -107,7 +107,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
                 analysisRepository.save(analysis);
             } catch (Exception exception) {
                 IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for accession " + analysisAccession);
-                IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+                IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage(), exception);
                 throw exception;
             }
         }
