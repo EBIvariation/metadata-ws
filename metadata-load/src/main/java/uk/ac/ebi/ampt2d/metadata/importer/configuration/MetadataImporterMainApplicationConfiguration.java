@@ -38,6 +38,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStud
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraProjectXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraSampleXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
@@ -81,6 +82,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 sraXmlRetrieverThroughApi,
                 referenceSequenceXmlRetrieverThroughEntrezApi,
 
+                sraProjectXmlParser(),
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
                 entrezAssemblyXmlParser(),
@@ -119,6 +121,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 sraXmlRetrieverThroughDatabase,
                 referenceSequenceXmlRetrieverThroughEntrezApi,
 
+                sraProjectXmlParser(),
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
                 entrezAssemblyXmlParser(),
@@ -141,6 +144,10 @@ public class MetadataImporterMainApplicationConfiguration {
     }
 
     // Parser factories
+
+    private SraProjectXmlParser sraProjectXmlParser() {
+        return new SraProjectXmlParser();
+    }
 
     private SraStudyXmlParser sraStudyXmlParser() {
         return new SraStudyXmlParser();

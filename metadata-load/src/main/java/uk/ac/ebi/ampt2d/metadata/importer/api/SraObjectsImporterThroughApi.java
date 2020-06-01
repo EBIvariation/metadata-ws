@@ -36,6 +36,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
 import uk.ac.ebi.ena.sra.xml.LinkType;
+import uk.ac.ebi.ena.sra.xml.ProjectType;
 import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.ena.sra.xml.XRefType;
@@ -54,6 +55,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
             SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
             ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
 
+            SraXmlParser<ProjectType> sraProjectXmlParser,
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
             EntrezAssemblyXmlParser entrezAssemblyXmlParser,
@@ -76,6 +78,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
                 sraXmlRetrieverByAccession,
                 referenceSequenceXmlRetrieverThroughEntrezApi,
 
+                sraProjectXmlParser,
                 sraStudyXmlParser,
                 sraAnalysisXmlParser,
                 entrezAssemblyXmlParser,

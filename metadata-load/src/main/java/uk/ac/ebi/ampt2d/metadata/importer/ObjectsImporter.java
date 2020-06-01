@@ -106,6 +106,7 @@ public abstract class ObjectsImporter {
             SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
             ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
 
+            SraXmlParser<ProjectType> sraProjectXmlParser,
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
             EntrezAssemblyXmlParser entrezAssemblyXmlParser,
@@ -127,6 +128,7 @@ public abstract class ObjectsImporter {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
         this.referenceSequenceXmlRetrieverThroughEntrezApi = referenceSequenceXmlRetrieverThroughEntrezApi;
 
+        this.sraProjectXmlParser = sraProjectXmlParser;
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
         this.entrezAssemblyXmlParser = entrezAssemblyXmlParser;
