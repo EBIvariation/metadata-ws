@@ -33,6 +33,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Project;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
@@ -87,6 +88,17 @@ public class SraObjectsImporterThroughApiTest {
         referenceSequenceRepository.deleteAll();
         sampleRepository.deleteAll();
         taxonomyRepository.deleteAll();
+    }
+
+    @Test
+    public void importProject() throws Exception {
+        Project project = sraObjectImporter.importProject("PRJEB6911");
+        assertNotNull(project);
+        assertEquals("ERP006576", project.getAccessionVersionId().getAccession());
+        assertEquals(LocalDate.of(2014, 8, 4), project.getReleaseDate());
+        assertEquals("Sanger Institute Mouse Genomes Project v3", project.getName());
+        assertEquals(2, project.getAnalyses().size());
+
     }
 
     @Test

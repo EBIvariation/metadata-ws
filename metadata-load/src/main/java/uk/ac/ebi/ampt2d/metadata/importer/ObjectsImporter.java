@@ -18,8 +18,8 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer;
 
+import org.apache.xmlbeans.XmlException;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
@@ -27,6 +27,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStud
 import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Project;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
@@ -38,6 +39,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepos
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
+import uk.ac.ebi.ena.sra.xml.ProjectType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceSequenceType;
 import uk.ac.ebi.ena.sra.xml.SampleType;
@@ -53,7 +55,7 @@ import java.util.logging.Logger;
 
 public abstract class ObjectsImporter {
 
-    private static final Logger IMPORT_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
 
     // XML retrievers: first is used for all entities except reference sequence, and the second one specifically for
     // reference sequences.
@@ -71,6 +73,8 @@ public abstract class ObjectsImporter {
     protected SampleRepository sampleRepository;
 
     // Entity XML parsers
+    protected SraXmlParser<ProjectType> sraProjectXmlParser;
+
     protected SraXmlParser<StudyType> sraStudyXmlParser;
 
     private SraXmlParser<AnalysisType> sraAnalysisXmlParser;
@@ -80,6 +84,8 @@ public abstract class ObjectsImporter {
     private EntrezAssemblyXmlParser entrezAssemblyXmlParser;
 
     // Entity converters
+    protected Converter<ProjectType, Project> projectConverter;
+
     protected Converter<StudyType, Study> studyConverter;
 
     private Converter<AnalysisType, Analysis> analysisConverter;
@@ -142,8 +148,17 @@ public abstract class ObjectsImporter {
         this.taxonomyEventHandler = taxonomyEventHandler;
     }
 
+    public Project importProject(String accession) throws Exception {
+        LOGGER.info("Importing study " + accession);
+        String xml = sraXmlRetrieverByAccession.getXml(accession);
+        if (xml == null) { return null; }
+        ProjectType projectType = sraProjectXmlParser.parseXml(xml, accession);
+        Project project = projectConverter.convert(projectType);
+        return project;
+    }
+
     public Study importStudy(String accession) throws Exception {
-        IMPORT_LOGGER.log(Level.INFO, "Importing study " + accession);
+        LOGGER.log(Level.INFO, "Importing study " + accession);
         String xml = sraXmlRetrieverByAccession.getXml(accession);
         if (xml == null) { return null; }
         StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
@@ -158,7 +173,7 @@ public abstract class ObjectsImporter {
     protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study) throws Exception;
 
     public Analysis importAnalysis(String accession) throws Exception {
-        IMPORT_LOGGER.log(Level.INFO, "Importing analysis " + accession);
+        LOGGER.log(Level.INFO, "Importing analysis " + accession);
         String xml = sraXmlRetrieverByAccession.getXml(accession);
         if (xml == null) { return null; }
         AnalysisType analysisType = sraAnalysisXmlParser.parseXml(xml, accession);
@@ -196,7 +211,7 @@ public abstract class ObjectsImporter {
      * @return Ready ReferenceSequence entity
      */
     public ReferenceSequence importReferenceSequence(String accession, String referenceSequenceKind) throws Exception {
-        IMPORT_LOGGER.log(Level.INFO, "Importing reference sequence " + accession + " of kind " + referenceSequenceKind);
+        LOGGER.log(Level.INFO, "Importing reference sequence " + accession + " of kind " + referenceSequenceKind);
         ReferenceSequence referenceSequence = referenceSequenceRepository.findByAccession(accession);
         if (referenceSequence != null) {
             return referenceSequence;
@@ -211,8 +226,8 @@ public abstract class ObjectsImporter {
             referenceSequence.setTaxonomy(taxonomy);
             referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
         } catch (Exception exception) {
-            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for ReferenceSequence accession " + accession);
-            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+            LOGGER.log(Level.SEVERE, "Encountered Exception for ReferenceSequence accession " + accession);
+            LOGGER.log(Level.SEVERE, exception.getMessage());
             throw exception;
         }
         return referenceSequence;
@@ -273,7 +288,7 @@ public abstract class ObjectsImporter {
     }
 
     public Sample importSample(String accession) throws Exception {
-        IMPORT_LOGGER.log(Level.INFO, "Importing sample " + accession);
+        LOGGER.log(Level.INFO, "Importing sample " + accession);
         Sample sample = sampleRepository.findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc(
                 accession);
         if (sample != null) { return sample; }
@@ -285,8 +300,8 @@ public abstract class ObjectsImporter {
             Taxonomy taxonomy = taxonomyEventHandler.importTaxonomyTree(extractTaxonomyFromSample(sampleType));
             sample.setTaxonomies(Arrays.asList(taxonomy));
         } catch (Exception exception) {
-            IMPORT_LOGGER.log(Level.SEVERE, "Encountered exception for sample accession " + accession);
-            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+            LOGGER.log(Level.SEVERE, "Encountered exception for sample accession " + accession);
+            LOGGER.log(Level.SEVERE, exception.getMessage());
             throw exception;
         }
         return sample;
@@ -305,5 +320,4 @@ public abstract class ObjectsImporter {
         }
         return sampleAccessions;
     }
-
 }
