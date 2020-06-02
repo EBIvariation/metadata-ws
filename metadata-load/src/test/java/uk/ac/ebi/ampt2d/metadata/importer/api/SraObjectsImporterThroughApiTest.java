@@ -94,11 +94,10 @@ public class SraObjectsImporterThroughApiTest {
     public void importProject() throws Exception {
         Project project = sraObjectImporter.importProject("PRJEB6911");
         assertNotNull(project);
-        assertEquals("ERP006576", project.getAccessionVersionId().getAccession());
+        assertEquals("PRJEB6911", project.getAccessionVersionId().getAccession());
         assertEquals(LocalDate.of(2014, 8, 4), project.getReleaseDate());
         assertEquals("Sanger Institute Mouse Genomes Project v3", project.getName());
         assertEquals(2, project.getAnalyses().size());
-
     }
 
     @Test

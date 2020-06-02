@@ -112,6 +112,7 @@ public abstract class ObjectsImporter {
             EntrezAssemblyXmlParser entrezAssemblyXmlParser,
             SraXmlParser<SampleType> sraSampleXmlParser,
 
+            Converter<ProjectType, Project> projectConverter,
             Converter<StudyType, Study> studyConverter,
             Converter<AnalysisType, Analysis> analysisConverter,
             Converter<SampleType, Sample> sampleConverter,
@@ -134,6 +135,7 @@ public abstract class ObjectsImporter {
         this.entrezAssemblyXmlParser = entrezAssemblyXmlParser;
         this.sraSampleXmlParser = sraSampleXmlParser;
 
+        this.projectConverter = projectConverter;
         this.studyConverter = studyConverter;
         this.analysisConverter = analysisConverter;
         this.sampleConverter = sampleConverter;

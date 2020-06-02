@@ -92,8 +92,10 @@ public class Project extends Auditable<Long> {
             "INNER JOIN reference_sequence ON reference_sequence.taxonomy_id = taxonomy.id " +
             "INNER JOIN analysis_reference_sequences ON analysis_reference_sequences.reference_sequences_id = reference_sequence.id " +
             "INNER JOIN analysis ON analysis.id = analysis_reference_sequences.analysis_id " +
-            "INNER JOIN project ON project.id = analysis.study_id " +
+            "INNER JOIN project ON project.id = analysis.project_id " +
             "WHERE project.id = id)", referencedColumnName = "taxonomyId")
+    // TODO jmmut: make sure this works. in particular, make sure that the analysis has a project_id
+
     private Taxonomy taxonomy;
 
     @ApiModelProperty(position = 8, example = "false")

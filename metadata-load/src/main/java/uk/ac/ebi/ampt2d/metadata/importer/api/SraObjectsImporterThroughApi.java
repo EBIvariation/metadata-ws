@@ -27,6 +27,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStud
 import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Project;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
@@ -61,6 +62,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
             EntrezAssemblyXmlParser entrezAssemblyXmlParser,
             SraXmlParser<SampleType> sraSampleXmlParser,
 
+            Converter<ProjectType, Project> projectConverter,
             Converter<StudyType, Study> studyConverter,
             Converter<AnalysisType, Analysis> analysisConverter,
             Converter<SampleType, Sample> sampleConverter,
@@ -84,6 +86,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
                 entrezAssemblyXmlParser,
                 sraSampleXmlParser,
 
+                projectConverter,
                 studyConverter,
                 analysisConverter,
                 sampleConverter,

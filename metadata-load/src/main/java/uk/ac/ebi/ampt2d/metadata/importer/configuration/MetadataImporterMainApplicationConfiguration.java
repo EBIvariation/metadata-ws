@@ -29,6 +29,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThrou
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
+import uk.ac.ebi.ampt2d.metadata.importer.converter.ProjectConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.SampleConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.StudyConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
@@ -88,6 +89,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 entrezAssemblyXmlParser(),
                 sraSampleXmlParser(),
 
+                projectConverter(),
                 studyConverter(),
                 analysisConverter(),
                 sampleConverter(),
@@ -127,6 +129,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 entrezAssemblyXmlParser(),
                 sraSampleXmlParser(),
 
+                projectConverter(),
                 studyConverter(),
                 analysisConverter(),
                 sampleConverter(),
@@ -166,6 +169,10 @@ public class MetadataImporterMainApplicationConfiguration {
     }
 
     // Converter factories
+
+    private ProjectConverter projectConverter() {
+        return new ProjectConverter();
+    }
 
     private StudyConverter studyConverter() {
         return new StudyConverter();
