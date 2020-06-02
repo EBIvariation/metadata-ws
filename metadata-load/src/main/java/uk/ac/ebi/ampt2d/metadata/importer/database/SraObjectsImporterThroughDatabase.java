@@ -22,8 +22,8 @@ import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.ObjectsImporter;
 import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
@@ -74,8 +74,8 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             Converter<AnalysisType, Analysis> analysisConverter,
             Converter<SampleType, Sample> sampleConverter,
 
-            PublicationExtractorFromStudy publicationExtractorFromStudy,
-            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
+            PublicationExtractor publicationExtractor,
+            WebResourceExtractor webResourceExtractor,
             FileExtractorFromAnalysis fileExtractorFromAnalysis,
 
             ProjectRepository projectRepository,
@@ -99,8 +99,8 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                 analysisConverter,
                 sampleConverter,
 
-                publicationExtractorFromStudy,
-                webResourceExtractorFromStudy,
+                publicationExtractor,
+                webResourceExtractor,
                 fileExtractorFromAnalysis,
 
                 projectRepository,

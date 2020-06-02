@@ -21,20 +21,38 @@ package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.WebResourceRepository;
 import uk.ac.ebi.ena.sra.xml.LinkType;
+import uk.ac.ebi.ena.sra.xml.ProjectType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
+import uk.ac.ebi.ena.sra.xml.URLType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
-public class WebResourceExtractorFromStudy {
+public class WebResourceExtractor {
 
     private WebResourceRepository webResourceRepository;
 
-    public WebResourceExtractorFromStudy(WebResourceRepository webResourceRepository) {
+    public WebResourceExtractor(WebResourceRepository webResourceRepository) {
         this.webResourceRepository = webResourceRepository;
     }
 
-    public List<WebResource> getWebResources(StudyType.STUDYLINKS studylinks) {
+    public List<WebResource> getWebResourcesFromProject(ProjectType.PROJECTLINKS projectLinks) {
+        List<WebResource> webResources = new ArrayList<>();
+        if (projectLinks == null) {
+            return webResources;
+        }
+        ProjectType.PROJECTLINKS.PROJECTLINK[] projectLinksArray = projectLinks.getPROJECTLINKArray();
+        for (int i = 0; i < projectLinksArray.length; i++) {
+            URLType urlLink = projectLinksArray[i].getURLLINK();
+            if (urlLink != null) {
+                webResources.add(findOrCreateWebResource(urlLink.getURL()));
+            }
+        }
+        return webResources;
+    }
+
+    public List<WebResource> getWebResourcesFromStudy(StudyType.STUDYLINKS studylinks) {
         List<WebResource> webResources = new ArrayList<>();
         if (studylinks == null) {
             return webResources;

@@ -35,8 +35,8 @@ import uk.ac.ebi.ampt2d.metadata.importer.converter.StudyConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraXmlRetrieverThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraProjectXmlParser;
@@ -193,12 +193,12 @@ public class MetadataImporterMainApplicationConfiguration {
 
     // Extractor factories
 
-    private PublicationExtractorFromStudy publicationExtractorFromStudy(PublicationRepository publicationRepository) {
-        return new PublicationExtractorFromStudy(publicationRepository);
+    private PublicationExtractor publicationExtractorFromStudy(PublicationRepository publicationRepository) {
+        return new PublicationExtractor(publicationRepository);
     }
 
-    private WebResourceExtractorFromStudy webResourceExtractorFromStudy(WebResourceRepository webResourceRepository) {
-        return new WebResourceExtractorFromStudy(webResourceRepository);
+    private WebResourceExtractor webResourceExtractorFromStudy(WebResourceRepository webResourceRepository) {
+        return new WebResourceExtractor(webResourceRepository);
     }
 
     private FileExtractorFromAnalysis fileExtractorFromAnalysis(FileRepository fileRepository) {

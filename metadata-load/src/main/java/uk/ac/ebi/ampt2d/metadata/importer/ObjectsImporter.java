@@ -18,12 +18,11 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer;
 
-import org.apache.xmlbeans.XmlException;
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
@@ -96,9 +95,9 @@ public abstract class ObjectsImporter {
     protected Converter<SampleType, Sample> sampleConverter;
 
     // Extractors
-    protected PublicationExtractorFromStudy publicationExtractorFromStudy;
+    protected PublicationExtractor publicationExtractor;
 
-    protected WebResourceExtractorFromStudy webResourceExtractorFromStudy;
+    protected WebResourceExtractor webResourceExtractor;
 
     private FileExtractorFromAnalysis fileExtractorFromAnalysis;
 
@@ -120,8 +119,8 @@ public abstract class ObjectsImporter {
             Converter<AnalysisType, Analysis> analysisConverter,
             Converter<SampleType, Sample> sampleConverter,
 
-            PublicationExtractorFromStudy publicationExtractorFromStudy,
-            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
+            PublicationExtractor publicationExtractor,
+            WebResourceExtractor webResourceExtractor,
             FileExtractorFromAnalysis fileExtractorFromAnalysis,
 
             ProjectRepository projectRepository,
@@ -144,8 +143,8 @@ public abstract class ObjectsImporter {
         this.analysisConverter = analysisConverter;
         this.sampleConverter = sampleConverter;
 
-        this.publicationExtractorFromStudy = publicationExtractorFromStudy;
-        this.webResourceExtractorFromStudy = webResourceExtractorFromStudy;
+        this.publicationExtractor = publicationExtractor;
+        this.webResourceExtractor = webResourceExtractor;
         this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
 
         this.projectRepository = projectRepository;
@@ -158,15 +157,15 @@ public abstract class ObjectsImporter {
     }
 
     public Project importProject(String accession) throws Exception {
-        LOGGER.info("Importing study " + accession);
+        LOGGER.info("Importing project " + accession);
         String xml = sraXmlRetrieverByAccession.getXml(accession);
         if (xml == null) { return null; }
         ProjectType projectType = sraProjectXmlParser.parseXml(xml, accession);
         Project project = projectConverter.convert(projectType);
         ProjectType.PROJECTLINKS projectlinks = projectType.getPROJECTLINKS();
-        study.setPublications(publicationExtractorFromProject.getPublications(studylinks));
-        study.setResources(webResourceExtractorFromStudy.getWebResources(studylinks));
-        study = extractAnalysisFromStudy(studyType, study);
+        project.setPublications(publicationExtractor.getPublicationsFromProject(projectlinks));
+        project.setResources(webResourceExtractor.getWebResourcesFromProject(projectlinks));
+        project = extractAnalysisFromProject(projectType, project);
         return project;
     }
 
@@ -177,8 +176,8 @@ public abstract class ObjectsImporter {
         StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
         Study study = studyConverter.convert(studyType);
         StudyType.STUDYLINKS studylinks = studyType.getSTUDYLINKS();
-        study.setPublications(publicationExtractorFromStudy.getPublications(studylinks));
-        study.setResources(webResourceExtractorFromStudy.getWebResources(studylinks));
+        study.setPublications(publicationExtractor.getPublicationsFromStudy(studylinks));
+        study.setResources(webResourceExtractor.getWebResourcesFromStudy(studylinks));
         study = extractAnalysisFromStudy(studyType, study);
         return study;
     }
