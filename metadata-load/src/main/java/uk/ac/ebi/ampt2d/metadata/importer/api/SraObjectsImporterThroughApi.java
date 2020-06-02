@@ -110,12 +110,17 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
     }
 
     @Override
-    protected Project extractAnalysisFromProject(ProjectType projectType, Project project) throws Exception {
+    protected Project extractAnalysisFromProject(ProjectType projectType, Project project,
+                                                 Study study) throws Exception {
         projectRepository.save(project);
+        project.setStudy(study);
+        study.setProject(project);
+        studyRepository.save(study);
         for (String analysisAccession : getAnalysisAccessions(projectType)) {
             Analysis analysis = importAnalysis(analysisAccession);
             try {
                 analysis.setProject(project);
+                analysis.setStudy(study);
                 analysisRepository.save(analysis);
             } catch (Exception exception) {
                 IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for accession " + analysisAccession);
@@ -127,12 +132,17 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
     }
 
     @Override
-    protected Study extractAnalysisFromStudy(StudyType studyType, Study study) throws Exception {
+    protected Study extractAnalysisFromStudy(StudyType studyType, Study study,
+                                             Project project) throws Exception {
         studyRepository.save(study);
+        project.setStudy(study);
+        study.setProject(project);
+        projectRepository.save(project);
         for (String analysisAccession : getAnalysisAccessions(studyType)) {
             Analysis analysis = importAnalysis(analysisAccession);
             try {
                 analysis.setStudy(study);
+                analysis.setProject(project);
                 analysisRepository.save(analysis);
             } catch (Exception exception) {
                 IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for accession " + analysisAccession);

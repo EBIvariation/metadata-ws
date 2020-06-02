@@ -167,12 +167,14 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     }
 
     @Override
-    protected Project extractAnalysisFromProject(ProjectType projectType, Project project) {
+    protected Project extractAnalysisFromProject(ProjectType projectType, Project project,
+                                                 Study study) {
         return project;
     }
 
     @Override
-    protected Study extractAnalysisFromStudy(StudyType studyType, Study study) {
+    protected Study extractAnalysisFromStudy(StudyType studyType, Study study,
+                                             Project project) {
         return study;
     }
 

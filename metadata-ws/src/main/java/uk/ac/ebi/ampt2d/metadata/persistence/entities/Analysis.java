@@ -120,7 +120,7 @@ public class Analysis extends Auditable<Long> {
 
     @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Project")
     @JsonProperty
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = true) // TODO jmmut: I'm putting this as optional until we complete the project import from DB
     private Project project;
 
     @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a Study")

@@ -158,32 +158,62 @@ public abstract class ObjectsImporter {
 
     public Project importProject(String accession) throws Exception {
         LOGGER.info("Importing project " + accession);
+        ProjectType projectType = retrieveType(accession, sraProjectXmlParser);
+        if (projectType == null) { return null; }
+        Project project = convertProject(projectType);
+
+        String studyAccession = projectType.getIDENTIFIERS().getSECONDARYIDArray(0).getStringValue();
+        StudyType studyType = retrieveType(studyAccession, sraStudyXmlParser);
+        if (studyType == null) {
+            throw new RuntimeException("All projects shold have a study ID");
+        }
+        Study study = convertStudy(studyType);
+        project = extractAnalysisFromProject(projectType, project, study);
+        return project;
+    }
+
+    public <T> T retrieveType(String accession, SraXmlParser<T> parser) throws Exception {
         String xml = sraXmlRetrieverByAccession.getXml(accession);
         if (xml == null) { return null; }
-        ProjectType projectType = sraProjectXmlParser.parseXml(xml, accession);
+        return parser.parseXml(xml, accession);
+    }
+
+    public Project convertProject(ProjectType projectType) throws Exception {
         Project project = projectConverter.convert(projectType);
         ProjectType.PROJECTLINKS projectlinks = projectType.getPROJECTLINKS();
         project.setPublications(publicationExtractor.getPublicationsFromProject(projectlinks));
         project.setResources(webResourceExtractor.getWebResourcesFromProject(projectlinks));
-        project = extractAnalysisFromProject(projectType, project);
         return project;
     }
 
     public Study importStudy(String accession) throws Exception {
         LOGGER.log(Level.INFO, "Importing study " + accession);
-        String xml = sraXmlRetrieverByAccession.getXml(accession);
-        if (xml == null) { return null; }
-        StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
+        StudyType studyType = retrieveType(accession, sraStudyXmlParser);
+        if (studyType == null) { return null; }
+        Study study = convertStudy(studyType);
+
+        String projectAccession = studyType.getIDENTIFIERS().getSECONDARYIDArray(0).getStringValue();
+        ProjectType projectType = retrieveType(projectAccession, sraProjectXmlParser);
+        if (projectType == null) {
+            throw new RuntimeException("All studies shold have a project ID");
+        }
+        Project project = convertProject(projectType);
+        study = extractAnalysisFromStudy(studyType, study, project);
+        return study;
+    }
+
+    private Study convertStudy(StudyType studyType) {
         Study study = studyConverter.convert(studyType);
         StudyType.STUDYLINKS studylinks = studyType.getSTUDYLINKS();
         study.setPublications(publicationExtractor.getPublicationsFromStudy(studylinks));
         study.setResources(webResourceExtractor.getWebResourcesFromStudy(studylinks));
-        study = extractAnalysisFromStudy(studyType, study);
         return study;
     }
 
-    protected abstract Project extractAnalysisFromProject(ProjectType projectType, Project project) throws Exception;
-    protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study) throws Exception;
+    protected abstract Project extractAnalysisFromProject(ProjectType projectType, Project project,
+                                                          Study study) throws Exception;
+    protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study,
+                                                      Project project) throws Exception;
 
     public Analysis importAnalysis(String accession) throws Exception {
         LOGGER.log(Level.INFO, "Importing analysis " + accession);

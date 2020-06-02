@@ -32,6 +32,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -111,7 +112,12 @@ public class Project extends Auditable<Long> {
     @OneToMany
     private List<Project> childProjects;
 
-    @ApiModelProperty(position = 11, dataType = "java.lang.String", example = "[Url1, Url2]")
+    @ApiModelProperty(position = 11)
+    @JsonProperty
+    @OneToOne
+    private Study study;
+
+    @ApiModelProperty(position = 12, dataType = "java.lang.String", example = "[Url1, Url2]")
     @ManyToMany
     @JsonProperty
     private List<Publication> publications;
@@ -229,5 +235,13 @@ public class Project extends Auditable<Long> {
     @Override
     public String getStudyIds() {
         return this.accessionVersionId.getAccession();
+    }
+
+    public Study getStudy() {
+        return study;
+    }
+
+    public void setStudy(Study study) {
+        this.study = study;
     }
 }
