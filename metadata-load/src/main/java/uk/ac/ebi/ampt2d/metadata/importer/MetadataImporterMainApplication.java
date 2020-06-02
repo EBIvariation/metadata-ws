@@ -72,9 +72,9 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
         } else if (objectsImporter instanceof SraObjectsImporterThroughApi) {
             accessions.forEach(accession -> {
                 try {
-                    objectsImporter.importStudy(accession);
+                    objectsImporter.importProject(accession);
                 } catch (Exception exception) {
-                    LOGGER.severe("Encountered Exception for study accession " + accession);
+                    LOGGER.severe("Encountered Exception for project accession " + accession);
                     LOGGER.severe(exception.getMessage());
                 }
             });
