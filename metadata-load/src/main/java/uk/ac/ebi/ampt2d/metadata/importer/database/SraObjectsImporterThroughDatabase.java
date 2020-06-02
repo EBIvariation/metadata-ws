@@ -33,6 +33,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ProjectRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
@@ -77,6 +78,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
             WebResourceExtractorFromStudy webResourceExtractorFromStudy,
             FileExtractorFromAnalysis fileExtractorFromAnalysis,
 
+            ProjectRepository projectRepository,
             StudyRepository studyRepository,
             AnalysisRepository analysisRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
@@ -101,6 +103,7 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
                 webResourceExtractorFromStudy,
                 fileExtractorFromAnalysis,
 
+                projectRepository,
                 studyRepository,
                 analysisRepository,
                 referenceSequenceRepository,
@@ -161,6 +164,11 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
         Study study = importStudyFromAnalysis(analysisType.getSTUDYREF().getAccession());
         analysis.setStudy(study);
         return analysisRepository.save(analysis);
+    }
+
+    @Override
+    protected Project extractAnalysisFromProject(ProjectType projectType, Project project) {
+        return project;
     }
 
     @Override

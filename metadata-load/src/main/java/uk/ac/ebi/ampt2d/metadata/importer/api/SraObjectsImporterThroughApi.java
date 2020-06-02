@@ -32,6 +32,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ProjectRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
@@ -42,7 +43,10 @@ import uk.ac.ebi.ena.sra.xml.SampleType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.ena.sra.xml.XRefType;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -71,6 +75,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
             WebResourceExtractorFromStudy webResourceExtractorFromStudy,
             FileExtractorFromAnalysis fileExtractorFromAnalysis,
 
+            ProjectRepository projectRepository,
             StudyRepository studyRepository,
             AnalysisRepository analysisRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
@@ -95,12 +100,30 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
                 webResourceExtractorFromStudy,
                 fileExtractorFromAnalysis,
 
+                projectRepository,
                 studyRepository,
                 analysisRepository,
                 referenceSequenceRepository,
                 sampleRepository,
                 taxonomyEventHandler
         );
+    }
+
+    @Override
+    protected Project extractAnalysisFromProject(ProjectType projectType, Project project) throws Exception {
+        projectRepository.save(project);
+        for (String analysisAccession : getAnalysisAccessions(projectType)) {
+            Analysis analysis = importAnalysis(analysisAccession);
+            try {
+                analysis.setProject(project);
+                analysisRepository.save(analysis);
+            } catch (Exception exception) {
+                IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for accession " + analysisAccession);
+                IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage(), exception);
+                throw exception;
+            }
+        }
+        return project;
     }
 
     @Override
@@ -125,27 +148,39 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
         return analysis;
     }
 
-    private Set<String> getAnalysisAccessions(StudyType studyType) {
-        Set<String> analysisAccessions = new HashSet<>();
+    private Set<String> getAnalysisAccessions(ProjectType projectType) {
+        ProjectType.PROJECTLINKS projectlinks = projectType.getPROJECTLINKS();
+        if (projectlinks == null) {
+            return new HashSet<>();
+        }
+        ProjectType.PROJECTLINKS.PROJECTLINK[] projectLinkArrays = projectlinks.getPROJECTLINKArray();
 
+        return getAnalysesFromLinks(
+                Arrays.stream(projectLinkArrays).map(ProjectType.PROJECTLINKS.PROJECTLINK::getXREFLINK));
+    }
+
+    private Set<String> getAnalysisAccessions(StudyType studyType) {
         StudyType.STUDYLINKS studylinks = studyType.getSTUDYLINKS();
         if (studylinks == null) {
-            return analysisAccessions;
+            return new HashSet<>();
         }
         LinkType[] studyLinkArrays = studylinks.getSTUDYLINKArray();
-        String analyses = null;
-        for (int i = 0; i < studyLinkArrays.length; i++) {
-            XRefType xRefType = studyLinkArrays[i].getXREFLINK();
-            if (xRefType != null && xRefType.getDB().equals("ENA-ANALYSIS")) {
-                analyses = xRefType.getID();
-                break;
-            }
-        }
-        if (analyses == null) {
+
+        return getAnalysesFromLinks(Arrays.stream(studyLinkArrays).map(LinkType::getXREFLINK));
+    }
+
+    private Set<String> getAnalysesFromLinks(Stream<XRefType> xrefs) {
+        Optional<String> analyses = xrefs.filter(Objects::nonNull)
+                                         .filter(xref -> xref.getDB().equals("ENA-ANALYSIS"))
+                                         .findFirst()
+                                         .map(XRefType::getID);
+
+        Set<String> analysisAccessions = new HashSet<>();
+        if (!analyses.isPresent()) {
             return analysisAccessions;
         }
-        Stream.of(analyses.split(","))
-                .forEach(analysis -> {
+        Stream.of(analyses.get().split(","))
+              .forEach(analysis -> {
                     String[] range = analysis.split("-");
                     if (range.length > 1) {
                         String startRange = range[0];

@@ -35,6 +35,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.AnalysisEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ProjectRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
@@ -64,6 +65,8 @@ public abstract class ObjectsImporter {
     protected ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi;
 
     // Entity repositories
+    protected ProjectRepository projectRepository;
+
     protected StudyRepository studyRepository;
 
     protected AnalysisRepository analysisRepository;
@@ -121,6 +124,7 @@ public abstract class ObjectsImporter {
             WebResourceExtractorFromStudy webResourceExtractorFromStudy,
             FileExtractorFromAnalysis fileExtractorFromAnalysis,
 
+            ProjectRepository projectRepository,
             StudyRepository studyRepository,
             AnalysisRepository analysisRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
@@ -144,6 +148,7 @@ public abstract class ObjectsImporter {
         this.webResourceExtractorFromStudy = webResourceExtractorFromStudy;
         this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
 
+        this.projectRepository = projectRepository;
         this.studyRepository = studyRepository;
         this.analysisRepository = analysisRepository;
         this.referenceSequenceRepository = referenceSequenceRepository;
@@ -158,6 +163,10 @@ public abstract class ObjectsImporter {
         if (xml == null) { return null; }
         ProjectType projectType = sraProjectXmlParser.parseXml(xml, accession);
         Project project = projectConverter.convert(projectType);
+        ProjectType.PROJECTLINKS projectlinks = projectType.getPROJECTLINKS();
+        study.setPublications(publicationExtractorFromProject.getPublications(studylinks));
+        study.setResources(webResourceExtractorFromStudy.getWebResources(studylinks));
+        study = extractAnalysisFromStudy(studyType, study);
         return project;
     }
 
@@ -174,6 +183,7 @@ public abstract class ObjectsImporter {
         return study;
     }
 
+    protected abstract Project extractAnalysisFromProject(ProjectType projectType, Project project) throws Exception;
     protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study) throws Exception;
 
     public Analysis importAnalysis(String accession) throws Exception {

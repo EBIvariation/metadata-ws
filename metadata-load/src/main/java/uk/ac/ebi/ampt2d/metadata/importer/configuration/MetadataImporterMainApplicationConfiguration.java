@@ -45,6 +45,7 @@ import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ProjectRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
@@ -77,6 +78,7 @@ public class MetadataImporterMainApplicationConfiguration {
                                                        TaxonomyRepository taxonomyRepository,
                                                        ReferenceSequenceRepository referenceSequenceRepository,
                                                        AnalysisRepository analysisRepository,
+                                                       ProjectRepository projectRepository,
                                                        StudyRepository studyRepository,
                                                        SampleRepository sampleRepository) {
         return new SraObjectsImporterThroughApi(
@@ -98,6 +100,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 webResourceExtractorFromStudy(webResourceRepository),
                 fileExtractorFromAnalysis(fileRepository),
 
+                projectRepository,
                 studyRepository,
                 analysisRepository,
                 referenceSequenceRepository,
@@ -117,6 +120,7 @@ public class MetadataImporterMainApplicationConfiguration {
             TaxonomyRepository taxonomyRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
             AnalysisRepository analysisRepository,
+            ProjectRepository projectRepository,
             StudyRepository studyRepository,
             SampleRepository sampleRepository) {
         return new SraObjectsImporterThroughDatabase(
@@ -138,6 +142,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 webResourceExtractorFromStudy(webResourceRepository),
                 fileExtractorFromAnalysis(fileRepository),
 
+                projectRepository,
                 studyRepository,
                 analysisRepository,
                 referenceSequenceRepository,

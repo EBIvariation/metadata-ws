@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PROJECT_SET>
+    <PROJECT accession="PRJEB6911" alias="WTSI MGP" broker_name="EBI" center_name="Wellcome Trust Sanger Institute" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <IDENTIFIERS>
+            <PRIMARY_ID>PRJEB6911</PRIMARY_ID>
+            <SUBMITTER_ID namespace="Wellcome Trust Sanger Institute">WTSI MGP</SUBMITTER_ID>
+        </IDENTIFIERS>
+        <TITLE>Sanger Institute Mouse Genomes Project v3</TITLE>
+        <DESCRIPTION>SNP and INDEL calls from version 3 of the Mouse Genome Project at the Wellcome Trust Sanger Institute. Specifically, this project describes the variants of 18 mouse strains (129P2, 129S1, 129S5, A/J, AKR/J, BALB/cJ, C3H/HeJ, C57BL/6NJ, CAST/EiJ, CBA/J, DBA/2J, FVB/NJ, LPJ, NOD/ShiLtJ, NZOHILtJ, PWK/PhJ, SPRET/EiJ, WSB/EiJ) called against the reference mouse genome sequence GRCm38.</DESCRIPTION>
+        <COLLABORATORS>
+            <COLLABORATOR>David J. Adams</COLLABORATOR>
+            <COLLABORATOR>WTSI; Thomas M. Keane</COLLABORATOR>
+            <COLLABORATOR>WTSI</COLLABORATOR>
+        </COLLABORATORS>
+        <SUBMISSION_PROJECT>
+            <SEQUENCING_PROJECT/>
+            <ORGANISM>
+                <TAXON_ID>10088</TAXON_ID>
+                <SCIENTIFIC_NAME>Mus</SCIENTIFIC_NAME>
+            </ORGANISM>
+        </SUBMISSION_PROJECT>
+        <PROJECT_LINKS>
+            <PROJECT_LINK>
+                <XREF_LINK>
+                    <DB>DGVA</DB>
+                    <ID>estd118</ID>
+                </XREF_LINK>
+            </PROJECT_LINK>
+            <PROJECT_LINK>
+                <XREF_LINK>
+                    <DB>PubMed</DB>
+                    <ID>22772437</ID>
+                </XREF_LINK>
+            </PROJECT_LINK>
+            <PROJECT_LINK>
+                <XREF_LINK>
+                    <DB>PubMed</DB>
+                    <ID>22916792</ID>
+                </XREF_LINK>
+            </PROJECT_LINK>
+            <PROJECT_LINK>
+                <XREF_LINK>
+                    <DB>PubMed</DB>
+                    <ID>21921910</ID>
+                </XREF_LINK>
+            </PROJECT_LINK>
+        </PROJECT_LINKS>
+    </PROJECT>
+</PROJECT_SET>

@@ -94,8 +94,6 @@ public class Project extends Auditable<Long> {
             "INNER JOIN analysis ON analysis.id = analysis_reference_sequences.analysis_id " +
             "INNER JOIN project ON project.id = analysis.project_id " +
             "WHERE project.id = id)", referencedColumnName = "taxonomyId")
-    // TODO jmmut: make sure this works. in particular, make sure that the analysis has a project_id
-
     private Taxonomy taxonomy;
 
     @ApiModelProperty(position = 8, example = "false")
@@ -111,14 +109,14 @@ public class Project extends Auditable<Long> {
     @ApiModelProperty(position = 10)
     @JsonProperty
     @OneToMany
-    private List<Project> childStudies;
+    private List<Project> childProjects;
 
     @ApiModelProperty(position = 11, dataType = "java.lang.String", example = "[Url1, Url2]")
     @ManyToMany
     @JsonProperty
     private List<Publication> publications;
 
-    @OneToMany(mappedBy = "study", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "project", fetch = FetchType.EAGER)
     private List<Analysis> analyses;
 
     @ManyToMany
@@ -149,8 +147,8 @@ public class Project extends Auditable<Long> {
         return deprecated;
     }
 
-    public List<Project> getChildStudies() {
-        return childStudies;
+    public List<Project> getChildProjects() {
+        return childProjects;
     }
 
     public String getName() {
