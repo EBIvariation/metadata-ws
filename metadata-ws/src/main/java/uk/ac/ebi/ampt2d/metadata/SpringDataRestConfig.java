@@ -35,6 +35,7 @@ import uk.ac.ebi.ampt2d.metadata.aop.ReleaseDateAspect;
 import uk.ac.ebi.ampt2d.metadata.aop.StudyDeprecationAspect;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.File;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Project;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Publication;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
@@ -42,6 +43,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.WebResource;
 import uk.ac.ebi.ampt2d.metadata.persistence.idconverter.CustomBackendIdConverter;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.ProjectService;
+import uk.ac.ebi.ampt2d.metadata.persistence.services.ProjectServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.ReferenceSequenceServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.StudyService;
@@ -50,10 +53,12 @@ import uk.ac.ebi.ampt2d.metadata.persistence.services.TaxonomyService;
 import uk.ac.ebi.ampt2d.metadata.persistence.services.TaxonomyServiceImpl;
 import uk.ac.ebi.ampt2d.metadata.rest.assemblers.GenericResourceAssembler;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.AnalysisRestController;
+import uk.ac.ebi.ampt2d.metadata.rest.controllers.ProjectRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.ReferenceSequenceRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.SampleRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.controllers.StudyRestController;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.AnalysisResource;
+import uk.ac.ebi.ampt2d.metadata.rest.resources.ProjectResource;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.ReferenceSequenceResource;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.SampleResource;
 import uk.ac.ebi.ampt2d.metadata.rest.resources.StudyResource;
@@ -121,6 +126,11 @@ public class SpringDataRestConfig {
     }
 
     @Bean
+    public ProjectService projectService() {
+        return new ProjectServiceImpl();
+    }
+
+    @Bean
     public ReferenceSequenceService referenceSequenceService() {
         return new ReferenceSequenceServiceImpl();
     }
@@ -138,6 +148,11 @@ public class SpringDataRestConfig {
     @Bean
     public GenericResourceAssembler<ReferenceSequence, ReferenceSequenceResource> referenceSequenceResourceAssembler() {
         return new GenericResourceAssembler<ReferenceSequence, ReferenceSequenceResource>(ReferenceSequenceRestController.class, ReferenceSequenceResource.class);
+    }
+
+    @Bean
+    public GenericResourceAssembler<Project, ProjectResource> projectResourceAssembler() {
+        return new GenericResourceAssembler<>(ProjectRestController.class, ProjectResource.class);
     }
 
     @Bean
