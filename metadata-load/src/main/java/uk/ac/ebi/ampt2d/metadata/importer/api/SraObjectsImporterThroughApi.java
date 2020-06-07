@@ -123,7 +123,7 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
                 analysis.setStudy(study);
                 analysisRepository.save(analysis);
             } catch (Exception exception) {
-                IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for accession " + analysisAccession);
+                IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for analysis accession " + analysisAccession);
                 IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage(), exception);
                 throw exception;
             }
@@ -140,14 +140,29 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
         projectRepository.save(project);
         for (String analysisAccession : getAnalysisAccessions(studyType)) {
             Analysis analysis = importAnalysis(analysisAccession);
+            analysis.setStudy(study);
+            analysis.setProject(project);
             try {
-                analysis.setStudy(study);
-                analysis.setProject(project);
                 analysisRepository.save(analysis);
-            } catch (Exception exception) {
-                IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for accession " + analysisAccession);
-                IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage(), exception);
-                throw exception;
+            } catch (Exception cause) {
+                throw new RuntimeException("Encountered Exception saving analysis accession " + analysisAccession,
+                                           cause);
+            }
+        }
+        return study;
+    }
+
+    @Override
+    protected Study extractAnalysisFromStudy(StudyType studyType, Study study) throws Exception {
+        studyRepository.save(study);
+        for (String analysisAccession : getAnalysisAccessions(studyType)) {
+            Analysis analysis = importAnalysis(analysisAccession);
+            analysis.setStudy(study);
+            try {
+                analysisRepository.save(analysis);
+            } catch (Exception cause) {
+                throw new RuntimeException("Encountered Exception saving analysis accession " + analysisAccession,
+                                           cause);
             }
         }
         return study;

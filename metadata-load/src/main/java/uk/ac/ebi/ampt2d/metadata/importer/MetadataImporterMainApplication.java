@@ -63,6 +63,7 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
         if (objectsImporter instanceof SraObjectsImporterThroughDatabase) {
             accessions.forEach(accession -> {
                 try {
+                    // TODO: EVA will want to import some projects from the DB too
                     objectsImporter.importAnalysis(accession);
                 } catch (Exception exception) {
                     LOGGER.severe("Encountered Exception for analysis accession " + accession);

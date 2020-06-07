@@ -47,6 +47,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -173,8 +174,12 @@ public class SraObjectsImporterThroughDatabase extends ObjectsImporter {
     }
 
     @Override
-    protected Study extractAnalysisFromStudy(StudyType studyType, Study study,
-                                             Project project) {
+    protected Study extractAnalysisFromStudy(StudyType studyType, Study study, Project project) {
+        return study;
+    }
+
+    @Override
+    protected Study extractAnalysisFromStudy(StudyType studyType, Study study) {
         return study;
     }
 

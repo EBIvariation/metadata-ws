@@ -18,6 +18,7 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer;
 
+import org.apache.xmlbeans.XmlAnySimpleType;
 import org.springframework.core.convert.converter.Converter;
 import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
@@ -39,6 +40,8 @@ import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepos
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
+import uk.ac.ebi.ena.sra.xml.IdentifierType;
+import uk.ac.ebi.ena.sra.xml.NameType;
 import uk.ac.ebi.ena.sra.xml.ProjectType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceSequenceType;
@@ -49,9 +52,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class ObjectsImporter {
 
@@ -158,21 +164,25 @@ public abstract class ObjectsImporter {
 
     public Project importProject(String accession) throws Exception {
         LOGGER.info("Importing project " + accession);
-        ProjectType projectType = retrieveType(accession, sraProjectXmlParser);
-        if (projectType == null) { return null; }
+        ProjectType projectType = retrieveSraType(accession, sraProjectXmlParser);
+        if (projectType == null) {
+            return null;    // TODO jmmut: return null is bad practice. Some clients will forget to check for null.
+                            // This should either return an Optional if it's expected that some studies won't be
+                            // retrieved, or throw an exception to call our attention to an unexpected scenario.
+        }
         Project project = convertProject(projectType);
 
         String studyAccession = projectType.getIDENTIFIERS().getSECONDARYIDArray(0).getStringValue();
-        StudyType studyType = retrieveType(studyAccession, sraStudyXmlParser);
+        StudyType studyType = retrieveSraType(studyAccession, sraStudyXmlParser);
         if (studyType == null) {
-            throw new RuntimeException("All projects shold have a study ID");
+            throw new RuntimeException("All projects should have a study ID");
         }
         Study study = convertStudy(studyType);
         project = extractAnalysisFromProject(projectType, project, study);
         return project;
     }
 
-    public <T> T retrieveType(String accession, SraXmlParser<T> parser) throws Exception {
+    public <T> T retrieveSraType(String accession, SraXmlParser<T> parser) throws Exception {
         String xml = sraXmlRetrieverByAccession.getXml(accession);
         if (xml == null) { return null; }
         return parser.parseXml(xml, accession);
@@ -188,17 +198,33 @@ public abstract class ObjectsImporter {
 
     public Study importStudy(String accession) throws Exception {
         LOGGER.log(Level.INFO, "Importing study " + accession);
-        StudyType studyType = retrieveType(accession, sraStudyXmlParser);
-        if (studyType == null) { return null; }
+        StudyType studyType = retrieveSraType(accession, sraStudyXmlParser);
+        if (studyType == null) {
+            return null;    // TODO jmmut: return null is bad practice. Some clients will forget to check for null.
+                            // This should either return an Optional if it's expected that some studies won't be
+                            // retrieved, or throw an exception to call our attention to an unexpected scenario.
+        }
         Study study = convertStudy(studyType);
 
-        String projectAccession = studyType.getIDENTIFIERS().getSECONDARYIDArray(0).getStringValue();
-        ProjectType projectType = retrieveType(projectAccession, sraProjectXmlParser);
-        if (projectType == null) {
-            throw new RuntimeException("All studies shold have a project ID");
+        NameType[] secondaryIdArray = studyType.getIDENTIFIERS().getSECONDARYIDArray();
+        if (secondaryIdArray.length > 1) {
+            String projects = Stream.of(secondaryIdArray)
+                                    .map(NameType::getStringValue)
+                                    .collect(Collectors.joining(","));
+            throw new RuntimeException("Study '" + accession + "' has more than 1 associated project: " + projects
+                                               + ". This is not supported by the table schema.");
+        } else if (secondaryIdArray.length == 1) {
+            String projectAccession = secondaryIdArray[0].getStringValue();
+            ProjectType projectType = retrieveSraType(projectAccession, sraProjectXmlParser);
+            if (projectType == null) {
+                throw new RuntimeException("Study '" + accession + "' has an associated project '" + projectAccession
+                                                   + "', but the project could not be retrieved");
+            }
+            Project project = convertProject(projectType);
+            study = extractAnalysisFromStudy(studyType, study, project);
+        } else {
+            study = extractAnalysisFromStudy(studyType, study);
         }
-        Project project = convertProject(projectType);
-        study = extractAnalysisFromStudy(studyType, study, project);
         return study;
     }
 
@@ -212,13 +238,19 @@ public abstract class ObjectsImporter {
 
     protected abstract Project extractAnalysisFromProject(ProjectType projectType, Project project,
                                                           Study study) throws Exception;
+    protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study) throws Exception;
     protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study,
                                                       Project project) throws Exception;
+
 
     public Analysis importAnalysis(String accession) throws Exception {
         LOGGER.log(Level.INFO, "Importing analysis " + accession);
         String xml = sraXmlRetrieverByAccession.getXml(accession);
-        if (xml == null) { return null; }
+        if (xml == null) {
+            return null;    // TODO jmmut: return null is bad practice. Some clients will forget to check for null.
+                            // This should either return an Optional if it's expected that some studies won't be
+                            // retrieved, or throw an exception to call our attention to an unexpected scenario.
+        }
         AnalysisType analysisType = sraAnalysisXmlParser.parseXml(xml, accession);
         Analysis analysis = analysisConverter.convert(analysisType);
 
