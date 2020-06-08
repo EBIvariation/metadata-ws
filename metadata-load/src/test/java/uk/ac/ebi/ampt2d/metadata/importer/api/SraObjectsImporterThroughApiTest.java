@@ -39,6 +39,7 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ProjectRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
@@ -67,6 +68,9 @@ public class SraObjectsImporterThroughApiTest {
     private SraObjectsImporterThroughApi sraObjectImporter;
 
     @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
     private StudyRepository studyRepository;
 
     @Autowired
@@ -85,6 +89,7 @@ public class SraObjectsImporterThroughApiTest {
     public void setUp() {
         analysisRepository.deleteAll();
         studyRepository.deleteAll();
+        projectRepository.deleteAll();
         referenceSequenceRepository.deleteAll();
         sampleRepository.deleteAll();
         taxonomyRepository.deleteAll();

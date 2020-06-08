@@ -114,7 +114,7 @@ public class Study extends Auditable<Long> {
 
     @ApiModelProperty(position = 11)
     @JsonProperty
-    @OneToOne
+    @OneToOne(optional = true)
     private Project project;
 
     @ApiModelProperty(position = 12, dataType = "java.lang.String", example = "[Url1, Url2]")
