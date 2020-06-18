@@ -45,12 +45,12 @@ import java.util.List;
 
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"accession", "version"}))
-@SequenceGenerator(initialValue = 1, allocationSize = 1, name = "STUDY_SEQ", sequenceName = "study_sequence")
-public class Study extends Auditable<Long> {
+@SequenceGenerator(initialValue = 1, allocationSize = 1, name = "PROJECT_SEQ", sequenceName = "project_sequence")
+public class Project extends Auditable<Long> {
 
-    @ApiModelProperty(position = 1, value = "Study auto generated id", readOnly = true)
+    @ApiModelProperty(position = 1, value = "Project auto generated id", readOnly = true)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "STUDY_SEQ")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PROJECT_SEQ")
     @Id
     private long id;
 
@@ -93,8 +93,8 @@ public class Study extends Auditable<Long> {
             "INNER JOIN reference_sequence ON reference_sequence.taxonomy_id = taxonomy.id " +
             "INNER JOIN analysis_reference_sequences ON analysis_reference_sequences.reference_sequences_id = reference_sequence.id " +
             "INNER JOIN analysis ON analysis.id = analysis_reference_sequences.analysis_id " +
-            "INNER JOIN study ON study.id = analysis.study_id " +
-            "WHERE study.id = id)", referencedColumnName = "taxonomyId")
+            "INNER JOIN project ON project.id = analysis.project_id " +
+            "WHERE project.id = id)", referencedColumnName = "taxonomyId")
     private Taxonomy taxonomy;
 
     @ApiModelProperty(position = 8, example = "false")
@@ -110,29 +110,29 @@ public class Study extends Auditable<Long> {
     @ApiModelProperty(position = 10)
     @JsonProperty
     @OneToMany
-    private List<Study> childStudies;
+    private List<Project> childProjects;
 
     @ApiModelProperty(position = 11)
     @JsonProperty
-    @OneToOne(optional = true)
-    private Project project;
+    @OneToOne
+    private Study study;
 
     @ApiModelProperty(position = 12, dataType = "java.lang.String", example = "[Url1, Url2]")
     @ManyToMany
     @JsonProperty
     private List<Publication> publications;
 
-    @OneToMany(mappedBy = "study", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "project", fetch = FetchType.EAGER)
     private List<Analysis> analyses;
 
     @ManyToMany
     private List<WebResource> resources;
 
-    public Study() {
+    public Project() {
     }
 
-    public Study(AccessionVersionId accessionVersionId, String name, String description, String center,
-                 LocalDate releaseDate) {
+    public Project(AccessionVersionId accessionVersionId, String name, String description, String center,
+                   LocalDate releaseDate) {
         this.accessionVersionId = accessionVersionId;
         this.name = name;
         this.description = description;
@@ -153,8 +153,8 @@ public class Study extends Auditable<Long> {
         return deprecated;
     }
 
-    public List<Study> getChildStudies() {
-        return childStudies;
+    public List<Project> getChildProjects() {
+        return childProjects;
     }
 
     public String getName() {
@@ -237,11 +237,11 @@ public class Study extends Auditable<Long> {
         return this.accessionVersionId.getAccession();
     }
 
-    public Project getProject() {
-        return project;
+    public Study getStudy() {
+        return study;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setStudy(Study study) {
+        this.study = study;
     }
 }

@@ -33,11 +33,13 @@ import uk.ac.ebi.ampt2d.metadata.importer.MetadataImporterMainApplication;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Project;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ProjectRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
@@ -66,6 +68,9 @@ public class SraObjectsImporterThroughApiTest {
     private SraObjectsImporterThroughApi sraObjectImporter;
 
     @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
     private StudyRepository studyRepository;
 
     @Autowired
@@ -84,9 +89,20 @@ public class SraObjectsImporterThroughApiTest {
     public void setUp() {
         analysisRepository.deleteAll();
         studyRepository.deleteAll();
+        projectRepository.deleteAll();
         referenceSequenceRepository.deleteAll();
         sampleRepository.deleteAll();
         taxonomyRepository.deleteAll();
+    }
+
+    @Test
+    public void importProject() throws Exception {
+        Project project = sraObjectImporter.importProject("PRJEB31129");
+        assertNotNull(project);
+        assertEquals("PRJEB31129", project.getAccessionVersionId().getAccession());
+        assertEquals(LocalDate.of(2019, 3, 14), project.getReleaseDate());
+        assertEquals("Identification of SNPs in alpacas using the Bovine HD Genotyping Beadchip", project.getName());
+        assertEquals(1, project.getAnalyses().size());
     }
 
     @Test

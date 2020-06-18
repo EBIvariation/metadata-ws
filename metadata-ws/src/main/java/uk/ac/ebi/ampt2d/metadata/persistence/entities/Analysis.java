@@ -118,32 +118,37 @@ public class Analysis extends Auditable<Long> {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Study")
+    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Project")
+    @JsonProperty
+    @ManyToOne(optional = true) // TODO jmmut: I'm putting this as optional until we complete the project import from DB
+    private Project project;
+
+    @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a Study")
     @JsonProperty
     @ManyToOne(optional = false)
     private Study study;
 
-    @ApiModelProperty(position = 6, dataType = "java.lang.String", example = "[url1, url2]",
+    @ApiModelProperty(position = 7, dataType = "java.lang.String", example = "[url1, url2]",
             notes = "URL(s) to the reference sequence(s)")
     @JsonProperty
     @ManyToMany
     private List<ReferenceSequence> referenceSequences;
-
-    @ApiModelProperty(position = 7, required = true)
-    @NotNull
-    @JsonProperty
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Technology technology;
 
     @ApiModelProperty(position = 8, required = true)
     @NotNull
     @JsonProperty
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Type type;
+    private Technology technology;
 
     @ApiModelProperty(position = 9, required = true)
+    @NotNull
+    @JsonProperty
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Type type;
+
+    @ApiModelProperty(position = 10, required = true)
     @NotNull
     @Size(min = 1, max = 255)
     @JsonProperty
@@ -176,6 +181,15 @@ public class Analysis extends Auditable<Long> {
 
     public AccessionVersionId getAccessionVersionId() {
         return accessionVersionId;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+        project.setAnalysis(this);
     }
 
     public Study getStudy() {

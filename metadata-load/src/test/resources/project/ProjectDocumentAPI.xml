@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PROJECT_SET>
+<PROJECT accession="PRJEB6911" alias="WTSI MGP" broker_name="European Bioinformatics Institute" center_name="Wellcome Trust Sanger Institute">
+     <IDENTIFIERS>
+          <PRIMARY_ID>PRJEB6911</PRIMARY_ID>
+          <SECONDARY_ID>ERP006576</SECONDARY_ID>
+          <SUBMITTER_ID namespace="Wellcome Trust Sanger Institute">WTSI MGP</SUBMITTER_ID>
+     </IDENTIFIERS>
+     <TITLE>Sanger Institute Mouse Genomes Project v3</TITLE>
+     <DESCRIPTION>SNP and INDEL calls from version 3 of the Mouse Genome Project at the Wellcome Trust Sanger Institute. Specifically, this project describes the variants of 18 mouse strains (129P2, 129S1, 129S5, A/J, AKR/J, BALB/cJ, C3H/HeJ, C57BL/6NJ, CAST/EiJ, CBA/J, DBA/2J, FVB/NJ, LPJ, NOD/ShiLtJ, NZOHILtJ, PWK/PhJ, SPRET/EiJ, WSB/EiJ) called against the reference mouse genome sequence GRCm38.</DESCRIPTION>
+     <COLLABORATORS>
+          <COLLABORATOR>David J. Adams</COLLABORATOR>
+          <COLLABORATOR>WTSI; Thomas M. Keane</COLLABORATOR>
+          <COLLABORATOR>WTSI</COLLABORATOR>
+     </COLLABORATORS>
+     <SUBMISSION_PROJECT>
+          <SEQUENCING_PROJECT/>
+          <ORGANISM>
+               <TAXON_ID>10088</TAXON_ID>
+               <SCIENTIFIC_NAME>Mus</SCIENTIFIC_NAME>
+          </ORGANISM>
+     </SUBMISSION_PROJECT>
+     <RELATED_PROJECTS>
+          <RELATED_PROJECT>
+               <PARENT_PROJECT accession="PRJEB1987"/>
+          </RELATED_PROJECT>
+          <RELATED_PROJECT>
+               <PARENT_PROJECT accession="PRJEB1988"/>
+          </RELATED_PROJECT>
+          <RELATED_PROJECT>
+               <PARENT_PROJECT accession="PRJEB1989"/>
+          </RELATED_PROJECT>
+          <RELATED_PROJECT>
+               <PARENT_PROJECT accession="PRJEB2546"/>
+          </RELATED_PROJECT>
+          <RELATED_PROJECT>
+               <PARENT_PROJECT accession="PRJEB2695"/>
+          </RELATED_PROJECT>
+     </RELATED_PROJECTS>
+     <PROJECT_LINKS>
+          <PROJECT_LINK>
+               <XREF_LINK>
+                    <DB>PubMed</DB>
+                    <ID>22772437</ID>
+               </XREF_LINK>
+          </PROJECT_LINK>
+          <PROJECT_LINK>
+               <XREF_LINK>
+                    <DB>PubMed</DB>
+                    <ID>22916792</ID>
+               </XREF_LINK>
+          </PROJECT_LINK>
+          <PROJECT_LINK>
+               <XREF_LINK>
+                    <DB>PubMed</DB>
+                    <ID>21921910</ID>
+               </XREF_LINK>
+          </PROJECT_LINK>
+          <PROJECT_LINK>
+               <XREF_LINK>
+                    <DB>ENA-SUBMISSION</DB>
+                    <ID>ERA340778</ID>
+               </XREF_LINK>
+          </PROJECT_LINK>
+          <PROJECT_LINK>
+               <XREF_LINK>
+                    <DB>ENA-ANALYSIS</DB>
+                    <ID>ERZ022024-ERZ022025</ID>
+               </XREF_LINK>
+          </PROJECT_LINK>
+          <PROJECT_LINK>
+               <XREF_LINK>
+                    <DB>ENA-FASTQ-FILES</DB>
+                    <ID><![CDATA[http://www.ebi.ac.uk/ena/data/warehouse/filereport?accession=PRJEB6911&result=read_run&fields=run_accession,fastq_ftp,fastq_md5,fastq_bytes]]></ID>
+               </XREF_LINK>
+          </PROJECT_LINK>
+          <PROJECT_LINK>
+               <XREF_LINK>
+                    <DB>ENA-SUBMITTED-FILES</DB>
+                    <ID><![CDATA[http://www.ebi.ac.uk/ena/data/warehouse/filereport?accession=PRJEB6911&result=read_run&fields=run_accession,submitted_ftp,submitted_md5,submitted_bytes,submitted_format]]></ID>
+               </XREF_LINK>
+          </PROJECT_LINK>
+     </PROJECT_LINKS>
+     <PROJECT_ATTRIBUTES>
+          <PROJECT_ATTRIBUTE>
+               <TAG>ENA-FIRST-PUBLIC</TAG>
+               <VALUE>2014-08-04</VALUE>
+          </PROJECT_ATTRIBUTE>
+          <PROJECT_ATTRIBUTE>
+               <TAG>ENA-LAST-UPDATE</TAG>
+               <VALUE>2018-05-04</VALUE>
+          </PROJECT_ATTRIBUTE>
+     </PROJECT_ATTRIBUTES>
+</PROJECT>
+</PROJECT_SET>

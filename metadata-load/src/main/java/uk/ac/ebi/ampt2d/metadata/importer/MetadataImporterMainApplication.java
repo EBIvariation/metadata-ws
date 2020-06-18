@@ -26,13 +26,11 @@ import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @SpringBootApplication
@@ -40,8 +38,7 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
 
     private static final String ACCESSION_FILE_PATH = "accessions.file.path";
 
-    private static final Logger METADATA_IMPORTER_MAIN_APPLICATION_LOGGER =
-            Logger.getLogger(MetadataImporterMainApplication.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MetadataImporterMainApplication.class.getName());
 
     private ObjectsImporter objectsImporter;
 
@@ -66,21 +63,20 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
         if (objectsImporter instanceof SraObjectsImporterThroughDatabase) {
             accessions.forEach(accession -> {
                 try {
+                    // TODO: EVA will want to import some projects from the DB too
                     objectsImporter.importAnalysis(accession);
                 } catch (Exception exception) {
-                    METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, "Encountered Exception for " +
-                            "analysis accession " + accession);
-                    METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, exception.getMessage());
+                    LOGGER.severe("Encountered Exception for analysis accession " + accession);
+                    LOGGER.severe(exception.getMessage());
                 }
             });
         } else if (objectsImporter instanceof SraObjectsImporterThroughApi) {
             accessions.forEach(accession -> {
                 try {
-                    objectsImporter.importStudy(accession);
+                    objectsImporter.importProject(accession);
                 } catch (Exception exception) {
-                    METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, "Encountered Exception for " +
-                            "study accession " + accession);
-                    METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, exception.getMessage());
+                    LOGGER.severe("Encountered Exception for project accession " + accession);
+                    LOGGER.severe(exception.getMessage());
                 }
             });
         } else {
@@ -91,7 +87,7 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
     private Set<String> readAccessionsFromFile(ApplicationArguments applicationArguments) {
         List<String> accessionsFilePath = applicationArguments.getOptionValues(ACCESSION_FILE_PATH);
         if (accessionsFilePath == null || accessionsFilePath.size() == 0) {
-            METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, "Please provide accessions.file.path");
+            LOGGER.severe("Please provide accessions.file.path");
             throw new RuntimeException("Please provide accessions.file.path");
         }
         String accessionFilePath = accessionsFilePath.get(0);
@@ -100,11 +96,11 @@ public class MetadataImporterMainApplication implements ApplicationRunner {
             accessions = new HashSet<>(Files.readAllLines(Paths.get(accessionFilePath)));
         } catch (NullPointerException exception) {
             String message = "Provided file path is invalid/file does not exists";
-            METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, message);
+            LOGGER.severe(message);
             throw new RuntimeException(message);
         } catch (IOException exception) {
             String message = "Provided file is not valid/corrupt";
-            METADATA_IMPORTER_MAIN_APPLICATION_LOGGER.log(Level.SEVERE, message);
+            LOGGER.severe(message);
             throw new RuntimeException(message);
         }
 

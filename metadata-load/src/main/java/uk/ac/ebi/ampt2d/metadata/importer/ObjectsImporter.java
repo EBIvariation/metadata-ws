@@ -18,15 +18,16 @@
 
 package uk.ac.ebi.ampt2d.metadata.importer;
 
+import org.apache.xmlbeans.XmlAnySimpleType;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.transaction.annotation.Transactional;
 import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThroughEntrezApi;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Analysis;
+import uk.ac.ebi.ampt2d.metadata.persistence.entities.Project;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.ReferenceSequence;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Sample;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Study;
@@ -34,10 +35,14 @@ import uk.ac.ebi.ampt2d.metadata.persistence.entities.Taxonomy;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.AnalysisEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ProjectRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.StudyRepository;
 import uk.ac.ebi.ena.sra.xml.AnalysisType;
+import uk.ac.ebi.ena.sra.xml.IdentifierType;
+import uk.ac.ebi.ena.sra.xml.NameType;
+import uk.ac.ebi.ena.sra.xml.ProjectType;
 import uk.ac.ebi.ena.sra.xml.ReferenceAssemblyType;
 import uk.ac.ebi.ena.sra.xml.ReferenceSequenceType;
 import uk.ac.ebi.ena.sra.xml.SampleType;
@@ -47,13 +52,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class ObjectsImporter {
 
-    private static final Logger IMPORT_LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ObjectsImporter.class.getName());
 
     // XML retrievers: first is used for all entities except reference sequence, and the second one specifically for
     // reference sequences.
@@ -62,6 +70,8 @@ public abstract class ObjectsImporter {
     protected ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi;
 
     // Entity repositories
+    protected ProjectRepository projectRepository;
+
     protected StudyRepository studyRepository;
 
     protected AnalysisRepository analysisRepository;
@@ -71,6 +81,8 @@ public abstract class ObjectsImporter {
     protected SampleRepository sampleRepository;
 
     // Entity XML parsers
+    protected SraXmlParser<ProjectType> sraProjectXmlParser;
+
     protected SraXmlParser<StudyType> sraStudyXmlParser;
 
     private SraXmlParser<AnalysisType> sraAnalysisXmlParser;
@@ -80,6 +92,8 @@ public abstract class ObjectsImporter {
     private EntrezAssemblyXmlParser entrezAssemblyXmlParser;
 
     // Entity converters
+    protected Converter<ProjectType, Project> projectConverter;
+
     protected Converter<StudyType, Study> studyConverter;
 
     private Converter<AnalysisType, Analysis> analysisConverter;
@@ -87,9 +101,9 @@ public abstract class ObjectsImporter {
     protected Converter<SampleType, Sample> sampleConverter;
 
     // Extractors
-    protected PublicationExtractorFromStudy publicationExtractorFromStudy;
+    protected PublicationExtractor publicationExtractor;
 
-    protected WebResourceExtractorFromStudy webResourceExtractorFromStudy;
+    protected WebResourceExtractor webResourceExtractor;
 
     private FileExtractorFromAnalysis fileExtractorFromAnalysis;
 
@@ -100,19 +114,22 @@ public abstract class ObjectsImporter {
             SraXmlRetrieverByAccession sraXmlRetrieverByAccession,
             ReferenceSequenceXmlRetrieverThroughEntrezApi referenceSequenceXmlRetrieverThroughEntrezApi,
 
+            SraXmlParser<ProjectType> sraProjectXmlParser,
             SraXmlParser<StudyType> sraStudyXmlParser,
             SraXmlParser<AnalysisType> sraAnalysisXmlParser,
             EntrezAssemblyXmlParser entrezAssemblyXmlParser,
             SraXmlParser<SampleType> sraSampleXmlParser,
 
+            Converter<ProjectType, Project> projectConverter,
             Converter<StudyType, Study> studyConverter,
             Converter<AnalysisType, Analysis> analysisConverter,
             Converter<SampleType, Sample> sampleConverter,
 
-            PublicationExtractorFromStudy publicationExtractorFromStudy,
-            WebResourceExtractorFromStudy webResourceExtractorFromStudy,
+            PublicationExtractor publicationExtractor,
+            WebResourceExtractor webResourceExtractor,
             FileExtractorFromAnalysis fileExtractorFromAnalysis,
 
+            ProjectRepository projectRepository,
             StudyRepository studyRepository,
             AnalysisRepository analysisRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
@@ -121,19 +138,22 @@ public abstract class ObjectsImporter {
         this.sraXmlRetrieverByAccession = sraXmlRetrieverByAccession;
         this.referenceSequenceXmlRetrieverThroughEntrezApi = referenceSequenceXmlRetrieverThroughEntrezApi;
 
+        this.sraProjectXmlParser = sraProjectXmlParser;
         this.sraStudyXmlParser = sraStudyXmlParser;
         this.sraAnalysisXmlParser = sraAnalysisXmlParser;
         this.entrezAssemblyXmlParser = entrezAssemblyXmlParser;
         this.sraSampleXmlParser = sraSampleXmlParser;
 
+        this.projectConverter = projectConverter;
         this.studyConverter = studyConverter;
         this.analysisConverter = analysisConverter;
         this.sampleConverter = sampleConverter;
 
-        this.publicationExtractorFromStudy = publicationExtractorFromStudy;
-        this.webResourceExtractorFromStudy = webResourceExtractorFromStudy;
+        this.publicationExtractor = publicationExtractor;
+        this.webResourceExtractor = webResourceExtractor;
         this.fileExtractorFromAnalysis = fileExtractorFromAnalysis;
 
+        this.projectRepository = projectRepository;
         this.studyRepository = studyRepository;
         this.analysisRepository = analysisRepository;
         this.referenceSequenceRepository = referenceSequenceRepository;
@@ -142,25 +162,95 @@ public abstract class ObjectsImporter {
         this.taxonomyEventHandler = taxonomyEventHandler;
     }
 
-    public Study importStudy(String accession) throws Exception {
-        IMPORT_LOGGER.log(Level.INFO, "Importing study " + accession);
+    public Project importProject(String accession) throws Exception {
+        LOGGER.info("Importing project " + accession);
+        ProjectType projectType = retrieveSraType(accession, sraProjectXmlParser);
+        if (projectType == null) {
+            return null;    // TODO jmmut: return null is bad practice. Some clients will forget to check for null.
+                            // This should either return an Optional if it's expected that some studies won't be
+                            // retrieved, or throw an exception to call our attention to an unexpected scenario.
+        }
+        Project project = convertProject(projectType);
+
+        String studyAccession = projectType.getIDENTIFIERS().getSECONDARYIDArray(0).getStringValue();
+        StudyType studyType = retrieveSraType(studyAccession, sraStudyXmlParser);
+        if (studyType == null) {
+            throw new RuntimeException("All projects should have a study ID");
+        }
+        Study study = convertStudy(studyType);
+        project = extractAnalysisFromProject(projectType, project, study);
+        return project;
+    }
+
+    public <T> T retrieveSraType(String accession, SraXmlParser<T> parser) throws Exception {
         String xml = sraXmlRetrieverByAccession.getXml(accession);
         if (xml == null) { return null; }
-        StudyType studyType = sraStudyXmlParser.parseXml(xml, accession);
-        Study study = studyConverter.convert(studyType);
-        StudyType.STUDYLINKS studylinks = studyType.getSTUDYLINKS();
-        study.setPublications(publicationExtractorFromStudy.getPublications(studylinks));
-        study.setResources(webResourceExtractorFromStudy.getWebResources(studylinks));
-        study = extractAnalysisFromStudy(studyType, study);
+        return parser.parseXml(xml, accession);
+    }
+
+    public Project convertProject(ProjectType projectType) throws Exception {
+        Project project = projectConverter.convert(projectType);
+        ProjectType.PROJECTLINKS projectlinks = projectType.getPROJECTLINKS();
+        project.setPublications(publicationExtractor.getPublicationsFromProject(projectlinks));
+        project.setResources(webResourceExtractor.getWebResourcesFromProject(projectlinks));
+        return project;
+    }
+
+    public Study importStudy(String accession) throws Exception {
+        LOGGER.log(Level.INFO, "Importing study " + accession);
+        StudyType studyType = retrieveSraType(accession, sraStudyXmlParser);
+        if (studyType == null) {
+            return null;    // TODO jmmut: return null is bad practice. Some clients will forget to check for null.
+                            // This should either return an Optional if it's expected that some studies won't be
+                            // retrieved, or throw an exception to call our attention to an unexpected scenario.
+        }
+        Study study = convertStudy(studyType);
+
+        NameType[] secondaryIdArray = studyType.getIDENTIFIERS().getSECONDARYIDArray();
+        if (secondaryIdArray.length > 1) {
+            String projects = Stream.of(secondaryIdArray)
+                                    .map(NameType::getStringValue)
+                                    .collect(Collectors.joining(","));
+            throw new RuntimeException("Study '" + accession + "' has more than 1 associated project: " + projects
+                                               + ". This is not supported by the table schema.");
+        } else if (secondaryIdArray.length == 1) {
+            String projectAccession = secondaryIdArray[0].getStringValue();
+            ProjectType projectType = retrieveSraType(projectAccession, sraProjectXmlParser);
+            if (projectType == null) {
+                throw new RuntimeException("Study '" + accession + "' has an associated project '" + projectAccession
+                                                   + "', but the project could not be retrieved");
+            }
+            Project project = convertProject(projectType);
+            study = extractAnalysisFromStudy(studyType, study, project);
+        } else {
+            study = extractAnalysisFromStudy(studyType, study);
+        }
         return study;
     }
 
+    private Study convertStudy(StudyType studyType) {
+        Study study = studyConverter.convert(studyType);
+        StudyType.STUDYLINKS studylinks = studyType.getSTUDYLINKS();
+        study.setPublications(publicationExtractor.getPublicationsFromStudy(studylinks));
+        study.setResources(webResourceExtractor.getWebResourcesFromStudy(studylinks));
+        return study;
+    }
+
+    protected abstract Project extractAnalysisFromProject(ProjectType projectType, Project project,
+                                                          Study study) throws Exception;
     protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study) throws Exception;
+    protected abstract Study extractAnalysisFromStudy(StudyType studyType, Study study,
+                                                      Project project) throws Exception;
+
 
     public Analysis importAnalysis(String accession) throws Exception {
-        IMPORT_LOGGER.log(Level.INFO, "Importing analysis " + accession);
+        LOGGER.log(Level.INFO, "Importing analysis " + accession);
         String xml = sraXmlRetrieverByAccession.getXml(accession);
-        if (xml == null) { return null; }
+        if (xml == null) {
+            return null;    // TODO jmmut: return null is bad practice. Some clients will forget to check for null.
+                            // This should either return an Optional if it's expected that some studies won't be
+                            // retrieved, or throw an exception to call our attention to an unexpected scenario.
+        }
         AnalysisType analysisType = sraAnalysisXmlParser.parseXml(xml, accession);
         Analysis analysis = analysisConverter.convert(analysisType);
 
@@ -196,7 +286,7 @@ public abstract class ObjectsImporter {
      * @return Ready ReferenceSequence entity
      */
     public ReferenceSequence importReferenceSequence(String accession, String referenceSequenceKind) throws Exception {
-        IMPORT_LOGGER.log(Level.INFO, "Importing reference sequence " + accession + " of kind " + referenceSequenceKind);
+        LOGGER.log(Level.INFO, "Importing reference sequence " + accession + " of kind " + referenceSequenceKind);
         ReferenceSequence referenceSequence = referenceSequenceRepository.findByAccession(accession);
         if (referenceSequence != null) {
             return referenceSequence;
@@ -211,8 +301,8 @@ public abstract class ObjectsImporter {
             referenceSequence.setTaxonomy(taxonomy);
             referenceSequence = referenceSequenceRepository.findOrSave(referenceSequence);
         } catch (Exception exception) {
-            IMPORT_LOGGER.log(Level.SEVERE, "Encountered Exception for ReferenceSequence accession " + accession);
-            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+            LOGGER.log(Level.SEVERE, "Encountered Exception for ReferenceSequence accession " + accession);
+            LOGGER.log(Level.SEVERE, exception.getMessage());
             throw exception;
         }
         return referenceSequence;
@@ -273,7 +363,7 @@ public abstract class ObjectsImporter {
     }
 
     public Sample importSample(String accession) throws Exception {
-        IMPORT_LOGGER.log(Level.INFO, "Importing sample " + accession);
+        LOGGER.log(Level.INFO, "Importing sample " + accession);
         Sample sample = sampleRepository.findFirstByAccessionVersionId_AccessionOrderByAccessionVersionId_VersionDesc(
                 accession);
         if (sample != null) { return sample; }
@@ -285,8 +375,8 @@ public abstract class ObjectsImporter {
             Taxonomy taxonomy = taxonomyEventHandler.importTaxonomyTree(extractTaxonomyFromSample(sampleType));
             sample.setTaxonomies(Arrays.asList(taxonomy));
         } catch (Exception exception) {
-            IMPORT_LOGGER.log(Level.SEVERE, "Encountered exception for sample accession " + accession);
-            IMPORT_LOGGER.log(Level.SEVERE, exception.getMessage());
+            LOGGER.log(Level.SEVERE, "Encountered exception for sample accession " + accession);
+            LOGGER.log(Level.SEVERE, exception.getMessage());
             throw exception;
         }
         return sample;
@@ -305,5 +395,4 @@ public abstract class ObjectsImporter {
         }
         return sampleAccessions;
     }
-
 }

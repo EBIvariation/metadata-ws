@@ -29,20 +29,23 @@ import uk.ac.ebi.ampt2d.metadata.importer.api.ReferenceSequenceXmlRetrieverThrou
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraObjectsImporterThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.api.SraXmlRetrieverThroughApi;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.AnalysisConverter;
+import uk.ac.ebi.ampt2d.metadata.importer.converter.ProjectConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.SampleConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.converter.StudyConverter;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraObjectsImporterThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.database.SraXmlRetrieverThroughDatabase;
 import uk.ac.ebi.ampt2d.metadata.importer.extractor.FileExtractorFromAnalysis;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractorFromStudy;
-import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractorFromStudy;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.PublicationExtractor;
+import uk.ac.ebi.ampt2d.metadata.importer.extractor.WebResourceExtractor;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.EntrezAssemblyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraAnalysisXmlParser;
+import uk.ac.ebi.ampt2d.metadata.importer.xml.SraProjectXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraSampleXmlParser;
 import uk.ac.ebi.ampt2d.metadata.importer.xml.SraStudyXmlParser;
 import uk.ac.ebi.ampt2d.metadata.persistence.events.TaxonomyEventHandler;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.AnalysisRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.FileRepository;
+import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ProjectRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.ReferenceSequenceRepository;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.SampleRepository;
@@ -75,17 +78,20 @@ public class MetadataImporterMainApplicationConfiguration {
                                                        TaxonomyRepository taxonomyRepository,
                                                        ReferenceSequenceRepository referenceSequenceRepository,
                                                        AnalysisRepository analysisRepository,
+                                                       ProjectRepository projectRepository,
                                                        StudyRepository studyRepository,
                                                        SampleRepository sampleRepository) {
         return new SraObjectsImporterThroughApi(
                 sraXmlRetrieverThroughApi,
                 referenceSequenceXmlRetrieverThroughEntrezApi,
 
+                sraProjectXmlParser(),
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
                 entrezAssemblyXmlParser(),
                 sraSampleXmlParser(),
 
+                projectConverter(),
                 studyConverter(),
                 analysisConverter(),
                 sampleConverter(),
@@ -94,6 +100,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 webResourceExtractorFromStudy(webResourceRepository),
                 fileExtractorFromAnalysis(fileRepository),
 
+                projectRepository,
                 studyRepository,
                 analysisRepository,
                 referenceSequenceRepository,
@@ -113,17 +120,20 @@ public class MetadataImporterMainApplicationConfiguration {
             TaxonomyRepository taxonomyRepository,
             ReferenceSequenceRepository referenceSequenceRepository,
             AnalysisRepository analysisRepository,
+            ProjectRepository projectRepository,
             StudyRepository studyRepository,
             SampleRepository sampleRepository) {
         return new SraObjectsImporterThroughDatabase(
                 sraXmlRetrieverThroughDatabase,
                 referenceSequenceXmlRetrieverThroughEntrezApi,
 
+                sraProjectXmlParser(),
                 sraStudyXmlParser(),
                 sraAnalysisXmlParser(),
                 entrezAssemblyXmlParser(),
                 sraSampleXmlParser(),
 
+                projectConverter(),
                 studyConverter(),
                 analysisConverter(),
                 sampleConverter(),
@@ -132,6 +142,7 @@ public class MetadataImporterMainApplicationConfiguration {
                 webResourceExtractorFromStudy(webResourceRepository),
                 fileExtractorFromAnalysis(fileRepository),
 
+                projectRepository,
                 studyRepository,
                 analysisRepository,
                 referenceSequenceRepository,
@@ -141,6 +152,10 @@ public class MetadataImporterMainApplicationConfiguration {
     }
 
     // Parser factories
+
+    private SraProjectXmlParser sraProjectXmlParser() {
+        return new SraProjectXmlParser();
+    }
 
     private SraStudyXmlParser sraStudyXmlParser() {
         return new SraStudyXmlParser();
@@ -160,6 +175,10 @@ public class MetadataImporterMainApplicationConfiguration {
 
     // Converter factories
 
+    private ProjectConverter projectConverter() {
+        return new ProjectConverter();
+    }
+
     private StudyConverter studyConverter() {
         return new StudyConverter();
     }
@@ -174,12 +193,12 @@ public class MetadataImporterMainApplicationConfiguration {
 
     // Extractor factories
 
-    private PublicationExtractorFromStudy publicationExtractorFromStudy(PublicationRepository publicationRepository) {
-        return new PublicationExtractorFromStudy(publicationRepository);
+    private PublicationExtractor publicationExtractorFromStudy(PublicationRepository publicationRepository) {
+        return new PublicationExtractor(publicationRepository);
     }
 
-    private WebResourceExtractorFromStudy webResourceExtractorFromStudy(WebResourceRepository webResourceRepository) {
-        return new WebResourceExtractorFromStudy(webResourceRepository);
+    private WebResourceExtractor webResourceExtractorFromStudy(WebResourceRepository webResourceRepository) {
+        return new WebResourceExtractor(webResourceRepository);
     }
 
     private FileExtractorFromAnalysis fileExtractorFromAnalysis(FileRepository fileRepository) {

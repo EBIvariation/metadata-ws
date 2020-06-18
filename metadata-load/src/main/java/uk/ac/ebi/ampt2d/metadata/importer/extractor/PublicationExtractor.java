@@ -21,35 +21,51 @@ package uk.ac.ebi.ampt2d.metadata.importer.extractor;
 import uk.ac.ebi.ampt2d.metadata.persistence.entities.Publication;
 import uk.ac.ebi.ampt2d.metadata.persistence.repositories.PublicationRepository;
 import uk.ac.ebi.ena.sra.xml.LinkType;
+import uk.ac.ebi.ena.sra.xml.ProjectType;
 import uk.ac.ebi.ena.sra.xml.StudyType;
 import uk.ac.ebi.ena.sra.xml.XRefType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class PublicationExtractorFromStudy {
+public class PublicationExtractor {
 
     private static final String PUBMED = "pubmed";
 
     private PublicationRepository publicationRepository;
 
-    public PublicationExtractorFromStudy(PublicationRepository publicationRepository) {
+    public PublicationExtractor(PublicationRepository publicationRepository) {
         this.publicationRepository = publicationRepository;
     }
 
-    public List<Publication> getPublications(StudyType.STUDYLINKS studylinks) {
-        List<Publication> publications = new ArrayList<>();
+    public List<Publication> getPublicationsFromProject(ProjectType.PROJECTLINKS projectLinks) {
+        if (projectLinks == null) {
+            return new ArrayList<>();
+        } else {
+            return getPublicationsFromLinks(
+                    Stream.of(projectLinks.getPROJECTLINKArray())
+                          .map(link -> link.getXREFLINK()));
+        }
+    }
+
+    public List<Publication> getPublicationsFromStudy(StudyType.STUDYLINKS studylinks) {
         if (studylinks == null) {
-            return publications;
+            return new ArrayList<>();
+        } else {
+            return getPublicationsFromLinks(
+                    Stream.of(studylinks.getSTUDYLINKArray())
+                          .map(link -> link.getXREFLINK()));
         }
-        LinkType[] studyLinksArray = studylinks.getSTUDYLINKArray();
-        for (int i = 0; i < studyLinksArray.length; i++) {
-            XRefType xRefType = studyLinksArray[i].getXREFLINK();
-            if (xRefType != null && xRefType.getDB().equalsIgnoreCase(PUBMED)) {
-                publications.add(findOrCreatePublication(xRefType.getID()));
-            }
-        }
-        return publications;
+    }
+
+    public List<Publication> getPublicationsFromLinks(Stream<XRefType> xrefs) {
+        return xrefs.filter(Objects::nonNull)
+                    .filter(xref -> xref.getDB().equalsIgnoreCase(PUBMED))
+                    .map(xref -> findOrCreatePublication(xref.getID()))
+                    .collect(Collectors.toList());
     }
 
     private Publication findOrCreatePublication(String publicationId) {
