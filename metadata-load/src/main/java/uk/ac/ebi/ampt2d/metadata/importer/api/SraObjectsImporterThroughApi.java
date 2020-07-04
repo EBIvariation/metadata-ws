@@ -119,7 +119,6 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
         for (String analysisAccession : getAnalysisAccessions(projectType)) {
             Analysis analysis = importAnalysis(analysisAccession);
             try {
-                analysis.setProject(project);
                 analysis.setStudy(study);
                 analysisRepository.save(analysis);
             } catch (Exception exception) {
@@ -141,7 +140,6 @@ public class SraObjectsImporterThroughApi extends ObjectsImporter {
         for (String analysisAccession : getAnalysisAccessions(studyType)) {
             Analysis analysis = importAnalysis(analysisAccession);
             analysis.setStudy(study);
-            analysis.setProject(project);
             try {
                 analysisRepository.save(analysis);
             } catch (Exception cause) {

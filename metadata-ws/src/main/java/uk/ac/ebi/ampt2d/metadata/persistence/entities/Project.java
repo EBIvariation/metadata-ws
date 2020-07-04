@@ -93,7 +93,8 @@ public class Project extends Auditable<Long> {
             "INNER JOIN reference_sequence ON reference_sequence.taxonomy_id = taxonomy.id " +
             "INNER JOIN analysis_reference_sequences ON analysis_reference_sequences.reference_sequences_id = reference_sequence.id " +
             "INNER JOIN analysis ON analysis.id = analysis_reference_sequences.analysis_id " +
-            "INNER JOIN project ON project.id = analysis.project_id " +
+            "INNER JOIN study ON study.id = analysis.study_id " +
+            "INNER JOIN project ON project.id = study.project_id " +
             "WHERE project.id = id)", referencedColumnName = "taxonomyId")
     private Taxonomy taxonomy;
 
@@ -121,9 +122,6 @@ public class Project extends Auditable<Long> {
     @ManyToMany
     @JsonProperty
     private List<Publication> publications;
-
-    @OneToMany(mappedBy = "project", fetch = FetchType.EAGER)
-    private List<Analysis> analyses;
 
     @ManyToMany
     private List<WebResource> resources;
@@ -187,19 +185,6 @@ public class Project extends Auditable<Long> {
 
     public boolean isBrowsable() {
         return browsable;
-    }
-
-    public List<Analysis> getAnalyses() {
-        return analyses;
-    }
-
-    public void setAnalysis(Analysis analysis) {
-        List<Analysis> analyses = this.getAnalyses();
-        if (analyses == null) {
-            analyses = new ArrayList<>();
-        }
-        analyses.add(analysis);
-        this.analyses = analyses;
     }
 
     public List<WebResource> getResources() {

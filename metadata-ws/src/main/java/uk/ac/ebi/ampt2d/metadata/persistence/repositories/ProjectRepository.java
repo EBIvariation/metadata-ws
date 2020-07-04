@@ -32,13 +32,7 @@ import java.util.List;
 
 @RepositoryRestResource
 public interface ProjectRepository extends PagingAndSortingRepository<Project, Long>,
-        QueryDslPredicateExecutor<Project>,  QuerydslBinderCustomizer<QProject> {
-
-    default void customize(QuerydslBindings bindings, QProject project) {
-        bindings.bind(project.analyses.any().referenceSequences.any().name,
-                project.analyses.any().referenceSequences.any().patch)
-                .first((path, value) -> path.equalsIgnoreCase(value));
-    }
+        QueryDslPredicateExecutor<Project> {
 
     @ApiOperation(value = "Get the latest version of Project based on accession")
     @RestResource(path = "/accession")

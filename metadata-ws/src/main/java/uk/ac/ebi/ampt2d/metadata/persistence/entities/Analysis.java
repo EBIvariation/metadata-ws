@@ -118,11 +118,6 @@ public class Analysis extends Auditable<Long> {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @ApiModelProperty(position = 5, dataType = "java.lang.String", notes = "Url to a Project")
-    @JsonProperty
-    @ManyToOne(optional = true) // TODO jmmut: I'm putting this as optional until we complete the project import from DB
-    private Project project;
-
     @ApiModelProperty(position = 6, dataType = "java.lang.String", notes = "Url to a Study")
     @JsonProperty
     @ManyToOne(optional = false)
@@ -181,15 +176,6 @@ public class Analysis extends Auditable<Long> {
 
     public AccessionVersionId getAccessionVersionId() {
         return accessionVersionId;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-        project.setAnalysis(this);
     }
 
     public Study getStudy() {
