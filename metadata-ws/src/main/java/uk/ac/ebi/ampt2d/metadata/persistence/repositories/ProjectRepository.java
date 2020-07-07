@@ -32,7 +32,17 @@ import java.util.List;
 
 @RepositoryRestResource
 public interface ProjectRepository extends PagingAndSortingRepository<Project, Long>,
-        QueryDslPredicateExecutor<Project> {
+        QueryDslPredicateExecutor<Project>, QuerydslBinderCustomizer<QProject> {
+
+    /**
+     * Custom bindings define how queries should be performed when a simple "field-by-field equals" is not adequate.
+     * In our case we want reference sequence queries to be ignoreCase equals.
+     */
+    default void customize(QuerydslBindings bindings, QProject project) {
+        bindings.bind(project.study.analyses.any().referenceSequences.any().name,
+                project.study.analyses.any().referenceSequences.any().patch)
+                .first((path, value) -> path.equalsIgnoreCase(value));
+    }
 
     @ApiOperation(value = "Get the latest version of Project based on accession")
     @RestResource(path = "/accession")
