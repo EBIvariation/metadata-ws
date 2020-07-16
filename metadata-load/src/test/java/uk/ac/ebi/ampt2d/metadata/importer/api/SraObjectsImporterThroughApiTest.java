@@ -102,7 +102,8 @@ public class SraObjectsImporterThroughApiTest {
         assertEquals("PRJEB31129", project.getAccessionVersionId().getAccession());
         assertEquals(LocalDate.of(2019, 3, 14), project.getReleaseDate());
         assertEquals("Identification of SNPs in alpacas using the Bovine HD Genotyping Beadchip", project.getName());
-        assertEquals(1, project.getAnalyses().size());
+        assertNotNull(project.getStudy());
+        assertEquals(1, project.getStudy().getAnalyses().size());
     }
 
     @Test
